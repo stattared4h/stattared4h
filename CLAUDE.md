@@ -4,10 +4,10 @@ This document defines how work is done on this project — the workflow,
 the writing style for requirements, the quality bar, and the principles
 that override any particular implementation choice.
 
-The project is at the **starting state**. Architecture, technology, and
-domain rules are not locked in yet. Sections 1–4 below are deliberately
-short; they grow as the project decides what it is. The workflow
-(Sections 5–8) is locked in from day one.
+The project is at the **starting state**. Architecture, technology,
+and domain rules are not locked in yet. Sections 1–4 below are
+deliberately short; they grow as the project decides what it is. The
+workflow and style rules (Sections 5–9) are locked in from day one.
 
 If a rule here ever conflicts with a more specific rule in `/docs/`,
 the doc wins — `CLAUDE.md` summarises principles, `/docs/` defines
@@ -21,17 +21,24 @@ Before writing any code, content, or data, read the relevant docs in
 `/docs/`. As the project grows, add new docs here so future contributors
 (human and AI) know where to look first.
 
-| File | What it governs |
-| ---- | --------------- |
+| Path | What lives there |
+| ---- | ---------------- |
 | `docs/01-CONTRIBUTORS.md` | Contribution guidelines, git workflow, setup, linting |
-| `docs/02-requirements/index.md` | Requirements index — audience overview and a map to topic files |
-| `docs/03-architecture/index.md` | Architecture index — system overview and a map to topic files |
-| `docs/99-traceability.md` | Requirements traceability matrix — every requirement, its tests, and its implementation |
+| `docs/02-requirements/` | One file per requirement (`<slug>.md`); `index.md` explains the convention |
+| `docs/03-architecture/` | One file per architectural decision (ADR, `<slug>.md`); `index.md` explains the convention |
+
+There is **no central requirements matrix** and **no central
+architecture document**. Each requirement and each decision lives in
+its own file so adding new ones never touches existing ones — the
+opposite of the conflict-prone pattern where one big shared file
+records everything. See [§5](#5-requirements-and-architecture-documentation)
+for the why.
 
 When new domains emerge (data contract, design tokens, environments,
-release process, operations), give them their own numbered doc and link
-it here. Do not let knowledge accumulate only in commit messages or
-chat — if it matters tomorrow, it belongs in `/docs/`.
+release process, operations), give them their own numbered doc or
+their own per-file directory and link it here. Do not let knowledge
+accumulate only in commit messages or chat — if it matters tomorrow,
+it belongs in `/docs/`.
 
 ---
 
@@ -96,40 +103,89 @@ These apply before any feature is considered "done":
   (`.markdownlint.json`, `npm run lint:md`); add HTML, CSS, JS, YAML
   configs as those file types appear. Build fails if lint fails.
 - Tests cover every testable requirement. Untestable requirements
-  (visual, manual UX) are marked as manual checkpoints in the
-  traceability matrix with a concrete verification step.
+  (visual, manual UX) are recorded as manual checkpoints in the
+  requirement file's Verification section with a concrete, actionable
+  step.
 - Build runs locally **and** in GitHub Actions. CI fails if the build
   fails.
 - Deployment happens only after CI is green.
 
 ---
 
-# 5. Requirements Writing Style
+# 5. Requirements and Architecture Documentation
 
-When writing requirements in `docs/02-requirements/`, **describe the
-desired state — not "changes" or "improvements"**.
+Documentation is **modular**. One thing per file. Each requirement
+gets its own file in `docs/02-requirements/`. Each architectural
+decision gets its own file in `docs/03-architecture/` (ADR pattern).
+There is no central matrix and no central architecture document.
+
+## Why per-file
+
+A central file that records every requirement (or every decision)
+becomes a merge-conflict magnet the moment more than one branch is
+in flight. Adding a new entry means editing a file that every other
+branch is also editing. This is the same anti-pattern as a "god
+class" in code — many concerns crammed into one place because
+nobody decided to split them.
+
+The per-file model fixes this:
+
+- Adding a new requirement = creating a new file. Existing files are
+  untouched.
+- Status, tests, and implementation references live in the
+  requirement file itself, so there is no second place that could
+  disagree with the first.
+- Each file is small enough to read in one screen. If a file outgrows
+  one screen, it is doing too much — split it.
+- The reasoning trail behind every decision is preserved because old
+  ADRs are never edited; superseding decisions get a new file.
+
+## Filename = ID
+
+Filenames are slugs (`contact-form.md`, `static-site-generator.md`).
+The slug **is** the stable ID. No numeric prefix, because numbers
+force allocation, allocation forces collisions, and collisions force
+renumbering.
+
+Reference a requirement from code as `<!-- req: <slug> -->` (or
+`// req: <slug>` in JS/CSS). Reference an ADR the same way with
+`adr:`. From other markdown, link to the file path.
+
+Slugs are never reused or renamed once the file's PR has merged. To
+replace a requirement or a decision, write a new file and set the
+old one's status to `superseded by <new-slug>`.
+
+## Writing style: desired state, not transitions
 
 Write each requirement as a standalone fact about how the system
-works. A reader who has never seen the codebase should understand the
-requirement without needing to know what existed before.
+works. A reader who has never seen the codebase should understand
+the requirement without needing to know what existed before.
 
-- **Bad**: "The cache version must be incremented to v4." / "The hero
-  banner must be removed from the front page."
-- **Good**: "The service worker cache name is `stattared-v4`." /
+- **Bad:** "The cache version must be incremented to v4." / "The
+  hero banner must be removed from the front page."
+- **Good:** "The service worker cache name is `stattared-v4`." /
   "The front page does not contain a hero banner."
 
-Avoid words like: "changed", "updated", "replaced", "removed",
-"incremented", "added", "new". These describe transitions, not
-desired state.
+Avoid words like *changed, updated, replaced, removed, incremented,
+added, new*. These describe transitions, not desired state.
 
-The Context subsection at the top of each requirement section is the
-only place where background and motivation belong. Requirements
-themselves are pure desired-state declarations.
+The **Context** section at the top of each file is the only place
+where background and motivation belong. Everything else is pure
+desired-state declaration (for requirements) or imperative decision
+text (for ADRs).
 
-Each requirement has a stable ID (e.g. `02-§3.4`) and an inline
-comment marker in the implementation that references it. The
-traceability matrix in `docs/99-traceability.md` lists every
-requirement, its tests, and its implementation files.
+## Templates and conventions
+
+Detailed file format, status values, and section structure live in
+the convention guides — not duplicated here:
+
+- [`docs/02-requirements/index.md`](../docs/02-requirements/index.md)
+  and [`docs/02-requirements/_template.md`](../docs/02-requirements/_template.md)
+- [`docs/03-architecture/index.md`](../docs/03-architecture/index.md)
+  and [`docs/03-architecture/_template.md`](../docs/03-architecture/_template.md)
+
+When the conventions need to change, change them there and link
+from here — do not let the same rule grow two homes.
 
 ---
 
@@ -161,21 +217,24 @@ explicitly notes that no commit is needed).
 
 ## Parallel-work rebase rule
 
-When multiple branches are in flight, shared documentation files
-(`99-traceability.md`, `02-requirements/`, architecture docs) change
-frequently on `main` and are prone to renumbering conflicts.
+The per-file documentation model in [§5](#5-requirements-and-architecture-documentation)
+makes most parallel work conflict-free: two branches that each add a
+new requirement file or a new ADR don't collide. The remaining
+conflict surface is small but real — `CLAUDE.md`, the convention
+guides under `docs/`, and any actual code file that two branches
+both touch.
 
-Before editing any shared documentation file, rebase on the latest
-`main`:
+Before editing one of those genuinely shared files, rebase on the
+latest `main`:
 
 ```bash
 git fetch origin main
 git rebase origin/main
 ```
 
-This applies throughout all phases — not only at Phase 7. The cost of
-rebasing when `main` has not moved is zero; the cost of discovering
-conflicts late is high.
+This applies throughout all phases — not only at Phase 7. The cost
+of rebasing when `main` has not moved is zero; the cost of
+discovering conflicts late is high.
 
 ## Phase 0 — Alignment
 
@@ -231,36 +290,51 @@ something is too big, split it.
 
 ## Phase 1 — Requirements
 
-- Convert the agreed prompt into structured requirements.
-- Add them to the appropriate topic file under `docs/02-requirements/`
-  with correct `02-§` IDs and inline comment markers.
-- Commit: `docs: add requirements for [feature]`
+- Convert the agreed prompt into one or more new requirement files
+  under `docs/02-requirements/`, one per file, using
+  [`_template.md`](../docs/02-requirements/_template.md).
+- Pick a short slug for each (`contact-form.md`,
+  `event-list-pagination.md`). Slug = stable ID.
+- Status starts as `proposed`. Verification and Implementation
+  sections may be `TBD` at this stage.
+- Commit per requirement when practical: `docs: req: <slug>`. A
+  bundle commit is fine when several requirements are tightly
+  related.
 
-## Phase 2 — Documentation and Traceability
+## Phase 2 — Architecture Decisions
 
-- Document how each requirement is or will be implemented in the
-  relevant architecture/design docs (`docs/03-architecture/`, etc.).
-- Add new sections to docs where needed; existing docs may already
-  cover some requirements.
-- Add all new requirements to `docs/99-traceability.md` with status
-  `gap`.
-- Commit: `docs: document design and traceability for [feature]`
+- If implementing a requirement requires a non-obvious or binding
+  technical choice (framework, hosting, data shape, schema), write
+  an ADR in `docs/03-architecture/` using
+  [`_template.md`](../docs/03-architecture/_template.md). Reference
+  the ADR from the requirement's Context section.
+- If no new decision is needed (the existing ADRs already cover the
+  ground), this phase has no commit.
+- Once the design is settled, set the requirement file's status to
+  `accepted`.
+- Commit (when an ADR is added): `docs: adr: <slug>`
 
 ## Phase 3 — Tests
 
-- Write tests for each testable requirement.
-- If a requirement cannot be tested in code (visual, UX, or inherently
-  manual), document the reason in the traceability matrix note field
-  and mark it as a manual/AI validation checkpoint.
+- Write tests for each testable requirement and link them in the
+  requirement file's Verification section.
+- If a requirement cannot be tested in code (visual, UX, or
+  inherently manual), record a concrete, actionable manual checkpoint
+  in the same Verification section instead — never both for the same
+  behaviour.
 - Browser-only behaviour (DOM, `fetch`, `localStorage`, CSS layout)
-  cannot be unit-tested in Node. Mark these as manual checkpoints
-  with a concrete, actionable verification step.
-- Commit: `test: add tests for [feature]`
+  cannot be unit-tested in Node. These are manual checkpoints by
+  default.
+- Commit: `test: req: <slug>`
 
 ## Phase 4 — Implementation
 
 - Write code to make all tests pass.
-- Commit: `feat: implement [feature]`
+- Add an inline marker in each touched implementation file:
+  `<!-- req: <slug> -->` or `// req: <slug>`.
+- Update the requirement file's Implementation section to list the
+  files that fulfil it.
+- Commit: `feat: req: <slug>`
 
 **Wait for user review of the implementation result:**
 
@@ -282,15 +356,15 @@ If Phase 4 went in the wrong direction, every minute spent on
 traceability, extra review passes, and PR creation is wasted. A short
 pause here is cheap; rework after Phase 8 is not.
 
-## Phase 5 — Review and Traceability Update
+## Phase 5 — Status Update
 
-- Verify that requirements, documentation, tests, and implementation
-  are consistent and complete.
-- Update the traceability matrix: set final statuses, fill in
-  implementation references, link tests.
-- Update summary counts in the matrix.
-- Only create a commit if the matrix actually required updating.
-- Commit (if needed): `docs: traceability update for [feature]`
+- Verify each requirement file's Verification and Implementation
+  sections are accurate and the inline `req:` markers in the code
+  match.
+- Set the requirement file's status to `done` and bump the `Date`
+  field.
+- Only create a commit if a status or section actually changed.
+- Commit (if needed): `docs: req: <slug> → done`
 
 ## Phase 6 — Final Check
 
@@ -392,7 +466,74 @@ git branch -d <branch-name>
 
 ---
 
-# 8. How This Document Evolves
+# 8. Code and Documentation Style
+
+The same principle that drives the per-file documentation model
+applies to code: **one thing per unit, small enough to read in one
+sitting**. The shorthand is Uncle Bob's, but the rule is older than
+that — Unix tools have lived by it for fifty years.
+
+## One thing per file
+
+A file contains one cohesive concept. If you cannot name a file in
+three to five words, it is doing too much — split it. A folder
+groups files that are about the same concern; a file is the smallest
+unit of understanding.
+
+This applies to code, to requirement files, to ADRs, and to test
+files.
+
+## One thing per function
+
+A function does one thing at one level of abstraction. If the body
+mixes "decide what to do" with "actually do it", split.
+
+The honest test: can you describe what the function does in one
+sentence without using the word *and*? If not, split.
+
+## Names carry the meaning
+
+A well-named function or variable removes the need for a comment
+that explains what it does. Spend the time on the name, not on the
+comment.
+
+- **Bad:** `function p(x)` with a comment `// processes input`.
+- **Good:** `function normaliseEmailAddress(input)`.
+
+## Comments explain why, not what
+
+The code already says what. Comments explain why a non-obvious
+choice was made — a workaround, an invariant, a constraint that
+isn't visible from the surrounding lines.
+
+Default to writing no comments. Add one only when removing it would
+genuinely confuse a future reader. Never write comments that
+restate the code, reference the current task ("added for issue
+&#35;123"), or describe historical state ("used to use X").
+
+## Don't repeat yourself — once
+
+Two similar lines is fine. Three similar lines is a candidate for
+extraction. Premature abstraction is more expensive than a little
+duplication; only extract once the shape is actually clear.
+
+## No dead code
+
+Delete unused functions, variables, parameters, and imports. Git
+remembers — the codebase doesn't need to. Backwards-compatibility
+shims for unused things are noise.
+
+## Errors at boundaries, trust inside
+
+Validate input where it enters the system: HTTP requests, file
+reads, user-submitted data. Inside the system, trust your own
+function signatures and your framework's guarantees. Defensive
+checks for things that cannot happen are noise that hides the
+checks that matter.
+
+---
+
+# 9. How This Document Evolves
 
 `CLAUDE.md` is itself subject to the workflow above. Changes to it
 go through the same phases as code changes. When a session uncovers a

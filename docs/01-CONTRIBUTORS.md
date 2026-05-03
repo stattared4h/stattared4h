@@ -140,10 +140,10 @@ types are introduced.
 
 ### Testing
 
-*To be filled in.* Tests should cover every testable requirement
-listed in `docs/02-requirements/`. Browser-only behaviour is marked
-as a manual checkpoint in `docs/99-traceability.md` rather than
-faked with a brittle simulation.
+*To be filled in.* Tests should cover every testable requirement in
+`docs/02-requirements/`. Browser-only behaviour is recorded as a
+manual checkpoint in the requirement file's Verification section
+rather than faked with a brittle simulation.
 
 ### Architecture
 

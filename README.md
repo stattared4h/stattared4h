@@ -47,16 +47,19 @@ documentation is listed below.
 
 ### Documentation
 
-| #  | Doc | What it covers |
-| -- | --- | -------------- |
+| #  | Path | What lives there |
+| -- | ---- | ---------------- |
 | 1  | [docs/01-CONTRIBUTORS.md](docs/01-CONTRIBUTORS.md) | Setup, git workflow, linting, testing, contribution rules |
-| 2  | [docs/02-requirements/](docs/02-requirements/index.md) | Requirements index — audience overview and a map to topic files |
-| 3  | [docs/03-architecture/](docs/03-architecture/index.md) | Architecture index — system overview and a map to topic files |
-| 99 | [docs/99-traceability.md](docs/99-traceability.md) | Requirements traceability matrix — every requirement, its tests, and its implementation |
+| 2  | [docs/02-requirements/](docs/02-requirements/index.md) | One file per requirement — `index.md` explains the convention; `_template.md` is the starting point |
+| 3  | [docs/03-architecture/](docs/03-architecture/index.md) | One file per architectural decision (ADR) — `index.md` explains the convention; `_template.md` is the starting point |
+
+There is no central traceability matrix and no central architecture
+document. Each requirement and each ADR is self-contained — see
+[CLAUDE.md §5](CLAUDE.md) for the why.
 
 Add new docs (operations, data contract, design tokens, environments,
-release process) as the project decides what it needs. Numbering keeps
-them ordered without forcing a particular sequence to exist.
+release process) as the project decides what it needs. Numbering
+keeps them ordered without forcing a particular sequence to exist.
 
 ### Core Constraints
 

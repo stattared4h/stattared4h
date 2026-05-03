@@ -1,38 +1,88 @@
 # Architecture
 
-This is the architecture index. As the system takes shape, give each
-concern its own file in this directory and add it to the map below.
+Architectural decisions are recorded here as **ADRs** (Architecture
+Decision Records). Each ADR is one decision in one file. Decisions
+already taken are not edited — if a decision changes, write a new
+ADR that supersedes the old one. The old file stays so the reasoning
+trail is preserved.
 
-The job of these files is to explain **how** the system fulfils the
-requirements in `../02-requirements/`. Every architectural section
-should reference one or more requirement IDs (`02-§N.M`) so the link
-between *what* and *how* stays explicit.
+This matters because:
 
-When a major decision is made — a framework chosen, a hosting target
-locked in, a data shape finalised — record both the **outcome** and
-the **reasoning** here. Future contributors (human and AI) will need
-the reasoning to know whether a later request conflicts with the
-decision or simply revisits a question that was already settled.
+- The history of why we landed where we did is the most valuable
+  piece of architectural documentation. Editing old ADRs erases it.
+- Adding an ADR = creating a new file. No central architecture
+  document grows unchecked, no shared file becomes a merge-conflict
+  magnet.
+- Each ADR is small enough to read in one screen. If a decision needs
+  more, it is probably actually two decisions — split it.
 
-Decisions that were considered and **rejected** belong in
-`appendix.md`. Knowing what was tried and why it was set aside is
-often more valuable than knowing what was chosen.
+> **Companion to requirements:** an ADR records *how* and *why*. A
+> requirement records *what*. When a requirement needs a decision
+> made before it can be implemented (framework choice, data shape,
+> hosting target), write the ADR first and reference it from the
+> requirement's Context section.
 
 ---
 
-## Topic Map
+## Filename and ID
 
-*Add files as decisions are made.* Suggested starting set:
+- The filename is `<slug>.md` — short, lowercase, hyphenated. The slug
+  is the stable ID. Reference it from code as `<!-- adr: <slug> -->`
+  and from other docs as `[adr:&nbsp;<slug>](path/to/<slug>.md)`.
+- No numeric prefix. ADRs are not chronological; they are referential.
+  Use git log or the `Date` field if you need ordering.
+- Slugs are **never reused or renamed** after an ADR reaches
+  `accepted`. To change a decision, write a new ADR with a different
+  slug and set the old one's status to `superseded by <new-slug>`.
 
-| File | What it would govern |
-| ---- | -------------------- |
-| `data-layer.md` | Source-of-truth files, schema, data resolution |
-| `rendering.md` | How pages are produced, project structure, output |
-| `pages-and-content.md` | Navigation, page templates, content composition |
-| `forms-and-api.md` | Form handling, validation, server interactions (if any) |
-| `ci-and-deploy.md` | Build pipeline, validators, asset handling, deploy |
-| `platform-and-security.md` | Hosting, headers, secrets, rate limiting |
-| `appendix.md` | Decisions deliberately rejected; design philosophy |
+## File Format
 
-Do not create empty files in advance — add a topic file when there is
-at least one decision recorded in it.
+Use [`_template.md`](_template.md) as the starting point. Every ADR
+has these sections, in this order:
+
+1. **Title** — `# adr: <slug> — Short decision title`
+2. **Front matter block** — Status, Date, Deciders (optional)
+3. **Context** — what forces are at play, what problem we're solving,
+   what constraints apply
+4. **Decision** — what we decided, in the imperative
+5. **Consequences** — what follows from the decision, both positive
+   and negative
+6. **Alternatives considered** — what else we looked at and why we
+   set those aside
+
+If an ADR ever needs a seventh section, the decision is doing too
+much — split it.
+
+## Status Values
+
+| Status | Meaning |
+| ------ | ------- |
+| `proposed` | Written and under discussion. Not yet binding. |
+| `accepted` | The team has decided to follow this. Binding until superseded. |
+| `superseded by <slug>` | Replaced by a newer ADR. File kept for the trail. |
+| `rejected` | Considered and decided against. File kept so the reasoning survives. |
+
+## When to Write an ADR
+
+Write an ADR when:
+
+- A choice constrains future code (framework, hosting, data shape).
+- A choice is non-obvious enough that someone may revisit it in six
+  months without remembering why.
+- A choice was made between several real alternatives.
+
+Do **not** write an ADR for routine implementation details — those
+belong in code or, when they cross multiple files, in the relevant
+requirement.
+
+## Finding ADRs
+
+There is no central index that needs updating. Grep instead:
+
+```bash
+# everything still on the table
+grep -l "Status: proposed" docs/03-architecture/*.md
+
+# everything currently binding
+grep -l "Status: accepted" docs/03-architecture/*.md
+```
