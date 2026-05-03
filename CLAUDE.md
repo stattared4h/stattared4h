@@ -91,8 +91,10 @@ To be defined as the project takes shape. Until then:
 
 These apply before any feature is considered "done":
 
-- Linting is configured for every file type the project introduces
-  (HTML, CSS, JS, Markdown, YAML, etc.). Build fails if lint fails.
+- Linting is configured for every file type the project introduces.
+  Markdown is linted from day one via `markdownlint`
+  (`.markdownlint.json`, `npm run lint:md`); add HTML, CSS, JS, YAML
+  configs as those file types appear. Build fails if lint fails.
 - Tests cover every testable requirement. Untestable requirements
   (visual, manual UX) are marked as manual checkpoints in the
   traceability matrix with a concrete verification step.

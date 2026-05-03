@@ -48,12 +48,23 @@ or the documentation set itself.
 
 ### Setup
 
-*To be filled in once Node.js / runtime requirements are decided.*
+Requirements:
+
+- [Node.js](https://nodejs.org/) 18 or later
+- Git
+
+Install dev dependencies:
 
 ```bash
-# install dependencies
-# install git hooks (lint-on-commit)
+npm install
 ```
+
+This also points git at `.githooks/` via the `prepare` script, so the
+pre-commit hook is active automatically after install.
+
+The runtime stack (static site generator, server, hosting) is not
+chosen yet. The only tooling installed today is Markdown linting —
+more lands as decisions are made.
 
 ### Git Workflow
 
@@ -91,14 +102,41 @@ tests → implementation → review → rebase → PR → merge), see
 
 ### Pre-commit Hook
 
-*To be configured.* Once linting is in place, every commit should run
-the linter automatically and block the commit if lint fails.
+`npm install` configures `.githooks/` as the hooks path. The
+`pre-commit` hook runs `npm run lint:md` and blocks the commit if
+Markdown lint fails. Add additional checks (HTML, CSS, JS, tests) to
+the same hook as those file types appear in the project.
+
+To run the Markdown check manually:
+
+```bash
+npm run lint:md
+```
+
+To auto-fix what can be fixed automatically:
+
+```bash
+npm run lint:md:fix
+```
 
 ### Linting Rules
 
-*To be filled in.* Configure once the file types are known (HTML,
-CSS, JS, Markdown, YAML, …). Document any disabled rules and the
-reason they are disabled.
+Markdown is linted via [`markdownlint-cli`](https://github.com/igorshubovych/markdownlint-cli),
+configured in [`.markdownlint.json`](../.markdownlint.json).
+
+Disabled rules and the reasons:
+
+| Rule  | Reason                                                                  |
+| ----- | ----------------------------------------------------------------------- |
+| MD013 | Line length is not enforced — content editors should not worry about it |
+| MD025 | `CLAUDE.md` uses numbered `# N.` section headings intentionally         |
+| MD029 | Ordered lists interrupted by code blocks or content are acceptable      |
+| MD033 | Inline HTML is allowed where needed                                     |
+| MD042 | Empty `(#)` placeholder links are acceptable during development         |
+| MD060 | Reserved — kept disabled to mirror sister projects                      |
+
+Other lint configs (HTML, CSS, JS, YAML) land here as those file
+types are introduced.
 
 ### Testing
 
