@@ -75,9 +75,26 @@ Do **not** write an ADR for routine implementation details — those
 belong in code or, when they cross multiple files, in the relevant
 requirement.
 
-## Finding ADRs
+## Overview matrix
 
-There is no central index that needs updating. Grep instead:
+The matrix below is the equivalent of the per-module matrices in
+`02-requirements/` — a small, scan-friendly view of every ADR and
+its current status. ADRs are flat (no sub-modules) at this stage, so
+one matrix covers them all. Split into module folders only if the
+flat list ever grows past one screen.
+
+| ADR | Status | Date |
+| --- | ------ | ---- |
+
+When an ADR file lands, add a row here in the same commit. When an
+ADR's Status changes (typically `proposed` → `accepted` or
+`accepted` → `superseded by <new-slug>`), update both the file and
+this row. This is the only shared file in `03-architecture/`, and
+it is small on purpose.
+
+## Finding ADRs by status
+
+The matrix above is the local view. For programmatic access, grep:
 
 ```bash
 # everything still on the table

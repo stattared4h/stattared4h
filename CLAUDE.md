@@ -174,13 +174,43 @@ where background and motivation belong. Everything else is pure
 desired-state declaration (for requirements) or imperative decision
 text (for ADRs).
 
+## Modules and overview matrices
+
+A purely flat directory of requirement files would scale poorly —
+forty unrelated requirements in one folder is no easier to navigate
+than a forty-section file. So requirements are grouped into **module
+folders** (`docs/02-requirements/<module>/`), each with its own
+small overview matrix in `index.md`.
+
+The matrix has three columns — slug, status, verification — and
+nothing else. It is the equivalent of a class summary view in an
+IDE: just enough to scan, never the source of truth. The
+requirement file itself is the source of truth; the matrix only
+mirrors the slug and the status.
+
+This compromise keeps three properties at once:
+
+- **Per-file primary storage** — adding a requirement creates one new
+  file; existing requirement files are untouched.
+- **Per-module overview** — anyone looking at a module sees the full
+  list of its requirements and their statuses on one screen.
+- **Tiny shared surface** — the only file two parallel branches in
+  the same module both touch is the module's `index.md`, which has
+  one short row per requirement. Conflicts are rare and trivial when
+  they happen.
+
+The architecture directory follows the same pattern with one
+overview matrix at its top level (ADRs are not split into
+sub-modules at this scale).
+
 ## Templates and conventions
 
 Detailed file format, status values, and section structure live in
 the convention guides — not duplicated here:
 
-- [`docs/02-requirements/index.md`](../docs/02-requirements/index.md)
-  and [`docs/02-requirements/_template.md`](../docs/02-requirements/_template.md)
+- [`docs/02-requirements/index.md`](../docs/02-requirements/index.md),
+  [`docs/02-requirements/_template.md`](../docs/02-requirements/_template.md),
+  and [`docs/02-requirements/_module-template.md`](../docs/02-requirements/_module-template.md)
 - [`docs/03-architecture/index.md`](../docs/03-architecture/index.md)
   and [`docs/03-architecture/_template.md`](../docs/03-architecture/_template.md)
 
@@ -290,13 +320,21 @@ something is too big, split it.
 
 ## Phase 1 — Requirements
 
-- Convert the agreed prompt into one or more new requirement files
-  under `docs/02-requirements/`, one per file, using
-  [`_template.md`](../docs/02-requirements/_template.md).
-- Pick a short slug for each (`contact-form.md`,
-  `event-list-pagination.md`). Slug = stable ID.
-- Status starts as `proposed`. Verification and Implementation
-  sections may be `TBD` at this stage.
+- Pick the module folder under `docs/02-requirements/` that the
+  requirement belongs in. If none fits, create a new module folder
+  using
+  [`_module-template.md`](../docs/02-requirements/_module-template.md)
+  and add it to the module list in
+  [`02-requirements/index.md`](../docs/02-requirements/index.md).
+- Create one new requirement file per requirement under that module,
+  using
+  [`_template.md`](../docs/02-requirements/_template.md). Pick a
+  short, globally-unique slug (`contact-form-validation.md`). Slug =
+  stable ID.
+- Status starts as `proposed`. Verification and Implementation may
+  be `TBD` at this stage.
+- Add a row to the module's `index.md` matrix in the same commit
+  (slug link, status, verification — `—` while it's still TBD).
 - Commit per requirement when practical: `docs: req: <slug>`. A
   bundle commit is fine when several requirements are tightly
   related.
@@ -307,11 +345,15 @@ something is too big, split it.
   technical choice (framework, hosting, data shape, schema), write
   an ADR in `docs/03-architecture/` using
   [`_template.md`](../docs/03-architecture/_template.md). Reference
-  the ADR from the requirement's Context section.
+  the ADR from the requirement's Context section. Add a row to the
+  ADR overview matrix in
+  [`03-architecture/index.md`](../docs/03-architecture/index.md) in
+  the same commit.
 - If no new decision is needed (the existing ADRs already cover the
   ground), this phase has no commit.
 - Once the design is settled, set the requirement file's status to
-  `accepted`.
+  `accepted` and update the same row in the module's overview
+  matrix.
 - Commit (when an ADR is added): `docs: adr: <slug>`
 
 ## Phase 3 — Tests
@@ -363,6 +405,12 @@ pause here is cheap; rework after Phase 8 is not.
   match.
 - Set the requirement file's status to `done` and bump the `Date`
   field.
+- Update the corresponding row in the module's `index.md` overview
+  matrix — Status, and Verification (`test` or `manual`) if it was
+  still `—`.
+- For ADRs that just transitioned (e.g. `proposed` → `accepted`),
+  update both the ADR file and its row in
+  [`03-architecture/index.md`](../docs/03-architecture/index.md).
 - Only create a commit if a status or section actually changed.
 - Commit (if needed): `docs: req: <slug> → done`
 

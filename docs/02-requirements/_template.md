@@ -4,6 +4,12 @@
 > **Date:** YYYY-MM-DD
 > **Owner:** (optional — name or GitHub handle)
 
+*Place this file under `docs/02-requirements/<module>/`.* Pick the
+module folder that best matches what this requirement is about; if
+none fits, create a new module folder using
+[`_module-template.md`](_module-template.md). Add a row to the
+module's `index.md` matrix in the same commit.
+
 ## Context
 
 Why this requirement exists. Background, motivation, what failure
