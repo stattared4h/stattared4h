@@ -99,8 +99,8 @@ inte byggas in i egna märken (ADR 0007).
   meningen "Sidan samlar inga uppgifter om dig.", och versionen sist i
   `--font-size-small`. <!-- 02-§10.21 -->
 - Versionsraden lyder "Version 1.2.0" för ett släpp, "Version 1.2.0 – CR31" för en
-  kandidat, "Version 1.2.0 – lokal 2026-09-06 18:40" för ett lokalt bygge och får
-  tillägget " – QA" i QA-bygget. Ett CI-bygge utan versionsuppgift visar ingen
+  kandidat, "Version 0.0.PR31" före första släppet, "Version 1.2.0 – lokal 2026-09-06
+  18:40" för ett lokalt bygge, och får tillägget " – QA" i QA-bygget. Ett CI-bygge utan versionsuppgift visar ingen
   versionsrad. <!-- 02-§10.22 -->
 
 ### Version
@@ -111,6 +111,9 @@ inte byggas in i egna märken (ADR 0007).
   när filen finns. Varje senare deploy på samma `X.Y` är en kandidat: versionen är
   `X.Y.0 – CR<n>` där `n` är numret på den pull request som mergades, och commiten
   taggas `vX.Y.0-CR<n>`. <!-- 02-§10.24 -->
+- Så länge `VERSION` är `0.0` finns inget släpp: varje deploy får versionen `0.0.PR<n>`
+  med numret på den mergade pull requesten, utan tagg och utan GitHub Release. Första
+  släppet är `1.0.0`, den dag `VERSION` sätts till `1.0`. <!-- 02-§10.33 -->
 - Versionssträngen når bygget som miljövariabeln `BUILD_VERSION`. Saknas den lokalt
   bygger bygget själv en lokal version ur senaste taggen och klockslaget; saknas den i
   CI sätts ingen version. <!-- 02-§10.25 -->
