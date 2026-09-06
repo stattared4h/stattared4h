@@ -1,0 +1,84 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    # Weekly, so newly published queries reach existing code.
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: CodeQL analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The repository may hold documentation only. Detect what is actually
+      # tracked so this check reports a result either way.
+      - name: Detect analysable languages
+        id: detect
+        run: |
+          tracked="$(git ls-files)"
+          languages=""
+
+          add() {
+            case ",${languages}," in
+              *",$1,"*) ;;
+              *) languages="${languages:+${languages},}$1" ;;
+            esac
+          }
+
+          matches() {
+            grep -qE "$1" <<< "${tracked}"
+          }
+
+          matches '\.(js|jsx|mjs|cjs|ts|tsx|mts|cts)$' && add javascript-typescript
+          matches '\.py$' && add python
+          matches '\.go$' && add go
+          matches '\.(java|kt)$' && add java-kotlin
+          matches '\.rb$' && add ruby
+          matches '\.cs$' && add csharp
+          matches '\.rs$' && add rust
+          matches '\.(c|cc|cpp|cxx|h|hpp)$' && add c-cpp
+          matches '\.swift$' && add swift
+
+          if [ -z "${languages}" ]; then
+            echo "No CodeQL-supported source files are tracked yet."
+          else
+            echo "Analysing: ${languages}"
+          fi
+
+          echo "languages=${languages}" >> "$GITHUB_OUTPUT"
+
+      - name: Initialize CodeQL
+        if: steps.detect.outputs.languages != ''
+        uses: github/codeql-action/init@a35ac6e6798d72df5475948b28efb89edc2e19ca # v4.37.9
+        with:
+          languages: ${{ steps.detect.outputs.languages }}
+          queries: security-extended
+
+      - name: Autobuild
+        if: steps.detect.outputs.languages != ''
+        uses: github/codeql-action/autobuild@a35ac6e6798d72df5475948b28efb89edc2e19ca # v4.37.9
+
+      - name: Perform CodeQL analysis
+        if: steps.detect.outputs.languages != ''
+        uses: github/codeql-action/analyze@a35ac6e6798d72df5475948b28efb89edc2e19ca # v4.37.9
