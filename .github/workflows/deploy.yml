@@ -1,0 +1,154 @@
+name: Deploy
+
+# Reusable workflow (03-§8.8): builds ONE Pages artifact with production in the root and
+# QA under qa/, then deploys it. Called by deploy-qa.yml after a green Quality run on
+# main, and by deploy-prod.yml after approval in the production environment. It never
+# runs on its own.
+#
+# Production and QA are two builds of the same code with different DATA_DIR, BASE_PATH
+# and BUILD_VERSION (03-§8.9). When prod_ref names a tag, production's code is checked
+# out from that tag in its own directory and main's source/data/ and source/content/ are
+# copied over it, so that a content merge reaches visitors without releasing code
+# (02-§10.35).
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version string for the production build, passed as BUILD_VERSION"
+        required: true
+        type: string
+      qa_version:
+        description: "Version string for the QA build, passed as BUILD_VERSION"
+        required: true
+        type: string
+      prod_ref:
+        description: "Git ref for production's code. Empty or main builds it from ref"
+        required: false
+        type: string
+        default: ""
+      ref:
+        description: "Commit on main to deploy: QA, content, and production when prod_ref is empty or main. Empty means the triggering commit"
+        required: false
+        type: string
+        default: ""
+    outputs:
+      page_url:
+        description: "Address of the deployed site"
+        value: ${{ jobs.deploy.outputs.page_url }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build production and QA
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Reading the Pages configuration is what configure-pages needs for base_path.
+      pages: read
+    env:
+      PROD_FROM_TAG: ${{ inputs.prod_ref != '' && inputs.prod_ref != 'main' }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      # Exposes base_path, so the site keeps working if the repository is renamed or a
+      # custom domain is added. Nothing hard-codes /stattared4h/ (ADR 0005, 06-§3.4).
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      # Lifecycle scripts stay disabled; see docs/07-SAKERHET.md. npm ci, never npm
+      # install, so the deploy uses exactly the lock file that Quality checked (02-§9.11).
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # QA first, from main with the made-up data set, under <base_path>/qa (06-§1).
+      - name: Build QA
+        env:
+          DATA_DIR: source/data-qa
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}/qa
+          BUILD_VERSION: ${{ inputs.qa_version }}
+        run: |
+          npm run build
+          mv public qa-build
+
+      - name: Check out production code
+        if: env.PROD_FROM_TAG == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.prod_ref }}
+          path: production
+          persist-credentials: false
+
+      # The tag's code with main's content: the editors' changes reach production, the
+      # developers' do not until someone releases (02-§9.12).
+      - name: Build production from the tag with main's content
+        if: env.PROD_FROM_TAG == 'true'
+        working-directory: production
+        env:
+          DATA_DIR: source/data
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          BUILD_VERSION: ${{ inputs.version }}
+        run: |
+          for dir in source/data source/content; do
+            if [ -d "../${dir}" ]; then
+              rm -rf "${dir}"
+              mkdir -p "$(dirname "${dir}")"
+              cp -R "../${dir}" "${dir}"
+              echo "Copied ${dir} from main"
+            fi
+          done
+          npm ci --ignore-scripts
+          npm run build
+          mv public ../public
+
+      - name: Build production from main
+        if: env.PROD_FROM_TAG != 'true'
+        env:
+          DATA_DIR: source/data
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          BUILD_VERSION: ${{ inputs.version }}
+        run: npm run build
+
+      - name: Assemble the Pages artifact
+        run: |
+          mv qa-build public/qa
+          echo "Production: ${PROD_VERSION} (code from ${PROD_SOURCE})" >> "$GITHUB_STEP_SUMMARY"
+          echo "QA: ${QA_VERSION}" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          PROD_VERSION: ${{ inputs.version }}
+          PROD_SOURCE: ${{ env.PROD_FROM_TAG == 'true' && inputs.prod_ref || 'main' }}
+          QA_VERSION: ${{ inputs.qa_version }}
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: public
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

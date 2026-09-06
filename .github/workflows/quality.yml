@@ -78,11 +78,12 @@ jobs:
             echo "No package.json found; nothing to check yet."
           fi
 
+      # The version the repository declares (02-§9.2), the same one the deploy builds with.
       - name: Set up Node.js
         if: steps.detect.outputs.node == 'true'
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: "24"
+          node-version-file: .nvmrc
 
       # Dependency lifecycle scripts are third-party code that would run with
       # access to the CI environment. They stay disabled here; see
@@ -102,7 +103,9 @@ jobs:
         run: python3 -m pip install --disable-pip-version-check yamllint==1.38.0
 
       # Every script must exist: a missing one fails the run (02-§9.7). The build runs
-      # first because html-validate lints the rendered output in public/.
+      # first because html-validate lints the rendered output in public/. The lint chain
+      # ends with the documentation check, npm run lint:docs (02-§9.10). The deploy
+      # workflows wait for this workflow to finish green on main (02-§9.11).
       - name: Run project scripts
         if: steps.detect.outputs.node == 'true'
         run: |

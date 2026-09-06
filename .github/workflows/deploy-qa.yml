@@ -1,0 +1,111 @@
+name: Deploy till QA
+
+# Runs after the Quality workflow has finished on main, and deploys only when it was
+# green on that very commit (02-§9.11). A merge to main therefore reaches QA by itself,
+# and production is rebuilt from the latest tag with main's content (02-§10.35).
+#
+# workflow_run always runs in the context of main, never with code from a fork, and the
+# only value taken from the event is the commit SHA.
+
+on:
+  workflow_run:
+    workflows: ["Quality"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: Compute versions
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Needed to look up which pull request the commit was merged from.
+      pull-requests: read
+    outputs:
+      version: ${{ steps.versions.outputs.version }}
+      qa_version: ${{ steps.versions.outputs.qa_version }}
+      prod_ref: ${{ steps.versions.outputs.prod_ref }}
+    steps:
+      - name: Check out the tested commit with tags
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      # QA's version is the latest tag vX.Y.* for the X.Y in VERSION, or X.Y.0 when the
+      # series has no tag yet, followed by " – QA PR<n>" (02-§10.33). The pull request
+      # number comes from the API because a rebase merge does not carry it in the
+      # subject line; the short SHA is the fallback (03-§10.4).
+      - name: Compute versions
+        id: versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          xy="$(tr -d '[:space:]' < VERSION)"
+          if ! [[ "${xy}" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "::error file=VERSION::VERSION must contain X.Y, found '${xy}'"
+            exit 1
+          fi
+
+          # Highest tag vX.Y.P for a given X.Y (or for any X.Y with the pattern [0-9]+\.[0-9]+).
+          latest_tag() {
+            git tag --list 'v*' | { grep -E "^v$1\.[0-9]+$" || true; } | sort -V | tail -n 1
+          }
+
+          series_tag="$(latest_tag "${xy//./\\.}")"
+          if [ -n "${series_tag}" ]; then
+            version="${series_tag#v}"
+          else
+            version="${xy}.0"
+          fi
+
+          # Production's code is the latest release, whatever series it belongs to; only a
+          # production deploy may put unreleased code in the root. Before the first
+          # release there is no production, and main is built there instead.
+          prod_ref="$(latest_tag '[0-9]+\.[0-9]+')"
+          if [ -z "${prod_ref}" ]; then
+            prod_ref="main"
+          fi
+
+          pr="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${SHA}/pulls" \
+            --jq '[.[] | select(.merged_at != null)][0].number // empty' || true)"
+          if [ -n "${pr}" ]; then
+            suffix="PR${pr}"
+          else
+            suffix="$(git rev-parse --short "${SHA}")"
+          fi
+          qa_version="${version} – QA ${suffix}"
+
+          {
+            echo "version=${version}"
+            echo "qa_version=${qa_version}"
+            echo "prod_ref=${prod_ref}"
+          } >> "$GITHUB_OUTPUT"
+          echo "QA ${qa_version}; production ${version} built from ${prod_ref}"
+
+  deploy:
+    name: Deploy
+    needs: version
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    # One deployment at a time, shared with the production deploy, and never cancel one
+    # that is mid-flight: an interrupted Pages deployment can leave the site half published.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    uses: ./.github/workflows/deploy.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+      qa_version: ${{ needs.version.outputs.qa_version }}
+      prod_ref: ${{ needs.version.outputs.prod_ref }}
+      ref: ${{ github.event.workflow_run.head_sha }}
