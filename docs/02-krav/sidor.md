@@ -37,9 +37,8 @@ namngivet djur står i hagen.
 
 ### Gemensamt för alla sidor
 
-- Sidhuvudet (`05-§6.1`) innehåller sajtens namn som länk till startsidan, en länk till
-  kartan och länken till huvudsidan på `4h.se/stattared`. <!-- 02-§5.4 -->
-- Sidfoten följer `05-§6.30`. <!-- 02-§5.5 -->
+- Sidhuvudet följer `02-§10.1`–`10.10`. <!-- 02-§5.4 -->
+- Sidfoten följer `02-§10.21`–`10.22`. <!-- 02-§5.5 -->
 - Varje sida har exakt en `h1`, `lang="sv"`, en `<title>` som börjar med sidans namn och
   slutar med "Stättareds 4H-gård", och en `meta description`. <!-- 02-§5.6 -->
 
