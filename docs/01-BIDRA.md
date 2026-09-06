@@ -1,8 +1,8 @@
 # Att bidra
 
 Den här sajten förvaltas av Stättareds 4H-gård. Det mesta som behöver ändras är
-**innehåll** — ett nytt djur, ett djurslag som bytt hage, en ny bild — och det kräver
-ingen utvecklarmiljö.
+**innehåll** — ett nytt djur, ett djurslag som bytt hage — och det kräver ingen
+utvecklarmiljö. Bara en ny bild behöver ett kommando, se *Lägga till en bild* nedan.
 
 ---
 
@@ -97,15 +97,23 @@ avkomman förlorar sin förälder.
 
 ### Lägga till en bild
 
-Lägg bilden i `source/images/animals/` och referera bara filnamnet från djurets `photos`.
-Filnamnet ska börja med djurets id: `rosa-1.webp`.
+Bilder kräver utvecklingsmiljön i §3, eftersom originalet måste webbanpassas först: repot
+tar bara WebP, högst 1600 pixlar på längsta sidan och högst 250 KB, utan EXIF — mobilfoton
+bär annars med sig GPS-positionen där bilden togs
+([ADR 0008](adr/0008-bilder-i-repot.md)). Kommandot `npm run image` gör allt det:
 
-Bilden ska vara webbanpassad innan den läggs in — WebP, högst 1600 pixlar på längsta sidan
-och högst 250 KB — och EXIF ska vara borttaget, eftersom mobilfoton annars bär med sig
-GPS-positionen där bilden togs. Se [ADR 0008](adr/0008-bilder-i-repot.md).
+```bash
+npm run image -- ~/Bilder/IMG_1234.jpg --to animals --name rosa-1
+```
 
-Varje bild behöver `alt` som beskriver vad man ser, och `credit` med den som tagit den.
-Publicera aldrig en bild på en identifierbar person utan samtycke.
+Det skriver `source/images/animals/rosa-1.webp`: nedskalat, konverterat och rensat på
+metadata. Originalet rörs inte. `--to` är `animals`, `species`, `places` eller
+`content`, och `--name` ska börja med postens id — `rosa-1`, `rosa-2`. Finns filen redan
+vägrar kommandot skriva över den; lägg till `--force` om det är meningen.
+
+Referera sedan bara filnamnet från djurets `photos`: `file: rosa-1.webp`. Varje bild
+behöver `alt` som beskriver vad man ser, och `credit` med den som tagit den. Publicera
+aldrig en bild på en identifierbar person utan samtycke.
 
 ### Vad som händer sedan
 
@@ -139,6 +147,8 @@ Andra kommandon:
 | --- | --- |
 | `npm run build` | Bygger sajten till `public/` |
 | `npm run serve` | Serverar `public/` utan att bygga om |
+| `npm run image -- <fil>` | Webbanpassar ett foto och lägger det i `source/images/` (§2) |
+| `npm run qa:images` | Genererar platshållarbilderna som QA-datat refererar, i `source/images-qa/` |
 | `npm test` | Kör testerna i `tests/` mot QA-datat |
 | `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en |
 | `npm run typecheck` | Typkontrollerar TypeScript strikt |
