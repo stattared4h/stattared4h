@@ -54,4 +54,7 @@ Designen ärver 4H:s visuella identitet från `4h.se/stattared`, med tillstånd.
 
 ## Licens
 
-[MIT](LICENSE)
+Koden är [MIT](LICENSE). Innehållet är det inte: texter och fotografier under
+`source/data/`, `source/content/` och `source/images/` tillhör Stättareds 4H-gård och de
+fotografer som anges i `credit`, och 4H-logotypen tillhör Riksförbundet Sveriges 4H
+(ADR 0007). Fråga före återanvändning.

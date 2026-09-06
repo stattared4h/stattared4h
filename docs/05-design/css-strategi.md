@@ -48,7 +48,7 @@ Kommentarerna i CSS-filerna är på engelska. De ligger i kod, och kod är engel
 Dessa bor i `source/assets/css/tokens.css` och är den enda platsen där ett färg-,
 spacing- eller typografivärde skrivs som literal i kod. Värdena *beslutas* i §2–§5 och
 *levereras* i filen; det här dokumentet upprepar dem inte, så att de inte kan glida
-isär. Ett test jämför filen mot §2 (`02-§9.7`). <!-- 05-§7.4 -->
+isär. Ett test jämför filen mot §2 (`02-§9.9`). <!-- 05-§7.4 -->
 
 Tokens namnges efter vad de är, inte var de används:
 

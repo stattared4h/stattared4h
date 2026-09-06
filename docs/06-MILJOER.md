@@ -19,6 +19,10 @@ datat, aldrig på att koden är en annan. <!-- 06-§1.1 -->
 Båda ligger i samma Pages-utgåva, så det behövs ingen andra värd och ingen andra
 deploy. <!-- 06-§1.2 -->
 
+QA har en egen service worker med scope `/stattared4h/qa/` och ett eget manifest-`id`
+(`02-§7.9`), så att den som öppnat QA inte får påhittade djur i produktionens
+cache. <!-- 06-§1.4 -->
+
 Varje sida i QA-bygget bär `<meta name="robots" content="noindex">`, så att påhittade
 djur aldrig hamnar i en sökmotor. En `robots.txt` duger inte till det: på en projektsajt
 under GitHub Pages läser sökmotorer bara värdens rot, `stattared4h.github.io/robots.txt`,

@@ -34,6 +34,7 @@ Steg 1 fäller bygget vid ogiltig data, så inget felaktigt når `public/`. <!--
 | Domän | `source/ts/domain/` | data; **inga** webbläsar-API:er |
 | Vy | `source/ts/ui/` | DOM och domän |
 | Mallar | `source/layouts/`, `source/content/` | data via Eleventy |
+| Tester | `tests/` | domän, validering och det färdiga bygget; körs i Node |
 
 Domänskiktet är rent: ingen `window`, `document` eller `navigator`. Där bor härledningarna
 och senare spelreglerna, och därför går de att enhetstesta i Node utan
@@ -70,10 +71,13 @@ identiska filer. <!-- 03-§3.3 -->
 
 | Sida | Adress | Innehåll |
 | --- | --- | --- |
+| Start | `/` | Djurslagen på gården som ingång till artsidorna, och kartan |
 | Plats | `/plats/<id>/` | QR-kodens måladress. Vilka djurslag som går här, och därifrån vidare till djuren |
 | Djur | `/djur/<id>/` | Namn, art, ras, stamtavla, bilder. Aldrig var individen står |
 | Art | `/arter/<id>/` | Om djurslaget, vilka platser det finns på, och individerna |
 | Karta | `/karta/` | Gårdens platser, med en textlista under kartan |
+| 404 | `404.html` | Sajtens egen felsida; GitHub Pages serverar den för okända adresser |
+| Offline | `/offline/` | Visas av service workern vid navigering utanför cachen |
 
 Platssidan är navet. QR-koden på hagen är permanent och pekar på `/plats/<id>/`; den behöver
 aldrig bytas när djuren flyttar, eftersom det är platsfilen som ändras. <!-- 03-§4.1 -->
@@ -95,6 +99,10 @@ raderas cacher med annat namn. <!-- 03-§5.2 -->
 Service workerns scope och manifestets `start_url` byggs från bas-sökvägen i
 [ADR 0005](../adr/0005-konfigurerbar-bassokvag.md). <!-- 03-§5.3 -->
 
+Offline-sidan ingår i förcachen och svaras vid en navigering utanför den (`02-§7.7`).
+QA-bygget under `/qa/` har en egen service worker med scope `<bas>qa/` och ett eget
+manifest-`id`, så att QA och produktion aldrig delar cache (`02-§7.9`). <!-- 03-§5.4 -->
+
 ---
 
 ## 6. Bilder
@@ -108,6 +116,10 @@ till var filerna ligger. <!-- 03-§6.2 -->
 Varje bild får `width`, `height` och `loading="lazy"` — utom den första bilden på sidan, som
 laddas ivrigt med `fetchpriority="high"` så att den inte fördröjer hur snabb sidan
 känns. <!-- 03-§6.3 -->
+
+En art kan ha en bild (`04-§6.3`) i `source/images/species/`. Den används i
+djurslagsrutorna på start- och platssidan och på artsidan. Saknas den visas artens namn
+på en ljusgrön platta (`05-§6.20`). <!-- 03-§6.4 -->
 
 ---
 
@@ -132,3 +144,28 @@ ska kunna skriva en post utan att röra någon annan. <!-- 03-§7.2 -->
 
 Två tester bevakar regler som annars urholkas tyst: att inget absolut sökvägsuttryck kringgår
 bas-sökvägens hjälpfunktion, och att inget djur har fått ett `location`-fält. <!-- 03-§8.6 -->
+
+- Node 22.18 eller senare krävs. Eleventys konfiguration importerar domänskiktets
+  TypeScript direkt, och Node tar bort typannoteringarna utan kompilering. Domänen
+  undviker därför `enum`, `namespace` och parameteregenskaper, som kräver
+  kompilering. <!-- 03-§8.7 -->
+- Deploy-arbetsflödet körs efter kvalitetsflödet och bara när det är grönt på samma
+  commit (`02-§9.11`). <!-- 03-§8.8 -->
+- Produktion och QA byggs i samma deploy: två byggen med olika `DATA_DIR` och
+  `BASE_PATH`, där QA-bygget läggs under `public/qa/` innan artefakten laddas
+  upp. <!-- 03-§8.9 -->
+
+---
+
+## 9. Kartan
+
+Kartan är en SVG som bygget genererar ur platsernas `lat`/`lon` (`02-§5.23`).
+Projektionen är linjär: den omslutande rektangeln kring alla aktiva platser med
+koordinater, med marginal, mappas på SVG:ns `viewBox`. Vid gårdens storlek är jordens
+krökning försumbar. Varje markör är ett `<a>`-element med platsens id, namn och
+länk. <!-- 03-§9.1 -->
+
+En ritad bakgrund — byggnader, vägar, hagarnas former — kan läggas under markörerna
+(issue #19). Ritningen anger då vilka koordinater dess hörn motsvarar, så att bygget kan
+placera markörerna rätt i den. Platsernas geometri bor ändå i YAML, aldrig i
+ritningen. <!-- 03-§9.2 -->
