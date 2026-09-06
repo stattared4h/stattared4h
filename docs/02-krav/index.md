@@ -35,8 +35,8 @@ går var. Öppettider, boende, bokningar, nyheter, medlemskap och kontaktuppgift
 huvudsidan och ska inte dupliceras här — ett faktum som står på två ställen slutar
 stämma på det ena. <!-- 02-§1.8 -->
 
-Varje sida länkar till huvudsidan, i sidhuvudet och i sidfoten. Länken är en permanent
-väg vidare, inte en tillfällig hänvisning i väntan på eget innehåll. <!-- 02-§1.9 -->
+Varje sida länkar till huvudsidan i sidfoten. Länken är en permanent väg vidare, inte en
+tillfällig hänvisning i väntan på eget innehåll. <!-- 02-§1.9 -->
 
 Tveka aldrig om en funktion hör hemma här: frågan är om den handlar om djuren eller om
 platserna de går på. Gör den inte det hör den till huvudsidan. <!-- 02-§1.10 -->
@@ -114,6 +114,7 @@ Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett inter
 | [`offline.md`](./offline.md) | Manifest, service worker, installation | §7 |
 | [`bilder.md`](./bilder.md) | Bildfiler, bildkedja, leverans | §8 |
 | [`bygge.md`](./bygge.md) | Verktygskedja, kontroller, deploy | §9 |
+| [`sidhuvud-sidfot.md`](./sidhuvud-sidfot.md) | Sidhuvud, meny, installation, feedback, sidfot, version | §10 |
 
 Filerna ovan täcker fas 1 enligt epic #3. Nya kravområden — spel enligt ADR 0009,
 redaktörsgränssnittet i fas 2 — får egna filer och nästa lediga avsnittsnummer.
