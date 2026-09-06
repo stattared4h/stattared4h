@@ -28,8 +28,9 @@ Allt som inte tjänar någon av de frågorna hör inte hemma här. <!-- 04-§1.2
 
 Datat finns i två dataset med identisk struktur: `source/data/` med gårdens riktiga
 uppgifter, och `source/data-qa/` med påhittade djur som testerna körs mot. Vilket som
-läses styrs av `DATA_DIR`, se [`06-MILJOER.md`](06-MILJOER.md). Ändras det här kontraktet
-ändras QA-datat i samma commit. <!-- 04-§2.3 -->
+läses styrs av `DATA_DIR`, se [`06-MILJOER.md`](06-MILJOER.md). Bara `*.yaml`-filer läses;
+en `README.md` i katalogen är tillåten och ignoreras. Ändras det här kontraktet ändras
+QA-datat i samma commit. <!-- 04-§2.3 -->
 
 ```text
 source/data/
@@ -86,6 +87,10 @@ photos:
 
 Obligatoriskt: `name`, `species`, `sex` och `status`. Övrigt får utelämnas. <!-- 04-§4.1 -->
 
+`born` skrivs utan citattecken. YAML läser `2021-04-12` som ett datum och `2016` som ett
+heltal; valideraren tar emot båda, och även text, och normaliserar till `YYYY-MM-DD`
+eller `YYYY` (`02-§6.7`). <!-- 04-§4.6 -->
+
 ### Ingen plats på djuret
 
 Ett djur har **inget** `location`-fält, och får aldrig få ett. Djuren flyttas ofta
@@ -121,11 +126,14 @@ name: string                 # platsens namn, t.ex. "Gethagen"
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
 description: string | null   # markdown
-lat: number | null           # WGS84, sex decimaler
+lat: number | null           # WGS84 i decimalgrader, t.ex. 57.412300
 lon: number | null
 accessible: boolean          # nåbar med rullstol eller barnvagn
 active: boolean              # false för platser som inte används just nu
 ```
+
+Obligatoriskt: `name`, `species`, `accessible` och `active`. `species` får vara en tom
+lista. Övrigt får utelämnas. <!-- 04-§5.6 -->
 
 Regler:
 
@@ -148,6 +156,10 @@ species:
   - id: string               # t.ex. "get"
     name: string             # singular, "Get"
     plural: string           # "Getter"
+    photo:                   # frivillig: bilden i djurslagsrutorna och på artsidan
+      file: string           # filnamn i source/images/species/
+      alt: string
+      credit: string
 ```
 
 Arten anges en gång här, så att "get" och "getter" stavas likadant överallt. <!-- 04-§6.1 -->
@@ -155,6 +167,10 @@ Arten anges en gång här, så att "get" och "getter" stavas likadant överallt.
 Redaktionell text om en art — vad de äter, hur de beter sig — skrivs som Markdown under
 `source/content/arter/<id>.md`, inte i den här filen. Struktur i YAML, prosa i
 Markdown. <!-- 04-§6.2 -->
+
+`photo` är frivillig, men valideringen varnar när den saknas, eftersom djurslagsrutan på
+platssidan (`05-§6.24`) bygger på den. Saknas bilden visas artens namn på en ljusgrön
+platta (`05-§6.20`). <!-- 04-§6.3 -->
 
 ---
 
@@ -192,9 +208,9 @@ länkar till artsidan som visar var arten finns. <!-- 04-§8.2 -->
 
 ## 9. Bilder
 
-Bilder ligger i `source/images/animals/`, `source/images/places/` och
-`source/images/content/`, platt inom varje mapp, med filnamn som inleds med postens
-id. <!-- 04-§9.1 -->
+Bilder ligger i `source/images/animals/`, `source/images/species/`,
+`source/images/places/` och `source/images/content/`, platt inom varje mapp, med filnamn
+som inleds med postens id. <!-- 04-§9.1 -->
 
 YAML refererar **bara filnamnet**, aldrig en sökväg. Bygget avgör var filen bor, så att
 lagringen kan bytas utan att datat rörs. <!-- 04-§9.2 -->
@@ -217,6 +233,8 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->
 - Att inget djur har ett `location`-fält. <!-- 04-§10.8 -->
 - Att inget fält innehåller HTML. Innehåll är markdown eller ren text. <!-- 04-§10.9 -->
+- Att inget fält finns som kontraktet inte känner till, så att ett felstavat fältnamn
+  inte tyst ignoreras. <!-- 04-§10.11 -->
 
 Valideringen ger dessutom **varningar** som inte fäller bygget, för sådant som är tillåtet
 men troligen ett förbiseende: ett djur utan foto, en aktiv plats utan djurslag, en plats
