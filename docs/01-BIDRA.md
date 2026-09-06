@@ -116,8 +116,9 @@ Blir en kontroll röd står det i meddelandet vad som är fel. De vanligaste är
 inte finns, en art som inte är upplagd, eller en förälder som stavats fel. Rätta i samma
 pull request — kontrollerna körs om av sig själva.
 
-**Tills vidare:** datavalideringen är inte byggd ännu (se spårbarhetsmatrisen). Fram till
-dess kontrollerar administratören filen mot datakontraktet för hand innan den läggs in.
+Samma kontroll går att köra själv med `npm run validate`, som skriver varje fel och
+varning på svenska med fil och fält. Ett fel stoppar bygget; en varning — ett djur utan
+foto, en aktiv hage utan djurslag — är tillåten men troligen ett förbiseende.
 
 ---
 
@@ -141,6 +142,7 @@ Andra kommandon:
 | `npm test` | Kör testerna i `tests/` mot QA-datat |
 | `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en |
 | `npm run typecheck` | Typkontrollerar TypeScript strikt |
+| `npm run validate` | Validerar datat i `DATA_DIR` (`source/data` som standard) och avslutar med felkod vid fel |
 
 Bygget tar `BASE_PATH`, med `/` som standard:
 
@@ -149,8 +151,11 @@ BASE_PATH=/stattared4h/ npm run build
 ```
 
 `npm run lint:yaml` kräver [yamllint](https://yamllint.readthedocs.io/), som installeras
-med `pip install yamllint`. `npm run validate` tillkommer med valideraren; spårbarhetsmatrisen
-visar vad som finns.
+med `pip install yamllint`.
+
+`npm run validate` kontrollerar också bildfilerna när bildkatalogen finns:
+`source/images-qa` för `DATA_DIR=source/data-qa`, annars `source/images`. Saknas katalogen
+hoppas filkontrollen över och det står i utskriften.
 
 ---
 
