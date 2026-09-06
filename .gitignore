@@ -141,3 +141,65 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# ---------------------------------------------------------------------------
+# Public-repository hardening
+# See docs/public-repo-safety.md. .gitignore is a safety net, not a boundary:
+# always review `git diff --cached` before committing.
+# ---------------------------------------------------------------------------
+
+# Credentials, keys and certificates
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.kdbx
+*.asc
+*.gpg
+id_rsa
+id_ecdsa
+id_ed25519
+.ssh/
+credentials
+credentials.*
+secrets
+secrets.*
+service-account*.json
+*-credentials.json
+
+# Tool and cloud credential caches
+.npmrc
+.yarnrc
+.netrc
+.pypirc
+.aws/
+.gcloud/
+.azure/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+
+# Local-only environment and overrides
+.envrc
+.direnv/
+docker-compose.override.yml
+compose.override.yaml
+*.local
+*.local.*
+
+# Editor and operating-system noise
+*.swp
+*.swo
+*.bak
+*~
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

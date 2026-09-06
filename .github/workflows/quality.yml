@@ -1,0 +1,152 @@
+name: Quality
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  markdown:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      - name: Run markdownlint
+        run: npx --yes markdownlint-cli2@0.23.2
+
+  yaml:
+    name: YAML lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install yamllint
+        run: python3 -m pip install --disable-pip-version-check yamllint==1.38.0
+
+      - name: Run yamllint
+        run: yamllint .
+
+  workflows:
+    name: Workflow lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run actionlint
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+
+  project:
+    name: Project checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Detect project type
+        id: detect
+        run: |
+          if [ -f package.json ]; then
+            echo "node=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "node=false" >> "$GITHUB_OUTPUT"
+            echo "No package.json found; nothing to check yet."
+          fi
+
+      - name: Set up Node.js
+        if: steps.detect.outputs.node == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+
+      # Dependency lifecycle scripts are third-party code that would run with
+      # access to the CI environment. They stay disabled here; see
+      # docs/public-repo-safety.md if a build genuinely needs them.
+      - name: Install dependencies
+        if: steps.detect.outputs.node == 'true'
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+          else
+            npm install --no-audit --no-fund --ignore-scripts
+          fi
+
+      - name: Run project scripts
+        if: steps.detect.outputs.node == 'true'
+        run: |
+          npm run --if-present lint
+          npm run --if-present typecheck
+          npm run --if-present build
+          npm run --if-present test
+
+  documentation-links:
+    name: Documentation links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate local Markdown links
+        shell: python
+        run: |
+          import re
+          import sys
+          from pathlib import Path
+          from urllib.parse import unquote
+
+          root = Path.cwd().resolve()
+          pattern = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+          failures = []
+
+          for document in root.rglob("*.md"):
+              if any(part in {".git", "node_modules"} for part in document.parts):
+                  continue
+
+              text = document.read_text(encoding="utf-8")
+              for match in pattern.finditer(text):
+                  target = match.group(1).strip()
+                  if target.startswith("<") and target.endswith(">"):
+                      target = target[1:-1]
+                  if target.startswith(("http://", "https://", "mailto:", "#")):
+                      continue
+
+                  target = target.split("#", 1)[0].split("?", 1)[0]
+                  if not target:
+                      continue
+
+                  resolved = (document.parent / unquote(target)).resolve()
+                  if resolved != root and root not in resolved.parents:
+                      failures.append(f"{document.relative_to(root)}: link escapes repository: {target}")
+                  elif not resolved.exists():
+                      failures.append(f"{document.relative_to(root)}: missing target: {target}")
+
+          if failures:
+              print("\n".join(failures))
+              sys.exit(1)
