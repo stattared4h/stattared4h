@@ -54,7 +54,7 @@ Tokens namnges efter vad de är, inte var de används:
 
 | Grupp | Namn | Beslutas i |
 | --- | --- | --- |
-| Färg | `--color-green`, `--color-green-deep`, `--color-green-pale`, `--color-page`, `--color-surface`, `--color-ink`, `--color-ink-soft`, `--color-border`, `--color-sun`, `--color-sun-ink`, `--color-danger` | §2 |
+| Färg | `--color-green`, `--color-green-deep`, `--color-green-pale`, `--color-page`, `--color-surface`, `--color-ink`, `--color-ink-soft`, `--color-border`, `--color-sun`, `--color-sun-ink`, `--color-danger`, `--color-backdrop` | §2 |
 | Typografi | `--font-sans`, `--font-size-body`, `--font-size-small`, `--font-size-h1`, `--font-size-h2`, `--font-size-h3`, `--line-height-body`, `--line-height-heading` | §3 |
 | Spacing | `--space-xs` … `--space-xxl` | §4 |
 | Layout | `--container-wide`, `--container-narrow`, `--tap-target-min` | §4 |

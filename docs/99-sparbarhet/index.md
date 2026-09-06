@@ -36,7 +36,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `02-§1.7`–`1.9` | Komplement till huvudsidan; länk i sidhuvud och sidfot | `påbörjad` | Startsidan länkar tre gånger. Bevakas av html-validate och ett sidtest när de finns |
+| `02-§1.7`–`1.9` | Komplement till huvudsidan; länk i sidfoten | `påbörjad` | Startsidan länkar i sidfoten; länken i sidhuvudet tas bort med `02-§10.10`. Bevakas av ett sidtest när det finns |
 | `02-§1.10` | Tumregel för vad som hör hit | `dokumenterad` | Vägledande |
 | `02-§2` | Målgrupp | `dokumenterad` | Vägledande |
 | `02-§3.1`–`3.4` | Roller via GitHub, ingen egen inloggning | `manuell` | Kontrollera under *Settings → Rules* att regelverket *Protect main* är aktivt och kräver pull request |
@@ -71,6 +71,16 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§9.10` | Dokumentkontroll i CI | `saknas` | |
 | `02-§9.11` | Deploy efter grön kvalitet, `npm ci` | `saknas` | Deployen kör parallellt med kvalitetsflödet och använder `npm install` |
 | `02-§9.12` | Produktion och QA i samma utgåva | `saknas` | |
+| `02-§10.1`–`10.10` | Sidhuvud, meny, hoppa-till-innehåll | `saknas` | Startsidans sidhuvud har namn och en huvudsidelänk som ska bort; inga ikonknappar |
+| `02-§10.11`–`10.13` | Installknapp | `saknas` | Kräver manifest och service worker (`02-§7`) |
+| `02-§10.14` | Till toppen | `saknas` | |
+| `02-§10.15`–`10.20` | Feedback via förifylld GitHub-issue | `saknas` | Issue-mallen `.github/ISSUE_TEMPLATE/feedback.md` finns inte |
+| `02-§10.21` | Sidfot | `påbörjad` | Huvudsidelänk, repolänk och integritetsmening finns; 4H-loggan och versionen saknas |
+| `02-§10.22`–`10.26` | Version i sidfot, `VERSION`, taggar, cachenamn | `saknas` | Ingen `VERSION`-fil, ingen `BUILD_VERSION` i deployen |
+| `02-§10.27` | Om-sidan | `saknas` | |
+| `02-§10.28`–`10.29` | Statusrad för ny version och offline | `saknas` | |
+| `02-§10.30` | Dela | `saknas` | Kräver de datadrivna sidorna |
+| `02-§10.31`–`10.32` | Egen appikon, inline-SVG-ikoner | `saknas` | Ikonen är inte ritad; favicon svarar 404 i dag |
 
 ### Designspecifikation (`05-§`)
 
@@ -80,12 +90,14 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§2.1`–`2.11` | Färgpalett | `påbörjad` | Levererad i `tokens.css`; testet i `02-§9.9` saknas |
 | `05-§2.12`–`2.18` | Kontrastregler och mörkt läge | `dokumenterad` | Testas av `02-§9.9` |
 | `05-§2.19` | Logotypgrön bara i logotypens SVG | `dokumenterad` | Logotypen finns inte i repot ännu |
+| `05-§2.20` | Bakgrundsskikt för dialog | `saknas` | Token `--color-backdrop` finns inte i `tokens.css` |
 | `05-§3` | Typografi | `påbörjad` | Tokens och `base.css`; `05-§3.9` navigering saknas |
 | `05-§4.1`–`4.10` | Behållare och spacing | `påbörjad` | Tokens och `layout.css`; inget test |
 | `05-§4.11`–`4.15` | Rutnät och träffytor | `dokumenterad` | Rutnätet skrivs med djurkorten |
 | `05-§5` | Brytpunkter | `dokumenterad` | Tillämpas när layouten skrivs |
 | `05-§6.3` | Knappar | `påbörjad` | `.button` på startsidan, 47 px hög |
-| `05-§6.9` | Sidfot | `påbörjad` | Startsidans sidfot |
+| `05-§6.30` | Sidfot | `påbörjad` | Startsidans sidfot; logotyp och version saknas |
+| `05-§6.33`–`6.37` | Ikonknapp, meny, dialog, statusrad, sidhuvudets höjd | `saknas` | |
 | `05-§6` övrigt | Komponenter | `saknas` | Skrivs när markupen finns, enligt `05-§7.2` |
 | `05-§7.1`, `7.5` | Inga hårdkodade värden | `saknas` | Kräver stylelint (`02-§9.3`); följs i dag för hand |
 | `05-§7.4` | Designtokens | `påbörjad` | `tokens.css`; testet i `02-§9.9` saknas |
@@ -109,6 +121,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | --- | --- | --- | --- |
 | `06-§1.1`–`1.2`, `1.4` | QA och produktion ur samma kod i samma utgåva | `saknas` | Deployen bygger bara produktion |
 | `06-§1.3` | QA-sidor bär `noindex` | `saknas` | `source/robots.txt` finns men verkar inte på en projektsajt |
+| `06-§1.5` | QA-versionen får tillägget " – QA" | `saknas` | |
 | `06-§2.1` | `DATA_DIR` väljer dataset | `saknas` | Bygget läser inget dataset |
 | `06-§2.2` | Tester körs mot QA-data | `saknas` | Inga tester finns |
 | `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | Datasetet finns och `source/data-qa/README.md` listar fallen; bildfilerna saknas |
@@ -129,6 +142,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§8.5` | Merge till `main` deployar | `påbörjad` | Fungerar, men utan beroende av kvalitetsflödet (`02-§9.11`) |
 | `03-§8.6`–`8.9` | Bevakande tester, Node 22.18, deploy-ordning, dubbelbygge | `saknas` | |
 | `03-§9` | Kartan | `dokumenterad` | |
+| `03-§10` | Sidhuvud, sidfot, version och feedback | `dokumenterad` | Mekanismen bakom `02-§10` |
 
 ---
 
@@ -148,9 +162,9 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 34 |
-| `dokumenterad` | 16 |
-| `påbörjad` | 21 |
+| `saknas` | 46 |
+| `dokumenterad` | 17 |
+| `påbörjad` | 22 |
 | `byggd` | 0 |
 | `manuell` | 2 |
 

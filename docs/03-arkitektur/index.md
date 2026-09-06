@@ -76,6 +76,7 @@ identiska filer. <!-- 03-§3.3 -->
 | Djur | `/djur/<id>/` | Namn, art, ras, stamtavla, bilder. Aldrig var individen står |
 | Art | `/arter/<id>/` | Om djurslaget, vilka platser det finns på, och individerna |
 | Karta | `/karta/` | Gårdens platser, med en textlista under kartan |
+| Om | `/om/` | Vad sajten är, installation, integritet, källkod, version (`02-§10.27`) |
 | 404 | `404.html` | Sajtens egen felsida; GitHub Pages serverar den för okända adresser |
 | Offline | `/offline/` | Visas av service workern vid navigering utanför cachen |
 
@@ -93,8 +94,10 @@ Service workern förcachar sidskal, CSS, buntad JS, ikoner samt plats- och djurs
 Strategin är cache först för dessa, och nätverk först med cache som reserv för
 fotografier. <!-- 03-§5.1 -->
 
-Cachenamnet innehåller ett byggnummer och sätts av bygget, aldrig för hand. Vid aktivering
-raderas cacher med annat namn. <!-- 03-§5.2 -->
+Cachenamnet är versionssträngen (`02-§10.26`) och sätts av bygget, aldrig för hand. Vid
+aktivering raderas cacher med annat namn. En ny worker som väntar på att ta över
+signalerar till sidan, som visar statusraden "Ny version finns"; knappen skickar
+`skipWaiting` och laddar om (`02-§10.28`). <!-- 03-§5.2 -->
 
 Service workerns scope och manifestets `start_url` byggs från bas-sökvägen i
 [ADR 0005](../adr/0005-konfigurerbar-bassokvag.md). <!-- 03-§5.3 -->
@@ -169,3 +172,33 @@ En ritad bakgrund — byggnader, vägar, hagarnas former — kan läggas under m
 (issue #19). Ritningen anger då vilka koordinater dess hörn motsvarar, så att bygget kan
 placera markörerna rätt i den. Platsernas geometri bor ändå i YAML, aldrig i
 ritningen. <!-- 03-§9.2 -->
+
+---
+
+## 10. Sidhuvud, sidfot och version
+
+Sidhuvud och sidfot är två Eleventy-inkluderingar, `source/layouts/header.njk` och
+`source/layouts/footer.njk`, som grundlayouten tar in på varje sida. Ingen sida skriver
+egen markup för dem. Ikonerna är inline-SVG i inkluderingarna. <!-- 03-§10.1 -->
+
+Beteendet — meny, installknapp, "till toppen", feedbackdialog, statusrader, dela — är
+små moduler under `source/ts/ui/`, buntade till en fil. Varje modul letar upp sitt
+element och gör ingenting om det saknas, så en sida utan feedbackknapp kostar inget.
+Sidorna är läsbara och länkarna följbara utan JavaScript; bara menyknappen, dialogen
+och knapparna kräver det. <!-- 03-§10.2 -->
+
+Feedback bygger en adress till `github.com/<repo>/issues/new` med `template`, `title`
+och `body` som frågeparametrar och öppnar den i ny flik. Ingen kod på sajten talar med
+GitHub; det gör besökarens webbläsare, i besökarens namn. <!-- 03-§10.3 -->
+
+Versionen räknas i deploy-arbetsflödet, aldrig i bygget: `X.Y` läses ur `VERSION`,
+numret på den mergade pull requesten hämtas via GitHubs API för commiten (en
+rebase-merge bär inte numret i ämnesraden), med körningsnumret som reserv, och taggarna
+`vX.Y.*` avgör om det är ett släpp eller en kandidat (`02-§10.24`). Resultatet skickas
+som `BUILD_VERSION` till bygget, som skriver in det i sidfoten, om-sidan, manifestets
+`version`-fält och service workerns cachenamn. Efter deployen taggar arbetsflödet
+commiten och skapar en GitHub Release vid ett släpp. <!-- 03-§10.4 -->
+
+Utan `BUILD_VERSION` bygger bygget en lokal version ur senaste taggen och klockslaget i
+Europe/Stockholm, utom när `GITHUB_ACTIONS` är satt: då sätts ingen version alls,
+eftersom en felaktig version är sämre än ingen (`02-§10.25`). <!-- 03-§10.5 -->

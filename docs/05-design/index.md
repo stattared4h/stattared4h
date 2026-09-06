@@ -49,6 +49,7 @@ avsnitt kan flyttas mellan filer utan att referenser går sönder.
 | `05-§2.10` | Solbläck | `#7a4b00` | Text på ljus botten när solaccenten behöver ord |
 | `05-§2.11` | Varning | `#b3261e` | Felmeddelanden, destruktiva åtgärder |
 | `05-§2.19` | Logotypgrön | `#467c45` | Bara inne i 4H-logotypens egen SVG (ADR 0007). Aldrig som token, yta eller text |
+| `05-§2.20` | Bakgrundsskikt | `rgb(64 64 64 / 60%)` | Skiktet bakom en dialog: bläck med 60 % opacitet |
 
 ### Varför den gröna inte är exakt 4H:s
 
