@@ -60,6 +60,12 @@ jobs:
           matches '\.(c|cc|cpp|cxx|h|hpp)$' && add c-cpp
           matches '\.swift$' && add swift
 
+          # Workflow files are code too, and CodeQL's actions queries look for
+          # script injection and related flaws in them. This also means the
+          # analysis produces code scanning results before any application
+          # source exists.
+          matches '^\.github/workflows/.+\.ya?ml$' && add actions
+
           if [ -z "${languages}" ]; then
             echo "No CodeQL-supported source files are tracked yet."
           else
@@ -76,7 +82,7 @@ jobs:
           queries: security-extended
 
       - name: Autobuild
-        if: steps.detect.outputs.languages != ''
+        if: steps.detect.outputs.languages != '' && steps.detect.outputs.languages != 'actions'
         uses: github/codeql-action/autobuild@a35ac6e6798d72df5475948b28efb89edc2e19ca # v4.37.9
 
       - name: Perform CodeQL analysis
