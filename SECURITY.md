@@ -1,60 +1,58 @@
-# Security policy
+# Säkerhetspolicy
 
-This repository is public. Everything committed to it — including Git history,
-branches, tags, commit metadata, issues and GitHub Actions logs — is visible to
-anyone. It must never contain live credentials, private keys, access tokens,
-private runtime configuration or personal data.
+Det här repot är publikt. Allt som läggs i det — git-historik, grenar, taggar,
+commit-uppgifter, ärenden och loggar från GitHub Actions — är synligt för vem som helst.
+Det får därför aldrig innehålla giltiga lösenord, privata nycklar, åtkomsttokens,
+privat driftkonfiguration eller personuppgifter.
 
-## Reporting a security problem
+## Rapportera ett säkerhetsproblem
 
-Do not open a public issue containing credentials, tokens, private keys,
-private host details or working exploit details.
+Öppna inte ett publikt ärende som innehåller lösenord, tokens, privata nycklar,
+uppgifter om privata värdar eller en fungerande angreppsbeskrivning.
 
-Report privately instead:
+Rapportera privat i stället:
 
-1. Use GitHub private vulnerability reporting on this repository
-   (**Security → Report a vulnerability**) when it is enabled.
-2. Otherwise contact the repository owner privately through their GitHub
-   profile before sharing any sensitive detail.
+1. Använd GitHubs privata sårbarhetsrapportering på det här repot
+   (**Security → Report a vulnerability**) när den är aktiverad.
+2. Kontakta annars den som äger repot privat via deras GitHub-profil, innan du delar
+   någon känslig detalj.
 
-Please include what you observed, how to reproduce it, and the affected commit
-or version. Expect an initial response within a few working days.
+Beskriv vad du sett, hur det går att återskapa, och vilken commit eller version det
+gäller. Räkna med ett första svar inom några arbetsdagar.
 
-## If a secret is committed
+## Om en hemlighet hamnat i repot
 
-Treat a committed secret as compromised, even if the commit is reverted within
-seconds. Deleting a file in a later commit does not remove it from earlier
-history, and public repositories are cloned, forked and mirrored automatically.
+Betrakta en hemlighet som röjd så snart den commit:ats, även om commiten ångras inom
+någon sekund. Att radera en fil i en senare commit tar inte bort den ur tidigare
+historik, och publika repon klonas, förgrenas och speglas automatiskt.
 
-1. Revoke or rotate the credential at its issuing service first. This is the
-   only step that actually removes the risk.
-2. Remove the value from the current tree.
-3. Rewrite Git history if the value must not remain reachable, and force-push
-   with care.
-4. Check forks, caches, Actions logs and build artifacts for copies.
-5. Review the service's access logs for unexpected use.
+1. Återkalla eller byt ut uppgiften hos tjänsten som utfärdat den. Det är det enda
+   steget som faktiskt tar bort risken.
+2. Ta bort värdet ur arbetskopian.
+3. Skriv om git-historiken om värdet inte får vara åtkomligt, och tvinga fram en push
+   med försiktighet.
+4. Kontrollera förgreningar, cacher, Actions-loggar och byggartefakter efter kopior.
+5. Gå igenom tjänstens åtkomstloggar efter oväntad användning.
 
-## Repository hygiene
+## Repohygien
 
-The repository is designed around these rules:
+Repot är byggt kring de här reglerna:
 
-- `.env` files, local overrides and host-specific configuration stay local;
-- private keys, certificates and common credential files are ignored by
-  `.gitignore`;
-- documentation uses placeholder values such as `example.com` and `192.0.2.10`
-  rather than real infrastructure;
-- GitHub Actions are pinned to commit SHAs, not floating tags;
-- workflows are read-only by default and elevate permissions per job;
-- CI checkouts do not persist the Actions token into the working tree;
-- dependency installation in CI runs without lifecycle scripts;
-- Gitleaks scans the full Git history on every push and pull request;
-- CodeQL analyses source code once it is present, plus on a weekly schedule;
-- dependency changes in pull requests are reviewed for known vulnerabilities.
+- `.env`-filer, lokala åsidosättningar och värdspecifik konfiguration stannar lokalt.
+- Privata nycklar, certifikat och vanliga inloggningsfiler ignoreras av `.gitignore`.
+- Dokumentationen använder platshållare som `example.com` och `192.0.2.10` i stället för
+  verklig infrastruktur.
+- GitHub Actions är låsta till commit-SHA, inte till rörliga taggar.
+- Arbetsflöden är läsbehöriga som standard och höjer behörighet per jobb.
+- CI-utcheckningar sparar inte Actions-token i arbetskopian.
+- Beroenden installeras i CI utan livscykelskript.
+- Gitleaks skannar hela git-historiken vid varje push och pull request.
+- CodeQL analyserar källkoden när sådan finns, plus varje vecka.
+- Nya beroenden i en pull request granskas mot kända sårbarheter.
 
-See [Public repository safety](docs/public-repo-safety.md) for the full review
-checklist and the reasoning behind each rule.
+Se [Säkerhet i ett publikt repo](docs/07-SAKERHET.md) för hela checklistan och skälen
+bakom varje regel.
 
-## Supported versions
+## Versioner som stöds
 
-This repository does not yet publish released versions. Security fixes are
-applied to the `main` branch.
+Repot publicerar ännu inga släppta versioner. Säkerhetsrättningar görs på grenen `main`.

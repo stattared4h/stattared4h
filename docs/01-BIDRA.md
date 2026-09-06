@@ -69,7 +69,31 @@ gäller människor lika mycket som AI-agenter. I korthet:
 
 ---
 
-## 4. När en bild måste bort av rättighetsskäl
+## 4. Kontroller som körs automatiskt
+
+Varje push och pull request kör dessa. Alla måste vara gröna innan något kan läggas
+in i `main`.
+
+| Kontroll | Vad den gör |
+| --- | --- |
+| Secret scan | Skannar hela git-historiken efter lösenord, nycklar och tokens |
+| CodeQL | Säkerhetsanalys av källkoden, plus en gång i veckan |
+| Dependency review | Stoppar nya beroenden med kända allvarliga sårbarheter |
+| Project checks | Kör projektets egna lint-, typkontroll-, bygg- och testskript |
+| Markdown lint | Lintar all dokumentation |
+| YAML lint | Lintar datafiler och konfiguration |
+| Workflow lint | Kontrollerar arbetsflödena i `.github/workflows/` |
+| Documentation links | Verifierar att dokumentationens interna länkar pekar rätt |
+
+När du öppnar en pull request fylls mallen i `.github/pull_request_template.md` i
+automatiskt. Gå igenom den — den är en checklista, inte en formalitet.
+
+Bakgrunden till varför säkerheten ser ut så här står i
+[`07-SAKERHET.md`](07-SAKERHET.md) och [ADR 0011](adr/0011-sakerhetslage-for-publikt-repo.md).
+
+---
+
+## 5. När en bild måste bort av rättighetsskäl
 
 Att radera filen räcker inte: den ligger kvar i git-historiken och går att hämta fram.
 Måste en bild bort på riktigt — för att någon på bilden ber om det, eller av
@@ -81,7 +105,7 @@ som förvaltar repot.
 
 ---
 
-## 5. Lintning och stil
+## 6. Lintning och stil
 
 - CSS använder enbart variablerna i `source/assets/css/tokens.css`. Ett hårdkodat
   färgvärde fälls av lintningen.

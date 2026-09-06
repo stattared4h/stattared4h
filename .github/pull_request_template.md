@@ -1,23 +1,34 @@
 # Pull request
 
-## Summary
+## Sammanfattning
 
-Describe what changed and why.
+Beskriv vad som ändrats och varför.
 
-## Validation
+## Förankring
 
-- [ ] I reviewed the diff for credentials, tokens, keys, private hostnames,
-      addresses, personal data and runtime data.
-- [ ] No secret is introduced in code, tests, fixtures, comments or commit
-      messages.
-- [ ] New dependencies are necessary, and I checked their source and
-      maintenance status.
-- [ ] Documentation is updated when behaviour or operating instructions
-      changed.
-- [ ] Repository quality checks pass locally where applicable.
+- [ ] Ändringen spåras till ett krav i `docs/02-krav/` med rätt `02-§`-ID.
+- [ ] Beteendeförändringar uppdaterar kravdokumentet i samma ändring.
+- [ ] Arkitektoniskt betydande beslut har en ADR i den här pull requesten.
+- [ ] Spårbarhetsmatrisen i `docs/99-sparbarhet/` är uppdaterad.
 
-## Security impact
+## Testplan
 
-Describe any change to authentication, authorisation, input handling, secrets
-handling, network exposure, dependencies or CI permissions. Write `None` if
-there are none.
+Beskriv hur ändringen är verifierad. Lista manuella kontrollpunkter med konkreta steg,
+till exempel *"öppna bingosidan i 360 px bredd och bekräfta att brickan får fem
+kolumner"*.
+
+- [ ] Bygge, lint, typkontroll och tester är gröna lokalt.
+- [ ] UI-ändringar är använda i en webbläsare, i mobil- och desktopbredd.
+
+## Säkerhet och integritet
+
+- [ ] Jag har granskat diffen efter lösenord, tokens, nycklar, privata värdnamn,
+      adresser och personuppgifter.
+- [ ] Ingen hemlighet finns i kod, tester, testdata, kommentarer eller
+      commit-meddelanden.
+- [ ] Nya beroenden är nödvändiga, och jag har kontrollerat deras ursprung och underhåll.
+- [ ] Ändringen samlar inte in personuppgifter om besökare (se ADR 0010).
+
+Beskriv förändringar som rör autentisering, behörighet, hantering av indata eller
+hemligheter, nätverksexponering, beroenden eller CI-behörigheter. Skriv `Inga` om det
+inte finns några.

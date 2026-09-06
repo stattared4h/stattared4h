@@ -55,6 +55,16 @@ sajt. Statusen nedan speglar det ärligt.
 | --- | --- | --- | --- |
 | `02-§1` | Målgrupp | `dokumenterad` | Vägledande, inte testbar |
 
+### Vad som inte spåras här
+
+Två sorters dokument har medvetet inga `§`-ID och står därför utanför matrisen:
+
+- **ADRerna** i `docs/adr/`. De dokumenterar beslut, inte krav. Ett beslut är inte
+  "byggt" eller "saknas" — det gäller eller är ersatt av ett senare beslut.
+- **`docs/07-SAKERHET.md`** och `SECURITY.md`. De är vägledning och policy för den som
+  förvaltar repot, inte krav på sajten. Att skyddet faktiskt fungerar verifieras av
+  CI-kontrollerna själva, inte av den här matrisen. <!-- 99-§1.3 -->
+
 ---
 
 ## Summering
