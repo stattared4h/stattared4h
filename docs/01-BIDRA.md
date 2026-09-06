@@ -1,8 +1,8 @@
 # Att bidra
 
 Den här sajten förvaltas av Stättareds 4H-gård. Det mesta som behöver ändras är
-**innehåll** — ett nytt djur, en ändrad öppettid, en ny aktivitet — och det kräver ingen
-utvecklarmiljö.
+**innehåll** — ett nytt djur, ett djurslag som bytt hage, en ny bild — och det kräver
+ingen utvecklarmiljö.
 
 ---
 
@@ -116,17 +116,20 @@ Blir en kontroll röd står det i meddelandet vad som är fel. De vanligaste är
 inte finns, en art som inte är upplagd, eller en förälder som stavats fel. Rätta i samma
 pull request — kontrollerna körs om av sig själva.
 
+**Tills vidare:** datavalideringen är inte byggd ännu (se spårbarhetsmatrisen). Fram till
+dess kontrollerar administratören filen mot datakontraktet för hand innan den läggs in.
+
 ---
 
 ## 3. Utvecklingsmiljö
 
-Node 22 eller senare.
+Node 22.18 eller senare — bygget importerar TypeScript direkt, se `03-§8.7`.
 
 ```bash
 git clone https://github.com/stattared4h/stattared4h.git
 cd stattared4h
 npm install
-npm start          # utvecklingsserver med omladdning
+npm start          # bygger och serverar public/ på localhost:8080
 ```
 
 Andra kommandon:
@@ -170,7 +173,7 @@ in i `main`.
 | Secret scan | Skannar hela git-historiken efter lösenord, nycklar och tokens |
 | CodeQL | Säkerhetsanalys av källkoden, plus en gång i veckan |
 | Dependency review | Stoppar nya beroenden med kända allvarliga sårbarheter |
-| Project checks | Kör projektets egna lint-, typkontroll-, bygg- och testskript |
+| Project checks | Kör bygget, samt lint-, typkontroll- och testskripten allteftersom de tillkommer |
 | Markdown lint | Lintar all dokumentation |
 | YAML lint | Lintar datafiler och konfiguration |
 | Workflow lint | Kontrollerar arbetsflödena i `.github/workflows/` |
@@ -198,9 +201,10 @@ som förvaltar repot.
 
 ## 7. Lintning och stil
 
-- CSS använder enbart variablerna i `source/assets/css/tokens.css`. Ett hårdkodat
-  färgvärde fälls av lintningen.
+- CSS använder enbart variablerna i `source/assets/css/tokens.css`. Lintregeln som fäller
+  ett hårdkodat värde tillkommer med verktygskedjan (`02-§9.3`); tills dess granskas det
+  för hand.
 - Markdown lintas. Rader bryts vid rimlig längd.
-- TypeScript typkontrolleras strikt.
+- TypeScript typkontrolleras strikt så snart domänskiktet finns.
 - Kod och fältnamn på engelska, allt en människa läser på svenska
   ([ADR 0006](adr/0006-sprak-i-kod-och-dokumentation.md)).

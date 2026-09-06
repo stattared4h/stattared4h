@@ -12,7 +12,7 @@ Bilderna är sajtens hjärta: ett djur man inte ser är ett djur man inte minns.
 
 - Djuren i ögonhöjd, inte uppifrån. Ett porträtt där ansiktet syns tydligt gör att
   besökaren känner igen djuret i verkligheten — och det är hela poängen med
-  spelen. <!-- 05-§8.2 -->
+  sajten. <!-- 05-§8.2 -->
 - Gården som den ser ut, i vardagsljus. Hellre ärligt än putsat. <!-- 05-§8.3 -->
 - Varje djur i datat bör ha minst ett foto som duger som porträtt. <!-- 05-§8.4 -->
 

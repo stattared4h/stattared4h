@@ -43,8 +43,8 @@ ställen är en bugg som väntar på att inträffa.
 | Hur den är byggd (lager, bygge, CI) | `docs/03-arkitektur/` |
 | Varför den är byggd så (beslut) | `docs/adr/` |
 | Datastruktur för djur och platser | `docs/04-DATAKONTRAKT.md` |
-| Färger, typografi, spacing | CSS-variabler i `source/assets/css/tokens.css` |
-| Innehåll om gården, djuren och aktiviteterna | YAML och Markdown under `source/` |
+| Färger, typografi, spacing | Beslutet i `docs/05-design/`; i kod bara som variabler i `source/assets/css/tokens.css` |
+| Innehåll om gården, djuren och hagarna | YAML och Markdown under `source/` |
 | Säkerhetsmodell och hur problem rapporteras | `SECURITY.md` |
 
 Regler:
@@ -88,8 +88,8 @@ Regler:
   "ändringar" eller "förbättringar". <!-- CL-§1.13 -->
   - Skriv varje krav som ett fristående faktum om hur systemet fungerar. En läsare som
     aldrig sett koden ska förstå kravet utan att veta vad som fanns förut.
-  - **Dåligt**: "Cacheversionen ska höjas till v4." / "Bingosidan ska läggas till i menyn."
-  - **Bra**: "Service workerns cache heter `s4h-v4`." / "Huvudmenyn innehåller Bingo."
+  - **Dåligt**: "Cacheversionen ska höjas till v4." / "Kartsidan ska läggas till i menyn."
+  - **Bra**: "Service workerns cache heter `s4h-v4`." / "Sidhuvudet innehåller en länk till kartan."
   - Undvik ord som: "ändrad", "uppdaterad", "ersatt", "borttagen", "höjd", "ny".
   - Avsnittet *Bakgrund* överst i varje kravsektion är enda platsen där motiv och
     historik hör hemma.
@@ -231,7 +231,7 @@ Sajten ska:
   git checkout -b grennamn
   ```
 
-- Välj ett beskrivande grennamn (`fix/bingo-sortering`, `feat/djurkort`,
+- Välj ett beskrivande grennamn (`fix/syskon-sortering`, `feat/djurkort`,
   `docs/datakontrakt`). Kommer uppgiften från ett GitHub-issue, ta med numret:
   `feat/42-skattjakt`. <!-- CL-§7.3 -->
 - När en gren är mergad och mergen hämtats hem via `main`, radera den lokala
@@ -321,8 +321,8 @@ Innan någon kod skrivs: <!-- CL-§8.2 -->
   manuell kontrollpunkt. <!-- CL-§8.6 -->
 - Krav som bara rör webbläsarbeteende (DOM, `fetch`, `localStorage`, CSS-layout) går
   inte att enhetstesta i Node. Märk dem som manuella kontrollpunkter med ett konkret,
-  utförbart verifieringssteg — till exempel *"öppna bingosidan i mobilbredd och
-  bekräfta att brickan får fem kolumner"*.
+  utförbart verifieringssteg — till exempel *"öppna platssidan i mobilbredd och
+  bekräfta att djurslagen syns utan att rulla"*.
 - Commit: `test: tester för [funktion]`
 
 ### Fas 4 — Implementation

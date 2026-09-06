@@ -152,7 +152,8 @@ Arbetsflöden kör tredjepartskod med tillgång till repots token.
 - Actions är låsta till fullständiga commit-SHA med en versionskommentar, aldrig till en
   rörlig tagg eller gren. En tagg kan flyttas; en SHA kan det inte.
 - Varje arbetsflöde deklarerar `permissions: contents: read` överst och höjer behörighet
-  bara i det jobb som behöver det. Endast CodeQL-jobbet har `security-events: write`.
+  bara i det jobb som behöver det: CodeQL-jobbet har `security-events: write`, deploy-jobbet
+  `pages: write` och `id-token: write`. Inget annat jobb har mer än läsrätt.
 - Utcheckningar använder `persist-credentials: false`, så att Actions-token inte blir
   kvar i `.git/config` där bygg- eller testkod kan läsa den.
 - Lägg inte till `pull_request_target`, `workflow_run` med indata som inte går att lita

@@ -11,7 +11,7 @@ updates:
         patterns:
           - "*"
 
-  # Active once a package.json exists at the repository root.
+  # npm dependencies, grouped so that a week of updates lands as one pull request.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
