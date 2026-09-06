@@ -16,14 +16,16 @@ den blockerar allt som faktiskt möter besökaren.
 
 Arbetet delas i två faser.
 
-**Fas 1 — nu.** Ingen server, ingen inloggning, inga konton. En enda person med
-skrivbehörighet till repot underhåller datat genom vanliga commits. Sajten byggs statiskt
-och ligger på GitHub Pages. Rollerna är i praktiken två: administratör, som är den personen,
-och besökare, som är alla andra.
+**Fas 1 — nu.** Ingen server och ingen egen inloggning. Redaktörer med GitHub-konto
+ändrar datat genom pull request, och rollerna upprätthålls av repots behörigheter — se
+[ADR 0014](0014-roller-via-github.md). Sajten byggs statiskt och ligger på GitHub Pages.
 
 **Fas 2 — när fas 1 visat sig bära.** Ett litet skriv-API på ett webbhotell tar emot
 redaktörernas formulär, kontrollerar roll och skriver YAML-filerna till repot via GitHubs
-API. Bygget deployar som förut. Redaktörer rör aldrig GitHub.
+API. Bygget deployar som förut. Redaktörer rör aldrig GitHub och behöver inget konto där.
+
+Först då blir en egen token meningsfull: SB Sommars signerade `namn_roll_epoch_sig` kan
+återanvändas, eftersom det finns en server som kan hålla signeringshemligheten.
 
 Datastrukturen i fas 1 väljs redan nu så att fas 2 blir ett tillägg och inte en migrering:
 en fil per djur och per plats, så att API:et kan skriva en post utan att röra någon annan.
