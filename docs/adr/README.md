@@ -29,3 +29,4 @@ Mall: `NNNN-kort-titel.md` med rubrikerna **Status** (Antagen/Ersatt + datum),
 | 0008 | [Fotografier commit:as som binärer; härledda format genereras](0008-bilder-i-repot.md) |
 | 0009 | [Spelen är datadrivna och delar gårdens datakälla](0009-datadrivna-spel.md) |
 | 0010 | [Ingen spårning och inga personuppgifter; spelframsteg bor i webbläsaren](0010-ingen-sparning-av-besokare.md) |
+| 0011 | [Säkerhetsläget för ett publikt repo](0011-sakerhetslage-for-publikt-repo.md) |

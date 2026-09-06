@@ -28,6 +28,7 @@ definierar detaljerna.
 | `docs/05-design/css-strategi.md` | Hur CSS skrivs, filstruktur och designtokens i `:root` |
 | `docs/05-design/bilder-och-tillganglighet.md` | Bildhantering, fotoregler, tillgänglighetsminimum |
 | `docs/06-MILJOER.md` | Lokalt, förhandsvisning och produktion; bas-sökväg och flytt av drift |
+| `docs/07-SAKERHET.md` | Säkerhet i ett publikt repo: checklista före push, CI-härdning, GitHub-inställningar |
 | `docs/adr/` | Arkitekturbeslut: varför saker ser ut som de gör |
 | `docs/99-sparbarhet/index.md` | Spårbarhetsmatris: krav → dokumentation → test → implementation |
 
@@ -44,6 +45,7 @@ ställen är en bugg som väntar på att inträffa.
 | Datastruktur för djur och aktiviteter | `docs/04-DATAKONTRAKT.md` |
 | Färger, typografi, spacing | CSS-variabler i `source/assets/css/tokens.css` |
 | Innehåll om gården, djuren och aktiviteterna | YAML och Markdown under `source/` |
+| Säkerhetsmodell och hur problem rapporteras | `SECURITY.md` |
 
 Regler:
 
@@ -118,6 +120,9 @@ Föredra etablerade, väl beprövade verktyg för statiska sajter. <!-- CL-§2.1
   annars fungerar den inte offline. <!-- CL-§2.15 -->
 - Inga personuppgifter om besökare, ingen spårning, inga tredjepartskakor. Sajten
   används av barn. Se ADR 0010. <!-- CL-§2.16 -->
+- Repot är publikt. Inga hemligheter, inga verkliga värdnamn och inga personuppgifter
+  i kod, testdata, kommentarer eller commit-meddelanden. Se `docs/07-SAKERHET.md`
+  och ADR 0011. <!-- CL-§2.17 -->
 
 ---
 

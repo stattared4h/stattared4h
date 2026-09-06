@@ -18,7 +18,7 @@ offline och samlar inte in några personuppgifter.
 | Datastrukturen för djur och aktiviteter | [`docs/04-DATAKONTRAKT.md`](docs/04-DATAKONTRAKT.md) |
 | Färger, typografi, komponenter | [`docs/05-design/`](docs/05-design/index.md) |
 | Miljöer och drift | [`docs/06-MILJOER.md`](docs/06-MILJOER.md) |
-| Säkerhet i ett publikt repo | [`docs/public-repo-safety.md`](docs/public-repo-safety.md) |
+| Säkerhet i ett publikt repo | [`docs/07-SAKERHET.md`](docs/07-SAKERHET.md) |
 | Varför saker ser ut som de gör | [`docs/adr/`](docs/adr/README.md) |
 
 ## Säkerhet
@@ -29,7 +29,7 @@ lösenord, nycklar, tokens eller personuppgifter.
 
 - [Säkerhetspolicy](SECURITY.md) — hur du rapporterar ett problem, och vad som gäller om
   en hemlighet råkat hamna i repot.
-- [Säkerhet i ett publikt repo](docs/public-repo-safety.md) — checklistan före push och
+- [Säkerhet i ett publikt repo](docs/07-SAKERHET.md) — checklistan före push och
   skälen bakom varje regel.
 
 ## Automatiska kontroller
