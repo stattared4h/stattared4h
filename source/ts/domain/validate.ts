@@ -8,7 +8,7 @@
  * The validator also normalises: `born` becomes "YYYY-MM-DD" or "YYYY", missing
  * optional fields become null or [], and the resulting Dataset is sorted (02-§6.9).
  */
-import { readFile, stat } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { normaliseBorn } from "./born.ts";
 import type { RawDataset, RawRecord } from "./load.ts";
@@ -678,13 +678,16 @@ interface ImageRef {
 async function validateImages(refs: ImageRef[], imagesDir: string, issues: Issues): Promise<void> {
   for (const ref of refs) {
     const fullPath = path.join(imagesDir, ref.relative);
-    let size: number;
+    // Read once and measure the bytes we read, so the check and the parse never
+    // disagree about which file version they saw.
+    let bytes: Buffer;
     try {
-      size = (await stat(fullPath)).size;
+      bytes = await readFile(fullPath);
     } catch {
       issues.error(ref.file, ref.field, `bilden ${ref.relative} finns inte under ${imagesDir}.`);
       continue;
     }
+    const size = bytes.byteLength;
     if (size > MAX_IMAGE_BYTES) {
       issues.error(
         ref.file,
@@ -692,7 +695,7 @@ async function validateImages(refs: ImageRef[], imagesDir: string, issues: Issue
         `bilden ${ref.relative} är ${Math.round(size / 1024)} KB; högst ${MAX_IMAGE_BYTES / 1024} KB tillåts. Kör npm run image.`,
       );
     }
-    const info = inspectWebp(new Uint8Array(await readFile(fullPath)));
+    const info = inspectWebp(new Uint8Array(bytes));
     if (!info.ok) {
       issues.error(ref.file, ref.field, `bilden ${ref.relative} är inte en WebP-fil. Kör npm run image.`);
       continue;
