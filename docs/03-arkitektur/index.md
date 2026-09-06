@@ -156,15 +156,21 @@ bas-sökvägens hjälpfunktion, och att inget djur har fått ett `location`-fäl
   TypeScript direkt, och Node tar bort typannoteringarna utan kompilering. Domänen
   undviker därför `enum`, `namespace` och parameteregenskaper, som kräver
   kompilering. <!-- 03-§8.7 -->
-- Två deploy-arbetsflöden delar ett återanvändbart: `deploy-qa.yml` triggas av push till
-  `main` efter grönt kvalitetsflöde, `deploy-prod.yml` av "Run workflow" med ett
-  godkännandejobb i miljön `production`. Det återanvändbara flödet bygger båda
-  miljöerna och laddar upp en Pages-artefakt (`02-§9.11`). <!-- 03-§8.8 -->
+- Två deploy-arbetsflöden delar ett återanvändbart: "Deploy till QA" (`deploy-qa.yml`)
+  triggas av att arbetsflödet "Quality" avslutats på `main` och kör bara när det blev
+  grönt på den commiten; "Deploy till produktion" (`deploy-prod.yml`) av "Run workflow"
+  med ett godkännandejobb i miljön `production`. Det återanvändbara flödet `deploy.yml`
+  tar `version`, `qa_version`, `prod_ref` och `ref`, bygger båda miljöerna och laddar
+  upp en Pages-artefakt (`02-§9.11`). De två deploy-jobben delar `concurrency`-gruppen
+  `pages`, så bara en deploy kör åt gången och en pågående avbryts
+  aldrig. <!-- 03-§8.8 -->
 - Produktion och QA byggs i samma deploy: två byggen med olika `DATA_DIR`, `BASE_PATH`
   och `BUILD_VERSION`, där QA-bygget läggs under `public/qa/` innan artefakten laddas
-  upp. I QA-deployen checkas produktionens kod ut från senaste taggen `vX.Y.*` i en egen
-  katalog, och `source/data/` och `source/content/` kopieras dit från `main` innan
-  bygget; i produktionsdeployen byggs båda från `main`. <!-- 03-§8.9 -->
+  upp. I QA-deployen checkas produktionens kod ut från senaste produktionstaggen —
+  den högsta `vX.Y.P` oavsett serie, så att kod som inte släppts aldrig når roten — i
+  en egen katalog, och `source/data/` och `source/content/` kopieras dit från `main`
+  innan bygget; finns ingen tagg byggs produktionen från `main`. I produktionsdeployen
+  byggs båda från `main`. <!-- 03-§8.9 -->
 
 ---
 
@@ -203,9 +209,11 @@ Versionen räknas i deploy-arbetsflödena, aldrig i bygget. `deploy-prod.yml` l�
 ur `VERSION`, tar senaste taggen `vX.Y.*` och räknar upp patchnumret; efter lyckad
 deploy sätter ett jobb med `contents: write` den annoterade taggen och, för den första
 taggen i serien, en GitHub Release med `--generate-notes` (`02-§10.24`).
-`deploy-qa.yml` tar senaste taggens version, eller `X.Y.0`, och lägger till
-" – QA PR<n>", där numret hämtas via GitHubs API för commiten eftersom en rebase-merge
-inte bär det i ämnesraden, med kort SHA som reserv (`02-§10.33`). Strängen skickas som
+`deploy-qa.yml` tar versionen ur senaste taggen `vX.Y.*` för `X.Y` i `VERSION`, eller
+`X.Y.0` när serien saknar tagg, och lägger till " – QA PR<n>", där numret hämtas via
+GitHubs API för commiten eftersom en rebase-merge inte bär det i ämnesraden, med kort
+SHA som reserv (`02-§10.33`). Produktionsdeployen skickar sin version som både
+`version` och `qa_version`, så QA visar släppet utan suffix (`02-§10.34`). Strängen skickas som
 `BUILD_VERSION` till bygget, som skriver in den i sidfoten, om-sidan, manifestets
 `version`-fält och service workerns cachenamn. <!-- 03-§10.4 -->
 

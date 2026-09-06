@@ -150,7 +150,8 @@ Andra kommandon:
 | `npm run image -- <fil>` | Webbanpassar ett foto och lägger det i `source/images/` (§2) |
 | `npm run qa:images` | Genererar platshållarbilderna som QA-datat refererar, i `source/images-qa/` |
 | `npm test` | Kör testerna i `tests/` mot QA-datat |
-| `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en |
+| `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en, och kör dokumentkontrollen |
+| `npm run lint:docs` | Dokumentkontrollen ensam: dubbla `§`-ID, citeringar i spårbarhetsmatrisen, dess summering, och sökvägar i kodkommentarer |
 | `npm run typecheck` | Typkontrollerar TypeScript strikt |
 | `npm run validate` | Validerar datat i `DATA_DIR` (`source/data` som standard) och avslutar med felkod vid fel |
 
@@ -192,7 +193,7 @@ in i `main`.
 | Secret scan | Skannar hela git-historiken efter lösenord, nycklar och tokens |
 | CodeQL | Säkerhetsanalys av källkoden, plus en gång i veckan |
 | Dependency review | Stoppar nya beroenden med kända allvarliga sårbarheter |
-| Project checks | Kör bygget, samt lint-, typkontroll- och testskripten allteftersom de tillkommer |
+| Project checks | Kör bygget, lint (inklusive dokumentkontrollen `npm run lint:docs`), typkontroll och tester |
 | Markdown lint | Lintar all dokumentation |
 | YAML lint | Lintar datafiler och konfiguration |
 | Workflow lint | Kontrollerar arbetsflödena i `.github/workflows/` |
@@ -200,6 +201,15 @@ in i `main`.
 
 När du öppnar en pull request fylls mallen i `.github/pull_request_template.md` i
 automatiskt. Gå igenom den — den är en checklista, inte en formalitet.
+
+Två arbetsflöden deployar, och de är inte kontroller:
+
+| Arbetsflöde | När det kör | Vad det gör |
+| --- | --- | --- |
+| Deploy till QA | Av sig självt när *Quality* blivit grön på `main` | Deployar QA under `/qa/` och bygger om produktionen med senaste taggens kod och `main`:s innehåll |
+| Deploy till produktion | När någon startar det och godkänner i miljön `production` | Släpper `main` till produktionen, sätter en tagg och skriver en Release |
+
+Stegen för ett släpp står i [`08-SLAPP.md`](08-SLAPP.md).
 
 Bakgrunden till varför säkerheten ser ut så här står i
 [`07-SAKERHET.md`](07-SAKERHET.md) och [ADR 0011](adr/0011-sakerhetslage-for-publikt-repo.md).
