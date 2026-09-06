@@ -4,6 +4,11 @@
   "private": true,
   "description": "Djurguide för Stättareds 4H-gård — ett komplement till 4h.se/stattared",
   "license": "MIT",
+  "homepage": "https://stattared4h.github.io/stattared4h/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stattared4h/stattared4h.git"
+  },
   "type": "module",
   "engines": {
     "node": ">=22"
