@@ -1,41 +1,52 @@
-# stattared4h
+# Stättareds 4H-gård
 
-Public repository for the `stattared4h` organisation.
+Hemsida och innehållsdatabas för Stättareds 4H-gård: gårdens djur, aktiviteter och
+platser — plus interaktiva spel som djurbingo, gissa vad djuret heter och skattjakter,
+som hjälper besökare att upptäcka omgivningarna.
 
-## Security
+Sajten är en installerbar webbapp (PWA) för iOS och Android. Den är statisk, fungerar
+offline och samlar inte in några personuppgifter.
 
-This repository is public. Everything committed here — including Git history,
-commit metadata, branches and GitHub Actions logs — is visible to everyone, so
-it must never contain credentials, keys, tokens or personal data.
+## Var saker finns
 
-- [Security policy](SECURITY.md) — how to report a problem, and what to do if a
-  secret is ever committed.
-- [Public repository safety](docs/public-repo-safety.md) — the review checklist
-  and the reasoning behind each rule.
-
-## Automated checks
-
-Every push and pull request runs:
-
-| Check | What it does |
+| Vad | Var |
 | --- | --- |
-| Secret scan | Runs Gitleaks against the full Git history. |
-| CodeQL | Static security analysis of tracked source code, plus weekly. |
-| Dependency review | Blocks pull requests adding vulnerable dependencies. |
-| Project checks | Runs the project's own lint, typecheck, build and test scripts. |
-| Markdown, YAML and workflow lint | Keeps configuration and documentation valid. |
-| Documentation links | Verifies that local Markdown links resolve. |
+| Arbetsprocessen — läs denna först | [`CLAUDE.md`](CLAUDE.md) |
+| Ändra innehåll utan utvecklarmiljö | [`docs/01-BIDRA.md`](docs/01-BIDRA.md) |
+| Vad sajten ska göra | [`docs/02-krav/`](docs/02-krav/index.md) |
+| Hur den är byggd | [`docs/03-arkitektur/`](docs/03-arkitektur/index.md) |
+| Datastrukturen för djur och aktiviteter | [`docs/04-DATAKONTRAKT.md`](docs/04-DATAKONTRAKT.md) |
+| Färger, typografi, komponenter | [`docs/05-design/`](docs/05-design/index.md) |
+| Miljöer och drift | [`docs/06-MILJOER.md`](docs/06-MILJOER.md) |
+| Säkerhet i ett publikt repo | [`docs/public-repo-safety.md`](docs/public-repo-safety.md) |
+| Varför saker ser ut som de gör | [`docs/adr/`](docs/adr/README.md) |
 
-GitHub Actions are pinned to commit SHAs, workflows are read-only by default,
-and `main` is protected by the ruleset in
+## Säkerhet
+
+Repot är publikt. Allt som läggs här — git-historik, commit-uppgifter, grenar och
+loggar från GitHub Actions — är synligt för alla, och får därför aldrig innehålla
+lösenord, nycklar, tokens eller personuppgifter.
+
+- [Säkerhetspolicy](SECURITY.md) — hur du rapporterar ett problem, och vad som gäller om
+  en hemlighet råkat hamna i repot.
+- [Säkerhet i ett publikt repo](docs/public-repo-safety.md) — checklistan före push och
+  skälen bakom varje regel.
+
+## Automatiska kontroller
+
+Varje push och pull request kör hemlighetsskanning av hela historiken, CodeQL,
+granskning av nya beroenden, lintning av Markdown, YAML och arbetsflöden, samt en
+kontroll av att dokumentationens länkar pekar rätt. `main` skyddas av regelverket i
 [`.github/rulesets/main-protection.json`](.github/rulesets/main-protection.json).
 
-## Contributing
+## Läget
 
-Open a pull request against `main` and fill in the
-[pull request template](.github/pull_request_template.md). Review your own diff
-for secrets and private information before pushing.
+Ramverket är på plats: process, arkitekturbeslut, datakontrakt och designsystem.
+Själva sajten är inte byggd ännu — se
+[spårbarhetsmatrisen](docs/99-sparbarhet/index.md) för vad som finns och vad som saknas.
 
-## Licence
+Designen ärver 4H:s visuella identitet från `4h.se/stattared`, med tillstånd.
+
+## Licens
 
 [MIT](LICENSE)
