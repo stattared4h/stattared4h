@@ -43,6 +43,21 @@ Mobilen är utgångsläget. Skrivbordsvyn är den fördjupning som läsare 3 få
 
 ---
 
+## Var kraven kommer ifrån
+
+Uppdrag kommer in som **GitHub-issues**. Där formuleras målbilden med acceptanskriterier,
+och där förs diskussionen med gården. <!-- 02-§2.1 -->
+
+Issues är intaget; den här katalogen är det varaktiga registret. Ett issue stängs när
+arbetet är gjort, men kravet ska gå att läsa i repot om fem år. Därför skrivs varje
+överenskommet krav in här med ett `02-§`-ID, och issue-numret noteras intill. <!-- 02-§2.2 -->
+
+Går ett beslut emot vad ett issue säger — vilket har hänt, se
+[ADR 0012](../adr/0012-ingen-individuell-platssparning.md) — kommenteras issuet med skälet,
+så att avvikelsen syns där kravet väcktes. <!-- 02-§2.3 -->
+
+---
+
 ## Kartan över kravfiler
 
 Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett intervall av
@@ -50,7 +65,7 @@ Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett inter
 
 | Fil | Ämne | Avsnitt |
 | --- | --- | --- |
-| `index.md` (denna) | Målgrupp och kravkonventioner | §1 |
+| `index.md` (denna) | Målgrupp, kravkonventioner och intag | §1, §2 |
 
 Kravfiler skrivs i takt med att funktioner tas fram, enligt fas 1 i `CLAUDE.md`. Att den
 här tabellen är kort betyder att sajten är i sin början — inte att kraven saknas.

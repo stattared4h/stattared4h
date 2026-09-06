@@ -1,211 +1,213 @@
 # Datakontrakt
 
-Detta dokument definierar den officiella datastrukturen för gårdens data.
+Detta dokument definierar datastrukturen för gårdens data.
 
-Kontraktet ändras inte lättvindigt: sidor, spel och validering bygger på det. Se
-[ADR 0002](adr/0002-yaml-som-databas.md) för varför datat är YAML och inte en
-databasmotor.
+Kontraktet ändras inte lättvindigt: sidor och validering bygger på det. Se
+[ADR 0002](adr/0002-yaml-som-databas.md) för varför datat är YAML-filer i repot.
 
-**Fältnamnen är engelska, värdena svenska** — se [ADR 0006](adr/0006-sprak-i-kod-och-dokumentation.md).
-Varje fält förklaras på svenska nedan, så att den som redigerar en fil kan slå upp vad
-det betyder.
-
----
-
-## 1. Filer och placering
-
-| Fil | Innehåll |
-| --- | --- |
-| `source/data/animals.yaml` | Gårdens djur |
-| `source/data/activities.yaml` | Aktiviteter och öppettider |
-| `source/data/places.yaml` | Platser på gården, med koordinater |
-| `source/data/hunts/<id>.yaml` | En skattjakt per fil |
-
-En fil per ämne håller diffarna små och konflikterna få när flera redigerar
-samtidigt. <!-- 04-§1.1 -->
+**Fältnamnen är engelska, värdena svenska** — se
+[ADR 0006](adr/0006-sprak-i-kod-och-dokumentation.md). Varje fält förklaras på svenska
+nedan, så att den som redigerar en fil kan slå upp vad det betyder.
 
 ---
 
-## 2. Identifierare
+## 1. Vad datat är till för
 
-Alla `id`-fält följer samma regler: <!-- 04-§2.1 -->
+Datat finns för **besökaren**. Det är inte en journal, inte ett stambokssystem och
+inte ett driftsregister för gården. Det svarar på tre frågor: <!-- 04-§1.1 -->
 
-- Små bokstäver `a–z`, siffror och bindestreck. Inga åäö, inga mellanslag, ingen
-  versal. <!-- 04-§2.2 -->
-- Härleds från namnet: `Rosa` blir `rosa`, `Lilla Gumman` blir `lilla-gumman`.
-- **Ändras aldrig** efter att posten skapats. Länkar, bokmärken och sparat spelframsteg
-  pekar på id:t. Ett djur som byter namn behåller sitt id. <!-- 04-§2.3 -->
-- Måste vara unikt inom sin fil. Dubbletter fäller valideringen. <!-- 04-§2.4 -->
+- Vilka djur finns här, och hur ser de ut?
+- Vem är släkt med vem?
+- Vilka djurslag går i vilken hage?
+
+Allt som inte tjänar någon av de frågorna hör inte hemma här. <!-- 04-§1.2 -->
 
 ---
 
-## 3. Djur — `animals.yaml`
+## 2. Filer och placering
 
-```yaml
-animals:
-  - id: string                 # stabil identifierare, ändras aldrig
-    name: string               # djurets namn, t.ex. "Rosa"
-    species: string            # art-id ur listan i §3.3, t.ex. "get"
-    sex: female | male | unknown
-    born: YYYY-MM-DD | YYYY    # helt datum, eller bara år om dagen är okänd
-    arrived: YYYY-MM-DD | null # när djuret kom till gården, om det inte fötts här
-    status: here | away | remembered
-    home: string               # plats-id ur places.yaml, där djuret normalt finns
-    description: string        # markdown, presentationstexten på djurets sida
-    traits: [string]           # korta egenskaper som visas som etiketter
-    clues: [string]            # ledtrådar till "gissa djuret", se §3.4
-    photos:
-      - file: string           # sökväg i source/images/
-        alt: string            # alternativtext på svenska, obligatorisk
-        credit: string         # fotograf eller rättighetshavare
-        portrait: boolean      # true på den bild som används som porträtt
+```text
+source/data/
+├── species.yaml              # vokabulär: arterna vi känner igen
+├── breeds.yaml               # vokabulär: raserna
+├── animals/<djur-id>.yaml    # en fil per djur
+└── locations/<plats-id>.yaml # en fil per hage eller plats
 ```
 
-### Obligatoriska fält
+Regeln bakom uppdelningen: **egen fil för det som har en egen publik sida. En
+gemensam fil för kontrollerad vokabulär.** <!-- 04-§2.1 -->
 
-`id`, `name`, `species`, `sex`, `status`, `home` och `description` är obligatoriska.
-Övriga får utelämnas. <!-- 04-§3.1 -->
-
-### `status`
-
-| Värde | Betydelse |
-| --- | --- |
-| `here` | Finns på gården nu och visas överallt |
-| `away` | Tillfälligt borta, visas men markerad |
-| `remembered` | Har lämnat gården, visas bara i minnesavsnittet och deltar inte i spel |
-
-Ett djur raderas aldrig ur filen när det lämnar gården — det får `remembered`. Att radera
-posten skulle bryta länkar och göra historien osynlig. <!-- 04-§3.2 -->
-
-### `species`
-
-Arten anges som ett id, och arterna definieras en gång i `source/data/species.yaml` med
-svenskt namn i singular och plural samt en ikon. Det gör att "get" och "getter" stavas
-likadant överallt. <!-- 04-§3.3 -->
-
-### `clues`
-
-Ledtrådarna används av spelet "gissa vad djuret heter". Varje ledtråd är en fristående
-mening som inte avslöjar namnet, ordnade från svårast till lättast. Ett djur behöver minst
-tre ledtrådar för att kunna delta i spelet. <!-- 04-§3.4 -->
-
-### Vad ett djur behöver för att vara med i spelen
-
-Kraven uttrycks i datat, inte i koden. Ett djur som inte uppfyller dem hoppas över, och
-valideringen påpekar det. <!-- 04-§3.5 -->
-
-| Spel | Krav |
-| --- | --- |
-| Djurbingo | `status: here` och minst ett foto med `portrait: true` |
-| Gissa djuret | `status: here`, ett porträttfoto och minst tre `clues` |
-| Skattjakt | Djuret refereras från en post i en skattjaktsfil |
+Djur och platser har egna sidor, växer i innehåll och redigeras var för sig — därför
+egna filer, som aldrig kolliderar när flera redigerar samtidigt. Arter och raser är ett
+femtontal poster som ändras några gånger om året och läses bäst som en lista. <!-- 04-§2.2 -->
 
 ---
 
-## 4. Aktiviteter — `activities.yaml`
+## 3. Identifierare
+
+**Filnamnet är postens id.** `animals/rosa.yaml` har id:t `rosa`. Id:t upprepas inte
+inuti filen — det skulle vara samma faktum på två ställen. <!-- 04-§3.1 -->
+
+- Små bokstäver `a–z`, siffror och bindestreck. Inga åäö, inga mellanslag, inga
+  versaler. `Lilla Gumman` blir `lilla-gumman`. <!-- 04-§3.2 -->
+- **Ändras aldrig.** Länkar, bokmärken och QR-koder pekar på id:t. Ett djur som byter
+  namn behåller sitt id. <!-- 04-§3.3 -->
+
+---
+
+## 4. Djur — `animals/<id>.yaml`
 
 ```yaml
-activities:
+name: string                 # djurets namn, t.ex. "Rosa"
+species: string              # art-id ur species.yaml
+breed: string | null         # ras-id ur breeds.yaml
+sex: female | male | unknown
+born: YYYY-MM-DD | YYYY | null   # helt datum, eller bara år
+mother: string | null        # djur-id, om mamman finns i registret
+father: string | null        # djur-id, om pappan finns i registret
+status: here | gone          # finns på gården, eller har lämnat den
+description: string | null   # markdown, presentationstexten
+photos:
+  - file: string             # filnamn i source/images/animals/
+    alt: string              # alternativtext på svenska, obligatorisk
+    credit: string           # fotograf eller rättighetshavare
+    portrait: boolean        # true på bilden som används som porträtt
+```
+
+Obligatoriskt: `name`, `species`, `sex` och `status`. Övrigt får utelämnas. <!-- 04-§4.1 -->
+
+### Ingen plats på djuret
+
+Ett djur har **inget** `location`-fält, och får aldrig få ett. Djuren flyttas ofta
+individuellt, så en individuell platsuppgift vore inaktuell inom dagar — och ett register
+som ljuger är sämre än inget register. Var djurslagen finns står på platsen i stället.
+Se [ADR 0012](adr/0012-ingen-individuell-platssparning.md). <!-- 04-§4.2 -->
+
+### Ingen journal
+
+Det finns inga händelser, inga vägningar, inga behandlingar och inga
+ankomstdatum. Sådant hör till gårdens drift, inte till besökarens sajt. Ett djur som
+lämnat gården får `status: gone` och behålls, så att länkar och historik
+överlever. <!-- 04-§4.3 -->
+
+### Stamtavla
+
+`mother` och `father` pekar på djur-id. Avkomma härleds genom att söka baklänges — den
+skrivs aldrig in, eftersom den då skulle stå på två ställen och kunna glida
+isär. <!-- 04-§4.4 -->
+
+Föräldrar som inte finns i registret utelämnas. Ska en utomstående far nämnas hör det
+hemma i `description`. <!-- 04-§4.5 -->
+
+---
+
+## 5. Platser — `locations/<id>.yaml`
+
+Platsen är sajtens nav: QR-koden på hagen pekar hit, och härifrån väljer besökaren
+djuren som finns där. <!-- 04-§5.1 -->
+
+```yaml
+name: string                 # platsens namn, t.ex. "Gethagen"
+species: [string]            # art-id:n som går här nu — kan vara flera
+note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
+description: string | null   # markdown
+lat: number | null           # WGS84, sex decimaler
+lon: number | null
+accessible: boolean          # nåbar med rullstol eller barnvagn
+active: boolean              # false för platser som inte används just nu
+```
+
+Regler:
+
+- `species` är listan över **djurslag**, inte individer. Flera djurslag kan gå i samma
+  hage, och samma djurslag kan finnas på flera platser. <!-- 04-§5.2 -->
+- `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
+  är ingen uppgift att gissa. <!-- 04-§5.3 -->
+- En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död
+  sida. <!-- 04-§5.4 -->
+- Att flytta ett djurslag är två ändringar: ta bort arten ur en platsfil, lägg till den i
+  en annan. Ingen validering kan fånga en glömd halva, eftersom samma djurslag på två
+  platser också kan vara sant. <!-- 04-§5.5 -->
+
+---
+
+## 6. Arter — `species.yaml`
+
+```yaml
+species:
+  - id: string               # t.ex. "get"
+    name: string             # singular, "Get"
+    plural: string           # "Getter"
+```
+
+Arten anges en gång här, så att "get" och "getter" stavas likadant överallt. <!-- 04-§6.1 -->
+
+Redaktionell text om en art — vad de äter, hur de beter sig — skrivs som Markdown under
+`source/content/arter/<id>.md`, inte i den här filen. Struktur i YAML, prosa i
+Markdown. <!-- 04-§6.2 -->
+
+---
+
+## 7. Raser — `breeds.yaml`
+
+```yaml
+breeds:
   - id: string
-    title: string              # aktivitetens namn
-    kind: recurring | dated    # återkommande eller enskilt tillfälle
-    description: string        # markdown
-    place: string              # plats-id ur places.yaml
-    audience: string | null    # t.ex. "Från 6 år", "Hela familjen"
-    booking: none | required | recommended
-    link: string | null        # extern länk, t.ex. till bokning
-
-    # när kind: dated
-    date: YYYY-MM-DD
-    start: "HH:MM"
-    end: "HH:MM" | null
-
-    # när kind: recurring
-    weekdays: [mon|tue|wed|thu|fri|sat|sun]
-    season_start: MM-DD | null # första dagen på säsongen, utan år
-    season_end: MM-DD | null
+    name: string             # t.ex. "Jämtget"
+    species: string          # art-id rasen hör till
+    heritage: boolean        # true för svensk lantras
 ```
 
-Regler: <!-- 04-§4.1 -->
-
-- `end` måste vara efter `start` när båda finns. <!-- 04-§4.2 -->
-- En `dated`-aktivitet vars datum passerat visas inte bland kommande aktiviteter, men
-  raderas inte ur filen. <!-- 04-§4.3 -->
-- En `recurring`-aktivitet utan säsongsfält gäller året runt. <!-- 04-§4.4 -->
-- Sorteringen är deterministisk: datum och starttid först, därefter `id`. Två aktiviteter
-  kan aldrig byta plats mellan två bygganden. <!-- 04-§4.5 -->
+<!-- 04-§7.1 -->
 
 ---
 
-## 5. Platser — `places.yaml`
+## 8. Härledda vyer
 
-```yaml
-places:
-  - id: string
-    name: string               # platsens namn, t.ex. "Ladugården"
-    description: string | null # markdown
-    lat: number | null         # WGS84, sex decimaler
-    lon: number | null
-    accessible: boolean        # nåbar med rullstol eller barnvagn
-```
+Inget av detta lagras — allt räknas fram i bygget, så att samma faktum aldrig står på
+två ställen. <!-- 04-§8.1 -->
 
-Regler: <!-- 04-§5.1 -->
+| Vy | Härleds ur |
+| --- | --- |
+| Vilka djur finns på en plats | platsens `species` → djur med den arten och `status: here` |
+| Var finns ett djurslag | alla platser vars `species` innehåller arten |
+| Ett djurs avkomma | djur vars `mother` eller `father` är detta djur |
+| Syskon | djur med samma `mother` eller `father` |
+| Djur per ras | djur med det `breed`-id:t |
 
-- Varje `home` i `animals.yaml`, `place` i `activities.yaml` och plats i en skattjakt
-  måste peka på ett `id` som finns här. Valideringen kontrollerar det. <!-- 04-§5.2 -->
-- `lat` och `lon` får utelämnas för platser som inte ska ligga på kartan, men en plats i
-  en skattjakt måste ha koordinater. <!-- 04-§5.3 -->
-- `accessible` sätts medvetet för varje plats. Utelämnas fältet fäller valideringen —
-  det är ingen uppgift att gissa. <!-- 04-§5.4 -->
+Djurets egen sida påstår aldrig var individen står. Den säger vilken art djuret är, och
+länkar till artsidan som visar var arten finns. <!-- 04-§8.2 -->
 
 ---
 
-## 6. Skattjakter — `hunts/<id>.yaml`
+## 9. Bilder
 
-```yaml
-hunt:
-  id: string
-  title: string
-  description: string          # markdown, vad jakten går ut på
-  audience: string             # t.ex. "Från 7 år"
-  duration_minutes: number     # ungefärlig tid
-  order: fixed | any           # måste posterna tas i ordning?
+Bilder ligger i `source/images/animals/`, `source/images/places/` och
+`source/images/content/`, platt inom varje mapp, med filnamn som inleds med postens
+id. <!-- 04-§9.1 -->
 
-stations:
-  - id: string
-    place: string              # plats-id ur places.yaml, måste ha koordinater
-    clue: string               # ledtråden som leder hit
-    question: string | null    # frågan som besvaras på plats
-    answer: string | null      # rätt svar, jämförs okänsligt för versaler och blanksteg
-    animal: string | null      # djur-id, om posten handlar om ett djur
-    reveal: string             # texten som visas när posten är klarad
-```
+YAML refererar **bara filnamnet**, aldrig en sökväg. Bygget avgör var filen bor, så att
+lagringen kan bytas utan att datat rörs. <!-- 04-§9.2 -->
 
-Regler: <!-- 04-§6.1 -->
-
-- En skattjakt behöver minst tre poster. <!-- 04-§6.2 -->
-- Har en post `question` måste den också ha `answer`. <!-- 04-§6.3 -->
-- `answer` jämförs efter att versaler, inledande och avslutande blanksteg samt
-  dubbla mellanslag normaliserats. Svaret ska vara ett enda ord eller ett kort
-  uttryck — inte en mening ett barn ska stava rätt. <!-- 04-§6.4 -->
-- Posternas `id` är unika inom jakten, och används för att spara framsteg i
-  webbläsaren. De ändras aldrig, för då tappar en pågående jakt sitt läge. <!-- 04-§6.5 -->
+Bara webbanpassade bilder läggs i repot — WebP, högst 1600 px och 250 KB. Original bevaras
+i gårdens eget arkiv. Se [ADR 0008](adr/0008-bilder-i-repot.md). <!-- 04-§9.3 -->
 
 ---
 
-## 7. Validering
+## 10. Validering
 
-Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§7.1 -->
+Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 
-- Att alla obligatoriska fält finns. <!-- 04-§7.2 -->
-- Att alla `id` följer formatet i §2 och är unika. <!-- 04-§7.3 -->
-- Att datum är giltiga och att sluttid ligger efter starttid. <!-- 04-§7.4 -->
-- Att varje referens till en plats, ett djur eller en art pekar på något som
-  finns. <!-- 04-§7.5 -->
-- Att varje refererad bildfil finns i `source/images/` och har alternativtext och
-  upphovsuppgift. <!-- 04-§7.6 -->
-- Att inget fält innehåller HTML. Innehåll är markdown eller ren text. <!-- 04-§7.7 -->
+- Att obligatoriska fält finns. <!-- 04-§10.2 -->
+- Att filnamnen följer id-formatet i §3. <!-- 04-§10.3 -->
+- Att `born` är ett giltigt datum eller årtal, och inte i framtiden. <!-- 04-§10.4 -->
+- Att varje `species`, `breed`, `mother` och `father` pekar på något som finns. <!-- 04-§10.5 -->
+- Att ingen stamtavla går i cirkel, och att ingen är sin egen förälder. <!-- 04-§10.6 -->
+- Att varje refererad bildfil finns, har alternativtext och upphovsuppgift, och håller sig
+  inom mått- och storleksgränsen. <!-- 04-§10.7 -->
+- Att inget djur har ett `location`-fält. <!-- 04-§10.8 -->
+- Att inget fält innehåller HTML. Innehåll är markdown eller ren text. <!-- 04-§10.9 -->
 
 Valideringen ger dessutom **varningar** som inte fäller bygget, för sådant som är tillåtet
-men troligen ett förbiseende: ett djur utan foto, ett `here`-djur utan ledtrådar, en plats
-utan koordinater. <!-- 04-§7.8 -->
+men troligen ett förbiseende: ett djur utan foto, en aktiv plats utan djurslag, en plats
+utan koordinater. <!-- 04-§10.10 -->

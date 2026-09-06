@@ -1,46 +1,48 @@
-# 0001 — Statisk sajt utan server och utan klientramverk
+# 0001 — Statiskt byggd sajt utan klientramverk
 
 **Status:** Antagen, 2026-09-06
 
 ## Sammanhang
 
-Stättareds 4H-gård är en ideell förening. Sajten ska presentera gården, djuren och
-aktiviteterna, och köra några små spel som hjälper besökare att upptäcka omgivningarna.
-Besökarna kommer i huvudsak från mobilen, ofta stående ute på gården där täckningen är
-ojämn. Den som förvaltar sajten över tid är sannolikt inte utvecklare, och bemanningen i
-en förening växlar mellan säsonger.
+Stättareds 4H-gård är en ideell förening. Sajten ska presentera gården och dess djur, och
+hjälpa besökaren att hitta rätt bland hagarna. Besökarna kommer från mobilen, ofta stående
+ute på gården där täckningen är ojämn. Den som förvaltar sajten över tid är inte
+utvecklare, och bemanningen i en förening växlar mellan säsonger.
 
-Det ger tre krav som styr allt annat: sajten måste vara billig att driva, tåla att stå
-orörd i månader utan säkerhetsuppdateringar, och ladda snabbt på en halvdan mobil
-uppkoppling.
+Det ger tre krav: billig drift, tålighet mot att stå orörd i månader utan
+säkerhetsuppdateringar, och snabb laddning på en halvdan uppkoppling.
 
 ## Beslut
 
-Sajten byggs till statisk HTML, CSS och JavaScript och serveras som filer. Ingen
-applikationsserver, ingen databasmotor i drift, inget klientrenderande ramverk.
+Varje sida byggs till statisk HTML, CSS och JavaScript och serveras som filer. Ingen
+applikationsserver renderar sidor vid anrop, och inget klientrenderande ramverk används.
 
-Interaktiviteten — spel, filtrering, kartan — skrivs som liten, avgränsad TypeScript som
-förstärker färdig HTML. DOM byggs med `createElement` och `textContent`; `innerHTML`
-används inte, vilket samtidigt är sajtens skydd mot XSS.
+Interaktiviteten — kartan, filtrering, senare spel — skrivs som liten avgränsad
+TypeScript som förstärker färdig HTML. DOM byggs med `createElement` och `textContent`;
+`innerHTML` används inte, vilket samtidigt är skyddet mot XSS.
+
+Det här beslutet handlar om **rendering**, inte om att sajten aldrig får ha en server.
+[ADR 0013](0013-faser-admin-nu-skriv-api-sedan.md) inför i fas 2 ett litet skriv-API som
+tar emot redaktörernas ändringar. Det API:et renderar inga sidor — det skriver data till
+repot, och bygget gör resten.
 
 ## Övervägda alternativ
 
 - **WordPress, som dagens 4h.se/stattared** — avvisad: kräver PHP-värd, löpande
-  säkerhetsuppdateringar av kärna och plugins, och en inloggning någon måste förvalta.
-  En förening som glömmer uppdatera under en säsong får en angripbar sajt.
+  uppdateringar av kärna och plugins, och en inloggning någon måste förvalta. En förening
+  som glömmer uppdatera under en säsong får en angripbar sajt.
 - **React eller Vue som SPA** — avvisad: kilobyte och ett beroendeträd som ruttnar, för
-  vad som i grunden är innehållssidor plus tre små spel. Dessutom sämre förstaladdning
-  på mobil, vilket är precis fel avvägning här.
-- **Ren handskriven HTML utan generator** — avvisad: duplicerad markup i varje sidhuvud
-  och sidfot, och djurpresentationerna skulle behöva underhållas för hand. Se ADR 0003.
+  vad som i grunden är innehållssidor. Sämre förstaladdning på mobil, vilket är precis fel
+  avvägning här.
+- **Serverrendering vid anrop** — avvisad: kräver en server som är uppe, vilket är
+  det driftansvar vi inte vill ta på oss.
 
 ## Konsekvenser
 
 - Drift blir nära gratis och kräver ingen övervakning.
-- Angreppsytan är i praktiken bara innehållet: det finns ingen inloggning att forcera
-  och ingen databas att injicera i.
-- Priset är att allt som ändras kräver ett bygge. Redigering sker i repot, inte i ett
-  administrationsgränssnitt — det gör förvaltarens vardag lite mer teknisk, och är skälet
-  till att datat måste vara läsbar text (ADR 0002) och processen tydligt beskriven.
-- Funktioner som i sig kräver en server — inloggning, bokning, uppladdning av bilder från
-  webbläsaren — kan inte byggas utan att det här beslutet först rivs upp i en ny ADR.
+- Angreppsytan mot besökaren är i praktiken bara innehållet.
+- Priset är att en ändring kräver ett bygge. Det tar någon minut, vilket är gott och väl
+  tillräckligt eftersom det som ändras oftast — vilka djurslag som går i en hage — ändras
+  säsongsvis och inte i realtid.
+- En funktion som kräver att servern vet något om den enskilda besökaren kan inte byggas
+  utan att det här beslutet först rivs upp.

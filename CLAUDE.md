@@ -22,7 +22,7 @@ definierar detaljerna.
 | `docs/01-BIDRA.md` | Uppsättning, kommandon, git-arbetsflöde, lintning |
 | `docs/02-krav/index.md` | Kravindex — målgrupp, kravkonventioner och karta till ämnesfilerna |
 | `docs/03-arkitektur/index.md` | Arkitekturindex — systemöversikt och karta till ämnesfilerna |
-| `docs/04-DATAKONTRAKT.md` | YAML-schema för djur, aktiviteter, platser och skattjakter |
+| `docs/04-DATAKONTRAKT.md` | YAML-schema för djur, arter, raser och platser |
 | `docs/05-design/index.md` | Designindex — filosofi, färger, typografi, layout, brytpunkter |
 | `docs/05-design/komponenter.md` | Komponenternas visuella regler |
 | `docs/05-design/css-strategi.md` | Hur CSS skrivs, filstruktur och designtokens i `:root` |
@@ -42,7 +42,7 @@ ställen är en bugg som väntar på att inträffa.
 | Vad sajten gör (krav, acceptanskriterier) | `docs/02-krav/` |
 | Hur den är byggd (lager, bygge, CI) | `docs/03-arkitektur/` |
 | Varför den är byggd så (beslut) | `docs/adr/` |
-| Datastruktur för djur och aktiviteter | `docs/04-DATAKONTRAKT.md` |
+| Datastruktur för djur och platser | `docs/04-DATAKONTRAKT.md` |
 | Färger, typografi, spacing | CSS-variabler i `source/assets/css/tokens.css` |
 | Innehåll om gården, djuren och aktiviteterna | YAML och Markdown under `source/` |
 | Säkerhetsmodell och hur problem rapporteras | `SECURITY.md` |
@@ -59,7 +59,7 @@ Regler:
 ## 1. Grundprinciper
 
 - Statisk byggutdata. <!-- CL-§1.1 -->
-- Ingen server och ingen databasmotor i drift. <!-- CL-§1.2 -->
+- Ingen databasmotor. Gårdens data är YAML-filer i repot. <!-- CL-§1.2 -->
 - Inget klientramverk (ingen React, Vue eller motsvarande). <!-- CL-§1.3 -->
 - Minimal JavaScript. <!-- CL-§1.4 -->
 - Innehållet först. <!-- CL-§1.5 -->
@@ -67,6 +67,9 @@ Regler:
 - Underhållbar av icke-utvecklare. <!-- CL-§1.7 -->
 - Snabb på mobil, även på dålig uppkoppling ute på gården. <!-- CL-§1.8 -->
 - Fungerar offline när besökaren väl har laddat sajten. <!-- CL-§1.9 -->
+- Arbetet går i två faser: i fas 1 underhåller en administratör datat med vanliga
+  commits och det finns ingen inloggning; i fas 2 tar ett skriv-API emot redaktörernas
+  ändringar. Se ADR 0013. <!-- CL-§1.14 -->
 
 ### Språk
 
@@ -95,7 +98,7 @@ Implementationen ska:
 
 - Producera statisk HTML, CSS och JS som slutresultat. <!-- CL-§2.1 -->
 - Bygga innehållssidor från Markdown. <!-- CL-§2.2 -->
-- Hålla djur, aktiviteter, platser och skattjakter i strukturerad data med en enda
+- Hålla djur, arter, raser och platser i strukturerad data med en enda
   sanningskälla. <!-- CL-§2.3 -->
 - Återanvända layoutkomponenter mellan sidor. <!-- CL-§2.4 -->
 - Undvika duplicerad markup. <!-- CL-§2.5 -->
@@ -106,8 +109,8 @@ Implementationen ska:
 Gör INTE:
 
 - Bygg inte en SPA. <!-- CL-§2.7 -->
-- Inför inte en databasmotor. <!-- CL-§2.8 -->
-- Använd inte klientrenderande ramverk. <!-- CL-§2.9 -->
+- Inför inte en databasmotor. Se ADR 0002. <!-- CL-§2.8 -->
+- Använd inte klientrenderande ramverk. Sidor renderas vid bygget. <!-- CL-§2.9 -->
 - Bygg inte egna komplexa byggsystem utan tydlig motivering. <!-- CL-§2.10 -->
 
 Föredra etablerade, väl beprövade verktyg för statiska sajter. <!-- CL-§2.11 -->
@@ -136,8 +139,9 @@ Innehållssidor:
 - Skrivs i Markdown. <!-- CL-§3.2 -->
 - Kan skrivas om eller flyttas utan att layoutkoden rörs. <!-- CL-§3.3 -->
 
-Datadrivna sidor — djurpresentationer, aktivitetsöversikt, karta, bingo, gissa djuret
-och skattjakt — läser samma strukturerade data och delar layoutstruktur. <!-- CL-§3.4 -->
+Datadrivna sidor — plats, djur, art och karta — läser samma strukturerade data och delar
+layoutstruktur. Platssidan är navet: QR-koden på hagen pekar dit, och därifrån väljer
+besökaren djuren som finns där. <!-- CL-§3.4 -->
 
 ---
 
@@ -146,14 +150,19 @@ och skattjakt — läser samma strukturerade data och delar layoutstruktur. <!--
 Data om gården ska:
 
 - Bo i en central strukturerad källa. <!-- CL-§4.1 -->
-- Driva djurpresentationer, aktiviteter, karta, spel och eventuella flöden. <!-- CL-§4.2 -->
+- Driva plats-, djur- och artsidor, kartan och senare spel. <!-- CL-§4.2 -->
 
 Det ska finnas:
 
-- Inga duplicerade definitioner av samma djur eller aktivitet. <!-- CL-§4.3 -->
+- Inga duplicerade definitioner. Allt som kopplar ihop poster härleds i bygget. <!-- CL-§4.3 -->
 - Deterministisk sortering. <!-- CL-§4.4 -->
 - Tydlig validering av obligatoriska fält. <!-- CL-§4.5 -->
-- Stabila identifierare som aldrig ändras när ett djur väl finns. <!-- CL-§4.6 -->
+- Stabila identifierare som aldrig ändras när ett djur väl finns. Filnamnet är
+  id:t. <!-- CL-§4.6 -->
+- **Inget djur har ett `location`-fält.** Djuren flyttas ofta individuellt, så en
+  individuell platsuppgift vore osann inom dagar. Platsen bär djurslagen i stället.
+  Se ADR 0012. <!-- CL-§4.7 -->
+- Ingen journal. Datat finns för besökaren, inte för gårdens drift. <!-- CL-§4.8 -->
 
 ---
 
@@ -174,9 +183,9 @@ Data ska valideras för: <!-- CL-§5.5 -->
 
 - Obligatoriska fält <!-- CL-§5.6 -->
 - Giltiga datum <!-- CL-§5.7 -->
-- Sluttid efter starttid <!-- CL-§5.8 -->
-- Inga dubbletter av identifierare <!-- CL-§5.9 -->
-- Att varje refererad bild och plats faktiskt finns <!-- CL-§5.14 -->
+- Att varje referens pekar på något som finns <!-- CL-§5.8 -->
+- Att ingen stamtavla går i cirkel <!-- CL-§5.9 -->
+- Att varje refererad bild finns och håller storleksgränsen <!-- CL-§5.14 -->
 
 ### Byggintegritet
 
