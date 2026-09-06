@@ -166,6 +166,12 @@ Workflows execute third-party code with access to the repository token.
 - Do not print secrets, and remember that Actions logs on a public repository
   are public.
 
+Where an Action is not usable — the Gitleaks Action, for example, requires a
+paid licence for organisation-owned repositories — the workflow runs the
+upstream MIT-licensed CLI directly at a pinned version instead, rather than
+dropping the check. Do not swap those steps back to the Action without a
+licence; the job will fail.
+
 When updating an Action:
 
 1. verify the upstream repository and release;
