@@ -189,7 +189,10 @@ Some protections live in repository settings rather than in files. Verify under
   credential is blocked before it becomes public;
 - **Private vulnerability reporting** is enabled, giving reporters a private
   channel;
-- **Dependabot alerts** and **Dependabot security updates** are enabled;
+- the **dependency graph** is enabled, and with it **Dependabot alerts** and
+  **Dependabot security updates**. The **Dependency review** check cannot run
+  without the dependency graph, and skips itself until the repository declares
+  its first dependency manifest;
 - **Code scanning** shows results from the CodeQL workflow;
 - the **Protect main** ruleset is imported from
   [`.github/rulesets/main-protection.json`](../.github/rulesets/main-protection.json)

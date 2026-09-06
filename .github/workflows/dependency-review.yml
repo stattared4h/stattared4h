@@ -20,9 +20,28 @@ jobs:
         with:
           persist-credentials: false
 
+      # Until the repository declares dependencies there is nothing to review,
+      # and the action cannot run at all without the dependency graph. Detect
+      # manifests so this check reports a result either way, and starts
+      # enforcing on its own once the first manifest lands.
+      - name: Detect dependency manifests
+        id: detect
+        run: |
+          tracked="$(git ls-files)"
+          manifests='(^|/)(package\.json|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|requirements\.txt|pyproject\.toml|Pipfile|Pipfile\.lock|go\.mod|Gemfile|Gemfile\.lock|pom\.xml|build\.gradle(\.kts)?|Cargo\.toml|Cargo\.lock|composer\.json|[^/]+\.csproj)$'
+
+          if grep -qE "${manifests}" <<< "${tracked}"; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No dependency manifests are tracked yet; nothing to review."
+          fi
+
       # Blocks pull requests that introduce dependencies with known high or
-      # critical advisories, or a licence the project cannot accept.
+      # critical advisories. Requires the dependency graph to be enabled under
+      # Settings -> Advanced Security.
       - name: Review dependency changes
+        if: steps.detect.outputs.found == 'true'
         uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: high
