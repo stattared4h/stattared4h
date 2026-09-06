@@ -11,14 +11,19 @@ Inga literaler.
 
 ### 6.1 Sidhuvud
 
-Sidhuvudet är vitt, klistrat i toppen, med en tunn kantlinje undertill. Det innehåller
-4H-logotypen till vänster och navigeringen till höger. <!-- 05-§6.1 -->
+Sidhuvudet är vitt, klistrat i toppen, med en tunn kantlinje undertill. Under
+desktopbrytpunkten är det en rad ikonknappar (6.11): meny och installation till vänster,
+"till toppen" i mitten, feedback till höger. Från desktopbrytpunkten innehåller det
+4H-logotypen och sajtens namn till vänster, länkarna i raden, och installation och
+feedback som ikoner utan botten till höger (`02-§10.3`, `02-§10.7`). <!-- 05-§6.1 -->
 
-- På mobil fälls navigeringen ihop till en menyknapp med tydlig text, inte bara tre
-  streck. Knappen är minst `--tap-target-min` i båda riktningar. <!-- 05-§6.2 -->
+- Menyknappen visar tre streck **och** ordet "Meny" under dem i `--font-size-small`,
+  inte bara strecken. Knappen är minst `--tap-target-min` i båda riktningar. <!-- 05-§6.2 -->
 - Aktuell sida markeras med djupgrön text och en grön underlinje — aldrig enbart med
   färg, så att markeringen syns även för den som inte skiljer färgerna åt. <!-- 05-§6.3 -->
 - Logotypen länkar till startsidan och har alltid en textalternativbeskrivning. <!-- 05-§6.4 -->
+- Sidhuvudets höjd är densamma på varje sida och vid varje rullningsläge, så att
+  innehållet aldrig hoppar när det klistras fast. <!-- 05-§6.37 -->
 
 ### 6.2 Hero
 
@@ -104,9 +109,43 @@ en hand, av någon som just skannat en skylt. <!-- 05-§6.22 -->
 ### 6.9 Sidfot
 
 Djupgrön botten `--color-green-deep` med vit text — 7,4:1, den mest kontrastrika ytan på
-sajten. Innehåller länken till huvudsidan på `4h.se/stattared`, en mening om att sajten
-inte samlar in uppgifter om besökaren, och länken till repot. Öppettider och
-kontaktuppgifter hör till huvudsidan (`02-§1.8`). <!-- 05-§6.30 -->
+sajten. Innehåller, i ordning: 4H-logotypen i vit variant, länken till huvudsidan på
+`4h.se/stattared`, länken till repot, meningen om att sajten inte samlar in uppgifter om
+besökaren, och versionen sist i `--font-size-small` med vit text (`02-§10.21`).
+Öppettider och kontaktuppgifter hör till huvudsidan (`02-§1.8`). <!-- 05-§6.30 -->
+
+### 6.11 Ikonknapp
+
+En fyrkantig knapp om `--tap-target-min` × `--tap-target-min` med `--radius-md`, botten
+`--color-green` och vit inline-SVG-ikon om 22 px. Den används i sidhuvudets rad på mobil
+(6.1) och för "till toppen". Från desktopbrytpunkten har installation och feedback ingen
+botten och ikonen är `--color-green-deep`. Varje ikonknapp har `aria-label`, och ikonen
+`aria-hidden`. <!-- 05-§6.33 -->
+
+### 6.12 Meny
+
+Menyn på mobil är ett kort som fälls ut under sidhuvudet, indraget `--space-xs` från
+kanterna, med botten `--color-green`, `--radius-lg` och `--shadow-raised`. Länkarna är
+vita, `--font-size-body`, vikt 700, en per rad med lodrät innermarginal `--space-xs`, och
+får `--focus-ring` i vitt. Kortet öppnas och stängs med en övergång under 250 ms som
+stängs av vid `prefers-reduced-motion`. Från desktopbrytpunkten finns inget kort;
+länkarna ligger i sidhuvudets rad i `--color-green-deep`, vikt 600. <!-- 05-§6.34 -->
+
+### 6.13 Dialog
+
+En dialog ligger på ett bakgrundsskikt i `--color-backdrop` (`05-§2.20`) och är en yta
+i `--color-surface` med `--radius-lg`, `--shadow-raised` och innermarginal `--space-md`,
+som mest `--container-narrow` bred. Rubriken är en `h2`; kryssknappen är en ikonknapp i
+övre högra hörnet. Dialogen tonar in på högst 200 ms enligt `05-§7.8`. Den används för
+feedback (`02-§10.15`). <!-- 05-§6.35 -->
+
+### 6.14 Statusrad
+
+En statusrad ligger direkt under sidhuvudet, i hela bredden, med botten
+`--color-green-pale` och text i `--color-green-deep`, innermarginal `--space-xs`
+`--space-md`, och högst en knapp (sekundär variant) till höger om texten. Den används
+för "Ny version finns" och "Du är offline" (`02-§10.28`–`10.29`), och för iOS-texten om
+installation (`02-§10.12`). Aldrig fler än en statusrad åt gången. <!-- 05-§6.36 -->
 
 ### 6.10 Karta
 

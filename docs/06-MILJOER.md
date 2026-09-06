@@ -6,11 +6,11 @@ Var sajten körs, vilket dataset varje miljö läser, och vad som skiljer dem å
 
 ## 1. Miljöerna
 
-| Miljö | Adress | Dataset | Bas-sökväg |
-| --- | --- | --- | --- |
-| Lokalt | `http://localhost:8080` | valfritt via `DATA_DIR`, `source/data/` som standard | `/` |
-| QA | GitHub Pages, under `/qa/` | `source/data-qa/` | `/stattared4h/qa/` |
-| Produktion | GitHub Pages, i roten | `source/data/` | `/stattared4h/` |
+| Miljö | Adress | Dataset | Bas-sökväg | Version i sidfoten |
+| --- | --- | --- | --- | --- |
+| Lokalt | `http://localhost:8080` | valfritt via `DATA_DIR`, `source/data/` som standard | `/` | `1.2.0 – lokal 2026-09-06 18:40` |
+| QA | GitHub Pages, under `/qa/` | `source/data-qa/` | `/stattared4h/qa/` | `1.2.0 – CR31 – QA` |
+| Produktion | GitHub Pages, i roten | `source/data/` | `/stattared4h/` | `1.2.0` eller `1.2.0 – CR31` |
 
 QA och produktion byggs ur **samma kod** och skiljer sig bara på vilket dataset de läser
 och var de hamnar. Det är hela poängen: en avvikelse mellan miljöerna kan bara bero på
@@ -22,6 +22,9 @@ deploy. <!-- 06-§1.2 -->
 QA har en egen service worker med scope `/stattared4h/qa/` och ett eget manifest-`id`
 (`02-§7.9`), så att den som öppnat QA inte får påhittade djur i produktionens
 cache. <!-- 06-§1.4 -->
+
+QA-bygget får samma versionssträng som produktionen med tillägget " – QA", så att den
+som läser sidfoten aldrig tar QA för produktion (`02-§10.22`). <!-- 06-§1.5 -->
 
 Varje sida i QA-bygget bär `<meta name="robots" content="noindex">`, så att påhittade
 djur aldrig hamnar i en sökmotor. En `robots.txt` duger inte till det: på en projektsajt
