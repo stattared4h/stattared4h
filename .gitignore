@@ -144,7 +144,7 @@ vite.config.ts.timestamp-*
 
 # ---------------------------------------------------------------------------
 # Public-repository hardening
-# See docs/public-repo-safety.md. .gitignore is a safety net, not a boundary:
+# See docs/07-SAKERHET.md. .gitignore is a safety net, not a boundary:
 # always review `git diff --cached` before committing.
 # ---------------------------------------------------------------------------
 

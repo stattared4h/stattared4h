@@ -25,7 +25,7 @@ avsnitt kan flyttas mellan filer utan att referenser går sönder.
 - Varm, välkomnande och lantlig känsla — inte myndighetsaktig och inte
   barnslig. <!-- 05-§1.2 -->
 - Höga kontraster och stora träffytor. Läsbarhet slår elegans varje gång. <!-- 05-§1.3 -->
-- Innehållet först: djuren och aktiviteterna är sajten, inte dekorationen runt dem. <!-- 05-§1.4 -->
+- Innehållet först: djuren och hagarna är sajten, inte dekorationen runt dem. <!-- 05-§1.4 -->
 - Snabb och lätt. Ingen dekorativ överlast, inga animationer som väntar på sig. <!-- 05-§1.5 -->
 - Igenkännbart som 4H. En besökare ska se sambandet med `4h.se`. <!-- 05-§1.6 -->
 
@@ -45,9 +45,10 @@ avsnitt kan flyttas mellan filer utan att referenser går sönder.
 | `05-§2.6` | Bläck | `#404040` | Brödtext |
 | `05-§2.7` | Dämpat bläck | `#5a5a5a` | Metatext, bildtexter, hjälptexter |
 | `05-§2.8` | Kantlinje | `#dfe3dd` | Avgränsare, kortkanter, fältramar |
-| `05-§2.9` | Sol | `#f2b134` | Spelaccent: fyllda bingorutor, hittade poster, märken |
+| `05-§2.9` | Sol | `#f2b134` | Accent reserverad för framtida spel enligt ADR 0009. Används inte i fas 1 |
 | `05-§2.10` | Solbläck | `#7a4b00` | Text på ljus botten när solaccenten behöver ord |
 | `05-§2.11` | Varning | `#b3261e` | Felmeddelanden, destruktiva åtgärder |
+| `05-§2.19` | Logotypgrön | `#467c45` | Bara inne i 4H-logotypens egen SVG (ADR 0007). Aldrig som token, yta eller text |
 
 ### Varför den gröna inte är exakt 4H:s
 
@@ -103,7 +104,7 @@ Skalan är satt för mobil först. Rubrikerna växer på större skärmar, bröd
 | `05-§3.6` | Brödtext | 17px | 17px | 400 | `#404040` |
 | `05-§3.7` | Liten text | 15px | 15px | 400 | `#5a5a5a` |
 | `05-§3.8` | Knapptext | 17px | 17px | 600 | varierar |
-| `05-§3.9` | Navigering | 16px | 15px | 600 | varierar |
+| `05-§3.9` | Navigering | 17px | 17px | 600 | `#15623e` |
 
 Brödtexten är 17px, inte 16px. En punkt större kostar ingenting och är märkbart lättare
 att läsa på en telefon i solljus. <!-- 05-§3.10 -->
@@ -143,14 +144,14 @@ Basenhet: `8px`. Alla värden är multiplar av den. <!-- 05-§4.4 -->
 
 - Mobil: en kolumn. <!-- 05-§4.11 -->
 - Surfplatta: två kolumner. <!-- 05-§4.12 -->
-- Desktop: tre kolumner för djur- och aktivitetskort. <!-- 05-§4.13 -->
+- Desktop: tre kolumner för djur- och platskort. <!-- 05-§4.13 -->
 - CSS Grid med `auto-fit` och `minmax`, så att antalet kolumner följer av bredden i
   stället för av mediefrågor. Inget rutnätsramverk. <!-- 05-§4.14 -->
 
 ### Träffytor
 
-Allt klickbart är minst `44 × 44px`. Det gäller även ikonknappar, bingorutor och poster i
-skattjakten. Ett barn med små händer och en vuxen med vantar ska träffa lika säkert. <!-- 05-§4.15 -->
+Allt klickbart är minst `44 × 44px`. Det gäller även ikonknappar, djurslagsrutorna på
+platssidan och markörerna på kartan. Ett barn med små händer och en vuxen med vantar ska träffa lika säkert. <!-- 05-§4.15 -->
 
 ---
 

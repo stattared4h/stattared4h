@@ -14,8 +14,8 @@ Beskriv vad som ändrats och varför.
 ## Testplan
 
 Beskriv hur ändringen är verifierad. Lista manuella kontrollpunkter med konkreta steg,
-till exempel *"öppna bingosidan i 360 px bredd och bekräfta att brickan får fem
-kolumner"*.
+till exempel *"öppna platssidan i 360 px bredd och bekräfta att djurslagen syns utan
+att rulla"*.
 
 - [ ] Bygge, lint, typkontroll och tester är gröna lokalt.
 - [ ] UI-ändringar är använda i en webbläsare, i mobil- och desktopbredd.

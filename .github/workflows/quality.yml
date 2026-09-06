@@ -86,7 +86,7 @@ jobs:
 
       # Dependency lifecycle scripts are third-party code that would run with
       # access to the CI environment. They stay disabled here; see
-      # docs/public-repo-safety.md if a build genuinely needs them.
+      # docs/07-SAKERHET.md if a build genuinely needs them.
       - name: Install dependencies
         if: steps.detect.outputs.node == 'true'
         run: |

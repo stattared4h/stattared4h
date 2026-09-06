@@ -9,8 +9,8 @@ vilka djurslag som går där, och därifrån hittar besökaren vidare till varje
 [4h.se/stattared](https://www.4h.se/stattared/), inte en ersättning för den.** Öppettider,
 boende, bokningar och nyheter finns kvar där. Här bor bara djuren och hagarna.
 
-Sajten är en installerbar webbapp (PWA) för iOS och Android. Den är statisk, fungerar
-offline och samlar inte in några personuppgifter.
+Sajten byggs som en installerbar webbapp (PWA) för iOS och Android: statisk, offline-tålig
+och utan personuppgifter om besökaren. Hur långt det kommit står under *Läget* nedan.
 
 ## Var saker finns
 

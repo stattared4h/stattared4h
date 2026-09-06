@@ -8,7 +8,7 @@ Var sajten körs, vilket dataset varje miljö läser, och vad som skiljer dem å
 
 | Miljö | Adress | Dataset | Bas-sökväg |
 | --- | --- | --- | --- |
-| Lokalt | `http://localhost:8080` | valfritt, `source/data-qa/` som standard | `/` |
+| Lokalt | `http://localhost:8080` | valfritt via `DATA_DIR`, `source/data/` som standard | `/` |
 | QA | GitHub Pages, under `/qa/` | `source/data-qa/` | `/stattared4h/qa/` |
 | Produktion | GitHub Pages, i roten | `source/data/` | `/stattared4h/` |
 
@@ -19,8 +19,10 @@ datat, aldrig på att koden är en annan. <!-- 06-§1.1 -->
 Båda ligger i samma Pages-utgåva, så det behövs ingen andra värd och ingen andra
 deploy. <!-- 06-§1.2 -->
 
-`robots.txt` utestänger `/qa/`, så att påhittade djur aldrig hamnar i en
-sökmotor. <!-- 06-§1.3 -->
+Varje sida i QA-bygget bär `<meta name="robots" content="noindex">`, så att påhittade
+djur aldrig hamnar i en sökmotor. En `robots.txt` duger inte till det: på en projektsajt
+under GitHub Pages läser sökmotorer bara värdens rot, `stattared4h.github.io/robots.txt`,
+som repot inte äger. <!-- 06-§1.3 -->
 
 ---
 
@@ -58,13 +60,6 @@ standard. <!-- 06-§3.1 -->
 BASE_PATH=/stattared4h/ npm run build
 ```
 
-I CI sätts den inte för hand: `actions/configure-pages` räknar fram `base_path`, och
-deploy-arbetsflödet skickar vidare den. Byter repot namn eller får en egen domän följer
-sajten med utan att någon ändrar en rad. <!-- 06-§3.4 -->
-
-Bygget vägrar dessutom rendera en sida vars mall innehåller en handskriven absolut
-sökväg. Regeln kan alltså inte urholkas av förbiseende. <!-- 06-§3.5 -->
-
 Varje intern länk, varje resursreferens, service workerns scope och manifestets
 `start_url` byggs genom bas-sökvägens hjälpfunktion. Ingen absolut sökväg skrivs för hand,
 och ett test bevakar regeln. Bakgrunden står i
@@ -73,6 +68,13 @@ och ett test bevakar regeln. Bakgrunden står i
 QA-bygget ärver samma mekanism med `/stattared4h/qa/`, vilket också är det löpande beviset
 för att bas-sökvägen fungerar — går QA att öppna, går flytten till ett webbhotell att
 göra. <!-- 06-§3.3 -->
+
+I CI sätts den inte för hand: `actions/configure-pages` räknar fram `base_path`, och
+deploy-arbetsflödet skickar vidare den. Byter repot namn eller får en egen domän följer
+sajten med utan att någon ändrar en rad. <!-- 06-§3.4 -->
+
+Bygget vägrar dessutom rendera en sida vars mall innehåller en handskriven absolut
+sökväg. Regeln kan alltså inte urholkas av förbiseende. <!-- 06-§3.5 -->
 
 ---
 

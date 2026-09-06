@@ -13,8 +13,8 @@ Varje krav är ett **fristående faktum om hur systemet fungerar**, inte en besk
 en ändring. En läsare som aldrig sett kodbasen ska förstå kravet utan att veta vad som
 fanns förut.
 
-- **Dåligt**: "Bingosidan ska läggas till i menyn." / "Cacheversionen höjs till v4."
-- **Bra**: "Huvudmenyn innehåller Bingo." / "Service workerns cache heter `s4h-v4`."
+- **Dåligt**: "Kartsidan ska läggas till i menyn." / "Cacheversionen höjs till v4."
+- **Bra**: "Sidhuvudet innehåller en länk till kartan." / "Service workerns cache heter `s4h-v4`."
 
 Undvik orden *ändrad, uppdaterad, ersatt, borttagen, ny, förbättrad*. Bakgrund och motiv
 hör hemma i avsnittet **Bakgrund** överst i varje kravsektion — ingen annanstans.

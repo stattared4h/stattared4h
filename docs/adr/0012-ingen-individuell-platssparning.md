@@ -21,7 +21,7 @@ Platsen äger uppgiften om vilka **djurslag** som finns där. Ett djur har inget
 ```yaml
 # locations/gethagen.yaml
 name: Gethagen
-species: [get, får]
+species: [get, far]
 note: Här går bockarna.
 ```
 

@@ -41,15 +41,15 @@ Tre varianter, inte fler: <!-- 05-§6.9 -->
 | Sekundär | genomskinlig, `--color-green-deep` kant | `--color-green-deep` | Sidoåtgärder |
 | Fara | `--color-danger` | vit | Nollställ framsteg och liknande |
 
-- Radie `--radius-full`, innermarginal `--space-sm` lodrätt och `--space-md` vågrätt,
-  minsta höjd `--tap-target-min`. <!-- 05-§6.10 -->
+- Radie `--radius-full`, innermarginal `--space-xs` lodrätt och `--space-md` vågrätt.
+  Höjden styrs av minsta höjd `--tap-target-min`, inte av marginalen. <!-- 05-§6.10 -->
 - Hovring och aktivt tillstånd mörknar bakgrunden till `--color-green-deep`. <!-- 05-§6.11 -->
 - Inaktiverade knappar undviks. Går en åtgärd inte att göra, förklara varför i text i
   stället för att visa en grå knapp utan besked. <!-- 05-§6.12 -->
 
 ### 6.4 Kort
 
-Kortet är sajtens arbetshäst: ett djur, en aktivitet, en nyhet. <!-- 05-§6.13 -->
+Kortet är sajtens arbetshäst: ett djur, ett djurslag, en plats. <!-- 05-§6.13 -->
 
 - Vit yta, `--radius-md`, `--shadow-card`, innermarginal `--space-md`. <!-- 05-§6.14 -->
 - Bilden ligger överst i fast bildförhållande `4:3` med `object-fit: cover`, så att
@@ -61,19 +61,19 @@ Kortet är sajtens arbetshäst: ett djur, en aktivitet, en nyhet. <!-- 05-§6.13
 
 ### 6.5 Djurkort
 
-Djurkortet är ett kort med tillägg: art och namn i rubriken, och små etiketter för
-egenskaper som "född här" eller "gillar klappar". <!-- 05-§6.18 -->
+Djurkortet är ett kort med tillägg: art och namn i rubriken, och små etiketter för det
+datat vet — rasen, "lantras", och "har lämnat gården" för `status: gone`. <!-- 05-§6.18 -->
 
 - Etiketter har ljusgrön botten och djupgrön text, `--radius-full`,
   `--font-size-small`. <!-- 05-§6.19 -->
-- Saknar djuret foto visas en grön platta med artens ikon, aldrig en trasig
-  bild. <!-- 05-§6.20 -->
+- Saknar djuret foto visas en ljusgrön platta med djurslagets namn i djupgrön text,
+  aldrig en trasig bild. <!-- 05-§6.20 -->
 
 ### 6.6 Faktaruta
 
-Ljusgrön botten, `--radius-md`, ingen kantlinje. Används för öppettider, praktisk
-information och regler. Aldrig fler än två per sida — blir de fler slutar de
-märkas. <!-- 05-§6.21 -->
+Ljusgrön botten, `--radius-md`, ingen kantlinje. Används för platsens `note`,
+tillgänglighetsuppgiften och regler vid hagen, som att inte mata djuren. Aldrig fler än
+två per sida — blir de fler slutar de märkas. <!-- 05-§6.21 -->
 
 ### 6.7 Platssida
 
@@ -86,15 +86,16 @@ en hand, av någon som just skannat en skylt. <!-- 05-§6.22 -->
   namn i plural — "Getter", "Får". Det är sidans svar och ska synas utan att man
   rullar. <!-- 05-§6.24 -->
 - `note` från platsen visas som en kort mening under djurslagen, i dämpad text. <!-- 05-§6.25 -->
-- Under det: djuren av de arterna, som djurkort, så att besökaren kan välja ett och läsa
-  vidare. <!-- 05-§6.26 -->
+- Under det: djuren av de arterna med `status: here`, som djurkort, under en rubrik som
+  säger vad listan är — "Getterna på gården", aldrig "Djuren i hagen". Sajten vet vilka
+  djurslag som går här, inte vilka individer (ADR 0012). <!-- 05-§6.26 -->
 - En tom plats säger det rakt ut — "Just nu går inga djur här" — och länkar till kartan.
   Aldrig en tom yta. <!-- 05-§6.27 -->
 
 ### 6.8 Formulärfält
 
 - Etiketten står ovanför fältet och är alltid synlig. Platshållartext ersätter aldrig en
-  etikett. <!-- 05-§6.27 -->
+  etikett. <!-- 05-§6.32 -->
 - Fältet är vitt med `--color-border` ram, `--radius-sm`, minsta höjd
   `--tap-target-min`. <!-- 05-§6.28 -->
 - Fel visas under fältet i `--color-danger`, med ord som säger vad som är fel och hur man
@@ -103,8 +104,9 @@ en hand, av någon som just skannat en skylt. <!-- 05-§6.22 -->
 ### 6.9 Sidfot
 
 Djupgrön botten `--color-green-deep` med vit text — 7,4:1, den mest kontrastrika ytan på
-sajten. Innehåller kontaktuppgifter, öppettider, länk till 4h.se och en länk till
-sajtens tillgänglighetsinformation. <!-- 05-§6.30 -->
+sajten. Innehåller länken till huvudsidan på `4h.se/stattared`, en mening om att sajten
+inte samlar in uppgifter om besökaren, och länken till repot. Öppettider och
+kontaktuppgifter hör till huvudsidan (`02-§1.8`). <!-- 05-§6.30 -->
 
 ### 6.10 Karta
 
