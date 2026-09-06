@@ -55,7 +55,7 @@ besökaren.
 
 - Innehåll kan skrivas och flyttas av icke-utvecklare utan att layoutkod rörs.
 - Generatorn delar runtime med domänskiktet, så härledningarna kan enhetstestas i Node och
-  används vid renderingen utan att passera ett filformat på vägen.
+  användas vid renderingen utan att passera ett filformat på vägen.
 - Vi tar en större beroendeyta än nödvändigt — Eleventy med plugin, mot Hugos enda binär.
   Det är byggberoenden som inte når besökaren, så eftersläpning är en underhållsfråga och
   inte en säkerhetsrisk mot publiken. Men i ett repo som annars är beroendeförsiktigt
