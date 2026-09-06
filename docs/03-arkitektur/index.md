@@ -194,7 +194,8 @@ GitHub; det gör besökarens webbläsare, i besökarens namn. <!-- 03-§10.3 -->
 Versionen räknas i deploy-arbetsflödet, aldrig i bygget: `X.Y` läses ur `VERSION`,
 numret på den mergade pull requesten hämtas via GitHubs API för commiten (en
 rebase-merge bär inte numret i ämnesraden), med körningsnumret som reserv, och taggarna
-`vX.Y.*` avgör om det är ett släpp eller en kandidat (`02-§10.24`). Resultatet skickas
+`vX.Y.*` avgör om det är ett släpp eller en kandidat (`02-§10.24`). Är `VERSION` `0.0`
+blir versionen `0.0.PR<n>` och inget taggas (`02-§10.33`). Resultatet skickas
 som `BUILD_VERSION` till bygget, som skriver in det i sidfoten, om-sidan, manifestets
 `version`-fält och service workerns cachenamn. Efter deployen taggar arbetsflödet
 commiten och skapar en GitHub Release vid ett släpp. <!-- 03-§10.4 -->

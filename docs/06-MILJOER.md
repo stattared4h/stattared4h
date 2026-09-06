@@ -10,7 +10,7 @@ Var sajten körs, vilket dataset varje miljö läser, och vad som skiljer dem å
 | --- | --- | --- | --- | --- |
 | Lokalt | `http://localhost:8080` | valfritt via `DATA_DIR`, `source/data/` som standard | `/` | `1.2.0 – lokal 2026-09-06 18:40` |
 | QA | GitHub Pages, under `/qa/` | `source/data-qa/` | `/stattared4h/qa/` | `1.2.0 – CR31 – QA` |
-| Produktion | GitHub Pages, i roten | `source/data/` | `/stattared4h/` | `1.2.0` eller `1.2.0 – CR31` |
+| Produktion | GitHub Pages, i roten | `source/data/` | `/stattared4h/` | `1.2.0` eller `1.2.0 – CR31`; `0.0.PR31` före första släppet |
 
 QA och produktion byggs ur **samma kod** och skiljer sig bara på vilket dataset de läser
 och var de hamnar. Det är hela poängen: en avvikelse mellan miljöerna kan bara bero på
