@@ -99,8 +99,9 @@ inte byggas in i egna märken (ADR 0007).
   meningen "Sidan samlar inga uppgifter om dig.", och versionen sist i
   `--font-size-small`. <!-- 02-§10.21 -->
 - Versionsraden lyder "Version 1.2.0" för ett släpp, "Version 1.2.0 – CR31" för en
-  kandidat, "Version 0.0.PR31" före första släppet, "Version 1.2.0 – lokal 2026-09-06
-  18:40" för ett lokalt bygge, och får tillägget " – QA" i QA-bygget. Ett CI-bygge utan versionsuppgift visar ingen
+  kandidat, "Version 0.0.PR31" före första släppet och
+  "Version 1.2.0 – lokal 2026-09-06 18:40" för ett lokalt bygge, och får tillägget
+  " – QA" i QA-bygget. Ett CI-bygge utan versionsuppgift visar ingen
   versionsrad. <!-- 02-§10.22 -->
 
 ### Version
