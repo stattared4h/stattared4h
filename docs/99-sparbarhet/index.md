@@ -50,6 +50,16 @@ sajt. Statusen nedan speglar det ärligt.
 | `04-§4.2` | Djur har inget `location`-fält | `saknas` | Ska bevakas av ett test, inte bara av valideringen |
 | `04-§10` | Validering | `saknas` | Valideraren är nästa steg |
 
+### Miljöer (`06-§`)
+
+| ID-intervall | Ämne | Status | Anteckning |
+| --- | --- | --- | --- |
+| `06-§1` | QA och produktion ur samma kod, olika dataset | `dokumenterad` | Inget bygge och ingen deploy finns ännu |
+| `06-§2.1` | `DATA_DIR` väljer dataset | `saknas` | Införs med bygget |
+| `06-§2.2` | Tester körs mot QA-data, aldrig mot gårdens | `byggd` | `source/data-qa/` finns och täcker kontraktets gränsfall |
+| `06-§2.3` | QA-datat prövar gränsfallen | `byggd` | Täckningen listas i `source/data-qa/README.md` |
+| `06-§3` | Bas-sökvägen | `saknas` | Bevakas av ett test när bygget finns |
+
 ### Arkitektur (`03-§`)
 
 | ID-intervall | Ämne | Status | Anteckning |
@@ -82,9 +92,9 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal ID-intervall |
 | --- | --- |
-| `byggd` | 4 |
-| `dokumenterad` | 12 |
-| `saknas` | 5 |
+| `byggd` | 6 |
+| `dokumenterad` | 13 |
+| `saknas` | 7 |
 | `manuell` | 0 |
 
 Summeringen uppdateras i fas 5 av processen i `CLAUDE.md`. <!-- 99-§1.2 -->

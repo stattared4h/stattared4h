@@ -1,0 +1,12 @@
+name: Stjärna
+species: get
+breed: jamtget
+sex: female
+born: 2016
+status: here
+description: Gårdens äldsta get, och mamma till både Rosa och Lilla Gumman.
+photos:
+  - file: stjarna-1.webp
+    alt: Stjärna, en grå get med en vit fläck i pannan.
+    credit: Erik Eriksson
+    portrait: true

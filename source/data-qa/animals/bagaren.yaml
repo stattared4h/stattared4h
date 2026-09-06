@@ -1,0 +1,12 @@
+name: Bagaren
+species: far
+breed: gotlandsfar
+sex: male
+born: 2020
+status: here
+description: Flockens lugnaste får. Går alltid först ut i hagen.
+photos:
+  - file: bagaren-1.webp
+    alt: Bagaren, ett grått får med kraftiga horn.
+    credit: Erik Eriksson
+    portrait: true

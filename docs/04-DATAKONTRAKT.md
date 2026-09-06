@@ -26,6 +26,11 @@ Allt som inte tjänar någon av de frågorna hör inte hemma här. <!-- 04-§1.2
 
 ## 2. Filer och placering
 
+Datat finns i två dataset med identisk struktur: `source/data/` med gårdens riktiga
+uppgifter, och `source/data-qa/` med påhittade djur som testerna körs mot. Vilket som
+läses styrs av `DATA_DIR`, se [`06-MILJOER.md`](06-MILJOER.md). Ändras det här kontraktet
+ändras QA-datat i samma commit. <!-- 04-§2.3 -->
+
 ```text
 source/data/
 ├── species.yaml              # vokabulär: arterna vi känner igen
@@ -50,6 +55,11 @@ inuti filen — det skulle vara samma faktum på två ställen. <!-- 04-§3.1 --
 
 - Små bokstäver `a–z`, siffror och bindestreck. Inga åäö, inga mellanslag, inga
   versaler. `Lilla Gumman` blir `lilla-gumman`. <!-- 04-§3.2 -->
+- Svenska tecken skrivs om: `å` och `ä` blir `a`, `ö` blir `o`. `Snöbollen` blir
+  `snobollen`, `Björkhagen` blir `bjorkhagen`. Regeln kan ge id:n som liknar varandra —
+  `får` blir `far` — vilket är acceptabelt eftersom id:t aldrig visas för besökaren.
+  Skulle två poster få samma id fälls valideringen och den ena får ett förtydligande
+  tillägg. <!-- 04-§3.4 -->
 - **Ändras aldrig.** Länkar, bokmärken och QR-koder pekar på id:t. Ett djur som byter
   namn behåller sitt id. <!-- 04-§3.3 -->
 

@@ -1,0 +1,17 @@
+breeds:
+  - id: jamtget
+    name: Jämtget
+    species: get
+    heritage: true
+  - id: gotlandsfar
+    name: Gotlandsfår
+    species: far
+    heritage: true
+  - id: fjallko
+    name: Fjällko
+    species: ko
+    heritage: true
+  - id: islandshast
+    name: Islandshäst
+    species: hast
+    heritage: false

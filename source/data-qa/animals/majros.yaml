@@ -1,0 +1,17 @@
+name: Majros
+species: ko
+breed: fjallko
+sex: female
+born: 2019-05-20
+status: here
+description: |
+  Majros är gårdens enda ko och tar den rollen på allvar.
+photos:
+  - file: majros-1.webp
+    alt: Majros, en vit och svart fjällko, betar i högt gräs.
+    credit: Anna Andersson
+    portrait: true
+  - file: majros-2.webp
+    alt: Närbild på Majros mule.
+    credit: Anna Andersson
+    portrait: false
