@@ -1,5 +1,7 @@
 # Stättareds 4H-gård
 
+**Sajten:** <https://stattared4h.github.io/stattared4h/>
+
 Djurguide för Stättareds 4H-gård: gårdens djur, arter och hagar. QR-koden på hagen visar
 vilka djurslag som går där, och därifrån hittar besökaren vidare till varje djur.
 
