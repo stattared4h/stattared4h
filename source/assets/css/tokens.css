@@ -1,39 +1,41 @@
 /**
- * Designtokens — Stättareds 4H-gård
+ * Design tokens — Stättareds 4H-gård
  *
- * Enda platsen i kodbasen där ett färg-, typografi- eller spacingvärde skrivs som
- * literal. Allt annat refererar hit. Se docs/05-design/css-strategi.md §7.
+ * The only place in the codebase where a colour, typography or spacing value is
+ * written as a literal. Everything else references these. See
+ * docs/05-design/css-strategi.md §7.
  *
- * Kontrastreglerna i docs/05-design/index.md §2 är absoluta:
- *   - --color-green är en YTFÄRG och bär alltid vit text. Använd den aldrig som textfärg.
- *   - Grön text är alltid --color-green-deep.
- *   - --color-sun bär aldrig vit text.
+ * The contrast rules in docs/05-design/index.md §2 are absolute:
+ *   - --color-green is a SURFACE colour and always carries white text. Never use it
+ *     as a text colour.
+ *   - Green text is always --color-green-deep.
+ *   - --color-sun never carries white text.
  */
 
 :root {
-  /* ── Färg ─────────────────────────────────────────────────────────────── */
+  /* ── Colour ───────────────────────────────────────────────────────────── */
 
-  /* 4H-grön, ett snäpp mörkare än temats #008b45 så att vit text når AA (4,69:1) */
+  /* 4H green, one step darker than the theme's #008b45 so white text reaches AA (4.69:1) */
   --color-green: #00863f;
-  --color-green-deep: #15623e; /* all grön text, rubriker, sidfot — 7,37:1 mot vitt */
-  --color-green-pale: #e7fdf3; /* mjuk bakgrundston */
+  --color-green-deep: #15623e; /* all green text, headings, footer — 7.37:1 on white */
+  --color-green-pale: #e7fdf3; /* soft background tint */
 
-  --color-page: #f4f6f3; /* sidans bakgrund */
-  --color-surface: #ffffff; /* kort och innehållsytor */
+  --color-page: #f4f6f3; /* page background */
+  --color-surface: #ffffff; /* cards and content surfaces */
 
-  --color-ink: #404040; /* brödtext — 10,37:1 mot vitt */
-  --color-ink-soft: #5a5a5a; /* metatext — 6,90:1 mot vitt */
-  --color-border: #dfe3dd; /* avgränsare och fältramar */
+  --color-ink: #404040; /* body text — 10.37:1 on white */
+  --color-ink-soft: #5a5a5a; /* meta text — 6.90:1 on white */
+  --color-border: #dfe3dd; /* dividers and field borders */
 
-  --color-sun: #f2b134; /* spelaccent: fyllda rutor, hittade poster */
-  --color-sun-ink: #7a4b00; /* solfärgens ton som text på ljus botten */
-  --color-danger: #b3261e; /* fel och destruktiva åtgärder */
+  --color-sun: #f2b134; /* game accent: filled squares, found stations */
+  --color-sun-ink: #7a4b00; /* the sun tone as text on a light background */
+  --color-danger: #b3261e; /* errors and destructive actions */
 
-  /* ── Typografi ────────────────────────────────────────────────────────── */
+  /* ── Typography ───────────────────────────────────────────────────────── */
 
   --font-sans: system-ui, -apple-system, "Segoe UI", roboto, helvetica, arial, sans-serif;
 
-  --font-size-body: 17px; /* en punkt större än vanligt: läsbart i solsken */
+  --font-size-body: 17px; /* one step above the usual 16px: readable in sunlight */
   --font-size-small: 15px;
   --font-size-h1: 30px;
   --font-size-h2: 24px;
@@ -55,7 +57,7 @@
 
   --container-wide: 1200px;
   --container-narrow: 680px;
-  --tap-target-min: 44px; /* gäller allt klickbart, utan undantag */
+  --tap-target-min: 44px; /* applies to everything tappable, without exception */
 
   /* ── Form ─────────────────────────────────────────────────────────────── */
 
@@ -72,7 +74,7 @@
   --focus-offset: 2px;
 }
 
-/* Rubrikstorlekarna är de enda tokens som växer med skärmen. Brödtexten står still. */
+/* Heading sizes are the only tokens that grow with the screen. Body text stays put. */
 @media (min-width: 960px) {
   :root {
     --font-size-h1: 40px;

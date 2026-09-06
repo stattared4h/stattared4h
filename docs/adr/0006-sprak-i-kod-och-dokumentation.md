@@ -18,7 +18,13 @@ Svenska används för allt en människa läser som inte är kod: dokumentation, 
 kravtexter, commit-meddelanden, PR-beskrivningar, och all text besökaren ser på sajten.
 
 Engelska används i kod: variabel- och funktionsnamn, filnamn i `source/` och `tests/`,
-samt fältnamn i YAML och JSON.
+fältnamn i YAML och JSON, **och kommentarer i kodfiler** — CSS, TypeScript och
+arbetsflöden.
+
+Gränsen går vid filen, inte vid meningen. Allt inuti en kodfil är engelskt; varje
+fristående dokument är svenskt. Det gör regeln möjlig att följa utan att väga varje rad
+för sig, och gör det uppenbart var en text hör hemma: ska den läsas av någon som inte
+programmerar hör den hemma i `docs/`, inte i en kommentar.
 
 YAML-fältnamnen är alltså engelska (`name`, `species`, `born`), medan värdena är svenska.
 Datakontraktet i `docs/04-DATAKONTRAKT.md` förklarar varje fält på svenska, så den som
@@ -45,3 +51,5 @@ redigerar en djurfil kan slå upp vad fältet betyder utan att kunna engelska.
 - Sökningar i repot måste ibland göras på båda språken: kravet heter något på svenska,
   koden som uppfyller det något på engelska. Spårbarhetsmatrisen finns delvis för att
   överbrygga det.
+- En förklaring som en gårdsmedlem behöver kan inte gömmas i en kodkommentar, eftersom
+  den kommentaren är engelsk. Den måste skrivas i `docs/`, där den ändå gör mer nytta.

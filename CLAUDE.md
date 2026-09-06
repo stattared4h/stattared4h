@@ -73,8 +73,10 @@ Regler:
 - Sajten är på svenska. All text besökaren ser — etiketter, rubriker, beskrivningar,
   felmeddelanden, bekräftelser — ska vara på svenska. <!-- CL-§1.10 -->
 - All dokumentation, alla ADRer och alla commit-meddelanden skrivs på svenska. <!-- CL-§1.11 -->
-- Kod är engelsk: variabelnamn, funktionsnamn, filnamn och YAML-fältnamn. Det håller
-  koden konsekvent med de bibliotek och verktyg den vilar på. Se ADR 0006. <!-- CL-§1.12 -->
+- Kod är engelsk: variabelnamn, funktionsnamn, filnamn, YAML-fältnamn och kommentarer
+  i kodfiler. Gränsen går vid filen — allt inuti en kodfil är engelskt, varje fristående
+  dokument är svenskt. Det håller koden konsekvent med de bibliotek och verktyg den vilar
+  på. Se ADR 0006. <!-- CL-§1.12 -->
 - När du skriver krav i `docs/02-krav/`: beskriv **önskat läge**, inte
   "ändringar" eller "förbättringar". <!-- CL-§1.13 -->
   - Skriv varje krav som ett fristående faktum om hur systemet fungerar. En läsare som
