@@ -1,0 +1,22 @@
+name: Rosa
+species: get
+breed: jamtget
+sex: female
+born: 2021-04-12
+mother: stjarna
+father: bocken
+status: here
+description: |
+  Rosa är gårdens mest framfusiga get. Hon kommer fram direkt när någon
+  öppnar grinden, och hon vet mycket väl var fickorna sitter.
+
+  Hon är dotter till Stjärna.
+photos:
+  - file: rosa-1.webp
+    alt: Rosa, en brun get med vit nos, tittar rakt in i kameran.
+    credit: Anna Andersson
+    portrait: true
+  - file: rosa-2.webp
+    alt: Rosa står på en stubbe i hagen.
+    credit: Anna Andersson
+    portrait: false

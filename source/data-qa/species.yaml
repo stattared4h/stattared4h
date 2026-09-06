@@ -1,0 +1,16 @@
+species:
+  - id: get
+    name: Get
+    plural: Getter
+  - id: far
+    name: Får
+    plural: Får
+  - id: ko
+    name: Ko
+    plural: Kor
+  - id: hast
+    name: Häst
+    plural: Hästar
+  - id: kanin
+    name: Kanin
+    plural: Kaniner

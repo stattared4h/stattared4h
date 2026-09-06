@@ -1,0 +1,9 @@
+name: Gethagen
+species:
+  - get
+note: Här går getterna på dagarna.
+description: Den stora hagen närmast ladugården, med stubbar att klättra på.
+lat: 57.412300
+lon: 12.213400
+accessible: true
+active: true

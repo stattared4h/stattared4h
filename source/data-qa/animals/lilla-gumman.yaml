@@ -1,0 +1,11 @@
+name: Lilla Gumman
+species: get
+sex: female
+mother: stjarna
+status: here
+description: Yngst i gethagen, och alltid närmast Stjärna.
+photos:
+  - file: lilla-gumman-1.webp
+    alt: En liten vit killing som ligger i halmen.
+    credit: Anna Andersson
+    portrait: true

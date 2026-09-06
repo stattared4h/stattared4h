@@ -1,0 +1,12 @@
+name: Vinter
+species: hast
+breed: islandshast
+sex: unknown
+born: 2018
+status: here
+description: Vinter kom till gården 2024 och är fortfarande lite reserverad.
+photos:
+  - file: vinter-1.webp
+    alt: Vinter, en ljusbrun islandshäst med ljus man.
+    credit: Erik Eriksson
+    portrait: true
