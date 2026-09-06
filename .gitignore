@@ -203,3 +203,4 @@ compose.override.yaml
 Thumbs.db
 .idea/
 .vscode/
+public/

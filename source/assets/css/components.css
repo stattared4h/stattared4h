@@ -1,0 +1,51 @@
+/** Component styling. Written only once the markup exists (05-§7.2). */
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-md);
+}
+
+.note {
+  background: var(--color-green-pale);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-target-min);
+  padding: var(--space-xs) var(--space-md);
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  background: var(--color-green);
+  color: var(--color-surface); /* white on green: 4.69:1, AA (05-§2.15) */
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.button:hover,
+.button:focus-visible {
+  background: var(--color-green-deep);
+}
+
+.button--secondary {
+  background: transparent;
+  border-color: var(--color-green-deep);
+  color: var(--color-green-deep);
+}
+
+.button--secondary:hover,
+.button--secondary:focus-visible {
+  background: var(--color-green-deep);
+  color: var(--color-surface);
+}
+
+.meta {
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-small);
+}

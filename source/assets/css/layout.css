@@ -1,0 +1,44 @@
+/** Containers, header and footer structure. */
+
+.container {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
+}
+
+.container--narrow {
+  max-width: var(--container-narrow);
+}
+
+.site-header {
+  background: var(--color-surface);
+  border-bottom: var(--border-width) solid var(--color-border);
+  padding-block: var(--space-sm);
+}
+
+.site-header__name {
+  margin: 0;
+  color: var(--color-green-deep);
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+}
+
+.site-main {
+  padding-block: var(--space-xl);
+}
+
+.site-footer {
+  background: var(--color-green-deep);
+  color: var(--color-surface);
+  padding-block: var(--space-lg);
+}
+
+.site-footer a {
+  color: var(--color-surface);
+}
+
+/* The footer sits on deep green, so muted text must not fall back to the light-ground tone. */
+.site-footer .meta {
+  color: inherit;
+}
