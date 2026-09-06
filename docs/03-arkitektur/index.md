@@ -12,7 +12,7 @@ Avsnitts-ID (`03-§N.M`) är stabila och citeras från kod och spårbarhetsmatri
 Sajten är en statisk PWA. Ingenting körs på en server; allt avgörs vid bygget eller i
 besökarens webbläsare. <!-- 03-§1.1 -->
 
-```
+```text
 source/                      bygge (Eleventy + esbuild)        public/
 ├── data/*.yaml       ──┐                                   ┌── *.html
 ├── content/*.md      ──┼──►  1. läs och validera data  ──┐  ├── assets/*.css
