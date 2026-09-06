@@ -62,18 +62,42 @@ fördjupningen för den som vill läsa vidare om djuren hemma. <!-- 02-§2.6 -->
 
 ---
 
-## 3. Var kraven kommer ifrån
+## 3. Roller och redigering
+
+Sajten har tre roller. De upprätthålls av GitHubs behörigheter och av regelverket på
+`main`, inte av kod i det här repot — se
+[ADR 0014](../adr/0014-roller-via-github.md). <!-- 02-§3.1 -->
+
+| Roll | Kan |
+| --- | --- |
+| Besökare | Läsa den publicerade sajten. Ingen inloggning finns |
+| Redaktör | Ändra data och öppna en pull request |
+| Administratör | Lägga in en pull request på `main` |
+
+- En redaktör kan inte ändra den publicerade sajten direkt. Varje ändring går genom en
+  pull request där datavalidering och lintning körs innan den kan läggas
+  in. <!-- 02-§3.2 -->
+- Redaktören arbetar i GitHubs webbgränssnitt och behöver ingen utvecklarmiljö.
+  `docs/01-BIDRA.md` §2 beskriver vägen steg för steg. <!-- 02-§3.3 -->
+- Sajten har ingen egen inloggning och ingen egen token. Autentiseringen är
+  GitHubs. <!-- 02-§3.4 -->
+- Ett djur som lämnat gården raderas aldrig. Det får `status: gone` och behåller sin sida,
+  sin stamtavla och sina bilder. <!-- 02-§3.5 -->
+
+---
+
+## 4. Var kraven kommer ifrån
 
 Uppdrag kommer in som **GitHub-issues**. Där formuleras målbilden med acceptanskriterier,
-och där förs diskussionen med gården. <!-- 02-§3.1 -->
+och där förs diskussionen med gården. <!-- 02-§4.1 -->
 
 Issues är intaget; den här katalogen är det varaktiga registret. Ett issue stängs när
 arbetet är gjort, men kravet ska gå att läsa i repot om fem år. Därför skrivs varje
-överenskommet krav in här med ett `02-§`-ID, och issue-numret noteras intill. <!-- 02-§3.2 -->
+överenskommet krav in här med ett `02-§`-ID, och issue-numret noteras intill. <!-- 02-§4.2 -->
 
 Går ett beslut emot vad ett issue säger — vilket har hänt, se
 [ADR 0012](../adr/0012-ingen-individuell-platssparning.md) — kommenteras issuet med skälet,
-så att avvikelsen syns där kravet väcktes. <!-- 02-§3.3 -->
+så att avvikelsen syns där kravet väcktes. <!-- 02-§4.3 -->
 
 ---
 
@@ -84,7 +108,7 @@ Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett inter
 
 | Fil | Ämne | Avsnitt |
 | --- | --- | --- |
-| `index.md` (denna) | Avgränsning mot huvudsidan, målgrupp, kravkonventioner och intag | §1–§3 |
+| `index.md` (denna) | Avgränsning, målgrupp, roller, kravkonventioner och intag | §1–§4 |
 
 Kravfiler skrivs i takt med att funktioner tas fram, enligt fas 1 i `CLAUDE.md`. Att den
 här tabellen är kort betyder att sajten är i sin början — inte att kraven saknas.

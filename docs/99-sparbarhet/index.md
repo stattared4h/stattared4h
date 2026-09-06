@@ -77,7 +77,9 @@ sajt. Statusen nedan speglar det ärligt.
 | --- | --- | --- | --- |
 | `02-§1` | Avgränsning mot huvudsidan | `byggd` | Startsidan länkar till `4h.se/stattared` i sidhuvud, brödtext och sidfot |
 | `02-§2` | Målgrupp | `dokumenterad` | Vägledande, inte testbar |
-| `02-§3` | Kravintag via issues | `dokumenterad` | Process, inte kod |
+| `02-§3.1`–`3.4` | Roller via GitHub | `byggd` | Regelverket kräver PR till `main`; ingen egen inloggning finns |
+| `02-§3.5` | Djur som lämnat gården behålls | `saknas` | Bevakas av valideraren när den finns |
+| `02-§4` | Kravintag via issues | `dokumenterad` | Process, inte kod |
 
 ---
 
@@ -97,9 +99,9 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal ID-intervall |
 | --- | --- |
-| `byggd` | 12 |
+| `byggd` | 13 |
 | `dokumenterad` | 13 |
-| `saknas` | 8 |
+| `saknas` | 9 |
 | `manuell` | 0 |
 
 Summeringen uppdateras i fas 5 av processen i `CLAUDE.md`. <!-- 99-§1.2 -->
