@@ -1,0 +1,82 @@
+/**
+ * Designtokens — Stättareds 4H-gård
+ *
+ * Enda platsen i kodbasen där ett färg-, typografi- eller spacingvärde skrivs som
+ * literal. Allt annat refererar hit. Se docs/05-design/css-strategi.md §7.
+ *
+ * Kontrastreglerna i docs/05-design/index.md §2 är absoluta:
+ *   - --color-green är en YTFÄRG och bär alltid vit text. Använd den aldrig som textfärg.
+ *   - Grön text är alltid --color-green-deep.
+ *   - --color-sun bär aldrig vit text.
+ */
+
+:root {
+  /* ── Färg ─────────────────────────────────────────────────────────────── */
+
+  /* 4H-grön, ett snäpp mörkare än temats #008b45 så att vit text når AA (4,69:1) */
+  --color-green: #00863f;
+  --color-green-deep: #15623e; /* all grön text, rubriker, sidfot — 7,37:1 mot vitt */
+  --color-green-pale: #e7fdf3; /* mjuk bakgrundston */
+
+  --color-page: #f4f6f3; /* sidans bakgrund */
+  --color-surface: #ffffff; /* kort och innehållsytor */
+
+  --color-ink: #404040; /* brödtext — 10,37:1 mot vitt */
+  --color-ink-soft: #5a5a5a; /* metatext — 6,90:1 mot vitt */
+  --color-border: #dfe3dd; /* avgränsare och fältramar */
+
+  --color-sun: #f2b134; /* spelaccent: fyllda rutor, hittade poster */
+  --color-sun-ink: #7a4b00; /* solfärgens ton som text på ljus botten */
+  --color-danger: #b3261e; /* fel och destruktiva åtgärder */
+
+  /* ── Typografi ────────────────────────────────────────────────────────── */
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", roboto, helvetica, arial, sans-serif;
+
+  --font-size-body: 17px; /* en punkt större än vanligt: läsbart i solsken */
+  --font-size-small: 15px;
+  --font-size-h1: 30px;
+  --font-size-h2: 24px;
+  --font-size-h3: 20px;
+
+  --line-height-body: 1.6;
+  --line-height-heading: 1.25;
+
+  /* ── Spacing ──────────────────────────────────────────────────────────── */
+
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --space-xl: 64px;
+  --space-xxl: 96px;
+
+  /* ── Layout ───────────────────────────────────────────────────────────── */
+
+  --container-wide: 1200px;
+  --container-narrow: 680px;
+  --tap-target-min: 44px; /* gäller allt klickbart, utan undantag */
+
+  /* ── Form ─────────────────────────────────────────────────────────────── */
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  --shadow-card: 0 2px 8px rgb(21 98 62 / 8%);
+  --shadow-raised: 0 6px 20px rgb(21 98 62 / 14%);
+
+  --border-width: 1px;
+  --focus-ring: 3px solid var(--color-green-deep);
+  --focus-offset: 2px;
+}
+
+/* Rubrikstorlekarna är de enda tokens som växer med skärmen. Brödtexten står still. */
+@media (min-width: 960px) {
+  :root {
+    --font-size-h1: 40px;
+    --font-size-h2: 30px;
+    --font-size-h3: 22px;
+  }
+}
