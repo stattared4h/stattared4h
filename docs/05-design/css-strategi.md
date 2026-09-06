@@ -40,6 +40,9 @@ En källfil per skikt under `source/assets/css/`, sammanfogade i byggordning:
 Ingen annan fil än `tokens.css` får definiera en variabel. Det gör paletten sökbar på
 ett ställe. <!-- 05-§7.5 -->
 
+Kommentarerna i CSS-filerna är på engelska. De ligger i kod, och kod är engelsk enligt
+[ADR 0006](../adr/0006-sprak-i-kod-och-dokumentation.md). <!-- 05-§7.9 -->
+
 ### Designtokens
 
 Dessa bor i `source/assets/css/tokens.css` och är den enda platsen där ett färg-,
@@ -47,20 +50,20 @@ spacing- eller typografivärde skrivs som literal. <!-- 05-§7.4 -->
 
 ```css
 :root {
-  /* Färg — se 05-§2 för kontrastreglerna */
-  --color-green: #00863f;        /* ytor och knappar, alltid med vit text */
-  --color-green-deep: #15623e;   /* all grön text, rubriker, sidfot */
-  --color-green-pale: #e7fdf3;   /* mjuk bakgrundston */
-  --color-page: #f4f6f3;         /* sidans bakgrund */
-  --color-surface: #ffffff;      /* kort och innehållsytor */
-  --color-ink: #404040;          /* brödtext */
-  --color-ink-soft: #5a5a5a;     /* metatext */
-  --color-border: #dfe3dd;       /* avgränsare och fältramar */
-  --color-sun: #f2b134;          /* spelaccent */
-  --color-sun-ink: #7a4b00;      /* text i solfärgens ton på ljus botten */
-  --color-danger: #b3261e;       /* fel och destruktiva åtgärder */
+  /* Colour — see 05-§2 for the contrast rules */
+  --color-green: #00863f;        /* surfaces and buttons, always with white text */
+  --color-green-deep: #15623e;   /* all green text, headings, footer */
+  --color-green-pale: #e7fdf3;   /* soft background tint */
+  --color-page: #f4f6f3;         /* page background */
+  --color-surface: #ffffff;      /* cards and content surfaces */
+  --color-ink: #404040;          /* body text */
+  --color-ink-soft: #5a5a5a;     /* meta text */
+  --color-border: #dfe3dd;       /* dividers and field borders */
+  --color-sun: #f2b134;          /* game accent */
+  --color-sun-ink: #7a4b00;      /* the sun tone as text on a light background */
+  --color-danger: #b3261e;       /* errors and destructive actions */
 
-  /* Typografi */
+  /* Typography */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-size-body: 17px;
   --font-size-small: 15px;
