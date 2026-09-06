@@ -76,7 +76,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§10.14` | Till toppen | `saknas` | |
 | `02-§10.15`–`10.20` | Feedback via förifylld GitHub-issue | `saknas` | Issue-mallen `.github/ISSUE_TEMPLATE/feedback.md` finns inte |
 | `02-§10.21` | Sidfot | `påbörjad` | Huvudsidelänk, repolänk och integritetsmening finns; 4H-loggan och versionen saknas |
-| `02-§10.22`–`10.26`, `10.33` | Version i sidfot, `VERSION`, taggar, förfasen `0.0.PR<n>`, cachenamn | `saknas` | Ingen `VERSION`-fil, ingen `BUILD_VERSION` i deployen |
+| `02-§10.22`–`10.26`, `10.33`–`10.35` | Version i sidfot, `VERSION`, QA- och produktionsdeploy, taggar, cachenamn | `saknas` | Ingen `VERSION`-fil, ingen `BUILD_VERSION`, en enda deploy utan godkännande |
+| `02-§10.36` | Releaseguide | `dokumenterad` | `docs/08-SLAPP.md` |
 | `02-§10.27` | Om-sidan | `saknas` | |
 | `02-§10.28`–`10.29` | Statusrad för ny version och offline | `saknas` | |
 | `02-§10.30` | Dela | `saknas` | Kräver de datadrivna sidorna |
@@ -163,7 +164,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | Status | Antal rader |
 | --- | --- |
 | `saknas` | 46 |
-| `dokumenterad` | 17 |
+| `dokumenterad` | 18 |
 | `påbörjad` | 22 |
 | `byggd` | 0 |
 | `manuell` | 2 |

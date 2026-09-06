@@ -24,6 +24,7 @@ och utan personuppgifter om besökaren. Hur långt det kommit står under *Läge
 | Färger, typografi, komponenter | [`docs/05-design/`](docs/05-design/index.md) |
 | Miljöer och drift | [`docs/06-MILJOER.md`](docs/06-MILJOER.md) |
 | Säkerhet i ett publikt repo | [`docs/07-SAKERHET.md`](docs/07-SAKERHET.md) |
+| Släpp till produktion | [`docs/08-SLAPP.md`](docs/08-SLAPP.md) |
 | Varför saker ser ut som de gör | [`docs/adr/`](docs/adr/README.md) |
 
 ## Säkerhet

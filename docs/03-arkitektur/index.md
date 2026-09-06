@@ -152,11 +152,15 @@ bas-sökvägens hjälpfunktion, och att inget djur har fått ett `location`-fäl
   TypeScript direkt, och Node tar bort typannoteringarna utan kompilering. Domänen
   undviker därför `enum`, `namespace` och parameteregenskaper, som kräver
   kompilering. <!-- 03-§8.7 -->
-- Deploy-arbetsflödet körs efter kvalitetsflödet och bara när det är grönt på samma
-  commit (`02-§9.11`). <!-- 03-§8.8 -->
-- Produktion och QA byggs i samma deploy: två byggen med olika `DATA_DIR` och
-  `BASE_PATH`, där QA-bygget läggs under `public/qa/` innan artefakten laddas
-  upp. <!-- 03-§8.9 -->
+- Två deploy-arbetsflöden delar ett återanvändbart: `deploy-qa.yml` triggas av push till
+  `main` efter grönt kvalitetsflöde, `deploy-prod.yml` av "Run workflow" med ett
+  godkännandejobb i miljön `production`. Det återanvändbara flödet bygger båda
+  miljöerna och laddar upp en Pages-artefakt (`02-§9.11`). <!-- 03-§8.8 -->
+- Produktion och QA byggs i samma deploy: två byggen med olika `DATA_DIR`, `BASE_PATH`
+  och `BUILD_VERSION`, där QA-bygget läggs under `public/qa/` innan artefakten laddas
+  upp. I QA-deployen checkas produktionens kod ut från senaste taggen `vX.Y.*` i en egen
+  katalog, och `source/data/` och `source/content/` kopieras dit från `main` innan
+  bygget; i produktionsdeployen byggs båda från `main`. <!-- 03-§8.9 -->
 
 ---
 
@@ -191,15 +195,17 @@ Feedback bygger en adress till `github.com/<repo>/issues/new` med `template`, `t
 och `body` som frågeparametrar och öppnar den i ny flik. Ingen kod på sajten talar med
 GitHub; det gör besökarens webbläsare, i besökarens namn. <!-- 03-§10.3 -->
 
-Versionen räknas i deploy-arbetsflödet, aldrig i bygget: `X.Y` läses ur `VERSION`,
-numret på den mergade pull requesten hämtas via GitHubs API för commiten (en
-rebase-merge bär inte numret i ämnesraden), med körningsnumret som reserv, och taggarna
-`vX.Y.*` avgör om det är ett släpp eller en kandidat (`02-§10.24`). Är `VERSION` `0.0`
-blir versionen `0.0.PR<n>` och inget taggas (`02-§10.33`). Resultatet skickas
-som `BUILD_VERSION` till bygget, som skriver in det i sidfoten, om-sidan, manifestets
-`version`-fält och service workerns cachenamn. Efter deployen taggar arbetsflödet
-commiten och skapar en GitHub Release vid ett släpp. <!-- 03-§10.4 -->
+Versionen räknas i deploy-arbetsflödena, aldrig i bygget. `deploy-prod.yml` läser `X.Y`
+ur `VERSION`, tar senaste taggen `vX.Y.*` och räknar upp patchnumret; efter lyckad
+deploy sätter ett jobb med `contents: write` den annoterade taggen och, för den första
+taggen i serien, en GitHub Release med `--generate-notes` (`02-§10.24`).
+`deploy-qa.yml` tar senaste taggens version, eller `X.Y.0`, och lägger till
+" – QA PR<n>", där numret hämtas via GitHubs API för commiten eftersom en rebase-merge
+inte bär det i ämnesraden, med kort SHA som reserv (`02-§10.33`). Strängen skickas som
+`BUILD_VERSION` till bygget, som skriver in den i sidfoten, om-sidan, manifestets
+`version`-fält och service workerns cachenamn. <!-- 03-§10.4 -->
 
 Utan `BUILD_VERSION` bygger bygget en lokal version ur senaste taggen och klockslaget i
 Europe/Stockholm, utom när `GITHUB_ACTIONS` är satt: då sätts ingen version alls,
-eftersom en felaktig version är sämre än ingen (`02-§10.25`). <!-- 03-§10.5 -->
+eftersom en felaktig version är sämre än ingen (`02-§10.25`). Logiken bor i
+`source/ts/domain/version.ts` och testas i Node. <!-- 03-§10.5 -->
