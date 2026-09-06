@@ -55,6 +55,10 @@ deployar en röd `main` ändå.
 ### Drift
 
 - Deploy till GitHub Pages körs bara när alla kvalitetskontroller är gröna på samma
-  commit, och installerar beroenden med `npm ci`. <!-- 02-§9.11 -->
-- Deployen bygger produktion med `source/data/` i roten och QA med `source/data-qa/`
-  under `/qa/`, i samma Pages-utgåva (`06-§1`). <!-- 02-§9.12 -->
+  commit, och installerar beroenden med `npm ci`. QA-deployen startar av sig själv vid
+  merge till `main`; produktionsdeployen startas för hand och godkänns i miljön
+  `production` (`02-§10.24`, `02-§10.33`). <!-- 02-§9.11 -->
+- Varje deploy bygger en Pages-utgåva med produktionen i roten och QA under `/qa/`
+  (`06-§1`). QA byggs från `main` med `source/data-qa/`. Produktionen byggs från
+  senaste produktionstaggens kod med `source/data/` och `source/content/` från `main`,
+  utom i produktionsdeployen, där den byggs från `main`. <!-- 02-§9.12 -->

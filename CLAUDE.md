@@ -29,6 +29,7 @@ definierar detaljerna.
 | `docs/05-design/bilder-och-tillganglighet.md` | Bildhantering, fotoregler, tillgänglighetsminimum |
 | `docs/06-MILJOER.md` | Lokalt, förhandsvisning och produktion; bas-sökväg och flytt av drift |
 | `docs/07-SAKERHET.md` | Säkerhet i ett publikt repo: checklista före push, CI-härdning, GitHub-inställningar |
+| `docs/08-SLAPP.md` | Släpp till produktion: deploy, versioner, taggar, rollback |
 | `docs/adr/` | Arkitekturbeslut: varför saker ser ut som de gör |
 | `docs/99-sparbarhet/index.md` | Spårbarhetsmatris: krav → dokumentation → test → implementation |
 

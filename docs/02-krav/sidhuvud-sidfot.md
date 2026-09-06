@@ -98,28 +98,42 @@ inte byggas in i egna märken (ADR 0007).
   4H-gård" till `https://www.4h.se/stattared/`, länken "Källkoden på GitHub" till repot,
   meningen "Sidan samlar inga uppgifter om dig.", och versionen sist i
   `--font-size-small`. <!-- 02-§10.21 -->
-- Versionsraden lyder "Version 1.2.0" för ett släpp, "Version 1.2.0 – CR31" för en
-  kandidat, "Version 0.0.PR31" före första släppet och
-  "Version 1.2.0 – lokal 2026-09-06 18:40" för ett lokalt bygge, och får tillägget
-  " – QA" i QA-bygget. Ett CI-bygge utan versionsuppgift visar ingen
-  versionsrad. <!-- 02-§10.22 -->
+- Versionsraden lyder "Version 1.0.4" i produktion, "Version 1.0.4 – QA PR212" i QA
+  efter en merge, "Version 1.0.4" i QA direkt efter en produktionsdeploy,
+  "Version 0.0.0 – QA PR31" i QA före första produktionsdeployen, och
+  "Version 1.0.4 – lokal 2026-09-06 18:40" för ett lokalt bygge. Ett CI-bygge utan
+  versionsuppgift visar ingen versionsrad. <!-- 02-§10.22 -->
 
 ### Version
 
-- Filen `VERSION` i repots rot innehåller huvud- och delversion, `X.Y`. <!-- 02-§10.23 -->
-- Första deployen av en ny `X.Y` är släppet: versionen är `X.Y.0`, commiten taggas
-  `vX.Y.0`, och en GitHub Release skapas med anteckningarna i `docs/releases/vX.Y.0.md`
-  när filen finns. Varje senare deploy på samma `X.Y` är en kandidat: versionen är
-  `X.Y.0 – CR<n>` där `n` är numret på den pull request som mergades, och commiten
-  taggas `vX.Y.0-CR<n>`. <!-- 02-§10.24 -->
-- Så länge `VERSION` är `0.0` finns inget släpp: varje deploy får versionen `0.0.PR<n>`
-  med numret på den mergade pull requesten, utan tagg och utan GitHub Release. Första
-  släppet är `1.0.0`, den dag `VERSION` sätts till `1.0`. <!-- 02-§10.33 -->
+- Filen `VERSION` i repots rot innehåller huvud- och delversion, `X.Y`, och är det enda
+  om versionen som finns i repot. Huvud- och delversion höjs för hand i filen;
+  patchnumret räknas ur git-taggarna. <!-- 02-§10.23 -->
+- Produktionen deployas för hand, genom att arbetsflödet "Deploy till produktion"
+  startas och godkänns i GitHub-miljön `production`. Versionen är nästa patch efter
+  senaste taggen `vX.Y.*`, eller `X.Y.0` när ingen finns. Efter lyckad deploy sätts en
+  annoterad tagg `vX.Y.P`; finns taggen redan hoppas steget över. Är det den första
+  taggen för `X.Y` skapas en GitHub Release med automatiskt genererade anteckningar;
+  patchdeployer får ingen Release. <!-- 02-§10.24 -->
 - Versionssträngen når bygget som miljövariabeln `BUILD_VERSION`. Saknas den lokalt
-  bygger bygget själv en lokal version ur senaste taggen och klockslaget; saknas den i
-  CI sätts ingen version. <!-- 02-§10.25 -->
+  bygger bygget själv en lokal version ur senaste taggen, eller `X.Y.0`, och klockslaget
+  i Europe/Stockholm; saknas den i CI sätts ingen version. Versionslogiken är en egen
+  modul som enhetstestas. <!-- 02-§10.25 -->
 - Service workerns cachenamn är versionssträngen, så att versionen i sidfoten och cachen
   aldrig pekar på olika byggen (`02-§7.6`). <!-- 02-§10.26 -->
+- QA deployas automatiskt vid varje merge till `main`. QA:s version är senaste
+  produktionsversionen, eller `X.Y.0` när ingen tagg finns, följd av " – QA PR<n>" där
+  `n` är numret på den mergade pull requesten; kan numret inte hämtas används commitens
+  korta SHA i stället. <!-- 02-§10.33 -->
+- Efter en lyckad produktionsdeploy byggs QA om med exakt produktionens version, utan
+  suffix, så att det syns att QA kör släppet. Nästa merge ger QA sitt suffix
+  igen. <!-- 02-§10.34 -->
+- En merge till `main` som bara rör `source/data/` och `source/content/` bygger också om
+  produktionen, med produktionstaggens kod och `main`:s innehåll, utan ny version. En
+  redaktörs ändring når besökarna utan att kod släpps. <!-- 02-§10.35 -->
+- Releaseguiden i `docs/08-SLAPP.md` beskriver hur en produktionsdeploy görs, hur man
+  ser vad som är deployat, när huvud- och delversion höjs, och hur en deploy
+  rullas tillbaka. <!-- 02-§10.36 -->
 
 ### Om sajten
 
