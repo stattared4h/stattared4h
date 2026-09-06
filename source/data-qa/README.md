@@ -53,8 +53,12 @@ prövar större listor, svensk sortering och att samtliga arter och raser använ
 Arten `hast` finns medvetet på **ingen** plats, så att artsidan prövas när svaret på
 "var finns hästarna?" är att vi inte vet.
 
-## Vad som ännu saknas
+## Bilder
 
-Bildfilerna som posterna refererar finns inte. De skapas när bildkedjan byggs, som
-genererade platshållare — inga påhittade fotografier commit:as. Fram till dess kan
-valideringen inte kontrollera att en bild existerar.
+Bildfilerna som posterna refererar genereras av `npm run qa:images` som enfärgade
+platshållare med postens namn i bilden, i `source/images-qa/`. Katalogen ignoreras av
+git — inga påhittade fotografier commit:as (`02-§8.4`). Bildkatalogen följer datasetet
+(`04-§9.4`), så platshållarna blandas aldrig med gårdens bilder i `source/images/`.
+
+Kör kommandot innan ett QA-bygge och när en post får en ny bildreferens. En fil som
+redan finns lämnas orörd, så en omkörning är omedelbar.

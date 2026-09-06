@@ -204,3 +204,6 @@ Thumbs.db
 .idea/
 .vscode/
 public/
+
+# Generated QA placeholders (02-§8.4); never commit made-up photographs
+source/images-qa/
