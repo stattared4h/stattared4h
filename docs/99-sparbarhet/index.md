@@ -35,9 +35,11 @@ sajt. Statusen nedan speglar det ärligt.
 | `05-§3` | Typografi | `byggd` | Tokens finns; `base.css` saknas |
 | `05-§4` | Layout och spacing | `byggd` | Tokens finns; `layout.css` saknas |
 | `05-§5` | Brytpunkter | `dokumenterad` | Tillämpas när layouten skrivs |
-| `05-§6` | Komponenter | `saknas` | Skrivs när markupen finns, enligt `05-§7.2` |
+| `05-§6.3` | Knappar | `byggd` | `.button` på startsidan, 47 px hög, vit text på grön |
+| `05-§6` övrigt | Komponenter | `saknas` | Skrivs när markupen finns, enligt `05-§7.2` |
 | `05-§7.4` | Designtokens | `byggd` | `source/assets/css/tokens.css` |
-| `05-§7.1`, `7.5` | Inga hårdkodade värden | `saknas` | Kräver en lint-regel |
+| `05-§7.3` | Filstruktur för CSS | `byggd` | `base.css`, `layout.css`, `components.css` |
+| `05-§7.1`, `7.5` | Inga hårdkodade värden | `saknas` | Kräver en lint-regel; följs i dag för hand |
 | `05-§8` | Bilder | `dokumenterad` | Bildpipeline saknas |
 | `05-§9` | Tillgänglighet | `dokumenterad` | Delvis testbar när markupen finns |
 | `05-§10` | Vad man inte gör | `dokumenterad` | Delvis kontrollerbar med lint |
@@ -55,10 +57,12 @@ sajt. Statusen nedan speglar det ärligt.
 | ID-intervall | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
 | `06-§1` | QA och produktion ur samma kod, olika dataset | `dokumenterad` | Inget bygge och ingen deploy finns ännu |
-| `06-§2.1` | `DATA_DIR` väljer dataset | `saknas` | Införs med bygget |
+| `06-§2.1` | `DATA_DIR` väljer dataset | `saknas` | Bygget renderar ännu inga datadrivna sidor |
 | `06-§2.2` | Tester körs mot QA-data, aldrig mot gårdens | `byggd` | `source/data-qa/` finns och täcker kontraktets gränsfall |
 | `06-§2.3` | QA-datat prövar gränsfallen | `byggd` | Täckningen listas i `source/data-qa/README.md` |
-| `06-§3` | Bas-sökvägen | `saknas` | Bevakas av ett test när bygget finns |
+| `06-§3` | Bas-sökvägen | `byggd` | `scripts/build.mjs` löser `{{base}}` och vägrar bygga en mall med handskriven absolut sökväg |
+| `06-§1.3` | `robots.txt` utestänger `/qa/` | `byggd` | `source/robots.txt` |
+| `06-§1.2` | QA under `/qa/` i samma utgåva | `saknas` | QA-bygget tillkommer med de datadrivna sidorna |
 
 ### Arkitektur (`03-§`)
 
@@ -92,9 +96,9 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal ID-intervall |
 | --- | --- |
-| `byggd` | 6 |
+| `byggd` | 11 |
 | `dokumenterad` | 13 |
-| `saknas` | 7 |
+| `saknas` | 8 |
 | `manuell` | 0 |
 
 Summeringen uppdateras i fas 5 av processen i `CLAUDE.md`. <!-- 99-§1.2 -->

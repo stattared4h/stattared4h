@@ -44,15 +44,16 @@ Andra kommandon:
 | Kommando | Gör |
 | --- | --- |
 | `npm run build` | Bygger sajten till `public/` |
-| `npm test` | Kör enhetstester och datavalidering |
-| `npm run lint` | Lintar HTML, CSS, TypeScript och Markdown |
-| `npm run validate` | Kör bara datavalideringen, med varningar |
+| `npm run serve` | Serverar `public/` utan att bygga om |
 
-Allt ska vara grönt innan du commit:ar. Aktivera de delade git-hookarna en gång:
+Bygget tar `BASE_PATH`, med `/` som standard:
 
 ```bash
-git config core.hookspath .githooks
+BASE_PATH=/stattared4h/ npm run build
 ```
+
+Kommandona `npm test`, `npm run lint` och `npm run validate` finns ännu inte — de
+tillkommer med valideraren och testerna. Spårbarhetsmatrisen visar vad som finns.
 
 ---
 

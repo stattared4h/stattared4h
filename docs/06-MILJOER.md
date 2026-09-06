@@ -29,10 +29,13 @@ sökmotor. <!-- 06-§1.3 -->
 Bygget läser miljövariabeln `DATA_DIR`, med `source/data` som standard. <!-- 06-§2.1 -->
 
 ```bash
-npm start                              # lokalt mot QA-data
+npm start                              # bygger och serverar på localhost:8080
 DATA_DIR=source/data npm run build     # produktion
 DATA_DIR=source/data-qa npm run build  # QA
 ```
+
+`DATA_DIR` får verkan när de datadrivna sidorna byggs. Bygget renderar i dag bara
+startsidan; se spårbarhetsmatrisen för vad som finns och vad som saknas.
 
 **Testerna körs alltid mot `source/data-qa/`, aldrig mot gårdens riktiga data.** Ett test
 får aldrig kunna börja fallera för att gården sålt en get. <!-- 06-§2.2 -->
@@ -52,8 +55,15 @@ Det som skiljer miljöerna åt i adressen hanteras av `BASE_PATH`, med `/` som
 standard. <!-- 06-§3.1 -->
 
 ```bash
-BASE_PATH=/stattared4h/ DATA_DIR=source/data npm run build
+BASE_PATH=/stattared4h/ npm run build
 ```
+
+I CI sätts den inte för hand: `actions/configure-pages` räknar fram `base_path`, och
+deploy-arbetsflödet skickar vidare den. Byter repot namn eller får en egen domän följer
+sajten med utan att någon ändrar en rad. <!-- 06-§3.4 -->
+
+Bygget vägrar dessutom rendera en sida vars mall innehåller en handskriven absolut
+sökväg. Regeln kan alltså inte urholkas av förbiseende. <!-- 06-§3.5 -->
 
 Varje intern länk, varje resursreferens, service workerns scope och manifestets
 `start_url` byggs genom bas-sökvägens hjälpfunktion. Ingen absolut sökväg skrivs för hand,

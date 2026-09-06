@@ -1,0 +1,78 @@
+/**
+ * Reset, element defaults and typography.
+ * Every value comes from tokens.css — see docs/05-design/css-strategi.md §7.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-green-deep);
+  line-height: var(--line-height-heading);
+  /* Never uppercase: Swedish words with å ä ö lose legibility (05-§3.12). */
+  text-transform: none;
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+}
+
+p {
+  margin: 0 0 var(--space-sm);
+  max-width: 62ch;
+}
+
+a {
+  color: var(--color-green-deep);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Never removed without an equally clear replacement (05-§9.4). */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important; /* stylelint-disable-line declaration-no-important */
+    animation-iteration-count: 1 !important; /* stylelint-disable-line declaration-no-important */
+    transition-duration: 0.01ms !important; /* stylelint-disable-line declaration-no-important */
+  }
+}
