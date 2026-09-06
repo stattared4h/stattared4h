@@ -22,12 +22,13 @@
     "test": "node --test \"tests/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "validate": "node scripts/validate.mjs",
-    "lint": "npm run lint:css && npm run lint:ts && npm run lint:md && npm run lint:yaml && npm run lint:html",
+    "lint": "npm run lint:css && npm run lint:ts && npm run lint:md && npm run lint:yaml && npm run lint:html && npm run lint:docs",
     "lint:css": "stylelint \"source/assets/css/**/*.css\"",
     "lint:ts": "eslint .",
     "lint:md": "markdownlint-cli2",
     "lint:yaml": "yamllint .",
-    "lint:html": "html-validate \"public/**/*.html\""
+    "lint:html": "html-validate \"public/**/*.html\"",
+    "lint:docs": "node scripts/check-docs.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.6",
