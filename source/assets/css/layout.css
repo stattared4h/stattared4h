@@ -17,11 +17,30 @@
   padding-block: var(--space-sm);
 }
 
+/* Wraps on narrow screens so the link to the main site is never pushed off-screen. */
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-sm);
+}
+
 .site-header__name {
   margin: 0;
   color: var(--color-green-deep);
   font-size: var(--font-size-h3);
   font-weight: 700;
+}
+
+/* The main site is a permanent destination, not a temporary fallback: it stays in the
+   header on every page (05-§6.1). */
+.site-header__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  color: var(--color-green-deep);
+  font-weight: 600;
 }
 
 .site-main {

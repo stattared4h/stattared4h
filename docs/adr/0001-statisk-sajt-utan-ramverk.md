@@ -4,8 +4,9 @@
 
 ## Sammanhang
 
-Stättareds 4H-gård är en ideell förening. Sajten ska presentera gården och dess djur, och
-hjälpa besökaren att hitta rätt bland hagarna. Besökarna kommer från mobilen, ofta stående
+Stättareds 4H-gård är en ideell förening. Sajten är ett komplement till gårdens huvudsida
+på `4h.se/stattared`: den presenterar djuren och hjälper besökaren att hitta rätt bland
+hagarna, medan öppettider och bokningar blir kvar på huvudsidan. Besökarna kommer från mobilen, ofta stående
 ute på gården där täckningen är ojämn. Den som förvaltar sajten över tid är inte
 utvecklare, och bemanningen i en förening växlar mellan säsonger.
 

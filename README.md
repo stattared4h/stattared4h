@@ -1,8 +1,11 @@
 # Stättareds 4H-gård
 
-Hemsida och innehållsdatabas för Stättareds 4H-gård: gårdens djur, arter och
-hagar. QR-koden på hagen visar vilka djurslag som går där, och därifrån hittar besökaren
-vidare till varje djur.
+Djurguide för Stättareds 4H-gård: gårdens djur, arter och hagar. QR-koden på hagen visar
+vilka djurslag som går där, och därifrån hittar besökaren vidare till varje djur.
+
+**Det här är ett komplement till gårdens huvudsida på
+[4h.se/stattared](https://www.4h.se/stattared/), inte en ersättning för den.** Öppettider,
+boende, bokningar och nyheter finns kvar där. Här bor bara djuren och hagarna.
 
 Sajten är en installerbar webbapp (PWA) för iOS och Android. Den är statisk, fungerar
 offline och samlar inte in några personuppgifter.

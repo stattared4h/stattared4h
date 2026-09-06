@@ -25,36 +25,55 @@ flyttas till en annan fil.
 
 ---
 
-## 1. Målgrupp
+## 1. Vad sajten är — och inte är
 
-Sajten har fyra läsare, i prioritetsordning: <!-- 02-§1.1 -->
+Sajten är ett **komplement** till Stättareds 4H-gårds huvudsida på `4h.se/stattared`.
+Den ersätter den inte, och ska inte växa till en andra hemsida för gården. <!-- 02-§1.7 -->
 
-1. **Besökaren på gården**, med mobilen i handen, som vill veta vad som händer nu, vilket
-   djur den tittar på, och vad man kan göra härnäst. Ojämn täckning. Ofta sol i
-   skärmen. <!-- 02-§1.2 -->
-2. **Barnet som spelar**, i grundskoleåldern, som använder bingo, gissningsleken och
-   skattjakten för att upptäcka gården. Läser inte långa texter. <!-- 02-§1.3 -->
-3. **Den som planerar besöket** hemma vid datorn: öppettider, hitta hit, vad som passar
-   åldern, bokning för skola eller grupp. <!-- 02-§1.4 -->
-4. **Gårdsmedlemmen som förvaltar innehållet**, som lägger till ett djur eller en
-   aktivitet utan att vara utvecklare. <!-- 02-§1.5 -->
+Här bor djuren och hagarna: vem djuret är, vem det är släkt med, och vilka djurslag som
+går var. Öppettider, boende, bokningar, nyheter, medlemskap och kontaktuppgifter hör till
+huvudsidan och ska inte dupliceras här — ett faktum som står på två ställen slutar
+stämma på det ena. <!-- 02-§1.8 -->
 
-Mobilen är utgångsläget. Skrivbordsvyn är den fördjupning som läsare 3 får. <!-- 02-§1.6 -->
+Varje sida länkar till huvudsidan, i sidhuvudet och i sidfoten. Länken är en permanent
+väg vidare, inte en tillfällig hänvisning i väntan på eget innehåll. <!-- 02-§1.9 -->
+
+Tveka aldrig om en funktion hör hemma här: frågan är om den handlar om djuren eller om
+platserna de går på. Gör den inte det hör den till huvudsidan. <!-- 02-§1.10 -->
 
 ---
 
-## Var kraven kommer ifrån
+## 2. Målgrupp
+
+Sajten har tre läsare, i prioritetsordning: <!-- 02-§2.1 -->
+
+1. **Besökaren på gården**, med mobilen i handen framför en hage, som vill veta vilka djur
+   som går där och vad de heter. Ojämn täckning. Ofta sol i skärmen. <!-- 02-§2.2 -->
+2. **Barnet**, i grundskoleåldern, som vill känna igen djuret det just klappat. Läser inte
+   långa texter. <!-- 02-§2.3 -->
+3. **Gårdsmedlemmen som förvaltar innehållet**, som lägger till ett djur utan att vara
+   utvecklare. <!-- 02-§2.4 -->
+
+Den som planerar sitt besök hemma vid datorn — öppettider, hitta hit, bokning för skola
+eller grupp — är huvudsidans läsare, inte vår. <!-- 02-§2.5 -->
+
+Mobilen är utgångsläget, eftersom sajten framför allt används på plats. Skrivbordsvyn är
+fördjupningen för den som vill läsa vidare om djuren hemma. <!-- 02-§2.6 -->
+
+---
+
+## 3. Var kraven kommer ifrån
 
 Uppdrag kommer in som **GitHub-issues**. Där formuleras målbilden med acceptanskriterier,
-och där förs diskussionen med gården. <!-- 02-§2.1 -->
+och där förs diskussionen med gården. <!-- 02-§3.1 -->
 
 Issues är intaget; den här katalogen är det varaktiga registret. Ett issue stängs när
 arbetet är gjort, men kravet ska gå att läsa i repot om fem år. Därför skrivs varje
-överenskommet krav in här med ett `02-§`-ID, och issue-numret noteras intill. <!-- 02-§2.2 -->
+överenskommet krav in här med ett `02-§`-ID, och issue-numret noteras intill. <!-- 02-§3.2 -->
 
 Går ett beslut emot vad ett issue säger — vilket har hänt, se
 [ADR 0012](../adr/0012-ingen-individuell-platssparning.md) — kommenteras issuet med skälet,
-så att avvikelsen syns där kravet väcktes. <!-- 02-§2.3 -->
+så att avvikelsen syns där kravet väcktes. <!-- 02-§3.3 -->
 
 ---
 
@@ -65,7 +84,7 @@ Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett inter
 
 | Fil | Ämne | Avsnitt |
 | --- | --- | --- |
-| `index.md` (denna) | Målgrupp, kravkonventioner och intag | §1, §2 |
+| `index.md` (denna) | Avgränsning mot huvudsidan, målgrupp, kravkonventioner och intag | §1–§3 |
 
 Kravfiler skrivs i takt med att funktioner tas fram, enligt fas 1 i `CLAUDE.md`. Att den
 här tabellen är kort betyder att sajten är i sin början — inte att kraven saknas.
