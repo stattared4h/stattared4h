@@ -2,7 +2,7 @@
   "name": "stattared4h",
   "version": "0.1.0",
   "private": true,
-  "description": "Hemsida och djurdatabas för Stättareds 4H-gård",
+  "description": "Djurguide för Stättareds 4H-gård — ett komplement till 4h.se/stattared",
   "license": "MIT",
   "type": "module",
   "engines": {

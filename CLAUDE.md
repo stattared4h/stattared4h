@@ -58,6 +58,10 @@ Regler:
 
 ## 1. Grundprinciper
 
+- Sajten är ett **komplement** till gårdens huvudsida på `4h.se/stattared` — inte en
+  ersättning för den, och inte en andra hemsida. Här bor djuren och hagarna; öppettider,
+  boende, bokningar och nyheter hör till huvudsidan. Varje sida länkar dit. Se
+  `docs/02-krav/index.md` §1. <!-- CL-§1.0 -->
 - Statisk byggutdata. <!-- CL-§1.1 -->
 - Ingen databasmotor. Gårdens data är YAML-filer i repot. <!-- CL-§1.2 -->
 - Inget klientramverk (ingen React, Vue eller motsvarande). <!-- CL-§1.3 -->

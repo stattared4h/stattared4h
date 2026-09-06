@@ -49,3 +49,8 @@
   color: var(--color-ink-soft);
   font-size: var(--font-size-small);
 }
+
+.lead {
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-heading);
+}
