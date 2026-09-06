@@ -80,15 +80,20 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§9.7` | Alla skript finns och CI kör dem utan `--if-present` | `påbörjad` | `quality.yml` kör `build`, `lint`, `typecheck` och `test` utan `--if-present`; `validate` saknas |
 | `02-§9.8` | Test av bas-sökvägen på det färdiga bygget | `påbörjad` | En regex på mallen i `build.mjs`; inget test av `public/` |
 | `02-§9.9` | Test av tokens och kontrast | `byggd` | `tests/design/tokens.test.ts` läser paletten ur `05-§2` och räknar kontrasten |
-| `02-§9.10` | Dokumentkontroll i CI | `saknas` | |
-| `02-§9.11` | Deploy efter grön kvalitet, `npm ci` | `saknas` | Deployen kör parallellt med kvalitetsflödet och använder `npm install` |
-| `02-§9.12` | Produktion och QA i samma utgåva | `saknas` | |
+| `02-§9.10` | Dokumentkontroll i CI | `byggd` | `scripts/lib/check-docs.ts` via `npm run lint:docs`, som ingår i lint-kedjan i *Project checks*; testad i `tests/docs/check-docs.test.ts` |
+| `02-§9.11` | Deploy efter grön kvalitet, `npm ci` | `manuell` | Öppna en körning av *Deploy till QA* i Actions-fliken och bekräfta att den startades av *Quality* med grönt resultat på samma commit, och att steget *Install dependencies* kör `npm ci --ignore-scripts` |
+| `02-§9.12` | Produktion och QA i samma utgåva | `manuell` | Efter en körning av *Deploy till QA*: öppna `https://stattared4h.github.io/stattared4h/` och `.../stattared4h/qa/` och bekräfta att båda svarar, och att körningens sammanfattning anger vilken tagg produktionens kod kom från |
 | `02-§10.1`–`10.10` | Sidhuvud, meny, hoppa-till-innehåll | `saknas` | Startsidans sidhuvud har namn och en huvudsidelänk som ska bort; inga ikonknappar |
 | `02-§10.11`–`10.13` | Installknapp | `saknas` | Kräver manifest och service worker (`02-§7`) |
 | `02-§10.14` | Till toppen | `saknas` | |
 | `02-§10.15`–`10.20` | Feedback via förifylld GitHub-issue | `saknas` | Issue-mallen `.github/ISSUE_TEMPLATE/feedback.md` finns inte |
 | `02-§10.21` | Sidfot | `påbörjad` | Huvudsidelänk, repolänk och integritetsmening finns; 4H-loggan och versionen saknas |
-| `02-§10.22`–`10.26`, `10.33`–`10.35` | Version i sidfot, `VERSION`, QA- och produktionsdeploy, taggar, cachenamn | `saknas` | Ingen `VERSION`-fil, ingen `BUILD_VERSION`, en enda deploy utan godkännande |
+| `02-§10.22`, `10.25`–`10.26` | Version i sidfot, `BUILD_VERSION`, cachenamn | `saknas` | Bygget läser inte `BUILD_VERSION` ännu; ingen service worker |
+| `02-§10.23` | `VERSION` med `X.Y` | `påbörjad` | `VERSION` finns med `0.0` och deploy-flödena läser den; `package.json` bär fortfarande ett eget `version`-fält; inget test |
+| `02-§10.24` | Produktionsdeploy med godkännande, tagg och Release | `manuell` | Kör *Deploy till produktion* från Actions-fliken, godkänn i miljön `production`, och bekräfta att taggen `v0.0.0` och Releasen `v0.0.0` finns och att sidfoten visar `Version 0.0.0` när bygget läser `BUILD_VERSION` |
+| `02-§10.33` | QA-versionen får " – QA PR<n>" | `manuell` | Merga en pull request och öppna körningen av *Deploy till QA*: jobbet *Compute versions* skriver `0.0.0 – QA PR<n>` med numret på pull requesten |
+| `02-§10.34` | QA visar släppet utan suffix efter produktionsdeploy | `manuell` | Efter *Deploy till produktion*: körningens sammanfattning visar samma version för QA som för produktionen |
+| `02-§10.35` | Innehållsmerge bygger om produktionen med taggens kod | `manuell` | När en tagg finns: merga en ändring i `source/data/` och bekräfta i körningen av *Deploy till QA* att produktionen byggs från taggen och att loggen säger `Copied source/data from main` |
 | `02-§10.36` | Releaseguide | `dokumenterad` | `docs/08-SLAPP.md` |
 | `02-§10.27` | Om-sidan | `saknas` | |
 | `02-§10.28`–`10.29` | Statusrad för ny version och offline | `saknas` | |
@@ -135,16 +140,17 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `06-§1.1`–`1.2`, `1.4` | QA och produktion ur samma kod i samma utgåva | `saknas` | Deployen bygger bara produktion |
+| `06-§1.1`–`1.2` | QA och produktion ur samma kod i samma utgåva | `manuell` | Efter *Deploy till produktion*: sidfoten i `https://stattared4h.github.io/stattared4h/` och `.../qa/` visar samma version |
 | `06-§1.3` | QA-sidor bär `noindex` | `saknas` | `source/robots.txt` finns men verkar inte på en projektsajt |
-| `06-§1.5` | QA-versionen får tillägget " – QA" | `saknas` | |
+| `06-§1.4` | QA har egen service worker och eget manifest-`id` | `saknas` | Ingen service worker |
+| `06-§1.5` | QA-versionen får tillägget " – QA" | `manuell` | Kontrollpunkten för `02-§10.33` |
 | `06-§2.1` | `DATA_DIR` väljer dataset | `påbörjad` | `defaultDataDir()` i `source/ts/domain/index.ts` och `npm run validate` läser `DATA_DIR` (`tests/domain/validate-script.test.ts`); bygget läser ännu inget dataset |
 | `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
 | `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | 100 individer och två räknade hönsbestånd finns; bildfilerna genereras av `npm run qa:images` (`02-§8.4`) |
 | `06-§2.4` | Kontraktsändring ändrar QA-datat | `dokumenterad` | Process |
 | `06-§3.1` | `BASE_PATH` | `påbörjad` | `scripts/build.mjs`; ersätts av Eleventys `pathPrefix` |
 | `06-§3.2`–`3.3` | Hjälpfunktion och QA under `/qa/` | `saknas` | Testet är `02-§9.8` |
-| `06-§3.4` | CI sätter bas-sökvägen via `configure-pages` | `manuell` | Öppna `https://stattared4h.github.io/stattared4h/` och bekräfta att sidan har stil |
+| `06-§3.4` | CI sätter bas-sökvägen via `configure-pages` | `manuell` | Öppna `https://stattared4h.github.io/stattared4h/` och `.../qa/` och bekräfta att båda sidorna har stil |
 | `06-§3.5` | Bygget vägrar handskriven absolut sökväg | `påbörjad` | Regex på mallen; ersätts av `02-§9.8` |
 | `06-§4`–`06-§5` | Flytt till webbhotell, hemligheter | `dokumenterad` | Vägledning |
 
@@ -158,8 +164,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `påbörjad` | `renderPicture` är testad; sidorna använder den inte ännu |
 | `03-§8.1` | `npm run build` | `påbörjad` | Provisoriskt skript utan Eleventy |
 | `03-§8.2`–`8.4` | Test, lint och CI | `saknas` | Kraven i `02-§9` |
-| `03-§8.5` | Merge till `main` deployar | `påbörjad` | Fungerar, men utan beroende av kvalitetsflödet (`02-§9.11`) |
-| `03-§8.6`–`8.9` | Bevakande tester, Node 22.18, deploy-ordning, dubbelbygge | `saknas` | |
+| `03-§8.5` | Merge till `main` deployar | `manuell` | Merga till `main` och bekräfta att *Deploy till QA* startar när *Quality* blivit grön (`02-§9.11`) |
+| `03-§8.6`–`8.7` | Bevakande tester, Node 22.18 | `saknas` | |
+| `03-§8.8`–`8.9` | Två deploy-flöden med ett återanvändbart; dubbelbygge | `manuell` | Kontrollpunkterna för `02-§9.11`–`9.12` och `02-§10.35` |
 | `03-§9` | Kartan | `dokumenterad` | |
 | `03-§10` | Sidhuvud, sidfot, version och feedback | `dokumenterad` | Mekanismen bakom `02-§10` |
 
@@ -181,11 +188,11 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 31 |
+| `saknas` | 27 |
 | `dokumenterad` | 15 |
 | `påbörjad` | 33 |
-| `byggd` | 25 |
-| `manuell` | 2 |
+| `byggd` | 26 |
+| `manuell` | 12 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
