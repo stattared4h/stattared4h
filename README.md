@@ -1,8 +1,8 @@
 # Stättareds 4H-gård
 
-Hemsida och innehållsdatabas för Stättareds 4H-gård: gårdens djur, aktiviteter och
-platser — plus interaktiva spel som djurbingo, gissa vad djuret heter och skattjakter,
-som hjälper besökare att upptäcka omgivningarna.
+Hemsida och innehållsdatabas för Stättareds 4H-gård: gårdens djur, arter och
+hagar. QR-koden på hagen visar vilka djurslag som går där, och därifrån hittar besökaren
+vidare till varje djur.
 
 Sajten är en installerbar webbapp (PWA) för iOS och Android. Den är statisk, fungerar
 offline och samlar inte in några personuppgifter.
@@ -15,7 +15,7 @@ offline och samlar inte in några personuppgifter.
 | Ändra innehåll utan utvecklarmiljö | [`docs/01-BIDRA.md`](docs/01-BIDRA.md) |
 | Vad sajten ska göra | [`docs/02-krav/`](docs/02-krav/index.md) |
 | Hur den är byggd | [`docs/03-arkitektur/`](docs/03-arkitektur/index.md) |
-| Datastrukturen för djur och aktiviteter | [`docs/04-DATAKONTRAKT.md`](docs/04-DATAKONTRAKT.md) |
+| Datastrukturen för djur och platser | [`docs/04-DATAKONTRAKT.md`](docs/04-DATAKONTRAKT.md) |
 | Färger, typografi, komponenter | [`docs/05-design/`](docs/05-design/index.md) |
 | Miljöer och drift | [`docs/06-MILJOER.md`](docs/06-MILJOER.md) |
 | Säkerhet i ett publikt repo | [`docs/07-SAKERHET.md`](docs/07-SAKERHET.md) |

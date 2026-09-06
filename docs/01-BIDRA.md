@@ -11,7 +11,7 @@ utvecklarmiljö.
 Gårdens data ligger som textfiler i det här repot och går att redigera direkt i GitHubs
 webbgränssnitt.
 
-1. Gå till filen, till exempel `source/data/animals.yaml`.
+1. Gå till filen, till exempel `source/data/animals/rosa.yaml`.
 2. Klicka på pennan för att redigera.
 3. Gör ändringen. Följ mönstret som redan finns i filen, och slå upp fälten i
    [`04-DATAKONTRAKT.md`](04-DATAKONTRAKT.md) om något är oklart.
@@ -23,7 +23,7 @@ webbgränssnitt.
 Bilder läggs i `source/images/` och refereras från djurets post. Varje bild behöver
 alternativtext och en uppgift om vem som tagit den.
 
-**Ta aldrig bort ett djur ur filen när det lämnar gården.** Sätt `status: remembered`.
+**Ta aldrig bort ett djur ur filen när det lämnar gården.** Sätt `status: gone`.
 Att radera posten bryter länkar och raderar historien.
 
 ---

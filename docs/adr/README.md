@@ -19,14 +19,16 @@ Mall: `NNNN-kort-titel.md` med rubrikerna **Status** (Antagen/Ersatt + datum),
 
 | # | Beslut |
 | --- | --- |
-| 0001 | [Statisk sajt utan server och utan klientramverk](0001-statisk-sajt-utan-ramverk.md) |
-| 0002 | [Innehållsdata är versionerad YAML, inte SQLite](0002-yaml-som-databas.md) |
+| 0001 | [Statiskt byggd sajt utan klientramverk](0001-statisk-sajt-utan-ramverk.md) |
+| 0002 | [Gårdens data är YAML-filer i repot](0002-yaml-som-databas.md) |
 | 0003 | [Eleventy som statisk generator](0003-eleventy-som-generator.md) |
-| 0004 | [PWA med offline-först och förcachad gårdsdata](0004-pwa-offline-forst.md) |
+| 0004 | [Installerbar PWA med offline-först](0004-pwa-offline-forst.md) |
 | 0005 | [Bas-sökvägen är konfigurerbar; GitHub Pages nu, webbhotell sedan](0005-konfigurerbar-bassokvag.md) |
 | 0006 | [Svenska i dokumentation och gränssnitt, engelska i kod](0006-sprak-i-kod-och-dokumentation.md) |
 | 0007 | [Designen ärver 4H:s visuella identitet](0007-designen-arver-4h-identitet.md) |
-| 0008 | [Fotografier commit:as som binärer; härledda format genereras](0008-bilder-i-repot.md) |
-| 0009 | [Spelen är datadrivna och delar gårdens datakälla](0009-datadrivna-spel.md) |
-| 0010 | [Ingen spårning och inga personuppgifter; spelframsteg bor i webbläsaren](0010-ingen-sparning-av-besokare.md) |
+| 0008 | [Bara webbanpassade bilder, i repot, utan LFS](0008-bilder-i-repot.md) |
+| 0009 | [Spel läser gårdens data; de har ingen egen](0009-datadrivna-spel.md) |
+| 0010 | [Inga personuppgifter om besökare, och inga konton i fas 1](0010-ingen-sparning-av-besokare.md) |
 | 0011 | [Säkerhetsläget för ett publikt repo](0011-sakerhetslage-for-publikt-repo.md) |
+| 0012 | [Platsen bär djurslagen; enskilda djur spåras inte](0012-ingen-individuell-platssparning.md) |
+| 0013 | [Två faser: en administratör nu, skriv-API sedan](0013-faser-admin-nu-skriv-api-sedan.md) |

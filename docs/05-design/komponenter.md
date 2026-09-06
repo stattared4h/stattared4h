@@ -75,23 +75,21 @@ Ljusgrön botten, `--radius-md`, ingen kantlinje. Används för öppettider, pra
 information och regler. Aldrig fler än två per sida — blir de fler slutar de
 märkas. <!-- 05-§6.21 -->
 
-### 6.7 Spelkomponenter
+### 6.7 Platssida
 
-Spelen delar tre byggstenar. <!-- 05-§6.22 -->
+Platssidan är QR-kodens måladress och sajtens viktigaste vy. Den läses ofta i solsken, med
+en hand, av någon som just skannat en skylt. <!-- 05-§6.22 -->
 
-**Bingobricka:** ett kvadratiskt rutnät där varje ruta är minst `--tap-target-min`.
-En fylld ruta får solfärgad botten, `--color-ink` text och en bock — färgen ensam bär
-aldrig informationen. <!-- 05-§6.23 -->
-
-**Frågekort:** ett kort per fråga i "gissa djuret", med bilden stor överst och
-svarsalternativen som fullbreda knappar under. Alternativen staplas alltid lodrätt,
-även på desktop, så att träffytan förblir stor. <!-- 05-§6.24 -->
-
-**Skattjaktspost:** en rad per post med nummer, ledtråd och tillstånd. Hittade poster
-får en solfärgad markering och genomstruken ledtråd. Framstegsraden överst visar
-"3 av 8 hittade" i text, inte bara som en stapel. <!-- 05-§6.25 -->
-
-Rätt och fel svar ger alltid både färg, ikon och ord. <!-- 05-§6.26 -->
+- Platsens namn som `h1`, direkt under sidhuvudet. Ingen hero-bild som trycker ner
+  svaret. <!-- 05-§6.23 -->
+- Därefter, omedelbart: vilka djurslag som går här, som stora tryckytor med artens bild och
+  namn i plural — "Getter", "Får". Det är sidans svar och ska synas utan att man
+  rullar. <!-- 05-§6.24 -->
+- `note` från platsen visas som en kort mening under djurslagen, i dämpad text. <!-- 05-§6.25 -->
+- Under det: djuren av de arterna, som djurkort, så att besökaren kan välja ett och läsa
+  vidare. <!-- 05-§6.26 -->
+- En tom plats säger det rakt ut — "Just nu går inga djur här" — och länkar till kartan.
+  Aldrig en tom yta. <!-- 05-§6.27 -->
 
 ### 6.8 Formulärfält
 

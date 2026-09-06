@@ -1,52 +1,57 @@
-# 0002 — Innehållsdata är versionerad YAML, inte SQLite
+# 0002 — Gårdens data är YAML-filer i repot
 
 **Status:** Antagen, 2026-09-06
 
 ## Sammanhang
 
-Uppdraget beskrevs som "en hemsida och databas för gårdens djur och aktiviteter". Ordet
-databas väcker frågan om en riktig databasmotor, och SQLite övervägdes uttryckligen
-eftersom det är en fildatabas och därför verkar passa en sajt utan server.
+Uppdraget beskrevs som "en hemsida och databas för gårdens djur". Ordet databas väcker
+frågan om en databasmotor, och både SQLite och Postgres bakom en tjänst som Supabase
+övervägdes.
 
-Datamängden är liten och långsam: i storleksordningen några tiotal djur, ett par tiotal
-återkommande aktiviteter, en handfull platser och några skattjakter. Den ändras när ett
-djur föds, säljs eller dör, och när säsongens program spikas — inte kontinuerligt.
+Gården har omkring 100 djur och det tillkommer ungefär 50 om året. Historiska djur bevaras,
+så registret växer till några hundra poster på fem år och kanske tusen på tjugo. Datat
+ändras när ett djur föds, säljs eller dör, och när djurslag flyttar mellan hagar — inte
+kontinuerligt.
 
-De som redigerar datat är gårdens medlemmar, inte utvecklare.
+Ett krav vägde tungt: redaktörerna ska kunna uppdatera utan att använda GitHub. Det
+utgångsläget läste vi först som att datat inte kunde ligga i git. Det stämmer inte —
+redaktören behöver inte röra GitHub, det räcker att något commit:ar åt dem. Systersajten
+SB Sommar gör precis det: ett skriv-API tar emot formuläret och skriver en fragmentfil via
+GitHubs API.
 
 ## Beslut
 
-Gårdens data bor som YAML-filer i repot under `source/data/`, med ett schema definierat i
-`docs/04-DATAKONTRAKT.md` och validering som fäller CI. Bygget läser YAML och genererar
-både de statiska sidorna och de JSON-filer som spelen hämtar.
+Gårdens data bor som YAML-filer i repot under `source/data/`, med schema och validering
+enligt [`04-DATAKONTRAKT.md`](../04-DATAKONTRAKT.md). Bygget läser YAML och genererar
+sidorna.
 
-YAML är sanningen. Skulle vi någon gång behöva riktig frågekraft genereras en
-SQLite-fil från YAML som ett byggsteg — aldrig tvärtom.
+En fil per djur och per plats. Kontrollerad vokabulär — arter och raser — i var sin
+gemensam fil. Fragmenteringen är vald så att två redigeringar aldrig rör samma fil, vilket
+är vad ett skriv-API behöver i fas 2.
+
+Historik behöver ingen datastruktur: varje ändring är en commit med tidsstämpel och diff.
+Git *är* loggen.
 
 ## Övervägda alternativ
 
-- **SQLite i webbläsaren via sql.js eller wa-sqlite** — avvisad. Den kostar tre saker som
-  väger tungt här: den binära `.sqlite`-filen går inte att granska i en diff, den går inte
-  att redigera av en gårdsmedlem i GitHubs webbgränssnitt, och den går inte att validera
-  fält för fält i CI. Dessutom laddar besökaren ner ungefär en megabyte WASM för att kunna
-  ställa SQL-frågor mot data som ryms i en handfull kilobyte JSON. Vi skulle betala för
-  frågekraft vi inte behöver med granskningsbarhet vi behöver mycket.
-- **SQLite bakom ett API** — avvisad: kräver en server och river ADR 0001.
+- **Postgres via Supabase** — avvisad: en tjänst att förvalta, ett personuppgiftsbiträdes-
+  avtal, och en gratisnivå som historiskt pausat projekt som stått oanvända någon vecka.
+  En gårdssajt är tyst i november, och en sajt som ligger nere för att ingen tittat på den
+  är oacceptabel.
+- **SQLite i webbläsaren via sql.js** — avvisad: den binära filen går inte att granska i en
+  diff, och besökaren skulle ladda ungefär en megabyte WASM för frågekraft som några hundra
+  poster inte behöver.
 - **JSON i stället för YAML** — avvisad: JSON saknar kommentarer och är känsligare för
-  syntaxfel vid handredigering. Kommentarer spelar roll när den som redigerar kommer
-  tillbaka till filen ett år senare.
-- **Ett headless CMS (Contentful, Sanity)** — avvisad: månadskostnad, ett externt beroende
-  som kan läggas ned, och inloggningar att förvalta. Se ADR 0001.
+  syntaxfel vid handredigering.
+- **Ett headless CMS** — avvisad: månadskostnad och ett externt beroende som kan läggas ned.
 
 ## Konsekvenser
 
-- Varje ändring av gårdens data blir en granskningsbar commit med historik. Det går att se
-  när ett djur lades till och av vem.
-- Validering sker före publicering i stället för vid inläsning i webbläsaren. Ett stavfel i
-  ett datum fäller CI i stället för att bli en trasig sida.
-- Redigering kräver GitHub. En gårdsmedlem kan ändra i webbgränssnittet, men det är ett
-  steg mer tekniskt än ett administrationsgränssnitt. `docs/01-BIDRA.md` beskriver hur.
-- Vi får ingen ad hoc-frågekraft. Behöver en sida en ny genomskärning av datat skrivs den
-  i byggkoden, inte som en SQL-fråga.
-- Modellen håller så länge datamängden är i hundratal. Går den mot tiotusentals poster,
-  eller ska den redigeras av många samtidigt, är det dags att ompröva beslutet i en ny ADR.
+- Varje ändring blir en granskningsbar commit med historik, utan att vi bygger något.
+- Validering sker före publicering. Ett stavfel i ett art-id fäller CI i stället för att bli
+  en trasig sida.
+- Vi får ingen ad hoc-frågekraft. Behöver en sida en ny genomskärning skrivs den i
+  byggkoden, inte som en SQL-fråga. Vid den här datamängden är det en icke-fråga.
+- Massändringar över alla djur blir skript i stället för en `UPDATE`.
+- Modellen håller så länge posterna räknas i hundratal och några få personer redigerar. Går
+  det mot tiotusentals poster eller många samtidiga redaktörer är det dags att ompröva.

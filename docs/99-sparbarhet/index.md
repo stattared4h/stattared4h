@@ -46,14 +46,25 @@ sajt. Statusen nedan speglar det ärligt.
 
 | ID-intervall | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `04-§1`–`04-§6` | Schema för djur, aktiviteter, platser, skattjakter | `dokumenterad` | Inga datafiler finns ännu |
-| `04-§7` | Validering | `saknas` | Valideraren är nästa steg |
+| `04-§1`–`04-§9` | Modell för djur, arter, raser, platser och bilder | `dokumenterad` | Inga datafiler finns ännu |
+| `04-§4.2` | Djur har inget `location`-fält | `saknas` | Ska bevakas av ett test, inte bara av valideringen |
+| `04-§10` | Validering | `saknas` | Valideraren är nästa steg |
+
+### Arkitektur (`03-§`)
+
+| ID-intervall | Ämne | Status | Anteckning |
+| --- | --- | --- | --- |
+| `03-§1`–`03-§8` | Byggkedja, skikt, härledda vyer, sidor, offline | `dokumenterad` | Inget bygge finns ännu |
+| `03-§3.1` | Härledningarna i en modul | `saknas` | Bär möjligheten att byta till levande data senare |
 
 ### Krav (`02-§`)
 
 | ID-intervall | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
 | `02-§1` | Målgrupp | `dokumenterad` | Vägledande, inte testbar |
+| `02-§2` | Kravintag via issues | `dokumenterad` | Process, inte kod |
+
+---
 
 ### Vad som inte spåras här
 
@@ -72,8 +83,8 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | Status | Antal ID-intervall |
 | --- | --- |
 | `byggd` | 4 |
-| `dokumenterad` | 9 |
-| `saknas` | 3 |
+| `dokumenterad` | 12 |
+| `saknas` | 5 |
 | `manuell` | 0 |
 
 Summeringen uppdateras i fas 5 av processen i `CLAUDE.md`. <!-- 99-§1.2 -->
