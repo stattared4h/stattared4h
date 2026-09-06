@@ -40,7 +40,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§1.10` | Tumregel för vad som hör hit | `dokumenterad` | Vägledande |
 | `02-§2` | Målgrupp | `dokumenterad` | Vägledande |
 | `02-§3.1`–`3.4` | Roller via GitHub, ingen egen inloggning | `manuell` | Kontrollera under *Settings → Rules* att regelverket *Protect main* är aktivt och kräver pull request |
-| `02-§3.5` | Djur som lämnat gården behålls | `saknas` | Bevakas av valideraren (`02-§6.3`) |
+| `02-§3.5` | Djur som lämnat gården behålls | `påbörjad` | Valideraren tar emot `status: gone` och härledningarna behåller djuret (`tests/domain/derive.test.ts`); sidan tillkommer med djursidan (`02-§5.14`) |
 | `02-§4` | Kravintag via issues | `dokumenterad` | Process |
 | `02-§5.1`–`5.3` | Sidtyper, adresser, 404 | `saknas` | Tillkommer med Eleventy |
 | `02-§5.4` | Sidhuvud | `påbörjad` | Namn och huvudsidelänk finns på startsidan; kartlänken saknas |
@@ -52,10 +52,17 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.19`–`5.22` | Artsidan | `saknas` | |
 | `02-§5.23`–`5.27` | Kartan | `saknas` | Mekanismen i `03-§9` |
 | `02-§5.28` | Djurkortet | `saknas` | |
-| `02-§6.1`–`6.7` | Läsning och validering | `saknas` | Valideraren är nästa steg efter verktygskedjan |
-| `02-§6.8`–`6.9` | Härledning och sortering | `saknas` | `source/ts/domain/derive.ts` finns inte |
-| `02-§6.10` | Tester mot QA-datat | `saknas` | Datasetet finns; testerna inte |
-| `02-§6.11` | Test: inget `location`-fält | `saknas` | |
+| `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
+| `02-§6.2` | Valideringen körs först i bygget | `påbörjad` | `loadValidDataset` i `source/ts/domain/index.ts` kastar vid fel; bygget anropar den när Eleventy tillkommer (`02-§9.1`) |
+| `02-§6.3` | Fäller vid allt i `04-§10` och vid okända fält | `byggd` | `source/ts/domain/validate.ts`; varje regel prövas i `tests/domain/validate.test.ts` |
+| `02-§6.4` | Varningar | `byggd` | `collectWarnings` i `validate.ts`; QA-datats exakta varningar i `tests/domain/validate.test.ts` |
+| `02-§6.5` | Meddelanden på svenska med fil och fält | `byggd` | `formatIssue` i `validate.ts`; `tests/domain/validate.test.ts` och `load.test.ts` |
+| `02-§6.6` | `npm run validate` | `byggd` | `scripts/validate.mjs`; `tests/domain/validate-script.test.ts` kör skriptet och kontrollerar felkoden |
+| `02-§6.7` | `born` normaliseras | `byggd` | `source/ts/domain/born.ts`; `tests/domain/born.test.ts` |
+| `02-§6.8` | Härledningar utan webbläsar-API:er | `byggd` | `source/ts/domain/derive.ts`; `tests/domain/derive.test.ts` mot fallen i QA-README |
+| `02-§6.9` | Deterministisk svensk sortering | `byggd` | `source/ts/domain/sort.ts`; `tests/domain/sort.test.ts` |
+| `02-§6.10` | Tester mot QA-datat, ogiltiga poster i testet | `byggd` | `tests/domain/helpers.ts` läser `source/data-qa/`; ogiltiga poster byggs i minnet |
+| `02-§6.11` | Test: inget `location`-fält | `byggd` | `tests/domain/no-location.test.ts` läser både `source/data` och `source/data-qa` |
 | `02-§7.1`–`7.9` | Manifest och service worker | `saknas` | |
 | `02-§7.10` | Installation på iOS och Android | `saknas` | Blir `manuell` med steget i kravet när service workern finns |
 | `02-§8.1`–`8.2` | Bildfiler och validering av dem | `saknas` | `source/images/` finns inte |
@@ -114,8 +121,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
 | `04-§1`–`04-§9` | Modell för djur, arter, raser, platser och bilder | `dokumenterad` | QA-datat i `source/data-qa/` följer kontraktet; ingen kod läser det ännu |
-| `04-§4.2` | Djur har inget `location`-fält | `saknas` | Bevakas av `02-§6.11` |
-| `04-§10` | Validering | `saknas` | Kraven i `02-§6` |
+| `04-§4.2` | Djur har inget `location`-fält | `byggd` | Valideraren fäller (`tests/domain/validate.test.ts`) och `tests/domain/no-location.test.ts` bevakar datat |
+| `04-§10` | Validering | `byggd` | `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts`. Bildkontrollen (`04-§10.7`) prövas med handbyggda WebP-filer i `tests/domain/webp.test.ts` tills `source/images-qa/` finns |
 
 ### Miljöer (`06-§`)
 
@@ -124,8 +131,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `06-§1.1`–`1.2`, `1.4` | QA och produktion ur samma kod i samma utgåva | `saknas` | Deployen bygger bara produktion |
 | `06-§1.3` | QA-sidor bär `noindex` | `saknas` | `source/robots.txt` finns men verkar inte på en projektsajt |
 | `06-§1.5` | QA-versionen får tillägget " – QA" | `saknas` | |
-| `06-§2.1` | `DATA_DIR` väljer dataset | `saknas` | Bygget läser inget dataset |
-| `06-§2.2` | Tester körs mot QA-data | `saknas` | Inga tester finns |
+| `06-§2.1` | `DATA_DIR` väljer dataset | `påbörjad` | `defaultDataDir()` i `source/ts/domain/index.ts` och `npm run validate` läser `DATA_DIR` (`tests/domain/validate-script.test.ts`); bygget läser ännu inget dataset |
+| `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
 | `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | Datasetet finns och `source/data-qa/README.md` listar fallen; bildfilerna saknas |
 | `06-§2.4` | Kontraktsändring ändrar QA-datat | `dokumenterad` | Process |
 | `06-§3.1` | `BASE_PATH` | `påbörjad` | `scripts/build.mjs`; ersätts av Eleventys `pathPrefix` |
@@ -164,10 +171,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 42 |
+| `saknas` | 33 |
 | `dokumenterad` | 16 |
-| `påbörjad` | 23 |
-| `byggd` | 6 |
+| `påbörjad` | 26 |
+| `byggd` | 19 |
 | `manuell` | 2 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
