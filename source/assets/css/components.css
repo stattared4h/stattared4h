@@ -69,3 +69,137 @@
   font-size: var(--font-size-h3);
   line-height: var(--line-height-heading);
 }
+
+/* ── Icon button (05-§6.33) ────────────────────────────────────────────── */
+
+/* A square of --tap-target-min, green with a white 22px icon. */
+.icon-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-green);
+  color: var(--color-surface);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* The class sets display, so the hidden attribute needs restating (install and
+   "to top" are hidden until they can do something, 02-§10.11, 02-§10.14). */
+.icon-button[hidden] {
+  display: none;
+}
+
+.icon-button:hover,
+.icon-button:active {
+  background: var(--color-green-deep);
+}
+
+.icon-button__icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* The menu button shows the word "Meny" under the lines (05-§6.2). */
+.icon-button__label {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-heading);
+}
+
+/* From the desktop breakpoint install and feedback lose their ground (05-§6.33). */
+@media (min-width: 960px) {
+  .icon-button--plain-on-desktop {
+    background: transparent;
+    color: var(--color-green-deep);
+  }
+
+  .icon-button--plain-on-desktop:hover,
+  .icon-button--plain-on-desktop:active {
+    background: var(--color-green-pale);
+  }
+}
+
+/* ── Menu card (05-§6.34) ──────────────────────────────────────────────── */
+
+/* Hangs under the header, inset --space-xs from the edges. Closed it is invisible
+   and out of the tab order; open it slides down in under 250 ms. */
+.site-menu {
+  position: absolute;
+  top: 100%;
+  right: var(--space-xs);
+  left: var(--space-xs);
+  z-index: 2;
+  margin-top: var(--space-xs);
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--color-green);
+  box-shadow: var(--shadow-raised);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--space-xs)));
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+.site-menu--open {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.site-menu__brand {
+  display: inline-block;
+  margin-bottom: var(--space-sm);
+}
+
+.site-menu__logo {
+  display: block;
+  width: auto;
+  height: var(--space-lg);
+}
+
+.site-menu__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-menu__link {
+  display: block;
+  padding-block: var(--space-xs);
+  color: var(--color-surface);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-menu__link:hover {
+  text-decoration: underline;
+}
+
+/* The card is green, so the current page is underlined in the text colour rather
+   than in green (05-§6.3: never colour alone). */
+.site-menu__link[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.site-menu__brand:focus-visible,
+.site-menu__link:focus-visible {
+  outline-color: var(--color-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-menu {
+    transition: none;
+  }
+}

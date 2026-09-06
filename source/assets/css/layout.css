@@ -1,4 +1,7 @@
-/** Containers, header and footer structure. */
+/**
+ * Containers, header and footer structure (05-§4, 05-§6.1, 05-§6.30).
+ * Mobile first: media queries only add (05-§5.4).
+ */
 
 .container {
   width: 100%;
@@ -11,41 +14,154 @@
   max-width: var(--container-narrow);
 }
 
-.site-header {
+/* ── Skip link (02-§10.2) ──────────────────────────────────────────────── */
+
+/* Parked above the viewport until it has focus; then it sits on top of the header. */
+.skip-link {
+  position: absolute;
+  top: var(--space-xs);
+  left: var(--space-xs);
+  z-index: 3;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
-  border-bottom: var(--border-width) solid var(--color-border);
-  padding-block: var(--space-sm);
+  color: var(--color-green-deep);
+  font-weight: 600;
+  transform: translateY(-200%);
 }
 
-/* Wraps on narrow screens so the link to the main site is never pushed off-screen. */
+.skip-link:focus {
+  transform: none;
+}
+
+/* ── Header (02-§10.1–10.10) ───────────────────────────────────────────── */
+
+/* Sticky, so the buttons stay within thumb reach while reading. The menu card is
+   positioned against it. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-surface);
+  border-bottom: var(--border-width) solid var(--color-border);
+  padding-block: var(--space-xs);
+}
+
+/* One grid for both widths. On mobile: menu, install, "to top" centred, feedback.
+   From the desktop breakpoint the brand and the nav take the first two columns
+   instead, and the mobile-only buttons go away. The height never changes: every
+   item is exactly --tap-target-min tall (05-§6.37). */
 .site-header__inner {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-xs) var(--space-sm);
+  column-gap: var(--space-xs);
+  min-height: var(--tap-target-min);
+}
+
+.site-header__brand,
+.site-nav {
+  display: none;
+}
+
+.site-header__menu-button {
+  grid-column: 1;
+}
+
+.site-header__install {
+  grid-column: 2;
+}
+
+.site-header__to-top {
+  grid-column: 3;
+  justify-self: center;
+}
+
+.site-header__feedback {
+  grid-column: 4;
+}
+
+.site-header__logo {
+  display: block;
+  width: auto;
+  height: var(--tap-target-min);
 }
 
 .site-header__name {
-  margin: 0;
   color: var(--color-green-deep);
   font-size: var(--font-size-h3);
   font-weight: 700;
 }
 
-/* The main site is a permanent destination, not a temporary fallback: it stays in the
-   header on every page (05-§6.1). */
-.site-header__link {
+.site-nav__list {
+  display: flex;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Navigation is 17px, weight 600, deep green (05-§3.9). The current page gets a
+   green underline as well as the colour (05-§6.3). */
+.site-nav__link {
   display: inline-flex;
   align-items: center;
   min-height: var(--tap-target-min);
+  border-bottom: 3px solid transparent;
   color: var(--color-green-deep);
   font-weight: 600;
+  text-decoration: none;
 }
+
+.site-nav__link:hover {
+  text-decoration: underline;
+}
+
+.site-nav__link[aria-current="page"] {
+  border-bottom-color: var(--color-green);
+}
+
+@media (min-width: 960px) {
+  .site-header__inner {
+    grid-template-columns: auto 1fr auto auto;
+    column-gap: var(--space-md);
+  }
+
+  .site-header__brand {
+    display: flex;
+    grid-column: 1;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+  }
+
+  .site-nav {
+    display: block;
+    grid-column: 2;
+  }
+
+  .site-header__install {
+    grid-column: 3;
+  }
+
+  .site-header__feedback {
+    grid-column: 4;
+  }
+
+  .site-header__menu-button,
+  .site-header__to-top,
+  .site-menu {
+    display: none;
+  }
+}
+
+/* ── Main ──────────────────────────────────────────────────────────────── */
 
 .site-main {
   padding-block: var(--space-xl);
 }
+
+/* ── Footer (02-§10.21, 05-§6.30) ──────────────────────────────────────── */
 
 .site-footer {
   background: var(--color-green-deep);
@@ -57,7 +173,22 @@
   color: var(--color-surface);
 }
 
-/* The footer sits on deep green, so muted text must not fall back to the light-ground tone. */
-.site-footer .meta {
-  color: inherit;
+.site-footer p {
+  margin-bottom: var(--space-xs);
+}
+
+.site-footer__brand {
+  display: inline-block;
+  margin-bottom: var(--space-sm);
+}
+
+.site-footer__logo {
+  display: block;
+  width: auto;
+  height: var(--space-lg);
+}
+
+.site-footer__version {
+  margin: 0;
+  font-size: var(--font-size-small);
 }

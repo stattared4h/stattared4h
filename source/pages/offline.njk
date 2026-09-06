@@ -1,0 +1,20 @@
+---
+layout: base.njk
+permalink: /offline/
+eleventyExcludeFromCollections: true
+title: Du är offline
+description: Sidan du försökte öppna är inte sparad på den här enheten. Sajten om djuren på Stättareds 4H-gård fungerar offline när den väl har laddats.
+---
+<div class="container container--narrow">
+  <h1>Du är offline</h1>
+  <p class="lead">
+    Sidan du försökte öppna är inte sparad på den här enheten. De sidor du redan har
+    besökt finns kvar.
+  </p>
+  <p>
+    <a class="button" href="{{ '/' | url }}">Till startsidan</a>
+  </p>
+  <p>
+    <a href="{{ '/karta/' | url }}">Karta över gården</a>
+  </p>
+</div>

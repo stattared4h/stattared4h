@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+{#-
+  Base layout for every page (02-§5.6). Pages set `title` and `description` in their
+  front matter; header and footer are shared includes (03-§10.1). Every internal
+  address goes through the `url` filter so the base path is put in front (ADR 0005).
+#}
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }} – {{ site.farm }}</title>
+    <meta name="description" content="{{ description }}">
+    {%- if site.isQa %}
+    <meta name="robots" content="noindex">
+    {%- endif %}
+    <link rel="stylesheet" href="{{ '/assets/css/tokens.css' | url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/base.css' | url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/layout.css' | url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/components.css' | url }}">
+    <script type="module" src="{{ '/assets/main.js' | url }}" defer></script>
+  </head>
+  <body>
+    {%- include "header.njk" %}
+    <main id="main" class="site-main">{{ content | safe }}</main>
+    {%- include "footer.njk" %}
+  </body>
+</html>
