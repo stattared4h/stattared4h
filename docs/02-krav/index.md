@@ -109,6 +109,11 @@ Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett inter
 | Fil | Ämne | Avsnitt |
 | --- | --- | --- |
 | `index.md` (denna) | Avgränsning, målgrupp, roller, kravkonventioner och intag | §1–§4 |
+| [`sidor.md`](./sidor.md) | Sidtyper, navigering, start-, plats-, djur- och artsida, karta | §5 |
+| [`data.md`](./data.md) | Läsning, validering, härledning, sortering, tester | §6 |
+| [`offline.md`](./offline.md) | Manifest, service worker, installation | §7 |
+| [`bilder.md`](./bilder.md) | Bildfiler, bildkedja, leverans | §8 |
+| [`bygge.md`](./bygge.md) | Verktygskedja, kontroller, deploy | §9 |
 
-Kravfiler skrivs i takt med att funktioner tas fram, enligt fas 1 i `CLAUDE.md`. Att den
-här tabellen är kort betyder att sajten är i sin början — inte att kraven saknas.
+Filerna ovan täcker fas 1 enligt epic #3. Nya kravområden — spel enligt ADR 0009,
+redaktörsgränssnittet i fas 2 — får egna filer och nästa lediga avsnittsnummer.
