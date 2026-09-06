@@ -138,6 +138,9 @@ Andra kommandon:
 | --- | --- |
 | `npm run build` | Bygger sajten till `public/` |
 | `npm run serve` | Serverar `public/` utan att bygga om |
+| `npm test` | Kör testerna i `tests/` mot QA-datat |
+| `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en |
+| `npm run typecheck` | Typkontrollerar TypeScript strikt |
 
 Bygget tar `BASE_PATH`, med `/` som standard:
 
@@ -145,8 +148,9 @@ Bygget tar `BASE_PATH`, med `/` som standard:
 BASE_PATH=/stattared4h/ npm run build
 ```
 
-Kommandona `npm test`, `npm run lint` och `npm run validate` finns ännu inte — de
-tillkommer med valideraren och testerna. Spårbarhetsmatrisen visar vad som finns.
+`npm run lint:yaml` kräver [yamllint](https://yamllint.readthedocs.io/), som installeras
+med `pip install yamllint`. `npm run validate` tillkommer med valideraren; spårbarhetsmatrisen
+visar vad som finns.
 
 ---
 

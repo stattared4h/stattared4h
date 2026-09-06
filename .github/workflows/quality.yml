@@ -96,13 +96,20 @@ jobs:
             npm install --no-audit --no-fund --ignore-scripts
           fi
 
+      # yamllint is a Python tool; npm run lint shells out to it (02-§9.3).
+      - name: Install yamllint
+        if: steps.detect.outputs.node == 'true'
+        run: python3 -m pip install --disable-pip-version-check yamllint==1.38.0
+
+      # Every script must exist: a missing one fails the run (02-§9.7). The build runs
+      # first because html-validate lints the rendered output in public/.
       - name: Run project scripts
         if: steps.detect.outputs.node == 'true'
         run: |
-          npm run --if-present lint
-          npm run --if-present typecheck
-          npm run --if-present build
-          npm run --if-present test
+          npm run build
+          npm run lint
+          npm run typecheck
+          npm run test
 
   documentation-links:
     name: Documentation links

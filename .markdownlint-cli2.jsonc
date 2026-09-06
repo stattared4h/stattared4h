@@ -8,7 +8,10 @@
     "MD033": false
   },
   "globs": [
-    "**/*.md",
-    "#node_modules"
+    "**/*.md"
+  ],
+  "ignores": [
+    "node_modules/**",
+    "public/**"
   ]
 }
