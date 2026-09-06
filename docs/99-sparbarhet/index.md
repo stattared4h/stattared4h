@@ -61,13 +61,14 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§8.1`–`8.2` | Bildfiler och validering av dem | `saknas` | `source/images/` finns inte |
 | `02-§8.3`–`8.4` | Hjälpkommandon för bilder | `saknas` | Kräver ett bildbibliotek; granskas som beroende |
 | `02-§8.5`–`8.7` | Leverans av bilder | `saknas` | |
-| `02-§9.1`–`9.2` | Eleventy, esbuild, Node 22.18 | `saknas` | `scripts/build.mjs` är ett provisorium som byts ut |
-| `02-§9.3` | `npm run lint` | `påbörjad` | markdownlint och yamllint körs i CI, men inte via `npm run lint`; html-validate, stylelint, eslint saknas |
+| `02-§9.1` | Eleventy och esbuild | `saknas` | `scripts/build.mjs` är ett provisorium som byts ut |
+| `02-§9.2` | Node 22.18 i `.nvmrc` och `engines` | `påbörjad` | Båda finns; inget test |
+| `02-§9.3` | `npm run lint` | `påbörjad` | Kör html-validate, stylelint med `declaration-strict-value`, eslint, markdownlint och yamllint; inget test som bevakar att alla fem ingår |
 | `02-§9.4` | `npm start` med ombygge | `påbörjad` | Bygger och serverar; bygger inte om vid ändring |
 | `02-§9.5`–`9.6` | Inga beroenden till besökaren; låsta byggberoenden | `påbörjad` | Sant i dag eftersom inga beroenden finns; inget test |
-| `02-§9.7` | Alla skript finns och CI kör dem utan `--if-present` | `saknas` | `quality.yml` kör med `--if-present` |
+| `02-§9.7` | Alla skript finns och CI kör dem utan `--if-present` | `påbörjad` | `quality.yml` kör `build`, `lint`, `typecheck` och `test` utan `--if-present`; `validate` saknas |
 | `02-§9.8` | Test av bas-sökvägen på det färdiga bygget | `påbörjad` | En regex på mallen i `build.mjs`; inget test av `public/` |
-| `02-§9.9` | Test av tokens och kontrast | `saknas` | |
+| `02-§9.9` | Test av tokens och kontrast | `byggd` | `tests/design/tokens.test.ts` läser paletten ur `05-§2` och räknar kontrasten |
 | `02-§9.10` | Dokumentkontroll i CI | `saknas` | |
 | `02-§9.11` | Deploy efter grön kvalitet, `npm ci` | `saknas` | Deployen kör parallellt med kvalitetsflödet och använder `npm install` |
 | `02-§9.12` | Produktion och QA i samma utgåva | `saknas` | |
@@ -88,11 +89,11 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
 | `05-§1` | Designfilosofi | `dokumenterad` | Vägledande |
-| `05-§2.1`–`2.11` | Färgpalett | `påbörjad` | Levererad i `tokens.css`; testet i `02-§9.9` saknas |
-| `05-§2.12`–`2.18` | Kontrastregler och mörkt läge | `dokumenterad` | Testas av `02-§9.9` |
-| `05-§2.19` | Logotypgrön bara i logotypens SVG | `dokumenterad` | Logotypen finns inte i repot ännu |
-| `05-§2.20` | Bakgrundsskikt för dialog | `saknas` | Token `--color-backdrop` finns inte i `tokens.css` |
-| `05-§3` | Typografi | `påbörjad` | Tokens och `base.css`; `05-§3.9` navigering saknas |
+| `05-§2.1`–`2.11` | Färgpalett | `byggd` | `tokens.css`, bevakad av `tests/design/tokens.test.ts` |
+| `05-§2.12`–`2.18` | Kontrastregler och mörkt läge | `byggd` | Kontrastparen räknas i `tests/design/tokens.test.ts` |
+| `05-§2.19` | Logotypgrön bara i logotypens SVG | `påbörjad` | Testet bevakar att färgen inte är en token; logotypen finns inte i repot ännu |
+| `05-§2.20` | Bakgrundsskikt för dialog | `byggd` | `--color-backdrop` i `tokens.css`, bevakad av testet |
+| `05-§3` | Typografi | `påbörjad` | Tokens bevakas av testet; `05-§3.9` navigering saknas |
 | `05-§4.1`–`4.10` | Behållare och spacing | `påbörjad` | Tokens och `layout.css`; inget test |
 | `05-§4.11`–`4.15` | Rutnät och träffytor | `dokumenterad` | Rutnätet skrivs med djurkorten |
 | `05-§5` | Brytpunkter | `dokumenterad` | Tillämpas när layouten skrivs |
@@ -100,8 +101,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.30` | Sidfot | `påbörjad` | Startsidans sidfot; logotyp och version saknas |
 | `05-§6.33`–`6.37` | Ikonknapp, meny, dialog, statusrad, sidhuvudets höjd | `saknas` | |
 | `05-§6` övrigt | Komponenter | `saknas` | Skrivs när markupen finns, enligt `05-§7.2` |
-| `05-§7.1`, `7.5` | Inga hårdkodade värden | `saknas` | Kräver stylelint (`02-§9.3`); följs i dag för hand |
-| `05-§7.4` | Designtokens | `påbörjad` | `tokens.css`; testet i `02-§9.9` saknas |
+| `05-§7.1`, `7.5` | Inga hårdkodade värden | `byggd` | stylelint-regeln `declaration-strict-value` fäller literaler utanför `tokens.css` |
+| `05-§7.4` | Designtokens | `byggd` | `tokens.css`, bevakad av `tests/design/tokens.test.ts` |
 | `05-§7.7`–`7.8` | Fokusmarkering, rörelse | `påbörjad` | I `base.css`; inget test |
 | `05-§7.10` | Filstruktur för CSS | `påbörjad` | Tre av fyra filer; `utilities.css` skapas vid behov |
 | `05-§8` | Bilder | `dokumenterad` | Kraven i `02-§8` |
@@ -163,10 +164,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 46 |
-| `dokumenterad` | 18 |
-| `påbörjad` | 22 |
-| `byggd` | 0 |
+| `saknas` | 42 |
+| `dokumenterad` | 16 |
+| `påbörjad` | 23 |
+| `byggd` | 6 |
 | `manuell` | 2 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i

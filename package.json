@@ -11,11 +11,34 @@
   },
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   },
   "scripts": {
     "build": "node scripts/build.mjs",
     "start": "node scripts/build.mjs && node --run serve",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "test": "node --test \"tests/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "npm run lint:css && npm run lint:ts && npm run lint:md && npm run lint:yaml && npm run lint:html",
+    "lint:css": "stylelint \"source/assets/css/**/*.css\"",
+    "lint:ts": "eslint .",
+    "lint:md": "markdownlint-cli2",
+    "lint:yaml": "yamllint .",
+    "lint:html": "html-validate \"public/**/*.html\""
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "3.1.6",
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.4.1",
+    "esbuild": "0.28.2",
+    "eslint": "10.10.0",
+    "html-validate": "11.14.0",
+    "markdownlint-cli2": "0.23.2",
+    "stylelint": "17.15.0",
+    "stylelint-config-standard": "40.0.0",
+    "stylelint-declaration-strict-value": "1.12.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.69.0",
+    "yaml": "2.9.0"
   }
 }

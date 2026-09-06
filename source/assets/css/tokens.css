@@ -30,6 +30,7 @@
   --color-sun: #f2b134; /* game accent: filled squares, found stations */
   --color-sun-ink: #7a4b00; /* the sun tone as text on a light background */
   --color-danger: #b3261e; /* errors and destructive actions */
+  --color-backdrop: rgb(64 64 64 / 60%); /* the layer behind a dialog: ink at 60 % (05-§2.20) */
 
   /* ── Typography ───────────────────────────────────────────────────────── */
 
