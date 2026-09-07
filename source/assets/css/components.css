@@ -208,3 +208,154 @@
     transition: none;
   }
 }
+
+/* --- Header behaviour, dialog, status bar --- */
+
+/* ── Button states (05-§6.9–6.12) ──────────────────────────────────────── */
+
+/* .button sets display, so hidden needs restating (the share button, 02-§10.30). */
+.button[hidden] {
+  display: none;
+}
+
+/* A disabled button is always accompanied by a sentence that says why (05-§6.12). */
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Form fields (05-§6.28–6.32) ───────────────────────────────────────── */
+
+/* Also the fieldset around the radio buttons, which therefore loses its frame. */
+.field {
+  min-inline-size: 0;
+  margin: 0 0 var(--space-sm);
+  padding: 0;
+  border: 0;
+}
+
+/* Always visible, always above the field (05-§6.32). */
+.field__label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--color-green-deep);
+  font-weight: 600;
+}
+
+.field__input {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.field__input--multiline {
+  resize: vertical;
+}
+
+/* One radio button with its text; the whole row is the tap target. */
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--tap-target-min);
+  margin-right: var(--space-md);
+}
+
+.choice__input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--color-green);
+}
+
+/* ── Dialog (05-§6.35) ─────────────────────────────────────────────────── */
+
+/* No padding on the element itself: a click on it is a click on the backdrop
+   (source/ts/ui/feedback.ts). The body carries the padding instead. */
+.dialog {
+  width: calc(100% - var(--space-md) * 2);
+  max-width: var(--container-narrow);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-ink);
+}
+
+.dialog::backdrop {
+  background: var(--color-backdrop);
+}
+
+/* Fades in within 200 ms (05-§7.8); base.css turns the animation off for reduced motion. */
+.dialog[open] {
+  animation: dialog-in 200ms ease;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.dialog__body {
+  padding: var(--space-md);
+}
+
+.dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.dialog__title {
+  margin: 0;
+}
+
+.dialog__close {
+  flex-shrink: 0;
+}
+
+.dialog__hint {
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-small);
+}
+
+.dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Status bar (05-§6.36) ─────────────────────────────────────────────── */
+
+/* Directly under the header, full width; text left and at most one button right. */
+.status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-green-pale);
+  color: var(--color-green-deep);
+}
+
+.status-bar[hidden] {
+  display: none;
+}
+
+.status-bar__text {
+  font-weight: 600;
+}

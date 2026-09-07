@@ -3,8 +3,12 @@
   Base layout for every page (02-§5.6). Pages set `title` and `description` in their
   front matter; header and footer are shared includes (03-§10.1). Every internal
   address goes through the `url` filter so the base path is put in front (ADR 0005).
+  The client code reads the base path and the version from data attributes on <html>
+  rather than from anything hard-coded: the service worker is registered on
+  `<base>sw.js` (02-§7.3) and the feedback metadata names the version (02-§10.16).
+  Conditional lines use `{%-` so that a false branch leaves no blank line behind.
 #}
-<html lang="sv">
+<html lang="sv" data-base="{{ '/' | url }}" data-version="{{ build.version or '' }}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,6 +17,11 @@
     {%- if site.isQa %}
     <meta name="robots" content="noindex">
     {%- endif %}
+    <meta name="theme-color" content="{{ theme.themeColor }}">
+    <link rel="manifest" href="{{ '/manifest.webmanifest' | url }}">
+    <link rel="icon" href="{{ '/assets/img/favicon.svg' | url }}" type="image/svg+xml">
+    <link rel="icon" href="{{ '/assets/img/favicon.ico' | url }}" sizes="any">
+    <link rel="apple-touch-icon" href="{{ '/assets/img/apple-touch-icon.png' | url }}">
     <link rel="stylesheet" href="{{ '/assets/css/tokens.css' | url }}">
     <link rel="stylesheet" href="{{ '/assets/css/base.css' | url }}">
     <link rel="stylesheet" href="{{ '/assets/css/layout.css' | url }}">
@@ -21,7 +30,13 @@
   </head>
   <body>
     {%- include "header.njk" %}
+    {#- The status bar sits directly under the header (05-§6.36); source/ts/ui/status-bar.ts fills it. #}
+    <div class="status-bar" role="status" data-status-bar hidden>
+      <span class="status-bar__text" data-status-text></span>
+      <button class="button button--secondary status-bar__action" type="button" data-status-action hidden></button>
+    </div>
     <main id="main" class="site-main">{{ content | safe }}</main>
     {%- include "footer.njk" %}
+    {%- include "feedback-dialog.njk" %}
   </body>
 </html>
