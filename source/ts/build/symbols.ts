@@ -1,5 +1,5 @@
 /**
- * The symbol on a map marker, one per kind of place (02-§5.36, 03-§9.5, ADR 0019).
+ * The symbol on a map marker, one per kind of place (02-§5.38, 03-§9.5, ADR 0019).
  *
  * Three of the eight are the Swedish road sign's own figure, lifted out of the file and
  * recoloured: H5 servering, H8 vandrarhem and H28 husbilsplats. Their outlines are laid

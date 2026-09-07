@@ -112,7 +112,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     assert.deepEqual(renderMap([], { base: "/" }), { html: "", warnings: [] });
   });
 
-  test("every marker carries the symbol for its kind (02-§5.36)", () => {
+  test("every marker carries the symbol for its kind (02-§5.38)", () => {
     const mixed: MapLocation[] = [
       { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.4123, lon: 12.2134 },
       { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.411, lon: 12.212 },

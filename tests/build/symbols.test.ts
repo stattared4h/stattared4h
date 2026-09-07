@@ -1,5 +1,5 @@
 /**
- * 02-§5.36, 03-§9.5, ADR 0019: one symbol per kind of place.
+ * 02-§5.38, 03-§9.5, ADR 0019: one symbol per kind of place.
  *
  * The symbols are drawn in the page and must stay that way: a map that fetches its
  * icons is a blank map on the day the visitor stands in the yard without coverage
@@ -13,7 +13,7 @@ import { PLACE_SYMBOLS, symbolSvg } from "../../source/ts/build/symbols.ts";
 /** The eight kinds, written out here so the test fails when the vocabulary drifts. */
 const KINDS = ["boende", "djurplats", "grill", "husbil", "lek", "mat", "parkering", "toalett"];
 
-describe("place symbols (02-§5.36)", () => {
+describe("place symbols (02-§5.38)", () => {
   test("every kind of place has a symbol, and no two kinds share one", () => {
     assert.deepEqual(Object.keys(PLACE_SYMBOLS).sort(), KINDS);
     const drawings = Object.values(PLACE_SYMBOLS);

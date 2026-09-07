@@ -56,7 +56,7 @@ och tar bort metadata enligt ADR 0017. Bildposterna anger samma ursprung med
 Märkenas utformning är fastställd i författning och är därmed ett officiellt verk enligt
 9 § upphovsrättslagen. Commons-filerna bär mallen `PD-Transportstyrelsen`.
 
-Tre av kartans åtta symboler (`02-§5.36`) **är** märkets egen figur, lyft ur filen och
+Tre av kartans åtta symboler (`02-§5.38`) **är** märkets egen figur, lyft ur filen och
 omfärgad. Filerna ligger därför i repot enligt `09-§1.2`:
 
 | Sort | Märke | Figur | SHA-256 för filen |

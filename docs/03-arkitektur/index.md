@@ -270,7 +270,7 @@ skrivs som en modifierare på markören, och CSS lägger etiketten där. Uppskat
 just en uppskattning: den skiljer bra fall från dåliga, den garanterar inga
 pixlar. <!-- 03-§9.3 -->
 
-Markören bär en symbol per sorts plats (`02-§5.36`). `source/ts/build/symbols.ts` håller
+Markören bär en symbol per sorts plats (`02-§5.38`). `source/ts/build/symbols.ts` håller
 en symbol per `kind`-värde (`04-§5.7`) som en sträng med SVG-banor, och bygget skriver in
 den i markören och i listposten under kartan. Tre av symbolerna är inte våra alls: de är
 vägmärkets egen figur, lyft ur märkesfilen och färgad om — `docs/09-kallor/index.md` säger

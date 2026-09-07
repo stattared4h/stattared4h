@@ -187,7 +187,7 @@ Regler:
 - `species` är listan över **djurslag**, inte individer. Flera djurslag kan gå i samma
   hage, och samma djurslag kan finnas på flera platser. <!-- 04-§5.2 -->
 - `kind` säger vad platsen är, med ett av åtta värden. Varje värde bär sin egen symbol på
-  kartan (`02-§5.36`):
+  kartan (`02-§5.38`):
 
   | Värde | Platsen är |
   | --- | --- |

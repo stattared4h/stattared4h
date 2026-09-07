@@ -44,7 +44,7 @@ export interface Animal {
 
 /**
  * What a place is (04-§5.7, ADR 0019). Decides whether the page talks about animals,
- * and which symbol the map marker carries (02-§5.36).
+ * and which symbol the map marker carries (02-§5.38).
  */
 export type LocationKind =
   | "djurplats"

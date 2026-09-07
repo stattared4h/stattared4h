@@ -257,7 +257,7 @@ describe("the map page (02-§5.23–5.25)", () => {
     assert.deepEqual(views.map.warnings, []);
   });
 
-  test("the list carries the same symbol as the marker (02-§5.37)", async () => {
+  test("the list carries the same symbol as the marker (02-§5.39)", async () => {
     const { views } = await qaViews();
     const cafe = views.map.list.find((item) => item.name === "Caféet");
     assert.ok(cafe);

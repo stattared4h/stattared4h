@@ -14,7 +14,7 @@
  * The markers are HTML rather than SVG so that they keep their size — at least the
  * tap target minimum (05-§4.15) — and their readable label at every viewport width,
  * while the drawing scales with the page. Each one carries the symbol for its kind of
- * place (02-§5.36), drawn in the page like everything else on the map. Pure functions: everything comes in as
+ * place (02-§5.38), drawn in the page like everything else on the map. Pure functions: everything comes in as
  * arguments, so the tests never touch the file system except in `loadMapBackground`.
  */
 import { readFile } from "node:fs/promises";
@@ -39,7 +39,7 @@ export interface MapPoint {
 export interface MapLocation extends MapPoint {
   id: string;
   name: string;
-  /** Decides the marker's symbol (02-§5.36, 04-§5.7). */
+  /** Decides the marker's symbol (02-§5.38, 04-§5.7). */
   kind: LocationKind;
 }
 

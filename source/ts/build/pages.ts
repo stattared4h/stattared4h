@@ -146,7 +146,7 @@ export interface SpeciesPageView {
 export interface MapListItem extends LinkView {
   /** "Får och kor", or "Inga djur just nu". */
   species: string;
-  /** The same symbol the marker carries, as an `<svg>` (02-§5.37). */
+  /** The same symbol the marker carries, as an `<svg>` (02-§5.39). */
   symbol: string;
 }
 

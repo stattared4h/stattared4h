@@ -134,7 +134,7 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   ritningens koordinatsystem enligt de kanter `background.yaml` anger (`03-§9.2`).
   Bygget varnar om en plats hamnar utanför ritningen. Saknas filerna visas markörerna på
   en tom platta. <!-- 02-§5.30 -->
-- Markören visar platsens namn och sortens symbol (`02-§5.36`), inget mer. Vilka djurslag
+- Markören visar platsens namn och sortens symbol (`02-§5.38`), inget mer. Vilka djurslag
   som går var står i listan under kartan, aldrig i markörerna, så att ritningen förblir
   läsbar när hagarna ligger tätt. <!-- 02-§5.32 -->
 - Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
@@ -151,10 +151,10 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   symbolen den figuren: H5 servering, H8 vandrarhem och H28 husbilsplats. Övriga är ritade
   för sajten, och ingen symbol påstår något om platsen som inte är sant. Symbolen påstår aldrig något om platsen som inte är sant.
   Symbolen är ritad i sidan, hämtas inte utifrån (`02-§5.26`) och är dold för
-  skärmläsaren — markörens tillgängliga namn är platsens namn, som förut. <!-- 02-§5.36 -->
+  skärmläsaren — markörens tillgängliga namn är platsens namn, som förut. <!-- 02-§5.38 -->
 - Samma symbol står framför platsens namn i listan under kartan. Den som möter en symbol
   på ritningen hittar därmed dess betydelse i text på samma sida, utan egen
-  teckenförklaring (`02-§5.24`). <!-- 02-§5.37 -->
+  teckenförklaring (`02-§5.24`). <!-- 02-§5.39 -->
 - Startsidan länkar vidare till gårdens egen sida om vandring och fiske och till
   Naturkartan för Kungsbacka, under rubriken "Fler kartor i området". Länkarna är vanliga
   länkar; sidan bäddar inte in något från dem (`02-§5.26`). <!-- 02-§5.34 -->

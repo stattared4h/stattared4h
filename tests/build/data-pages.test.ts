@@ -284,7 +284,7 @@ describe("the map on the home page (02-§5.23–5.27)", () => {
     assert.match(
       list,
       /href="\/plats\/stora-hagen\/"><svg class="place-list__symbol"[^>]*>.*?<\/svg>Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/,
-      "the list carries the same symbol in front of the name (02-§5.37)",
+      "the list carries the same symbol in front of the name (02-§5.39)",
     );
     assert.doesNotMatch(list, /gamla-stallet/);
     // 02-§5.26 forbids fetching anything from outside; 02-§5.34 adds two ordinary

@@ -173,9 +173,9 @@ klumpa ihop sig. En `djurplats` är fylld — botten
 symbolens form, vilka markörer som är djur. <!-- 05-§6.39 -->
 
 Nya symboler ritas inte fritt. Finns ett svenskt vägmärke vars figur stämmer med platsen
-är symbolen den figuren (`02-§5.36`); saknas den följer motivet vanlig svensk skyltning,
+är symbolen den figuren (`02-§5.38`); saknas den följer motivet vanlig svensk skyltning,
 ritat i sidhuvudets streck.
 
 I listan under kartan står samma symbol framför platsens namn, 20 px i
 `--color-green-deep`, utan bricka. Listan är därmed också symbolernas
-teckenförklaring (`02-§5.37`). <!-- 05-§6.40 -->
+teckenförklaring (`02-§5.39`). <!-- 05-§6.40 -->

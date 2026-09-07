@@ -588,7 +588,7 @@
 }
 
 /* The same symbol as the marker, in front of the name: the list doubles as the key
-   to the map's symbols (02-§5.37, 05-§6.40). */
+   to the map's symbols (02-§5.39, 05-§6.40). */
 .place-list__symbol {
   width: 20px;
   height: 20px;
