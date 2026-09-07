@@ -22,10 +22,16 @@ import {
   targetWidths,
   type ImageInfo,
 } from "../../source/ts/build/images.ts";
+import { imageIdFor, isImageId } from "../../source/ts/domain/image-id.ts";
 import { imagesPlugin, normalisePathPrefix, type EleventyConfigLike } from "../../source/ts/build/images-plugin.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 const run = promisify(execFile);
+
+// Fixture ids. They only have to look like image ids; generateImageSizes never hashes.
+const WIDE = "img-000000000001";
+const MEDIUM = "img-000000000002";
+const SMALL = "img-000000000003";
 
 /** Runs a script in scripts/ as a child process, the way `npm run` would. */
 async function runScript(script: string, args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
@@ -76,17 +82,22 @@ describe("targetWidths", () => {
 
 describe("renderPicture", () => {
   const info: ImageInfo = { width: 1600, height: 1200, widths: [400, 800, 1600] };
-  const base = { kind: "animals", file: "rosa-1.webp", alt: "Rosa i hagen.", info, base: "/" };
+  const id = "img-a3f2c1d8b901";
+  const base = { id, alt: "Rosa i hagen.", info, base: "/" };
 
   test("srcset, sizes, width, height, lazy loading and async decoding", () => {
     const html = renderPicture({ ...base, sizes: "(min-width: 960px) 33vw, 100vw" });
     assert.equal(
       html,
-      `<img src="/images/animals/rosa-1-800.webp" ` +
-        `srcset="/images/animals/rosa-1-400.webp 400w, /images/animals/rosa-1-800.webp 800w, /images/animals/rosa-1-1600.webp 1600w" ` +
+      `<img src="/images/${id}-800.webp" ` +
+        `srcset="/images/${id}-400.webp 400w, /images/${id}-800.webp 800w, /images/${id}-1600.webp 1600w" ` +
         `sizes="(min-width: 960px) 33vw, 100vw" width="1600" height="1200" alt="Rosa i hagen." ` +
         `loading="lazy" decoding="async">`,
     );
+  });
+
+  test("the path has no sub-directory: the images directory is flat (04-§9.1)", () => {
+    assert.doesNotMatch(renderPicture(base), /images\/(animals|species|places|content)\//);
   });
 
   test("sizes defaults to the full viewport", () => {
@@ -102,7 +113,7 @@ describe("renderPicture", () => {
 
   test("the base path prefixes every URL", () => {
     const html = renderPicture({ ...base, base: "/stattared4h/" });
-    assert.match(html, /src="\/stattared4h\/images\/animals\/rosa-1-800\.webp"/);
+    assert.match(html, new RegExp(`src="/stattared4h/images/${id}-800\\.webp"`));
     assert.equal((html.match(/\/stattared4h\/images\//g) ?? []).length, 4);
   });
 
@@ -111,18 +122,17 @@ describe("renderPicture", () => {
     assert.throws(() => renderPicture({ ...base, base: "/stattared4h" }), /ADR 0005/);
   });
 
-  test("attributes are escaped", () => {
-    const html = renderPicture({ ...base, alt: `Rosa "Rosie" <3 & co`, file: `a&b.webp` });
+  test("the alt text is escaped", () => {
+    const html = renderPicture({ ...base, alt: `Rosa "Rosie" <3 & co` });
     assert.match(html, /alt="Rosa &quot;Rosie&quot; &lt;3 &amp; co"/);
-    assert.match(html, /src="\/images\/animals\/a&amp;b-800\.webp"/);
     assert.doesNotMatch(html, /<3/);
   });
 
   test("src falls back to the largest width below 800 when 800 does not exist", () => {
     const small: ImageInfo = { width: 700, height: 500, widths: [400, 700] };
     const html = renderPicture({ ...base, info: small });
-    assert.match(html, /src="\/images\/animals\/rosa-1-700\.webp"/);
-    assert.match(html, /srcset="\/images\/animals\/rosa-1-400\.webp 400w, \/images\/animals\/rosa-1-700\.webp 700w"/);
+    assert.match(html, new RegExp(`src="/images/${id}-700\\.webp"`));
+    assert.match(html, new RegExp(`srcset="/images/${id}-400\\.webp 400w, /images/${id}-700\\.webp 700w"`));
     assert.match(html, /width="700" height="500"/);
   });
 });
@@ -169,10 +179,12 @@ describe("imagesPlugin", () => {
     const originalWarn = console.warn;
     console.warn = (message: string) => warnings.push(message);
     try {
-      const html = picture({ file: "rosa-1.webp", alt: "Rosa" }, "animals", undefined, false, "Get");
+      const html = picture({ id: "img-a3f2c1d8b901", alt: "Rosa" }, undefined, false, "Get");
       assert.equal(html, renderPlaceholder({ label: "Get" }));
       assert.equal(warnings.length, 1);
-      assert.match(warnings[0], /animals\/rosa-1\.webp/);
+      assert.match(warnings[0], /img-a3f2c1d8b901\.webp/);
+      assert.equal(picture(undefined, undefined, false, "Get"), renderPlaceholder({ label: "Get" }));
+      assert.equal(warnings.length, 1, "a record without a photo is not a warning");
     } finally {
       console.warn = originalWarn;
     }
@@ -190,9 +202,9 @@ describe("generateImageSizes", () => {
     workDir = await mkdtemp(path.join(tmpdir(), "s4h-images-"));
     imagesDir = path.join(workDir, "images-qa");
     outDir = path.join(workDir, "public");
-    await sharp(syntheticPhoto(1600, 1200)).webp({ quality: 80 }).toFile(await ensureDir(imagesDir, "animals", "rosa-1.webp"));
-    await sharp(syntheticPhoto(1000, 750)).webp({ quality: 80 }).toFile(await ensureDir(imagesDir, "species", "get.webp"));
-    await sharp(syntheticPhoto(300, 400)).webp({ quality: 80 }).toFile(await ensureDir(imagesDir, "places", "gethagen.webp"));
+    await sharp(syntheticPhoto(1600, 1200)).webp({ quality: 80 }).toFile(await ensureFile(imagesDir, `${WIDE}.webp`));
+    await sharp(syntheticPhoto(1000, 750)).webp({ quality: 80 }).toFile(await ensureFile(imagesDir, `${MEDIUM}.webp`));
+    await sharp(syntheticPhoto(300, 400)).webp({ quality: 80 }).toFile(await ensureFile(imagesDir, `${SMALL}.webp`));
   });
 
   after(async () => {
@@ -203,17 +215,16 @@ describe("generateImageSizes", () => {
     const written: string[] = [];
     const infos = await generateImageSizes({ imagesDir, outDir, widths: [400, 800, 1600], onWrite: (p) => written.push(p) });
 
-    assert.deepEqual(infos.get("animals/rosa-1.webp"), { width: 1600, height: 1200, widths: [400, 800, 1600] });
-    assert.deepEqual(infos.get("species/get.webp"), { width: 1000, height: 750, widths: [400, 800, 1000] });
-    assert.deepEqual(infos.get("places/gethagen.webp"), { width: 300, height: 400, widths: [300] });
-    assert.equal(written.length, 7);
+    assert.deepEqual(infos.get(WIDE), { width: 1600, height: 1200, widths: [400, 800, 1600] });
+    assert.deepEqual(infos.get(MEDIUM), { width: 1000, height: 750, widths: [400, 800, 1000] });
+    assert.deepEqual(infos.get(SMALL), { width: 300, height: 400, widths: [300] });
+    assert.equal(written.length, 7, "3 + 3 + 1 sizes");
 
-    assert.deepEqual((await readdir(path.join(outDir, "images", "animals"))).sort(), [
-      "rosa-1-1600.webp",
-      "rosa-1-400.webp",
-      "rosa-1-800.webp",
-    ]);
-    const derived = await sharp(path.join(outDir, "images", "species", "get-400.webp")).metadata();
+    assert.deepEqual(
+      (await readdir(path.join(outDir, "images"))).filter((f) => f.startsWith(WIDE)).sort(),
+      [`${WIDE}-1600.webp`, `${WIDE}-400.webp`, `${WIDE}-800.webp`],
+    );
+    const derived = await sharp(path.join(outDir, "images", `${MEDIUM}-400.webp`)).metadata();
     assert.equal(derived.width, 400);
     assert.equal(derived.height, 300);
     assert.equal(derived.format, "webp");
@@ -229,9 +240,18 @@ describe("generateImageSizes", () => {
     assert.equal(infos.size, 3);
   });
 
-  test("a missing kind directory is not an error", async () => {
+  test("a missing images directory is not an error", async () => {
     const emptyDir = path.join(workDir, "images-empty");
     const infos = await generateImageSizes({ imagesDir: emptyDir, outDir });
+    assert.equal(infos.size, 0);
+  });
+
+  test("a file that is not a .webp is ignored", async () => {
+    const otherDir = path.join(workDir, "images-mixed");
+    await ensureFile(otherDir, "README.md");
+    const { writeFile } = await import("node:fs/promises");
+    await writeFile(path.join(otherDir, "README.md"), "# bilder");
+    const infos = await generateImageSizes({ imagesDir: otherDir, outDir });
     assert.equal(infos.size, 0);
   });
 });
@@ -239,11 +259,13 @@ describe("generateImageSizes", () => {
 describe("npm run image", () => {
   let workDir: string;
   let originalPath: string;
+  let dataDir: string;
   let imagesDir: string;
 
   before(async () => {
     workDir = await mkdtemp(path.join(tmpdir(), "s4h-image-cli-"));
-    imagesDir = path.join(workDir, "images");
+    dataDir = path.join(workDir, "data-qa");
+    imagesDir = path.join(workDir, "images-qa");
     originalPath = path.join(workDir, "Kalle Original.png");
     // A 3000×2000 PNG that carries EXIF and an ICC profile, like a phone photo would.
     await sharp(syntheticPhoto(3000, 2000))
@@ -260,12 +282,27 @@ describe("npm run image", () => {
     await rm(workDir, { recursive: true, force: true });
   });
 
-  test("scales to 1600 px, stays under 250 KB and strips metadata (02-§8.3)", async () => {
-    const result = await runScript("image.mjs", [originalPath, "--to", "animals", "--name", "kalle-1", "--images-dir", imagesDir]);
-    assert.equal(result.code, 0, result.stderr);
-    assert.match(result.stdout, /Skrev .*kalle-1\.webp/);
+  /** Runs the CLI with the temporary dataset and returns the id it printed. */
+  async function addImage(args: string[] = []): Promise<{ code: number; stdout: string; stderr: string; id: string }> {
+    const result = await runScript("image.mjs", [
+      originalPath,
+      "--alt",
+      "Kalle betar i hagen.",
+      "--credit",
+      "QA",
+      "--data-dir",
+      dataDir,
+      ...args,
+    ]);
+    return { ...result, id: /\b(img-[0-9a-f]{12})\b/.exec(result.stdout)?.[1] ?? "" };
+  }
 
-    const outputPath = path.join(imagesDir, "animals", "kalle-1.webp");
+  test("scales to 1600 px, stays under 250 KB and strips metadata (02-§8.3)", async () => {
+    const { code, stderr, id } = await addImage();
+    assert.equal(code, 0, stderr);
+    assert.ok(isImageId(id), `printed a usable id, got ${JSON.stringify(id)}`);
+
+    const outputPath = path.join(imagesDir, `${id}.webp`);
     const metadata = await sharp(outputPath).metadata();
     assert.equal(metadata.format, "webp");
     assert.equal(metadata.width, MAX_IMAGE_EDGE);
@@ -276,29 +313,54 @@ describe("npm run image", () => {
     assert.ok((await stat(outputPath)).size <= MAX_IMAGE_BYTES);
   });
 
-  test("the file name defaults to a slug of the original's name", async () => {
-    const result = await runScript("image.mjs", [originalPath, "--to", "content", "--images-dir", imagesDir]);
-    assert.equal(result.code, 0, result.stderr);
-    await stat(path.join(imagesDir, "content", "kalle-original.webp"));
+  test("the id is the hash of the written file (02-§8.9)", async () => {
+    const { id } = await addImage();
+    const { readFile } = await import("node:fs/promises");
+    assert.equal(imageIdFor(await readFile(path.join(imagesDir, `${id}.webp`))), id);
   });
 
-  test("refuses to overwrite without --force", async () => {
-    const refused = await runScript("image.mjs", [originalPath, "--name", "kalle-1", "--images-dir", imagesDir]);
-    assert.equal(refused.code, 1);
-    assert.match(refused.stderr, /finns redan.*--force/);
-
-    const forced = await runScript("image.mjs", [originalPath, "--name", "kalle-1", "--images-dir", imagesDir, "--force"]);
-    assert.equal(forced.code, 0, forced.stderr);
+  test("writes the image post with alt and credit beside the file (02-§8.8)", async () => {
+    const { id } = await addImage();
+    const { readFile } = await import("node:fs/promises");
+    const { parse } = await import("yaml");
+    const post = parse(await readFile(path.join(dataDir, "images", `${id}.yaml`), "utf8"));
+    assert.deepEqual(post, { alt: "Kalle betar i hagen.", credit: "QA" });
   });
 
-  test("rejects an unknown kind and a missing file", async () => {
-    const badKind = await runScript("image.mjs", [originalPath, "--to", "kor", "--images-dir", imagesDir]);
-    assert.equal(badKind.code, 1);
-    assert.match(badKind.stderr, /Okänd katalog "kor"/);
+  test("the same photo twice gives the same id and writes nothing the second time", async () => {
+    const first = await addImage();
+    const second = await addImage();
+    assert.equal(second.code, 0, second.stderr);
+    assert.equal(second.id, first.id);
+    assert.match(second.stdout, /finns redan/);
+  });
 
-    const missing = await runScript("image.mjs", [path.join(workDir, "finns-inte.jpg"), "--images-dir", imagesDir]);
+  test("alt and credit are required, and a missing file is reported", async () => {
+    const noAlt = await runScript("image.mjs", [originalPath, "--credit", "QA", "--data-dir", dataDir]);
+    assert.equal(noAlt.code, 1);
+    assert.match(noAlt.stderr, /--alt/);
+
+    const noCredit = await runScript("image.mjs", [originalPath, "--alt", "En bild.", "--data-dir", dataDir]);
+    assert.equal(noCredit.code, 1);
+    assert.match(noCredit.stderr, /--credit/);
+
+    const missing = await runScript("image.mjs", [
+      path.join(workDir, "finns-inte.jpg"),
+      "--alt",
+      "En bild.",
+      "--credit",
+      "QA",
+      "--data-dir",
+      dataDir,
+    ]);
     assert.equal(missing.code, 1);
     assert.match(missing.stderr, /Hittar inte filen/);
+  });
+
+  test("an unknown flag is refused rather than silently ignored", async () => {
+    const result = await runScript("image.mjs", [originalPath, "--to", "animals", "--data-dir", dataDir]);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /Okänd flagga --to/);
   });
 });
 
@@ -313,24 +375,23 @@ describe("npm run qa:images", () => {
     await rm(workDir, { recursive: true, force: true });
   });
 
-  test("creates a 1200×900 placeholder for every image the QA data refers to (02-§8.4)", async () => {
+  test("creates a 1200×900 placeholder for every image post (02-§8.4)", async () => {
     const imagesDir = path.join(workDir, "images-qa");
     const dataDir = path.join(ROOT, "source", "data-qa");
     const result = await runScript("qa-images.mjs", ["--data-dir", dataDir, "--images-dir", imagesDir]);
     assert.equal(result.code, 0, result.stderr);
 
-    const referenced = await referencedPhotos(dataDir);
-    assert.ok(referenced.length >= 10, "the QA data should refer to photos");
-    for (const file of referenced) {
-      const metadata = await sharp(path.join(imagesDir, "animals", file)).metadata();
-      assert.equal(metadata.width, 1200, file);
-      assert.equal(metadata.height, 900, file);
-      assert.equal(metadata.format, "webp", file);
+    const ids = await imagePostIds(dataDir);
+    assert.ok(ids.length >= 10, "the QA data should have image posts");
+    for (const id of ids) {
+      const metadata = await sharp(path.join(imagesDir, `${id}.webp`)).metadata();
+      assert.equal(metadata.width, 1200, id);
+      assert.equal(metadata.height, 900, id);
+      assert.equal(metadata.format, "webp", id);
     }
-    for (const kind of ["animals", "species", "places"]) {
-      assert.ok((await stat(path.join(imagesDir, kind))).isDirectory());
-    }
-    assert.match(result.stdout, new RegExp(`Skapade ${referenced.length} platshållare`));
+    const written = (await readdir(imagesDir)).filter((f) => f.endsWith(".webp"));
+    assert.equal(written.length, ids.length, "one file per image post, and nothing else");
+    assert.match(result.stdout, new RegExp(`Skapade ${ids.length} platshållare`));
   });
 
   test("is idempotent: a rerun creates nothing", async () => {
@@ -347,20 +408,14 @@ describe("npm run qa:images", () => {
   });
 });
 
-async function ensureDir(root: string, kind: string, file: string): Promise<string> {
+async function ensureFile(root: string, file: string): Promise<string> {
   const { mkdir } = await import("node:fs/promises");
-  await mkdir(path.join(root, kind), { recursive: true });
-  return path.join(root, kind, file);
+  await mkdir(root, { recursive: true });
+  return path.join(root, file);
 }
 
-/** The `photos[].file` values in the QA animals, read with a regex so the test does not depend on the domain layer. */
-async function referencedPhotos(dataDir: string): Promise<string[]> {
-  const { readFile } = await import("node:fs/promises");
-  const animalsDir = path.join(dataDir, "animals");
-  const files: string[] = [];
-  for (const entry of await readdir(animalsDir)) {
-    const yaml = await readFile(path.join(animalsDir, entry), "utf8");
-    for (const match of yaml.matchAll(/^\s*- file:\s*(\S+\.webp)/gm)) files.push(match[1]);
-  }
-  return files;
+/** The image post ids in a dataset, read from the file names so the test stays independent of the domain layer. */
+async function imagePostIds(dataDir: string): Promise<string[]> {
+  const entries = await readdir(path.join(dataDir, "images"));
+  return entries.filter((name) => name.endsWith(".yaml")).map((name) => name.replace(/\.yaml$/, "")).sort();
 }

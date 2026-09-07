@@ -6,14 +6,18 @@
  */
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { imageFileName } from "../../source/ts/domain/image-id.ts";
 import { formatIssue, MAX_IMAGE_BYTES } from "../../source/ts/domain/validate.ts";
 import {
   addAnimal,
+  addImage,
   addLocation,
   breedList,
   editAnimal,
+  editImage,
   editLocation,
   errorsFor,
+  photoId,
   qaDataset,
   rawQa,
   speciesList,
@@ -270,61 +274,98 @@ test("an unknown field anywhere fails, so a typo is never silently ignored", asy
   const raw = await rawQa();
   editAnimal(raw, "rosa", (a) => {
     a.nmae = "Rosa";
-    (a.photos as Record<string, unknown>[])[0].caption = "x";
   });
+  editImage(raw, await photoId("rosa"), (image) => (image.taken = "2021-05-01"));
   editLocation(raw, "gethagen", (l) => (l.notes = "x"));
   speciesList(raw)[0].photos = [];
   breedList(raw)[0].origin = "x";
   (raw.species?.data as Record<string, unknown>).extra = 1;
   const result = await validate(raw);
   assert.match(errorsFor(result, "animals/rosa.yaml", "nmae")[0].message, /okänt fält/);
-  assert.equal(errorsFor(result, "animals/rosa.yaml", "photos[0].caption").length, 1);
+  assert.equal(errorsFor(result, `images/${await photoId("rosa")}.yaml`, "taken").length, 1);
   assert.equal(errorsFor(result, "locations/gethagen.yaml", "notes").length, 1);
   assert.equal(errorsFor(result, "species.yaml", "species[get].photos").length, 1);
   assert.equal(errorsFor(result, "species.yaml", "extra").length, 1);
   assert.equal(errorsFor(result, "breeds.yaml", "breeds[jamtget].origin").length, 1);
 });
 
-// --- Photos (04-§10.7, 04-§9) -----------------------------------------------------
+// --- Image posts and references (04-§9, 04-§10.13–10.14) --------------------------
 
-test("a photo needs file, alt, credit and portrait", async () => {
-  for (const field of ["file", "alt", "credit", "portrait"]) {
+test("an image post needs alt and credit", async () => {
+  for (const field of ["alt", "credit"]) {
     const raw = await rawQa();
-    editAnimal(raw, "rosa", (a) => delete (a.photos as Record<string, unknown>[])[0][field]);
+    const id = await photoId("rosa");
+    editImage(raw, id, (image) => delete image[field]);
     const result = await validate(raw);
-    assert.equal(errorsFor(result, "animals/rosa.yaml", field).length, 1, field);
+    assert.equal(errorsFor(result, `images/${id}.yaml`, field).length, 1, field);
+    assert.match(errorsFor(result, `images/${id}.yaml`, field)[0].message, /saknas/);
   }
 });
 
-test("at most one photo per animal is the portrait", async () => {
+test("an image post file name must be a valid image id", async () => {
   const raw = await rawQa();
-  editAnimal(raw, "rosa", (a) => ((a.photos as { portrait: boolean }[])[1].portrait = true));
+  addImage(raw, "rosa-1");
   const result = await validate(raw);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos")[0].message, /Bara en bild kan vara porträttet/);
+  assert.match(errorsFor(result, "images/rosa-1.yaml", "filnamn")[0].message, /img- och tolv/);
 });
 
-test("a photo file is a bare .webp name that starts with the record's id", async () => {
+test("a photo reference must name an image post that exists", async () => {
   const raw = await rawQa();
-  editAnimal(raw, "rosa", (a) => {
-    const photos = a.photos as { file: string }[];
-    photos[0].file = "images/rosa-1.webp";
-    photos[1].file = "stjarna-1.jpg";
+  editAnimal(raw, "rosa", (a) => ((a.photos as string[])[0] = "img-ffffffffffff"));
+  editLocation(raw, "gethagen", (l) => (l.photos = ["img-eeeeeeeeeeee"]));
+  speciesList(raw)[0].photo = "img-dddddddddddd";
+  const result = await validate(raw);
+  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /finns inte i images\//);
+  assert.match(errorsFor(result, "locations/gethagen.yaml", "photos[0]")[0].message, /finns inte i images\//);
+  assert.match(errorsFor(result, "species.yaml", "species[get].photo")[0].message, /finns inte i images\//);
+});
+
+test("a photo reference that is not an image id fails with the form in the message", async () => {
+  const raw = await rawQa();
+  editAnimal(raw, "rosa", (a) => ((a.photos as unknown[])[0] = "rosa-1.webp"));
+  const result = await validate(raw);
+  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /img- och tolv/);
+});
+
+test("photos must be a list of ids, not a list of mappings", async () => {
+  const raw = await rawQa();
+  editAnimal(raw, "rosa", (a) => (a.photos = [{ file: "rosa-1.webp", alt: "Rosa", credit: "QA" }]));
+  const result = await validate(raw);
+  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /bild-id/);
+});
+
+test("the same image may not be listed twice on one record", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editAnimal(raw, "rosa", (a) => (a.photos = [id, id]));
+  const result = await validate(raw);
+  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[1]")[0].message, /står med två gånger/);
+});
+
+test("two records may share the same image (ADR 0015)", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editAnimal(raw, "tuva", (a) => (a.photos = [id]));
+  editLocation(raw, "gethagen", (l) => (l.photos = [id]));
+  speciesList(raw)[0].photo = id;
+  const result = await validate(raw);
+  assert.deepEqual(result.errors, []);
+  const dataset = result.dataset;
+  assert.equal(dataset?.animals.find((a) => a.id === "tuva")?.photos[0].id, id);
+  assert.equal(dataset?.locations.find((l) => l.id === "gethagen")?.photos[0].id, id);
+  assert.equal(dataset?.species.find((s) => s.id === "get")?.photo?.id, id);
+});
+
+test("a reference is resolved to the post's alt and credit", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editImage(raw, id, (image) => {
+    image.alt = "Rosa står i Gethagen.";
+    image.credit = "Anna Andersson";
   });
-  speciesList(raw)[0].photo = { file: "get.webp", alt: "En get", credit: "Anna Andersson" };
   const result = await validate(raw);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0].file")[0].message, /inte en sökväg/);
-  const second = errorsFor(result, "animals/rosa.yaml", "photos[1].file").map((e) => e.message);
-  assert.ok(second.some((m) => /\.webp/.test(m)), "extension");
-  assert.ok(second.some((m) => /inledas med postens id "rosa"/.test(m)), "prefix");
-  assert.deepEqual(errorsFor(result, "species.yaml"), [], "get.webp starts with the species id");
-});
-
-test("a species photo needs file, alt and credit", async () => {
-  const raw = await rawQa();
-  speciesList(raw)[0].photo = { file: "get-1.webp" };
-  const result = await validate(raw);
-  assert.equal(errorsFor(result, "species.yaml", "alt").length, 1);
-  assert.equal(errorsFor(result, "species.yaml", "credit").length, 1);
+  const photo = result.dataset?.animals.find((a) => a.id === "rosa")?.photos[0];
+  assert.deepEqual(photo, { id, alt: "Rosa står i Gethagen.", credit: "Anna Andersson" });
 });
 
 // --- Coordinates ------------------------------------------------------------------
@@ -383,7 +424,7 @@ test("an active location without coordinates warns", async () => {
 
 test("a species with a photo and a place stops warning", async () => {
   const raw = await rawQa();
-  speciesList(raw)[3].photo = { file: "hast-1.webp", alt: "En häst", credit: "Erik Eriksson" };
+  speciesList(raw)[3].photo = await photoId("rosa");
   editLocation(raw, "ovre-hagen", (l) => (l.species = ["hast"]));
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
@@ -393,12 +434,14 @@ test("a species with a photo and a place stops warning", async () => {
 
 // --- Image files (04-§10.7, 02-§8.2) ----------------------------------------------
 
-/** Writes every image the QA data references as a small valid WebP, then applies overrides. */
+/** Writes a small valid WebP for every image post, flat, then applies overrides. */
 async function imagesDirWith(overrides: Record<string, Uint8Array | null>): Promise<string> {
   const dir = await tempDir("s4h-images");
   const dataset = await qaDataset();
-  for (const animal of dataset.animals) {
-    for (const photo of animal.photos) await writeInto(dir, `animals/${photo.file}`, lossyWebp(800, 600));
+  for (const image of dataset.images) {
+    if (overrides[imageFileName(image.id)] === undefined) {
+      await writeInto(dir, imageFileName(image.id), lossyWebp(800, 600));
+    }
   }
   for (const [relative, bytes] of Object.entries(overrides)) {
     if (bytes !== null) await writeInto(dir, relative, bytes);
@@ -411,33 +454,67 @@ test("image checks are skipped when imagesDir is null", async () => {
   assert.deepEqual(result.errors, []);
 });
 
-test("all referenced images present and within limits pass", async () => {
-  const raw = await rawQa();
-  speciesList(raw)[0].photo = { file: "get-1.webp", alt: "En get", credit: "Anna Andersson" };
-  const imagesDir = await imagesDirWith({ "species/get-1.webp": extendedWebp(1600, 1600) });
-  const result = await validate(raw, { imagesDir });
+test("all image files present and within limits pass", async () => {
+  const imagesDir = await imagesDirWith({ [imageFileName(await photoId("rosa"))]: extendedWebp(1600, 1600) });
+  const result = await validate(await rawQa(), { imagesDir });
   assert.deepEqual(result.errors, []);
+  assert.deepEqual(result.warnings.filter((w) => w.file.startsWith("images/")), []);
 });
 
-test("a missing image fails", async () => {
-  const raw = await rawQa();
-  speciesList(raw)[0].photo = { file: "get-1.webp", alt: "En get", credit: "Anna Andersson" };
-  const imagesDir = await imagesDirWith({});
-  const result = await validate(raw, { imagesDir });
-  assert.match(errorsFor(result, "species.yaml", "species[get].photo.file")[0].message, /species\/get-1\.webp finns inte/);
+test("a missing image file fails, and the error names the image post", async () => {
+  const id = await photoId("rosa");
+  const imagesDir = await imagesDirWith({ [imageFileName(id)]: null });
+  const result = await validate(await rawQa(), { imagesDir });
+  assert.match(errorsFor(result, `images/${id}.yaml`)[0].message, new RegExp(`${id}\\.webp finns inte`));
 });
 
 test("an image that is not WebP, is too large, or carries metadata fails", async () => {
+  const [notWebp, tooWide, withExif, tooBig] = await Promise.all([
+    photoId("rosa", 0),
+    photoId("rosa", 1),
+    photoId("majros", 0),
+    photoId("majros", 1),
+  ]);
   const imagesDir = await imagesDirWith({
-    "animals/rosa-1.webp": new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0, 0, 0, 0, 0]),
-    "animals/rosa-2.webp": lossyWebp(1601, 900),
-    "animals/majros-1.webp": extendedWebp(1200, 800, VP8X_EXIF),
-    "animals/majros-2.webp": paddedWebp(800, 600, MAX_IMAGE_BYTES + 1),
+    [imageFileName(notWebp)]: new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    [imageFileName(tooWide)]: lossyWebp(1601, 900),
+    [imageFileName(withExif)]: extendedWebp(1200, 800, VP8X_EXIF),
+    [imageFileName(tooBig)]: paddedWebp(800, 600, MAX_IMAGE_BYTES + 1),
   });
   const result = await validate(await rawQa(), { imagesDir });
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0].file")[0].message, /inte en WebP-fil/);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[1].file")[0].message, /1601×900 px; högst 1600 px/);
-  assert.match(errorsFor(result, "animals/majros.yaml", "photos[0].file")[0].message, /EXIF-, XMP- eller ICC-metadata/);
-  assert.match(errorsFor(result, "animals/majros.yaml", "photos[1].file")[0].message, /högst 250 KB/);
+  assert.match(errorsFor(result, `images/${notWebp}.yaml`)[0].message, /inte en WebP-fil/);
+  assert.match(errorsFor(result, `images/${tooWide}.yaml`)[0].message, /1601×900 px; högst 1600 px/);
+  assert.match(errorsFor(result, `images/${withExif}.yaml`)[0].message, /EXIF-, XMP- eller ICC-metadata/);
+  assert.match(errorsFor(result, `images/${tooBig}.yaml`)[0].message, /högst 250 KB/);
   assert.equal(result.errors.length, 4);
+});
+
+// --- Unused images (02-§8.13, 04-§10.10) ------------------------------------------
+
+test("an image post nothing refers to warns", async () => {
+  const raw = await rawQa();
+  addImage(raw, "img-abcdef012345");
+  const result = await validate(raw);
+  assert.deepEqual(result.errors, []);
+  const warning = result.warnings.find((w) => w.file === "images/img-abcdef012345.yaml");
+  assert.match(warning?.message ?? "", /ingen post använder/);
+});
+
+test("an image file without an image post warns, and only when the directory is given", async () => {
+  const stray = "img-abcdef012345.webp";
+  const imagesDir = await imagesDirWith({ [stray]: lossyWebp(400, 300) });
+  const result = await validate(await rawQa(), { imagesDir });
+  assert.deepEqual(result.errors, []);
+  const warning = result.warnings.find((w) => w.message.includes(stray));
+  assert.match(warning?.message ?? "", /ingen bildpost/);
+
+  const withoutDir = await validate(await rawQa());
+  assert.ok(!withoutDir.warnings.some((w) => w.message.includes(stray)));
+});
+
+test("a file that is not a .webp in the images directory is ignored", async () => {
+  const imagesDir = await imagesDirWith({ "README.md": new TextEncoder().encode("# bilder") });
+  const result = await validate(await rawQa(), { imagesDir });
+  assert.deepEqual(result.errors, []);
+  assert.ok(!result.warnings.some((w) => w.message.includes("README.md")));
 });

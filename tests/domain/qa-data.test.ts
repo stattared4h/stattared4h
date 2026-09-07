@@ -1,6 +1,7 @@
 /** Regression tests for the deliberately large, realistic QA dataset (02-§6.12–6.13). */
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { isImageId } from "../../source/ts/domain/image-id.ts";
 import { qaDataset, rawQa, validate } from "./helpers.ts";
 
 test("QA represents at least 100 animals and exercises every vocabulary entry", async () => {
@@ -71,4 +72,27 @@ test("the same species and breed cannot be counted twice", async () => {
   const result = await validate(raw);
   assert.equal(result.dataset, null);
   assert.ok(result.errors.some((error) => error.message.includes("redan som ett räknat bestånd")));
+});
+
+test("QA exercises a shared image and a location with photos (02-§6.12)", async () => {
+  const dataset = await qaDataset();
+  const used = dataset.animals.flatMap((animal) => animal.photos.map((photo) => photo.id));
+  const shared = used.filter((id, index) => used.indexOf(id) !== index);
+  assert.ok(shared.length >= 1, "two animals should share a photo");
+
+  const withPhotos = dataset.locations.filter((location) => location.photos.length > 0);
+  assert.ok(withPhotos.length >= 1, "a location should have photos");
+
+  // Every image post is used, so the dataset produces no unused-image warnings.
+  const result = await validate(await rawQa());
+  assert.deepEqual(result.warnings.filter((warning) => warning.file.startsWith("images/")), []);
+});
+
+test("every image post id has the form from 04-§9.7", async () => {
+  const dataset = await qaDataset();
+  assert.ok(dataset.images.length >= 10);
+  for (const image of dataset.images) {
+    assert.ok(isImageId(image.id), image.id);
+    assert.ok(image.alt.length > 0 && image.credit.length > 0, image.id);
+  }
 });

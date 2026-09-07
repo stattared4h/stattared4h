@@ -67,6 +67,26 @@ export function addLocation(raw: RawDataset, id: string, data: Obj): void {
   raw.locations.push({ file: `locations/${id}.yaml`, id, data, parseError: null });
 }
 
+/** Applies `change` to the raw data of image `id`. */
+export function editImage(raw: RawDataset, id: string, change: (data: Obj) => void): void {
+  change(record(raw.images, id).data as Obj);
+}
+
+/** Adds a new raw image post named `<id>.yaml`. */
+export function addImage(raw: RawDataset, id: string, data: Obj = { alt: "En bild.", credit: "QA" }): void {
+  raw.images.push({ file: `images/${id}.yaml`, id, data, parseError: null });
+}
+
+/** The id of image number `index` on animal `id` in the QA data. */
+export async function photoId(animalId: string, index = 0): Promise<string> {
+  const dataset = await qaDataset();
+  const animal = dataset.animals.find((a) => a.id === animalId);
+  if (!animal) throw new Error(`no animal ${animalId} in QA data`);
+  const photo = animal.photos[index];
+  if (!photo) throw new Error(`animal ${animalId} has no photo ${index}`);
+  return photo.id;
+}
+
 /** The list under `species:` in species.yaml, for mutation. */
 export function speciesList(raw: RawDataset): Obj[] {
   return (raw.species?.data as { species: Obj[] }).species;
