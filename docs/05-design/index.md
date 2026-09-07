@@ -163,11 +163,17 @@ Basenhet: `8px`. Alla värden är multiplar av den. <!-- 05-§4.4 -->
 
 ### Rutnät
 
-- Mobil: en kolumn. <!-- 05-§4.11 -->
-- Surfplatta: två kolumner. <!-- 05-§4.12 -->
+- Mobil: en kolumn för text och sektioner. <!-- 05-§4.11 -->
+- Djur- och platskorten är två i bredd redan på mobil. Kortet bärs av sitt foto, och
+  ett barn som ska känna igen djuret framför sig jämför fotona med varandra — det går
+  bara om flera syns samtidigt. En hage med tjugo getter är annars tio skärmars
+  rullning. <!-- 05-§4.12 -->
 - Desktop: tre kolumner för djur- och platskort. <!-- 05-§4.13 -->
-- CSS Grid med `auto-fit` och `minmax`, så att antalet kolumner följer av bredden i
-  stället för av mediefrågor. Inget rutnätsramverk. <!-- 05-§4.14 -->
+- CSS Grid utan rutnätsramverk. Rutnät där fler kolumner alltid är bättre — som
+  djurslagsrutorna — använder `auto-fit` och `minmax`, så att antalet följer av bredden.
+  Djur- och platskorten har ett bestämt antal per bredd i stället, satt vid
+  desktopbrytpunkten: `auto-fit` kan inte uttrycka "exakt två, sedan exakt tre", utan ger
+  fler och fler kolumner ju bredare fönstret blir. <!-- 05-§4.14 -->
 
 ### Träffytor
 
