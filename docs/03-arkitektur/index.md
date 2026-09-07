@@ -307,11 +307,17 @@ Sidhuvud och sidfot är två Eleventy-inkluderingar, `source/layouts/header.njk`
 `source/layouts/footer.njk`, som grundlayouten tar in på varje sida. Ingen sida skriver
 egen markup för dem. Ikonerna är inline-SVG i inkluderingarna. <!-- 03-§10.1 -->
 
-Beteendet — meny, installknapp, "till toppen", feedbackdialog, statusrader, dela — är
-små moduler under `source/ts/ui/`, buntade till en fil. Varje modul letar upp sitt
-element och gör ingenting om det saknas, så en sida utan feedbackknapp kostar inget.
+Beteendet — meny, "Tillbaka", installknapp, "till toppen", feedbackdialog, statusrader,
+dela — är små moduler under `source/ts/ui/`, buntade till en fil. Varje modul letar upp
+sitt element och gör ingenting om det saknas, så en sida utan feedbackknapp kostar inget.
 Sidorna är läsbara och länkarna följbara utan JavaScript; bara menyknappen, dialogen
 och knapparna kräver det. <!-- 03-§10.2 -->
+
+"Tillbaka" (`02-§10.40`) är en länk till startsidan i markupen, och `source/ts/ui/back.ts`
+byter den mot `history.back()` först när `document.referrer` pekar på en sida under samma
+ursprung och samma bas-sökväg. Villkoret är funktionen `returnsToSitePage`, fri från
+webbläsar-API:er och därför enhetstestad i Node (`CL-§2.14`). Utan JavaScript, och för
+den som kommit utifrån, är knappen kvar som den länk den är. <!-- 03-§10.6 -->
 
 Feedback bygger en adress till `github.com/<repo>/issues/new` med `template`, `title`
 och `body` som frågeparametrar och öppnar den i ny flik. Ingen kod på sajten talar med

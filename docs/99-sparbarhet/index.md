@@ -136,6 +136,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§9.12` | Produktion och QA i samma utgåva | `manuell` | Efter en körning av *Deploy till QA*: öppna `https://stattared4h.github.io/stattared4h/` och `.../stattared4h/qa/` och bekräfta att båda svarar, och att körningens sammanfattning anger vilken tagg produktionens kod kom från |
 | `02-§10.1`–`10.8` | Sidhuvud, hopp-länk, ikonrad, meny, desktopvariant, aktuell sida | `manuell` | `source/layouts/header.njk`, `source/ts/ui/menu.ts`, `layout.css`, `components.css`. Öppna startsidan i 360 px: raden visar Meny och feedback, menyn öppnas med knappen och stängs med Escape, tryck utanför och länkval, och sidhuvudet ligger kvar vid rullning. I 1280 px: logga, namn och länkarna Hem och Om sajten syns, Hem är understruken. Tab från adressfältet landar på "Hoppa till innehållet" |
 | `02-§10.38` | Överlägget tar emot trycket utanför menyn | `manuell` | `[data-menu-overlay]` i `source/layouts/header.njk`, visat av `source/ts/ui/menu.ts` och format av `.site-menu-overlay` i `components.css`; att elementet finns på varje sida bevakas av `tests/build/site.test.ts`. Öppna `/plats/gethagen/` i 360 px, öppna menyn och tryck på artrutan under kortet: menyn stängs och sidan står kvar på platssidan |
+| `02-§10.40`–`10.42` | Tillbaka i sidhuvudet | `byggd` | Valet mellan historiken och startsidan är `returnsToSitePage` i `source/ts/ui/back.ts`, testad i `tests/ui/back.test.ts`; `tests/build/site.test.ts` kräver knappen på varje sida utom startsidan, med `aria-label` och en href till startsidan. Öppna `/djur/get-klara/` i 360 px efter att ha kommit från `/plats/gethagen/`: Tillbaka går till hagen; öppna samma adress direkt i en ny flik: Tillbaka går till startsidan med kartan |
 | `02-§10.39` | Menyns länkar håller träffytan | `manuell` | `.site-menu__link` i `components.css`. Öppna menyn i 360 px och mät en länk i DevTools: minst 44 px hög |
 | `02-§10.9` | 4H-loggan | `byggd` | Förbundets egna banor i `source/assets/img/4h-logo.svg`, härledda ur vektorfilen i `docs/09-kallor/`; `tests/design/logo.test.ts` jämför konstverkets kontrollsumma med registret |
 | `02-§10.10` | Ingen huvudsidelänk i sidhuvudet | `byggd` | `tests/build/site.test.ts` |
@@ -269,6 +270,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§9.5` | Symbolerna som inline-SVG i bygget | `byggd` | `source/ts/build/symbols.ts` med `Record<LocationKind, string>`, så att en sort utan symbol fäller `npm run typecheck`. Tre symboler är vägmärkets egen figur, registrerade med kontrollsumma i `docs/09-kallor/index.md` och bevakade av `tests/build/symbols.test.ts` |
 | `03-§9.3`–`9.4` | Etikettplacering och länkar vidare | `byggd` | `placeLabels` och kartsidans avsnitt; `tests/build/map.test.ts` och `data-pages.test.ts` |
 | `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
+| `03-§10.6` | Tillbaka är en länk som klientkoden uppgraderar | `byggd` | `source/ts/ui/back.ts`; villkoret `returnsToSitePage` testas i `tests/ui/back.test.ts`, och att markupen är en `<a>` med href till startsidan i `tests/build/site.test.ts` |
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
 
 ### Källregister (`09-§`)
@@ -300,7 +302,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 18 |
 | `påbörjad` | 15 |
-| `byggd` | 129 |
+| `byggd` | 131 |
 | `manuell` | 49 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
