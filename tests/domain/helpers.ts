@@ -7,8 +7,9 @@
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { validateDataset } from "../../source/ts/domain/index.ts";
 import { loadRawDataset, type RawDataset, type RawRecord } from "../../source/ts/domain/load.ts";
-import { validateDataset, type ValidateOptions } from "../../source/ts/domain/validate.ts";
+import type { ValidateOptions } from "../../source/ts/domain/validate.ts";
 import type { Dataset, Issue, ValidationResult } from "../../source/ts/domain/types.ts";
 
 export const ROOT = path.resolve(import.meta.dirname, "..", "..");
