@@ -64,8 +64,11 @@ namngivet djur står i hagen.
   (`04-§4.7`) får i stället en mening på formen "På gården finns 18 svarta dvärghöns och
   14 orusthöns." Sidan påstår inte att en namngiven individ står på platsen
   (ADR 0012). <!-- 02-§5.11 -->
-- En aktiv plats utan djurslag visar "Just nu går inga djur här" och en länk till
-  kartan. <!-- 02-§5.12 -->
+- En aktiv plats med `kind: djurplats` utan djurslag visar "Just nu går inga djur här"
+  och en länk till kartan. <!-- 02-§5.12 -->
+- En plats med `kind: besoksmal` nämner inte djur: ingen djurlista, ingen rubrik per
+  djurslag och ingen mening om att inga djur går där. Sidan visar namnet, texten,
+  tillgängligheten och bilderna. <!-- 02-§5.35 -->
 - En plats med `active: false` behåller sin adress, visar "Den här platsen används inte
   just nu" och en länk till kartan, och finns varken på kartan eller i kartans
   lista. <!-- 02-§5.13 -->
