@@ -8,6 +8,10 @@ test("QA represents at least 100 animals and exercises every vocabulary entry", 
   const dataset = await qaDataset();
   const counted = dataset.populations.reduce((sum, population) => sum + population.count, 0);
   assert.equal(dataset.animals.length, 100);
+  assert.ok(
+    dataset.animals.every((animal) => animal.photos.length > 0),
+    "every QA animal should have at least one photo",
+  );
   assert.equal(counted, 32);
   assert.ok(dataset.animals.length + counted >= 100);
   assert.equal(dataset.species.length, 8);
