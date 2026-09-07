@@ -126,8 +126,9 @@ håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
 Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-§5.7`).
 
 - Startsidan visar en karta över gården: en SVG som bygget genererar, där varje aktiv
-  plats med koordinater är en markör med platsens namn, länkad till
-  platssidan. <!-- 02-§5.23 -->
+  plats med koordinater är en markör med platsens namn, länkad till platssidan. Länken är
+  markörens grund: utan JavaScript går ett tryck dit, med JavaScript öppnas en ruta med
+  mer om platsen (`02-§5.46`). <!-- 02-§5.23 -->
 - Under kartan står en textlista med samma platser, deras djurslag i plural och länk till
   platssidan. Listan är en fullvärdig väg till informationen utan kartan. <!-- 02-§5.24 -->
 - En aktiv plats utan koordinater finns i listan men inte på kartan. <!-- 02-§5.25 -->
@@ -139,9 +140,10 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   ritningens koordinatsystem enligt de kanter `background.yaml` anger (`03-§9.2`).
   Bygget varnar om en plats hamnar utanför ritningen. Saknas filerna visas markörerna på
   en tom platta. <!-- 02-§5.30 -->
-- Markören visar platsens namn och sortens symbol (`02-§5.38`), inget mer. Vilka djurslag
-  som går var står i listan under kartan, aldrig i markörerna, så att ritningen förblir
-  läsbar när hagarna ligger tätt. <!-- 02-§5.32 -->
+- Markören visar platsens namn och sortens symbol (`02-§5.38`), inget mer. Djurslagen står
+  aldrig på ritningen, så att den förblir läsbar när hagarna ligger tätt; de står i listan
+  under kartan och i den ruta besökaren själv öppnar (`02-§5.46`). Skillnaden är vem som
+  bett om texten: ritningen bär bara det som måste synas hela tiden. <!-- 02-§5.32 -->
 - Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
   var sin sida om markören, så att båda går att läsa, och en etikett hålls innanför
   ritningens kant. Ligger fler markörer på samma fläck än det finns sidor visas de
@@ -183,6 +185,19 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
 - Utan JavaScript visas kartan som en stillbild i sitt utgångsläge, knapparna syns inte,
   och listan under kartan är fortfarande en fullvärdig väg till informationen
   (`02-§5.24`). Zoomen hämtar ingenting utifrån (`02-§5.26`). <!-- 02-§5.45 -->
+- Ett tryck på en markör öppnar en ruta vid platsen med mer om den: namnet, platsens
+  `note` när den finns, och tillgängligheten i ord. Rutan hämtar ingenting utifrån
+  (`02-§5.26`) — allt den visar står redan i sidan. <!-- 02-§5.46 -->
+- För en `djurplats` visar rutan också djurslagen i plural, eller "Just nu går inga djur
+  här", och en länk till platssidan med texten "Se djuren här". Övriga sorter visar ingen
+  länk: rutan säger allt deras sida säger, och en länk vidare till en sida som upprepar
+  det vore en omväg. Deras sida finns kvar och QR-koden på plats leder dit
+  (`02-§5.29`). <!-- 02-§5.47 -->
+- Högst en ruta är öppen åt gången. Den stängs med Escape, med ett tryck utanför den och
+  med sin egen stängknapp, och fokus går tillbaka till markören som öppnade
+  den. <!-- 02-§5.48 -->
+- Utan JavaScript öppnas ingen ruta. Ett tryck på markören går då till platssidan, som
+  bär samma uppgifter i sin helhet. <!-- 02-§5.49 -->
 
 ### Djurkortet
 
