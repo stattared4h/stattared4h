@@ -2,8 +2,8 @@ name: Kattvinden
 species:
   - katt
 description: En lugn plats för gårdens katter.
-lat: 57.4127
-lon: 12.2138
+lat: 57.337500
+lon: 12.340300
 accessible: false
 active: true
 photos:

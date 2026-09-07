@@ -144,6 +144,13 @@ Uttaget innehåller Stättaredsvägen, gårdsplanen, fyra byggnader, tre parkeri
 betesmarken sydost om vägen. Det användes för att kontrollera att gårdens koordinater
 ligger rätt, och är underlaget när den ritade bakgrunden (`02-§5.30`) en gång ritas.
 
+`source/map/background.svg` är ritad ur det här uttaget. Formerna följer OSM:s taggar:
+`landuse=meadow` och `grass` blir betesmark, `landuse=farmyard` gårdsplanen,
+`amenity=parking` parkeringarna, `barrier=wall` en streckad gräns, `highway=unclassified`
+och `service` vägarna, `highway=path` stigarna, och `building` husen. Inget är påhittat:
+ritningen visar det OSM känner till, ingenting annat. Hagarnas inre gränser saknas därför
+än så länge, och gårdens nya toalettbyggnad likaså — den finns inte i OSM.
+
 En ritning härledd ur OSM är ett *produced work* i ODbL:s mening: den ska bära
 "© OpenStreetMap contributors", men gör inte resten av repot till ODbL. Google Maps och
 Google Earth är **inte** användbara här — deras villkor förbjuder uttryckligen att rita

@@ -331,6 +331,9 @@ export function renderMapSvg(frame: MapFrame, background: MapBackground | null =
  */
 export function renderMap(locations: readonly MapLocation[], options: MapOptions): RenderedMap {
   assertBasePath(options.base);
+  // No places, no map — not even the drawing. The page says the dataset is empty
+  // (02-§6.2), and a drawing of the farm under that sentence would only puzzle.
+  if (locations.length === 0) return { html: "", warnings: [] };
   const frame: MapFrame | null = options.background ?? mapFrame(locations, options);
   if (frame === null) return { html: "", warnings: [] };
 
