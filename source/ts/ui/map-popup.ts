@@ -80,6 +80,10 @@ export function init(): void {
     // A drag that panned the map already suppressed its own click (03-§9.6); anything
     // still arriving here is a press on the marker and belongs to the popup.
     if (event.defaultPrevented) return;
+    // Except when the visitor asked for the link itself: ctrl, cmd, shift or a middle
+    // button means "open the place page", and the marker is a link precisely so that
+    // works. Swallowing those would take away something the page had before the popup.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault();
     open(marker);
   });
