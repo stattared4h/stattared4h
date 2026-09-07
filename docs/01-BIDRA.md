@@ -147,6 +147,64 @@ i bildposten:
 ![](img-a3f2c1d8b901)
 ```
 
+### Många bilder på en gång
+
+Ska du lägga in en hög med foton — den första omgången är runt hundra — är `npm run
+image` en bild i taget för långsamt. Använd importen i stället. Den arbetar i två steg,
+med ditt eget ifyllande emellan.
+
+**Steg 1. Låt kommandot skriva listan.**
+
+```bash
+npm run image:import -- --scan ~/Bilder/gard
+```
+
+Det skriver `bilder.csv` med en rad per foto i katalogen. Bara `fil` är ifylld:
+
+```text
+fil,post,alt,fotograf
+IMG_0001.jpg,,,
+IMG_0002.jpg,,,
+```
+
+**Steg 2. Fyll i tabellen.** Öppna `bilder.csv` i Excel, Numbers eller Google Kalkylark
+— eller i en vanlig textredigerare. Fyll i tre kolumner medan du tittar på bilderna:
+
+| Kolumn | Vad du skriver |
+| --- | --- |
+| `post` | Id:t på djuret, platsen eller arten bilden hör till, alltså filnamnet utan `.yaml` — `rosa`, `gethagen` |
+| `alt` | Vad som är viktigt i bilden, på svenska. Skriv en mening, inte ett ord |
+| `fotograf` | Den som tagit bilden |
+
+Två rader med samma `post` blir två bilder på det djuret, i den ordning de står.
+Kommaset och citattecken i alt-texten är inget problem — spara som CSV och låt
+kalkylprogrammet sköta citeringen.
+
+**Steg 3. Kör importen.**
+
+```bash
+npm run image:import -- bilder.csv --photos ~/Bilder/gard
+```
+
+Kommandot bereder varje bild precis som `npm run image` gör, skriver bildposterna, och
+skriver ut id:na grupperade per post:
+
+```text
+rosa:
+  - img-983a851829da
+  - img-88c164764c6d
+
+gethagen:
+  - img-e28ead3d09f0
+```
+
+Är något fel på någon rad skrivs **ingenting alls** — du får en lista med radnummer och
+vad som ska rättas, fixar tabellen och kör om. Du får aldrig hälften av bilderna inlagda.
+
+**Steg 4. Klistra in.** Kommandot rör aldrig djurens filer; det är du som avgör var
+bilderna hör hemma. Kopiera raderna under `rosa:` in i `source/data/animals/rosa.yaml`
+under `photos:`, och så vidare. Kör `npm run validate` när du är klar.
+
 ### Vad som händer sedan
 
 Kontrollerna körs automatiskt på din pull request. Blir de gröna kan en administratör
@@ -179,6 +237,8 @@ Andra kommandon:
 | --- | --- |
 | `npm run build` | Bygger sajten till `public/` med Eleventy; klientkoden buntas med esbuild |
 | `npm run image -- <fil> --alt <text> --credit <namn>` | Webbanpassar ett foto, skriver bildfilen och bildposten (§2) |
+| `npm run image:import -- --scan <katalog>` | Skriver en tabell med en rad per foto i katalogen, att fylla i (§2) |
+| `npm run image:import -- <tabell> --photos <katalog>` | Bereder alla foton i tabellen och skriver bildposterna (§2) |
 | `npm run icons` | Genererar `favicon.ico`, `apple-touch-icon.png` och manifestikonerna ur `source/assets/img/favicon.svg`; kör efter en ändring av SVG:n och committa resultatet |
 | `npm run qa:images` | Genererar platshållarbilderna som QA-datat refererar, i `source/images-qa/` |
 | `npm run qr` | Skriver en utskrivbar QR-kod per plats till `qr/`, med adressen ur `SITE_URL` (`02-§5.29`) |

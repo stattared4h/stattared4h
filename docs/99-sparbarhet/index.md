@@ -92,6 +92,11 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§8.10`–`8.11` | Referenser och huvudbild | `byggd` | `Fields.photos` och `Fields.imageReference` löser upp id:n till `Image`, `portraitOf` i `source/ts/build/pages.ts` tar den första; `tests/domain/validate.test.ts` prövar delning mellan poster och dubbelreferens, `tests/build/data-pages.test.ts` att en delad bild ger en fil och en alt-text på båda sidorna |
 | `02-§8.12` | Bilder i Markdown | `byggd` | Bildregeln i `source/ts/build/markdown.ts` och upplösaren i `images-plugin.ts`; `tests/build/markdown.test.ts` och en markdown-bild i en QA-platsbeskrivning som `tests/build/data-pages.test.ts` följer genom bygget |
 | `02-§8.13` | Varning för oanvänd bildpost och oanvänd bildfil | `byggd` | `collectWarnings` och `warnAboutStrayImageFiles` i `validate.ts`; bild-id i Markdown räknas som användning, annars vore varningen falsk. `tests/domain/validate.test.ts` |
+| `02-§8.14`–`8.15` | `npm run image:import` i två steg | `saknas` | Tabellen skrivs av kommandot; importen rör aldrig djurens filer |
+| `02-§8.16` | Importen är allt-eller-inget | `saknas` | Varje rad kontrolleras innan den första filen skrivs |
+| `02-§8.17` | Id:n grupperade per post, klistringsfärdiga | `saknas` | Utskriften har samma form som `photos` i YAML |
+| `02-§8.18`–`8.19` | Felmeddelanden och CSV med citerade fält | `saknas` | Radnummer och kolumn på svenska; alt-texter innehåller kommatecken |
+| `02-§8.20` | Samma bild två gånger skrivs en gång | `saknas` | Följer av att id:t är innehållets hash (`02-§8.9`) |
 | `02-§9.1` | Eleventy och esbuild | `byggd` | `eleventy.config.js` med esbuild i `eleventy.before`; `erasableSyntaxOnly` i `tsconfig.json` fäller `enum` och `namespace`; byggtesterna kör Eleventy som barnprocess |
 | `02-§9.2` | Node 22.18 i `.nvmrc` och `engines` | `påbörjad` | Båda finns, och `eleventy.config.js` importerar `.ts` direkt; inget test |
 | `02-§9.3` | `npm run lint` | `påbörjad` | Kör html-validate, stylelint med `declaration-strict-value`, eslint, markdownlint och yamllint; inget test som bevakar att alla fem ingår |
@@ -214,6 +219,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§6.1` | Bygget genererar bara mindre storlekar | `byggd` | `generateImageSizes` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `03-§6.2` | Upplösare från bild-id till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` kontrollerar också att ingen sökväg har en underkatalog per posttyp |
 | `03-§6.5` | Bild-id löses upp när datasetet normaliseras | `byggd` | `Fields.imageReference` i `validate.ts` ger `Animal.photos`, `Location.photos` och `Species.photo` färdiga `Image`-objekt; `tests/domain/validate.test.ts` |
+| `03-§6.7` | Importen delad i planering och utförande | `saknas` | `scripts/lib/image-import.ts` testbar i Node, som `check-docs.ts` |
 | `03-§6.6` | Bilder i Markdown genom samma kedja | `byggd` | `renderMarkdown(text, { renderImage })` och `markdownImages` från `images-plugin.ts`; `tests/build/markdown.test.ts` |
 | `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `byggd` | `renderPicture` med `eager` för sidans första bild; `tests/build/data-pages.test.ts` kräver `fetchpriority="high"` på porträttet och `loading="lazy"` på nästa bild |
 | `03-§8.1` | `npm run build` | `byggd` | `eleventy` med `eleventy.config.js`; byggtesterna kör samma bygge till en tillfällig katalog |
@@ -251,7 +257,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 7 |
 | `dokumenterad` | 16 |
 | `påbörjad` | 15 |
 | `byggd` | 97 |
