@@ -258,9 +258,11 @@ inte mäta text — det finns ingen webbläsare vid bygget — så det uppskatta
 ruta ur namnets längd och de mått som gäller i `tokens.css`: teckenstorlek, innerkant och
 träffytans minsta mått. Rutorna räknas i pixlar för en 360 px bred karta, den trängsta
 vyn, och prövas mot varandra i en bestämd ordning: platserna tas norrifrån och söderut,
-och varje etikett får den första av sidorna under, över, höger, vänster som är ledig.
-En sida som skulle skjuta etiketten utanför ritningen räknas också som upptagen, så en
-plats vid kanten vänder etiketten inåt. Räcker ingen av de fyra döljs etiketten visuellt
+och varje etikett får det första lediga av åtta lägen (`02-§5.51`). De fyra sneda prövas
+före de fyra raka: snett upp till vänster, snett upp till höger, snett ned till vänster,
+snett ned till höger, och därefter under, över, höger, vänster. Ett läge som skulle skjuta
+etiketten utanför ritningen räknas också som upptaget, så en plats vid kanten vänder
+etiketten inåt. Räcker inget av de åtta döljs etiketten visuellt
 i stället för att staplas oläslig ovanpå en annan; namnet finns kvar för skärmläsaren och
 kommer fram vid fokus. Konstanterna för teckenbredd och radhöjd är uppmätta i Chromium
 och satta strax över det värsta uppmätta fallet: att gissa för brett flyttar en etikett i

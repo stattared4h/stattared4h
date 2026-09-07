@@ -67,6 +67,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.30` | Ritad kartbakgrund | `byggd` | `parseMapBackground` och `loadMapBackground` i `source/ts/build/map.ts`, konventionen i `source/map/README.md`; `tests/build/map.test.ts` bäddar in en liten SVG och prövar varningen för en plats utanför. Gårdens egen ritning ligger i `source/map/background.svg`, härledd ur OSM-uttaget i källregistret; `tests/design/map-drawing.test.ts` håller den till paletten och utan externa referenser |
 | `02-§5.32` | Markören visar namn och symbol, inte djurslag | `byggd` | Markören bär bricka, symbol och namn och inget annat; `tests/build/map.test.ts` läser varje markörs innehåll, djurslagen står bara i listan under kartan |
 | `02-§5.33` | Etiketter som annars överlappar | `byggd` | `placeLabels` i `source/ts/build/map.ts` med modifierarna i `layout.css`; `tests/build/map.test.ts` prövar krock, kant, ordningsoberoende och att etiketter utöver fyra döljs. Konstanterna jämförs med `tokens.css` i samma fil |
+| `02-§5.53` | Etikettens åtta lägen, sneda före raka | `byggd` | `LABEL_SIDES` och `labelBox` i `source/ts/build/map.ts` med modifierarna i `layout.css`; `tests/build/map.test.ts` prövar att ett snett läge väljs före ett rakt, att ordningen är deterministisk och att de fyra numrerade hagarna får `above-left` vid både 360 px och 648 px |
 | `02-§5.34` | Fler kartor i området | `byggd` | `site.areaMaps` i `eleventy.config.js` och avsnittet i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver rubriken och exakt de två länkmålen, och att inget hämtas utifrån |
 | `02-§5.35` | En plats som inte är en djurplats nämner inte djur | `byggd` | `kind` i `source/ts/domain/validate.ts` och `locationView` i `pages.ts`, grenen i `source/pages/plats.njk`; `tests/build/data-pages.test.ts` öppnar QA-datats caféer och toaletter och `tests/domain/validate.test.ts` prövar att djurslag på en sådan plats fäller bygget |
 | `02-§5.36` | Visa och söka på öronmärke | `manuell` | Markup och visning bevakas av `tests/build/public-id.test.ts`, söklogiken av `tests/ui/animal-id-search.test.ts`. Bygg QA-sajten, öppna `/` i 360 px, sök `se-012345-0001` och bekräfta att `/djur/far-astrid/` öppnas och visar `Öronmärke: SE 012345 0001` |
@@ -84,7 +85,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.39` | Samma symbol framför namnet i listan under kartan | `byggd` | `symbol` på `MapListItem` i `source/ts/build/pages.ts`, skriven i länken av `source/pages/index.njk`; `tests/build/pages.test.ts` kräver rätt symbol för Caféet och en symbol på varje listad plats, `data-pages.test.ts` att den står före namnet i den byggda sidan |
 | `04-§5.8` | Koordinaten är den punkt besökaren ska gå till, för en yta dess mitt | `dokumenterad` | Konventionen gäller datat, inte koden: bygget projicerar den punkt som står i filen. De fyra numrerade hagarna bär bandens tyngdpunkter, härledda ur ritningen enligt `docs/09-kallor/index.md`; de elva utan koordinater väntar på gården (#56) |
 | `04-§5.7` | Platsen har en sort | `byggd` | ADR 0019; obligatoriskt `kind` med åtta värden i `source/ts/domain/validate.ts`. `tests/domain/validate.test.ts` prövar att var och en tas emot, att `besoksmal` avvisas, att felmeddelandet räknar upp värdena och att djurslag på annat än en `djurplats` fäller bygget; `tests/domain/qa-data.test.ts` kräver att QA-datat innehåller varje sort |
-| `02-§5.33` (dold etikett) | Etiketten kommer fram vid fokus | `manuell` | Bygg med `DATA_DIR=source/data-qa`, öppna `/karta/` i 360 px bredd och tabba till en markör i klungan i mitten: namnet ska komma fram, och markören ska ligga överst |
+| `02-§5.33` (dold etikett) | Etiketten kommer fram vid fokus | `manuell` | Bygg med `DATA_DIR=source/data-qa`, öppna `/` i 360 px bredd och tabba till en markör i klungan i mitten: namnet ska komma fram, och markören ska ligga överst |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
 | `02-§6.2` | Valideringen körs först i bygget | `byggd` | `eleventy.config.js` anropar `loadValidDataset` i `eleventy.before`, i sekventiellt händelseläge före bildpluginen; `tests/build/data-pages.test.ts` bygger ett ogiltigt dataset och kräver en tom utkatalog |
 | `02-§6.3` | Fäller vid allt i `04-§10` och vid okända fält | `byggd` | Den kompletta domäningången i `source/ts/domain/index.ts` validerar `publicId` och delegerar resten till `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts` och `tests/domain/public-id-validation.test.ts` |
@@ -310,7 +311,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 18 |
 | `påbörjad` | 17 |
-| `byggd` | 136 |
+| `byggd` | 137 |
 | `manuell` | 50 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
