@@ -142,8 +142,9 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
     for (const { file, html } of await htmlFiles(prod)) {
       const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
       assert.match(header, /<div class="site-menu-overlay" data-menu-overlay hidden><\/div>/, `${file}: överlägget saknas`);
+      const tag = header.slice(header.lastIndexOf("<button", header.indexOf("data-menu-button")), header.indexOf("data-menu-button"));
       const button = header.slice(header.indexOf("data-menu-button"));
-      assert.match(header, /data-menu-button[^>]*aria-expanded="false"/, `${file}: menyknappen börjar hopfälld`);
+      assert.match(tag, /aria-expanded="false"/, `${file}: menyknappen börjar hopfälld`);
       assert.match(button, /icon-button__label--closed">Meny</, `${file}: etiketten Meny`);
       assert.match(button, /icon-button__label--open">Stäng</, `${file}: etiketten Stäng`);
       assert.match(button, /icon-button__icon--closed/, `${file}: ikonen för stängt läge`);

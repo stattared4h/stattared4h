@@ -139,7 +139,8 @@ länkarna ligger i sidhuvudets rad i `--color-green-deep`, vikt 600. Varje länk
 `--tap-target-min` hög (`02-§10.39`). Medan kortet är öppet ligger ett överlägg i
 `--color-backdrop` (`05-§2.20`) över sidan, under kortet men över innehållet, och
 sidhuvudets rad ligger ovanpå överlägget så att menyknappen aldrig döljs
-(`02-§10.38`). Överlägget tonar in med samma övergång som kortet. <!-- 05-§6.34 -->
+(`02-§10.38`). <!-- 05-§6.34 -->
+
 - Menyknappen bär båda lägena i markupen: tre streck med ordet "Meny" när kortet är
   stängt, ett kryss med ordet "Stäng" när det är öppet. Vilket som syns avgörs av
   knappens `aria-expanded`, så tillståndet står på ett ställe. <!-- 05-§6.42 -->

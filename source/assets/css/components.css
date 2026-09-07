@@ -111,6 +111,15 @@
   line-height: var(--line-height-heading);
 }
 
+/* The menu button carries both states in the markup; `aria-expanded` picks one, so the
+   state is written in a single place (05-§6.42, 02-§10.4). */
+[aria-expanded="false"] > .icon-button__icon--open,
+[aria-expanded="false"] > .icon-button__label--open,
+[aria-expanded="true"] > .icon-button__icon--closed,
+[aria-expanded="true"] > .icon-button__label--closed {
+  display: none;
+}
+
 /* From the desktop breakpoint the menu and "to top" buttons do not exist (02-§10.7),
    and install and feedback lose their ground (05-§6.33). */
 @media (min-width: 960px) {
@@ -178,7 +187,9 @@
 }
 
 .site-menu__link {
-  display: block;
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
   padding-block: var(--space-xs);
   color: var(--color-surface);
   font-size: var(--font-size-body);
@@ -203,9 +214,32 @@
   outline-color: var(--color-surface);
 }
 
+/* The layer between the page and the menu card (02-§10.38). It is what receives a press
+   outside the menu, so the press that closes the menu never reaches a link underneath.
+   The header row is lifted above it in layout.css, so the menu button stays visible and
+   pressable the whole time. */
+.site-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: var(--color-backdrop);
+}
+
+.site-menu-overlay[hidden] {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-menu {
     transition: none;
+  }
+}
+
+/* From the desktop breakpoint there is no card and therefore nothing to lay over
+   (02-§10.7). */
+@media (min-width: 960px) {
+  .site-menu-overlay {
+    display: none;
   }
 }
 

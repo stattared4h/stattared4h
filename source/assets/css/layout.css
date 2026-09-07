@@ -52,6 +52,10 @@
    instead, and the mobile-only buttons go away. The height never changes: every
    item is exactly --tap-target-min tall (05-§6.37). */
 .site-header__inner {
+  /* Above the menu overlay, so the menu button is never dimmed and never blocked
+     (02-§10.38). */
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: auto auto 1fr auto;
   align-items: center;
