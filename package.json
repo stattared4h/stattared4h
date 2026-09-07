@@ -17,6 +17,7 @@
     "build": "eleventy",
     "start": "eleventy --serve --port 8080",
     "image": "node scripts/image.mjs",
+    "icons": "node scripts/icons.mjs",
     "qa:images": "node scripts/qa-images.mjs",
     "test": "node --test \"tests/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
