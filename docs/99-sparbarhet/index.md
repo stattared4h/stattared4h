@@ -69,6 +69,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.36` | Visa och söka på öronmärke | `manuell` | Markup och visning bevakas av `tests/build/public-id.test.ts`, söklogiken av `tests/ui/animal-id-search.test.ts`. Bygg QA-sajten, öppna `/` i 360 px, sök `se-012345-0001` och bekräfta att `/djur/far-astrid/` öppnas och visar `Öronmärke: SE 012345 0001` |
 | `02-§5.37` | Exakt normaliserad sökning, ingen suffix-sökning | `byggd` | `findAnimalByPublicId` i `source/ts/ui/animal-id-search.ts`; `tests/ui/animal-id-search.test.ts` prövar mellanslag, bindestreck, skiftläge, tom sträng och suffix |
 | `02-§5.38` | Symbol per sorts plats på markören | `byggd` | `PLACE_SYMBOLS` i `source/ts/build/symbols.ts`, en per `LocationKind`, skriven i markören av `renderMap`. `tests/build/symbols.test.ts` kräver en egen symbol per sort, att ingen delas, att inget hämtas utifrån, och räknar om SHA-256 för de tre banor som är lyfta ur ett vägmärke (`09-§1.5`); `tests/build/map.test.ts` kräver att varje markör bär sin sorts symbol och inget mer |
+| `02-§5.46`–`5.47` | Ruta på markören; djurslag och länk för en djurplats | `saknas` | |
+| `02-§5.48` | En ruta åt gången; stängs med Escape, tryck utanför och knapp | `saknas` | |
+| `02-§5.49` | Utan JavaScript öppnas ingen ruta | `saknas` | |
 | `02-§5.40` | Zoom och panorering med nyp, drag och Ctrl-hjul | `manuell` | Räknandet är `source/ts/domain/map-view.ts`, prövat i `tests/domain/map-view.test.ts`; kopplingen till händelser är `source/ts/ui/map-zoom.ts`. Bygg med `DATA_DIR=source/data-qa`, öppna `/` på en telefon och nyp isär över gårdsplanen: kartan ska zooma kring fingrarnas mittpunkt. På dator: Ctrl- eller Cmd-hjul zoomar, vanligt hjul rullar sidan |
 | `02-§5.41` | Tre knappar, nåbara med tangentbord | `påbörjad` | Markupen skrivs av `renderMap` och bevakas av `tests/build/map.test.ts`, som kräver alla tre knapparna och att gruppen är `hidden` från bygget. Beteendet — att `+` slås av vid maxzoom, `−` vid 1× och att "Visa hela kartan" syns först inzoomad — har inget test |
 | `02-§5.42` | Kartan fångar inte sidans rullning vid 1× | `manuell` | `touch-action` på `.map__canvas` i `layout.css`, `pan-y` vid 1× och `none` inzoomad. Öppna `/` **på en riktig telefon** och dra uppåt med fingret på kartan: sidan ska rulla. Zooma in och dra igen: nu ska kartan flytta sig. Headless Chromium duger inte — den simulerar pekhändelser men inte webbläsarens val av gest |
@@ -191,6 +194,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.21` | Faktaruta | `manuell` | `.note` för tillgängligheten på platssidan. Öppna `/plats/gethagen/` och bekräfta en ljusgrön ruta utan kantlinje under djurslagen |
 | `05-§6.22`–`6.27` | Platssida | `byggd` | `source/pages/plats.njk`: `h1`, djurslagsrutor, `note` i dämpad text, rubriken "Getterna på gården" och den tomma platsens text prövas i `tests/build/data-pages.test.ts`. Öppna `/plats/stora-hagen/` i 360 px och bekräfta att båda djurslagsrutorna syns utan att rulla |
 | `05-§6.28`–`6.29`, `6.32` | Formulärfält | `manuell` | `.field` i `components.css`. Öppna feedbackdialogen: etiketterna Rubrik och Beskrivning står ovanför fälten, som är vita med ram, rundade hörn och minst 44 px höga. Felmeddelanden (`05-§6.29`) har ingen markup ännu: dialogen förebygger fel genom att Skicka är inaktiv tills fälten är ifyllda |
+| `05-§6.42` | Rutan på markören | `saknas` | |
 | `05-§6.41` | Kartans zoomknappar | `manuell` | `.map__control` och `.map__controls` i `components.css` och `layout.css`. Öppna `/` i 360 px och 1280 px: knapparna står i kartans nedre högra hörn, ljusa med grön ikon och skugga, `−` nedtonad vid 1×, `+` nedtonad vid maxzoom, och "Visa hela kartan" syns bara inzoomad |
 | `05-§6.39`–`6.40` | Markörens bricka och symbolen i listan | `manuell` | `.map__pin`, `.map__symbol` och `.place-list__symbol` i `components.css`. Bygg med `DATA_DIR=source/data-qa`, öppna `/` i 360 px och bekräfta att hagarnas markörer är fyllda gröna brickor med vit symbol och att gårdens övriga är ljusa med grön ring och grön symbol, samt att samma symbol står framför namnet i listan under kartan |
 | `05-§6.31` | Kartan har en textlista | `byggd` | `views.map.list` i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver varje aktiv plats i listan |
@@ -266,6 +270,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§8.7` | Node 22.18; Eleventy importerar TypeScript direkt | `påbörjad` | `eleventy.config.js` importerar `source/ts/domain/version.ts`; `erasableSyntaxOnly` bevakas av typkontrollen, inte av ett test |
 | `03-§8.8`–`8.9` | Två deploy-flöden med ett återanvändbart; dubbelbygge | `manuell` | Kontrollpunkterna för `02-§9.11`–`9.12` och `02-§10.35` |
 | `03-§9` | Kartan | `byggd` | `source/ts/build/map.ts` med `mapFrame`, `projectPoint`, `renderMap` och bakgrunden; `tests/build/map.test.ts` |
+| `03-§9.7` | Rutan: en tom ruta från bygget, fylld ur markörens data | `saknas` | |
 | `03-§9.6` | Zoomen: domänmodul och tunn UI-modul | `byggd` | `source/ts/domain/map-view.ts` utan webbläsar-API:er; `tests/domain/map-view.test.ts` prövar ankarpunkten, gränserna, vägen tillbaka till utgångsläget och att ingen kant dras in i ramen. `source/ts/ui/map-zoom.ts` håller sig till händelser och en `transform` |
 | `03-§9.5` | Symbolerna som inline-SVG i bygget | `byggd` | `source/ts/build/symbols.ts` med `Record<LocationKind, string>`, så att en sort utan symbol fäller `npm run typecheck`. Tre symboler är vägmärkets egen figur, registrerade med kontrollsumma i `docs/09-kallor/index.md` och bevakade av `tests/build/symbols.test.ts` |
 | `03-§9.3`–`9.4` | Etikettplacering och länkar vidare | `byggd` | `placeLabels` och kartsidans avsnitt; `tests/build/map.test.ts` och `data-pages.test.ts` |
@@ -299,7 +304,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 6 |
 | `dokumenterad` | 18 |
 | `påbörjad` | 15 |
 | `byggd` | 131 |

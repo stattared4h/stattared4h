@@ -295,6 +295,17 @@ modulen kör, som installknappen (`03-§10.2`). Vid tillräcklig förstoring sä
 `map--names`, som upphäver döljandet av de etiketter bygget inte fick plats med
 (`02-§5.44`); tröskeln är mätt i Chromium mot klungan vid gårdsplanen. <!-- 03-§9.6 -->
 
+Rutan på markören (`02-§5.46`) är **en** ruta, inte trettio. Bygget skriver den tom, som
+feedbackdialogen skrivs tom (`03-§10.2`), och lägger det den ska visa på varje markör som
+`data-`-attribut: `data-kind`, `data-note`, `data-species` och `data-access`. `map-popup.ts`
+fyller rutan med `textContent` och flyttar den till markörens `left`/`top` — samma procent
+av ritningen, så rutan hör ihop med sin plats. Ingen `innerHTML` någonstans (`CL-§2.13`).
+
+Rutan ligger inuti `.map__canvas` och motskalas som markörerna, så den följer med när
+kartan panoreras och zoomas men behåller sin storlek. Markören förblir en `<a>` till
+platssidan; modulen fångar klicket med `preventDefault`, vilket är det som gör att sidan
+fungerar likadant som förut när JavaScript uteblir (`02-§5.49`). <!-- 03-§9.7 -->
+
 Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
 är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting
 utifrån (`02-§5.26`). <!-- 03-§9.4 -->
