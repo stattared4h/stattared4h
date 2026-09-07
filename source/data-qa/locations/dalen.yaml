@@ -1,0 +1,8 @@
+name: Dalen
+kind: djurplats
+species:
+  - ko
+lat: 57.336400
+lon: 12.343500
+accessible: false
+active: true

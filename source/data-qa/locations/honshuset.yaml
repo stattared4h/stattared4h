@@ -1,9 +1,10 @@
 name: Hönshuset
+kind: djurplats
 species:
   - hons
 description: Här hålls hönsen som räknade bestånd per ras.
-lat: 57.4125
-lon: 12.2145
+lat: 57.338384
+lon: 12.340552
 accessible: true
 active: true
 photos:

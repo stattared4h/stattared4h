@@ -30,7 +30,7 @@ eleventyComputed:
     <h2>{{ view.whereHeading }}</h2>
     {%- if view.unknownWhere %}
     <p>{{ view.unknownWhere }}.</p>
-    <p><a class="button" href="{{ '/karta/' | url }}">Karta över gården</a></p>
+    <p><a class="button" href="{{ '/' | url }}">Karta över gården</a></p>
     {%- else %}
     <ul class="link-list link-list--buttons">
       {%- for location in view.locations %}

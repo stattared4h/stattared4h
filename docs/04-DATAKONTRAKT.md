@@ -152,6 +152,7 @@ djuren som finns där. <!-- 04-§5.1 -->
 
 ```yaml
 name: string                 # platsens namn, t.ex. "Gethagen"
+kind: djurplats | besoksmal  # hage eller djurhus, respektive allt annat besökaren går till
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
 description: string | null   # markdown
@@ -162,13 +163,17 @@ active: boolean              # false för platser som inte används just nu
 photos: [string]             # bild-id:n, se §9; den första visas överst
 ```
 
-Obligatoriskt: `name`, `species`, `accessible` och `active`. `species` får vara en tom
-lista. Övrigt får utelämnas. <!-- 04-§5.6 -->
+Obligatoriskt: `name`, `kind`, `species`, `accessible` och `active`. `species` får vara en
+tom lista. Övrigt får utelämnas. <!-- 04-§5.6 -->
 
 Regler:
 
 - `species` är listan över **djurslag**, inte individer. Flera djurslag kan gå i samma
   hage, och samma djurslag kan finnas på flera platser. <!-- 04-§5.2 -->
+- `kind` skiljer hagen och djurhuset (`djurplats`) från caféet, toaletten och lekplatsen
+  (`besoksmal`). Sorten är ett faktum om platsen och härleds aldrig ur `species` — en hage
+  vars djur tillfälligt flyttats är fortfarande en hage. Ett besöksmål med djurslag fäller
+  valideringen. Se [ADR 0018](adr/0018-platsen-har-en-sort.md). <!-- 04-§5.7 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död

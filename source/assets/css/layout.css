@@ -238,14 +238,109 @@
   border-radius: var(--radius-md);
 }
 
+/* The marker box is exactly the tap target, centred on the place; the label hangs off
+   it on the side the build picked (02-§5.33), so the pin never moves off its spot. */
 .map__marker {
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: var(--tap-target-min);
-  transform: translate(-50%, calc(var(--tap-target-min) / -2));
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  transform: translate(-50%, -50%);
   text-decoration: none;
+}
+
+/* Default: under the pin. The three modifiers below move it, and nothing else changes. */
+.map__label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.map__marker--label-above .map__label {
+  top: auto;
+  bottom: 100%;
+}
+
+.map__marker--label-right .map__label {
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+}
+
+.map__marker--label-left .map__label {
+  top: 50%;
+  right: 100%;
+  left: auto;
+  transform: translateY(-50%);
+}
+
+/* Nowhere left to put the label (02-§5.33). It is hidden from sight only: the name is
+   still the link's accessible name, it is still in the list under the map, and pointing
+   at or focusing the marker brings it back. */
+.map__marker--label-hidden .map__label {
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.map__marker--label-hidden:hover .map__label,
+.map__marker--label-hidden:focus-visible .map__label {
+  clip-path: none;
+  width: auto;
+  height: auto;
+  padding: 0 var(--space-xs);
+}
+
+/* From the tablet width up the map is wider, and labels that crowd each other on a
+   phone have room (05-§5.2). The build works the placement out for both widths and
+   writes both on the marker; here the wide answer takes over. The first rule puts every
+   label back to the default, so a narrow choice never leaks into the wide layout. */
+@media (min-width: 600px) {
+  .map__marker .map__label {
+    inset: 100% auto auto 50%;
+    width: auto;
+    height: auto;
+    padding: 0 var(--space-xs);
+    clip-path: none;
+    transform: translateX(-50%);
+  }
+
+  .map__marker--wide-above .map__label {
+    top: auto;
+    bottom: 100%;
+  }
+
+  .map__marker--wide-right .map__label {
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+  }
+
+  .map__marker--wide-left .map__label {
+    top: 50%;
+    right: 100%;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  .map__marker--wide-hidden .map__label {
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .map__marker--wide-hidden:hover .map__label,
+  .map__marker--wide-hidden:focus-visible .map__label {
+    clip-path: none;
+    width: auto;
+    height: auto;
+    padding: 0 var(--space-xs);
+  }
 }
 
 /* ── Place list under the map (02-§5.24) ───────────────────────────────── */

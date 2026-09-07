@@ -560,6 +560,7 @@
   fill: var(--color-green-pale);
 }
 
-.place-list__species {
+.place-list__species,
+.place-list__note {
   color: var(--color-ink-soft);
 }

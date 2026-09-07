@@ -1,0 +1,8 @@
+name: Lilla grishagen
+kind: djurplats
+species:
+  - gris
+lat: 57.337600
+lon: 12.337800
+accessible: true
+active: true

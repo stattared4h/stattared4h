@@ -1,7 +1,8 @@
 name: Övre hagen
+kind: djurplats
 species: []
 description: Hagen står tom just nu och vilar inför nästa betessäsong.
-lat: 57.414
-lon: 12.2168
+lat: 57.338800
+lon: 12.343300
 accessible: true
 active: true

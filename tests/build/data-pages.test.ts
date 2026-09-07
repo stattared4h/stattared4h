@@ -32,16 +32,16 @@ function main(html: string): string {
 }
 
 describe("every page exists (02-§5.1–5.2)", () => {
-  test("a location page for all nine places, an animal page for all 100, a species page for all eight", async () => {
+  test("a location page for all 32 places, an animal page for all 100, a species page for all eight", async () => {
     const files = await listFiles(site);
     const locations = files.filter((f) => /^plats\/[^/]+\/index\.html$/.test(f));
     const animals = files.filter((f) => /^djur\/[^/]+\/index\.html$/.test(f));
     const species = files.filter((f) => /^arter\/[^/]+\/index\.html$/.test(f));
-    assert.equal(locations.length, 9);
+    assert.equal(locations.length, 32);
     assert.ok(locations.includes(path.join("plats", "gamla-stallet", "index.html")), "the inactive place keeps its page");
     assert.equal(animals.length, 100);
     assert.equal(species.length, 8);
-    assert.ok(files.includes(path.join("karta", "index.html")));
+    assert.ok(!files.some((f) => f.startsWith("karta")), "the map has no page of its own (02-§5.1)");
   });
 
   test("every internal link and image points at a file in the output", async () => {
@@ -77,13 +77,18 @@ describe("every page exists (02-§5.1–5.2)", () => {
 });
 
 describe("the home page (02-§5.7–5.8)", () => {
-  test("lists the species on the farm as tiles, links to the main site and the map", async () => {
+  test("shows the map first, then the places, then the species on the farm", async () => {
     const html = main(await page(""));
+    assert.match(html, /<svg class="map__drawing" [^>]*aria-label="Karta över Stättared med gårdens hagar">/);
+    assert.ok(
+      html.indexOf("map__drawing") < html.indexOf("place-list__link") &&
+        html.indexOf("place-list__link") < html.indexOf("species-tile"),
+      "map, then places, then species (02-§5.7)",
+    );
     const tiles = [...html.matchAll(/<a class="species-tile" href="\/arter\/([^/]+)\/">/g)].map((m) => m[1]);
     assert.deepEqual(tiles, ["get", "far", "ko", "hast", "kanin", "gris", "hons", "katt"]);
     assert.match(html, /Getter<\/span>/);
     assert.match(html, /href="https:\/\/www\.4h\.se\/stattared\/"/);
-    assert.match(html, /href="\/karta\/"/);
     assert.doesNotMatch(html, /inte inlagda/);
   });
 });
@@ -116,10 +121,10 @@ describe("the location page (02-§5.9–5.13, 05-§6.24)", () => {
   test("the empty place, the inactive place and the counted population", async () => {
     const empty = main(await page("plats/ovre-hagen"));
     assert.match(empty, /Just nu går inga djur här/);
-    assert.match(empty, /href="\/karta\/"/);
+    assert.match(empty, /<a class="button" href="\/">Karta över gården<\/a>/);
     const inactive = main(await page("plats/gamla-stallet"));
     assert.match(inactive, /Den här platsen används inte just nu/);
-    assert.match(inactive, /href="\/karta\/"/);
+    assert.match(inactive, /<a class="button" href="\/">Karta över gården<\/a>/);
     assert.doesNotMatch(inactive, /species-tile|animal-card/);
     const hens = main(await page("plats/honshuset"));
     assert.match(hens, /<h2>Hönsen på gården<\/h2>/);
@@ -260,7 +265,7 @@ describe("the species page (02-§5.19–5.22)", () => {
   test("horses: nobody knows where; hens: a counted population; no empty editorial heading", async () => {
     const hast = main(await page("arter/hast"));
     assert.match(hast, /Just nu vet vi inte var hästarna går/);
-    assert.match(hast, /href="\/karta\/"/);
+    assert.match(hast, /<a class="button" href="\/">Karta över gården<\/a>/);
     const hons = main(await page("arter/hons"));
     assert.match(hons, /På gården finns 18 svarta dvärghöns och 14 orusthöns\./);
     assert.doesNotMatch(hons, /animal-card/);
@@ -268,18 +273,48 @@ describe("the species page (02-§5.19–5.22)", () => {
   });
 });
 
-describe("the map (02-§5.23–5.27)", () => {
+describe("the map on the home page (02-§5.23–5.27)", () => {
   test("a marker per active place with coordinates, the description, and the list", async () => {
-    const html = main(await page("karta"));
-    assert.match(html, /<h1>Karta över gården<\/h1>/);
+    const html = main(await page(""));
     assert.match(html, /<svg class="map__drawing" [^>]*role="img" aria-label="Karta över Stättared med gårdens hagar">/);
-    const markers = [...html.matchAll(/<a class="map__marker" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
-    assert.equal(markers.length, 8, "nine places minus the inactive one without coordinates");
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
+    assert.equal(markers.length, 31, "32 places minus the inactive one without coordinates");
     assert.ok(!markers.includes("gamla-stallet"));
     const list = html.slice(html.indexOf('<ul class="place-list">'));
     assert.match(list, /href="\/plats\/stora-hagen\/">Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/);
     assert.doesNotMatch(list, /gamla-stallet/);
-    assert.doesNotMatch(html, /https?:\/\//, "no external calls (02-§5.26)");
+    // 02-§5.26 forbids fetching anything from outside; 02-§5.34 adds two ordinary
+    // links out. Checking the two separately keeps both requirements honest.
+    assert.doesNotMatch(html, /(?:src|srcset)="https?:|url\(\s*https?:/, "nothing is fetched from outside (02-§5.26)");
+    assert.match(html, /<h2>Fler kartor i området<\/h2>/);
+    assert.deepEqual(
+      [...html.matchAll(/href="(https?:[^"]+)"/g)].map((m) => m[1]),
+      [
+        // The lead paragraph points at the main site (02-§5.8); the other two are the
+        // area maps (02-§5.34). Nothing else may lead out of the site.
+        "https://www.4h.se/stattared/",
+        "https://www.4h.se/stattared/vandring-fiske/",
+        "https://www.naturkartan.se/sv/kungsbacka",
+      ],
+      "only the main site and the two area maps lead out",
+    );
+  });
+});
+
+describe("a besoksmal never mentions animals (02-§5.35, ADR 0018)", () => {
+  test("the café page shows its text and accessibility, and no animal sentence", async () => {
+    const html = main(await page("plats/kaffestugan"));
+    assert.match(html, /<h1>Kaffestugan<\/h1>/);
+    assert.match(html, /Öppet när flaggan är uppe/, "the note is shown");
+    assert.match(html, /Hit når man med rullstol och barnvagn/);
+    assert.doesNotMatch(html, /Just nu går inga djur här/, "that sentence belongs to a djurplats");
+    assert.doesNotMatch(html, /species-tile/, "no species boxes");
+    assert.doesNotMatch(html, /animal-card/, "no animals");
+  });
+
+  test("a djurplats without animals still says so", async () => {
+    const html = main(await page("plats/kattvinden"));
+    assert.match(html, /<h1>Kattvinden<\/h1>/);
   });
 });
 
@@ -297,9 +332,8 @@ describe("the dataset in the build (02-§6.2, 06-§2.1)", () => {
     assert.match(home, /Djuren är inte inlagda ännu/);
     assert.match(home, /href="https:\/\/www\.4h\.se\/stattared\/"/);
     assert.doesNotMatch(home, /species-tile/);
-    const map = main(await readFile(path.join(out, "karta", "index.html"), "utf8"));
-    assert.match(map, /Inga platser är inlagda ännu/);
-    assert.doesNotMatch(map, /class="map"/);
+    assert.doesNotMatch(home, /class="map"/, "no places, no map (02-§5.7)");
+    await assert.rejects(access(path.join(out, "karta")), "the map has no page of its own");
     await assert.rejects(access(path.join(out, "plats")), "no location pages");
   });
 

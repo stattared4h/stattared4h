@@ -71,11 +71,10 @@ identiska filer. <!-- 03-§3.3 -->
 
 | Sida | Adress | Innehåll |
 | --- | --- | --- |
-| Start | `/` | Djurslagen på gården som ingång till artsidorna, och kartan |
+| Start | `/` | Kartan med gårdens platser, textlistan under den, och djurslagen som ingång till artsidorna |
 | Plats | `/plats/<id>/` | QR-kodens måladress. Vilka djurslag som går här, och därifrån vidare till djuren |
 | Djur | `/djur/<id>/` | Namn, art, ras, stamtavla, bilder. Aldrig var individen står |
 | Art | `/arter/<id>/` | Om djurslaget, vilka platser det finns på, och individerna |
-| Karta | `/karta/` | Gårdens platser, med en textlista under kartan |
 | Om | `/om/` | Vad sajten är, installation, integritet, källkod, version (`02-§10.27`) |
 | 404 | `404.html` | Sajtens egen felsida; GitHub Pages serverar den för okända adresser |
 | Offline | `/offline/` | Visas av service workern vid navigering utanför cachen |
@@ -253,6 +252,27 @@ markörerna in i ritningens `viewBox`; en plats utanför ritningen utelämnas me
 varning i loggen. Ritningen får inte innehålla skript, stilmallar, bilder eller länkar
 utåt — bygget vägrar då. Konventionen i detalj står i `source/map/README.md`.
 Platsernas geometri bor ändå i YAML, aldrig i ritningen. <!-- 03-§9.2 -->
+
+Etiketterna placeras vid bygget så att de inte döljer varandra (`02-§5.33`). Bygget kan
+inte mäta text — det finns ingen webbläsare vid bygget — så det uppskattar etikettens
+ruta ur namnets längd och de mått som gäller i `tokens.css`: teckenstorlek, innerkant och
+träffytans minsta mått. Rutorna räknas i pixlar för en 360 px bred karta, den trängsta
+vyn, och prövas mot varandra i en bestämd ordning: platserna tas norrifrån och söderut,
+och varje etikett får den första av sidorna under, över, höger, vänster som är ledig.
+En sida som skulle skjuta etiketten utanför ritningen räknas också som upptagen, så en
+plats vid kanten vänder etiketten inåt. Räcker ingen av de fyra döljs etiketten visuellt
+i stället för att staplas oläslig ovanpå en annan; namnet finns kvar för skärmläsaren och
+kommer fram vid fokus. Konstanterna för teckenbredd och radhöjd är uppmätta i Chromium
+och satta strax över det värsta uppmätta fallet: att gissa för brett flyttar en etikett i
+onödan, att gissa för smalt lägger två ovanpå varandra, och bara det senare syns för
+besökaren. Sidan
+skrivs som en modifierare på markören, och CSS lägger etiketten där. Uppskattningen är
+just en uppskattning: den skiljer bra fall från dåliga, den garanterar inga
+pixlar. <!-- 03-§9.3 -->
+
+Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
+är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting
+utifrån (`02-§5.26`). <!-- 03-§9.4 -->
 
 ---
 

@@ -124,3 +124,59 @@ Källan till färgerna i ADR 0007, hämtad innan den grafiska profilen var känd
 **inte** längre en giltig källa för färg: där temat och profilen säger emot varandra gäller
 profilen (ADR 0016). Posten står kvar för att förklara var `#15623e`, `#e7fdf3` och
 `#00863f` kommer ifrån.
+
+### OpenStreetMap över Stättared
+
+| | |
+| --- | --- |
+| Utgivare | OpenStreetMap-bidragsgivarna |
+| Adress | `https://api.openstreetmap.org/api/0.6/map?bbox=12.3355,57.3355,12.3455,57.3405` |
+| Hämtad | 2026-09-07 |
+| Licens | ODbL 1.0 |
+| SHA-256 | `8ff12d33f735452978bc99b9558c4ce695026035b0e206e8f524c87d2c6d848a` |
+| I repot | `docs/09-kallor/stattared-osm.xml` (84 KB) |
+
+Adressen är en levande fråga: samma adress ger ett annat svar i morgon, eftersom OSM
+ändras hela tiden. Därför ligger just det uttag arbetet vilar på i repot, med sin
+kontrollsumma — annars vore källan omöjlig att kontrollera i efterhand.
+
+Uttaget innehåller Stättaredsvägen, gårdsplanen, fyra byggnader, tre parkeringar och
+betesmarken sydost om vägen. Det användes för att kontrollera att gårdens koordinater
+ligger rätt, och är underlaget när den ritade bakgrunden (`02-§5.30`) en gång ritas.
+
+`source/map/background.svg` är ritad ur det här uttaget, med två tillägg som gården själv
+märkt ut på ritningen och som inte finns i OSM: den nya toalettbyggnaden och de tre
+staketen som delar betesmarken i 1:an, 2:an, 3:an och 4:an. De är gårdens egna uppgifter,
+avlästa ur ritningen, och håller på någon meter — inte uppmätta.
+
+Att indelningen stämmer går att pröva: de fyra numrerade hagarnas koordinater, som lästes
+ur ett ortofoto innan staketen fanns, hamnar i var sitt fält och i ordning från nordost
+till sydväst. Två oberoende avläsningar som pekar åt samma håll.
+
+Resten följer OSM:s taggar. Formerna följer taggarna:
+`landuse=meadow` och `grass` blir betesmark, `landuse=farmyard` gårdsplanen,
+`amenity=parking` parkeringarna, `barrier=wall` en streckad gräns, `highway=unclassified`
+och `service` vägarna, `highway=path` stigarna, och `building` husen. Inget är påhittat:
+ritningen visar det OSM känner till, ingenting annat. Hagarnas inre gränser saknas därför
+än så länge, och gårdens nya toalettbyggnad likaså — den finns inte i OSM.
+
+En ritning härledd ur OSM är ett *produced work* i ODbL:s mening: den ska bära
+"© OpenStreetMap contributors", men gör inte resten av repot till ODbL. Google Maps och
+Google Earth är **inte** användbara här — deras villkor förbjuder uttryckligen att rita
+av satellitbilden.
+
+### Hagarnas namn — gårdens egen skylt
+
+Den här källan har varken adress eller kontrollsumma, och det är avsiktligt: den är
+ingen hämtad fil utan en skylt på gården, fotograferad 2026-09-07. Reglerna ovan
+(`09-§1.1`) är skrivna för filer vi laddat ner. Posten står här ändå, eftersom frågan
+*var kom det ifrån* är precis lika viktig för hagarnas namn som för en logotyp.
+
+Namnen i `source/data/locations/` är skyltens: Tåmossen, Bräckebur, Dammen, Lilla och
+Stora grishagen, Ekbacken, Trekanten, 1:an–4:an, Dalen, Lygnslätt 1 och 2, gethuset och
+kanin- och hönshuset. Gården har godkänt att uppgifterna används.
+
+Skylten är också enda kända källan till vilken hage som är vilken. Gården har två skyltar
+med **olika** bokstavssystem — pappersskylten märker husen A–D, den målade tavlan märker
+platserna A–Q och husen 1–5 — och de går inte att lägga ihop. Sajten följer
+pappersskylten.

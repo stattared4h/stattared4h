@@ -28,7 +28,7 @@ async function validateScript(dataDir: string): Promise<{ code: number; stdout: 
 test("exits 0 for the QA dataset and prints its warnings", async () => {
   const result = await validateScript(QA_DIR);
   assert.equal(result.code, 0, result.stderr);
-  assert.match(result.stdout, /är giltigt: 100 individer, 32 djur i 2 räknade bestånd, 9 platser, 8 arter, 11 raser/);
+  assert.match(result.stdout, /är giltigt: 100 individer, 32 djur i 2 räknade bestånd, 32 platser, 8 arter, 11 raser/);
   assert.match(result.stderr, /Varning: locations\/ovre-hagen\.yaml/);
 });
 

@@ -1,0 +1,8 @@
+name: Stora grishagen
+kind: djurplats
+species:
+  - gris
+lat: 57.338600
+lon: 12.341200
+accessible: true
+active: true

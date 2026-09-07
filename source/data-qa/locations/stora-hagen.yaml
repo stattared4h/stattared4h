@@ -1,10 +1,11 @@
 name: Stora hagen
+kind: djurplats
 species:
   - far
   - ko
 description: Gårdens största betesmark. Här går fåren och Majros tillsammans.
-lat: 57.411
-lon: 12.212
+lat: 57.335800
+lon: 12.338500
 accessible: false
 active: true
 photos:

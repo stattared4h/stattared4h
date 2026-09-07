@@ -28,13 +28,13 @@ namngivet djur står i hagen.
 
 ### Sidtyper och adresser
 
-- Sajten har fem sidtyper: startsidan `/`, platssidan `/plats/<id>/`, djursidan
-  `/djur/<id>/`, artsidan `/arter/<id>/` och kartan `/karta/`. Adressen byggs av
-  postens id och ändras aldrig. <!-- 02-§5.1 -->
+- Sajten har fyra sidtyper: startsidan `/`, platssidan `/plats/<id>/`, djursidan
+  `/djur/<id>/` och artsidan `/arter/<id>/`. Adressen byggs av postens id och ändras
+  aldrig. Kartan har ingen egen adress: den bor på startsidan. <!-- 02-§5.1 -->
 - Varje sidadress slutar med snedstreck och skrivs som `index.html` i en katalog, så att
   GitHub Pages och den lokala servern svarar likadant. <!-- 02-§5.2 -->
 - En adress som inte finns visar sajtens egen 404-sida, med sidhuvud och sidfot, texten
-  "Sidan finns inte" och länkar till startsidan och kartan. <!-- 02-§5.3 -->
+  "Sidan finns inte" och en länk till startsidan. <!-- 02-§5.3 -->
 
 ### Gemensamt för alla sidor
 
@@ -45,10 +45,12 @@ namngivet djur står i hagen.
 
 ### Startsidan
 
-- Startsidan visar djurslagen som finns på gården — arter med minst ett djur med
-  `status: here` eller ett räknat bestånd (`04-§4.7`) — som tryckytor med artens bild
-  och namn i plural, länkade till artsidan, och därefter en länk till kartan. Är inget
-  djurslag inlagt säger startsidan det och pekar på huvudsidan. <!-- 02-§5.7 -->
+- Startsidan visar först kartan över gården, sedan platslistan, och därunder djurslagen
+  som finns på gården — arter med minst ett djur med `status: here` eller ett räknat
+  bestånd (`04-§4.7`) — som tryckytor med artens bild och namn i plural, länkade till
+  artsidan. Besökaren står på gården med telefonen: kartan är det första hen behöver,
+  djuren det andra. Är inget djurslag inlagt säger startsidan det och pekar på
+  huvudsidan. <!-- 02-§5.7 -->
 - Startsidan säger i en mening vad sajten är och pekar på huvudsidan
   (`02-§1.9`). <!-- 02-§5.8 -->
 
@@ -64,11 +66,15 @@ namngivet djur står i hagen.
   (`04-§4.7`) får i stället en mening på formen "På gården finns 18 svarta dvärghöns och
   14 orusthöns." Sidan påstår inte att en namngiven individ står på platsen
   (ADR 0012). <!-- 02-§5.11 -->
-- En aktiv plats utan djurslag visar "Just nu går inga djur här" och en länk till
-  kartan. <!-- 02-§5.12 -->
+- En aktiv plats med `kind: djurplats` utan djurslag visar "Just nu går inga djur här"
+  och en länk till startsidan med kartan. <!-- 02-§5.12 -->
+- En plats med `kind: besoksmal` nämner inte djur: ingen djurlista, ingen rubrik per
+  djurslag och ingen mening om att inga djur går där. Sidan visar namnet, texten,
+  tillgängligheten och bilderna. I kartans lista står besöksmålet med namn och länk,
+  utan text om djurslag. <!-- 02-§5.35 -->
 - En plats med `active: false` behåller sin adress, visar "Den här platsen används inte
-  just nu" och en länk till kartan, och finns varken på kartan eller i kartans
-  lista. <!-- 02-§5.13 -->
+  just nu" och en länk till startsidan med kartan, och finns varken på kartan eller i
+  kartans lista. <!-- 02-§5.13 -->
 - Platssidan visar platsens bilder med `alt` och fotografens namn, efter faktarutan och
   före djurlistan, så att djurslagen överst inte trängs undan (`05-§6.24`). En plats utan
   bilder visar ingen platshållare. <!-- 02-§5.31 -->
@@ -100,13 +106,15 @@ namngivet djur står i hagen.
   `status: gone` under rubriken "Har lämnat gården". En art med räknade bestånd visar i
   stället meningen "På gården finns 18 svarta dvärghöns och 14 orusthöns." <!-- 02-§5.20 -->
 - Finns arten på ingen aktiv plats säger artsidan "Just nu vet vi inte var getterna går"
-  och länkar till kartan. <!-- 02-§5.21 -->
+  och länkar till startsidan med kartan. <!-- 02-§5.21 -->
 - Finns `source/content/arter/<id>.md` renderas dess Markdown som artens redaktionella
   text. Saknas filen visas ingen text och ingen tom rubrik. <!-- 02-§5.22 -->
 
 ### Kartan
 
-- Kartsidan visar en karta över gården: en SVG som bygget genererar, där varje aktiv
+Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-§5.7`).
+
+- Startsidan visar en karta över gården: en SVG som bygget genererar, där varje aktiv
   plats med koordinater är en markör med platsens namn, länkad till
   platssidan. <!-- 02-§5.23 -->
 - Under kartan står en textlista med samma platser, deras djurslag i plural och länk till
@@ -120,6 +128,20 @@ namngivet djur står i hagen.
   ritningens koordinatsystem enligt de kanter `background.yaml` anger (`03-§9.2`).
   Bygget varnar om en plats hamnar utanför ritningen. Saknas filerna visas markörerna på
   en tom platta. <!-- 02-§5.30 -->
+- Kartan visar bara platsernas namn. Vilka djurslag som går var står i listan under
+  kartan, aldrig i markörerna, så att ritningen förblir läsbar när hagarna ligger
+  tätt. <!-- 02-§5.32 -->
+- Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
+  var sin sida om markören, så att båda går att läsa, och en etikett hålls innanför
+  ritningens kant. Ligger fler markörer på samma fläck än det finns sidor visas de
+  etiketter som blir över inte på kartan: namnet är kvar som markörens tillgängliga namn, syns
+  när markören pekas på eller får fokus, och står alltid i listan under kartan
+  (`02-§5.24`). Bygget räknar placeringen för en karta som är 360 px bred — den trängsta
+  vyn i mobilläget (`05-§5.1`) — och räknar deterministiskt: samma platsdata ger samma
+  placering. <!-- 02-§5.33 -->
+- Startsidan länkar vidare till gårdens egen sida om vandring och fiske och till
+  Naturkartan för Kungsbacka, under rubriken "Fler kartor i området". Länkarna är vanliga
+  länkar; sidan bäddar inte in något från dem (`02-§5.26`). <!-- 02-§5.34 -->
 
 ### Djurkortet
 

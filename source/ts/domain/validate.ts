@@ -28,6 +28,7 @@ import type {
   Image,
   Issue,
   Location,
+  LocationKind,
   Population,
   Sex,
   Species,
@@ -78,6 +79,7 @@ const IMAGE_FIELDS = new Set(["alt", "credit"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
+const LOCATION_KINDS: readonly LocationKind[] = ["djurplats", "besoksmal"];
 
 const ANIMAL_FIELDS = new Set([
   "name",
@@ -93,6 +95,7 @@ const ANIMAL_FIELDS = new Set([
 ]);
 const LOCATION_FIELDS = new Set([
   "name",
+  "kind",
   "species",
   "note",
   "description",
@@ -686,6 +689,7 @@ function validateLocation(
   fields.noHtml(data, null);
 
   const name = fields.requiredString(data, "name");
+  const kind = fields.requiredEnum(data, "kind", LOCATION_KINDS);
   const note = fields.optionalString(data, "note");
   const description = fields.optionalString(data, "description");
   const lat = fields.optionalNumber(data, "lat");
@@ -735,8 +739,16 @@ function validateLocation(
     coordinatesValid = false;
   }
 
+  // A besoksmal with animals is almost always a paddock file copied for a café
+  // (ADR 0018), so it stops the build rather than passing with a warning.
+  if (kind === "besoksmal" && species !== null && species.length > 0) {
+    issues.error(record.file, "species", "ett besöksmål har inga djurslag. Skriv [], eller sätt kind: djurplats.");
+    species = null;
+  }
+
   if (
     name === null ||
+    kind === null ||
     species === null ||
     accessible === null ||
     active === null ||
@@ -745,7 +757,7 @@ function validateLocation(
   ) {
     return null;
   }
-  return { id: record.id, name, species, note, description, lat, lon, accessible, active, photos };
+  return { id: record.id, name, kind, species, note, description, lat, lon, accessible, active, photos };
 }
 
 // --- Warnings ------------------------------------------------------------------
@@ -787,7 +799,8 @@ function collectWarnings(
   for (const location of locations) {
     if (!location.active) continue;
     const file = files.get(`locations/${location.id}`) ?? `locations/${location.id}.yaml`;
-    if (location.species.length === 0) {
+    // Only a djurplats is expected to have animals; a café with none is not a mistake.
+    if (location.kind === "djurplats" && location.species.length === 0) {
       issues.warn(file, "species", "platsen är aktiv men har inget djurslag. Platssidan blir tom.");
     }
     if (location.lat === null) {

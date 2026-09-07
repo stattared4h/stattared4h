@@ -24,7 +24,7 @@ function animal(id: string, name: string): Animal {
 }
 
 function location(id: string, name: string): Location {
-  return { id, name, species: [], note: null, description: null, lat: null, lon: null, accessible: true, active: true, photos: [] };
+  return { id, name, kind: "djurplats" as const, species: [], note: null, description: null, lat: null, lon: null, accessible: true, active: true, photos: [] };
 }
 
 test("Å, Ä and Ö sort after Z, not among A and O", () => {
@@ -71,14 +71,37 @@ test("the validated QA dataset is already sorted", async () => {
   assert.deepEqual(
     dataset.locations.map((l) => l.id),
     [
+      "ettan",
+      "tvaan",
+      "trean",
+      "fyran",
       "bjorkhagen",
+      "cafeet",
+      "dalen",
+      "dammen",
+      "ekbacken",
       "gamla-stallet",
       "gethagen",
+      "gethuset",
       "grishagen",
       "honshuset",
+      "kaffestugan",
+      "kaninhagen",
       "kattvinden",
+      "kapphastbanan",
+      "lekplatsen",
+      "lilla-grishagen",
+      "lottas-vaffelstuga",
+      "parkeringen-vid-infarten",
+      "parkeringen-vid-toaletterna",
       "smadjurshuset",
+      "stallet",
+      "stora-grishagen",
       "stora-hagen",
+      "stallplatsen",
+      "toaletterna",
+      "trekanten",
+      "vandrarhemmet",
       "ovre-hagen",
     ],
   );

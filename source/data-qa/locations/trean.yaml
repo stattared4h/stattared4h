@@ -1,0 +1,10 @@
+name: "3:an"
+kind: djurplats
+species:
+  - far
+  - ko
+note: Fåren och korna delar hagen.
+lat: 57.336866
+lon: 12.341234
+accessible: false
+active: true

@@ -1,0 +1,9 @@
+name: "1:an"
+kind: djurplats
+species:
+  - far
+note: Fåren går här på försommaren.
+lat: 57.338053
+lon: 12.344015
+accessible: true
+active: true

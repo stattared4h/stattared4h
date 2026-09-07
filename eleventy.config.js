@@ -148,6 +148,20 @@ export default function (eleventyConfig) {
     name: "Djuren på Stättared",
     farm,
     mainSite: "https://www.4h.se/stattared/",
+    // Maps of the surrounding area, linked from the map page (02-§5.34). They live here
+    // rather than in the template so that an address is written once.
+    areaMaps: [
+      {
+        url: "https://www.4h.se/stattared/vandring-fiske/",
+        name: "Vandring och fiske hos Stättared",
+        about: "Gårdens egna leder, grillplatser och fiskevatten.",
+      },
+      {
+        url: "https://www.naturkartan.se/sv/kungsbacka",
+        name: "Naturkartan för Kungsbacka",
+        about: "Naturområden, leder och badplatser i hela kommunen.",
+      },
+    ],
     repo: "https://github.com/stattared4h/stattared4h",
     isQa: dataDir.endsWith("data-qa"),
   });
