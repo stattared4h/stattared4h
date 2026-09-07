@@ -443,6 +443,7 @@ test("the QA dataset yields exactly the known warnings", async () => {
   assert.deepEqual(
     result.warnings.map((w) => `${w.file}:${w.field}`).sort(),
     [
+      "locations/dammen.yaml:species",
       "locations/ovre-hagen.yaml:species",
       "species.yaml:species[hast]",
     ],

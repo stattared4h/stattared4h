@@ -32,12 +32,12 @@ function main(html: string): string {
 }
 
 describe("every page exists (02-§5.1–5.2)", () => {
-  test("a location page for all ten places, an animal page for all 100, a species page for all eight", async () => {
+  test("a location page for all 32 places, an animal page for all 100, a species page for all eight", async () => {
     const files = await listFiles(site);
     const locations = files.filter((f) => /^plats\/[^/]+\/index\.html$/.test(f));
     const animals = files.filter((f) => /^djur\/[^/]+\/index\.html$/.test(f));
     const species = files.filter((f) => /^arter\/[^/]+\/index\.html$/.test(f));
-    assert.equal(locations.length, 10);
+    assert.equal(locations.length, 32);
     assert.ok(locations.includes(path.join("plats", "gamla-stallet", "index.html")), "the inactive place keeps its page");
     assert.equal(animals.length, 100);
     assert.equal(species.length, 8);
@@ -274,7 +274,7 @@ describe("the map (02-§5.23–5.27)", () => {
     assert.match(html, /<h1>Karta över gården<\/h1>/);
     assert.match(html, /<svg class="map__drawing" [^>]*role="img" aria-label="Karta över Stättared med gårdens hagar">/);
     const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
-    assert.equal(markers.length, 9, "ten places minus the inactive one without coordinates");
+    assert.equal(markers.length, 31, "32 places minus the inactive one without coordinates");
     assert.ok(!markers.includes("gamla-stallet"));
     const list = html.slice(html.indexOf('<ul class="place-list">'));
     assert.match(list, /href="\/plats\/stora-hagen\/">Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/);
