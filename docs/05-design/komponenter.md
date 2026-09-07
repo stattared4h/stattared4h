@@ -193,7 +193,7 @@ Rutan som öppnas på en markör är en dialog (6.13) mitt på skärmen, som mes
 smalare än feedbackdialogen, eftersom den rymmer ett namn och några rader, inte ett
 formulär. Överst platsens namn som dialogens rubrik med stängknappen bredvid, därunder
 djurslagen i halvfet, och upplysningen och tillgängligheten i `--color-ink-soft`. Sist
-länken som en primär knapp, och bara när platsen är en `djurplats`. <!-- 05-§6.42 -->
+länken som en primär knapp, och bara när platsen är en `djurplats`. <!-- 05-§6.43 -->
 
 Kartans tre knappar — zooma in, zooma ut och "Visa hela kartan" — är ikonknappar (6.11)
 som ligger i kartans nedre högra hörn, staplade med `--space-xs` mellan sig och
