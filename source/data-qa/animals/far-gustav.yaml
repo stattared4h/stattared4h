@@ -3,6 +3,7 @@ species: far
 breed: varmlandsfar
 sex: female
 born: 2023
+publicId: SE 012345 0004
 mother: far-astrid
 father: far-bertil
 status: here
