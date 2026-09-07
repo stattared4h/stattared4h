@@ -127,6 +127,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§10.28`–`10.29` | Statusrad för ny version och offline | `manuell` | `source/ts/ui/sw-register.ts` och `source/ts/ui/offline.ts` via `source/ts/ui/status-bar.ts`. Bygg om lokalt med en annan `BUILD_VERSION` medan en sida är öppen: "Ny version finns." med Ladda om visas, och efter tryck visar sidfoten den nya versionen och bara den nya cachen finns kvar. Sätt DevTools → Network → Offline: "Du är offline. Du ser den sparade versionen." visas och försvinner när nätet är tillbaka |
 | `02-§10.30` | Dela | `manuell` | `source/ts/ui/share.ts` visar `[data-share-button]` när JS kör; valet mellan delning och kopiering testas i `tests/ui/share.test.ts`. Öppna en platssida på en mobil: Dela öppnar delningsarket; på ett skrivbord utan delningsfunktion visar knappen "Länken är kopierad" och urklippet har adressen |
 | `02-§10.31` | Egen appikon | `byggd` | `source/assets/img/favicon.svg` och storlekarna från `npm run icons` (`scripts/icons.mjs`); `tests/build/pwa.test.ts` kontrollerar filerna, måtten och länkarna i `<head>` |
+| `02-§10.37` | 4H-loggans färger och frizon | `saknas` | Förbundets profil tillåter mörkgrön, svart och vit; frizonen i `05-§6.38` |
 | `02-§10.32` | Inline-SVG-ikoner med `aria-hidden` | `byggd` | Sidhuvudets och dialogens ikoner; `tests/build/pwa.test.ts` kräver `aria-hidden` på varje `<svg>` i varje sida |
 
 ### Designspecifikation (`05-§`)
@@ -137,6 +138,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§2.1`–`2.11` | Färgpalett | `byggd` | `tokens.css`, bevakad av `tests/design/tokens.test.ts` |
 | `05-§2.12`–`2.18` | Kontrastregler och mörkt läge | `byggd` | Kontrastparen räknas i `tests/design/tokens.test.ts` |
 | `05-§2.19` | Logotypgrön bara i logotypens SVG | `påbörjad` | Testet bevakar att färgen inte är en token; logotypen finns inte i repot ännu |
+| `05-§2.21` | Grafiska profilen är källan; känd avvikelse i de gröna | `saknas` | Avvikelsetabellen i `docs/05-design/index.md` §2 mot `docs/09-kallor/` |
 | `05-§2.20` | Bakgrundsskikt för dialog | `byggd` | `--color-backdrop` i `tokens.css`, bevakad av testet |
 | `05-§3` | Typografi | `påbörjad` | Tokens bevakas av testet; navigeringen (`05-§3.9`) i `layout.css` utan test |
 | `05-§4.1`–`4.10` | Behållare och spacing | `påbörjad` | Tokens bevakas av testet; `layout.css` använder dem i behållare, sidhuvud och sidfot utan test |
@@ -158,6 +160,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.30` | Sidfot | `manuell` | `source/layouts/footer.njk`, `layout.css`. Öppna en sida och bekräfta djupgrön botten, vit text, och ordningen logga, huvudsidelänk, repolänk, integritetsmening, version |
 | `05-§6.33`–`6.34`, `6.37` | Ikonknapp, meny, sidhuvudets höjd | `manuell` | `components.css`, `layout.css`. I 360 px: knapparna är 44 px, menykortet är grönt med vita länkar och glider in under sidhuvudet; sidhuvudets höjd är densamma före och efter rullning och i 1280 px |
 | `05-§6.35`–`6.36` | Dialog, statusrad | `manuell` | `.dialog` och `.status-bar` i `components.css`. Öppna feedbackdialogen i 360 px och 1280 px: mörkt bakgrundsskikt, vit yta med rundade hörn och kryssknapp uppe till höger, som mest 680 px bred, intonad på under 200 ms; sätt DevTools → Network → Offline: ljusgrön rad med djupgrön text direkt under sidhuvudet |
+| `05-§6.38` | Frizon runt 4H-logotypen | `saknas` | Sidhuvud, menykort och sidfot |
 | `05-§6` övrigt | Hero | `saknas` | Skrivs när markupen finns, enligt `05-§7.2`; heron väntar på ett fotografi från gården |
 | `05-§7.1`, `7.5` | Inga hårdkodade värden | `byggd` | stylelint-regeln `declaration-strict-value` fäller literaler utanför `tokens.css` |
 | `05-§7.4` | Designtokens | `byggd` | `tokens.css`, bevakad av `tests/design/tokens.test.ts` |
@@ -165,6 +168,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§7.10` | Filstruktur för CSS | `påbörjad` | Fyra filer, laddade i ordning av `source/layouts/base.njk`; `utilities.css` skapas vid behov; inget test |
 | `05-§8.1`–`8.4`, `8.8`–`8.10` | Fotoregler, personer, upphovsrätt | `dokumenterad` | Vägledning för den som fotograferar; `credit` visas intill varje bild (`02-§8.7`) |
 | `05-§8.5`–`8.7` | Tekniska bildregler | `byggd` | `generateImageSizes` och `renderPicture`, använda av sidorna; `srcset`, `width`, `height` och `loading` bevakas av `tests/build/data-pages.test.ts`. En bild i brödtext delar utseende med en bild i en figure i `source/assets/css/components.css` |
+| `05-§8.11` | Logotypens ursprung står i källregistret | `saknas` | `docs/09-kallor/index.md` |
 | `05-§9` | Tillgänglighet | `dokumenterad` | Delvis testbar med html-validate |
 | `05-§10` | Vad man inte gör | `dokumenterad` | Delvis kontrollerbar med lint |
 
@@ -221,6 +225,12 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
 
+### Källregister (`09-§`)
+
+| ID | Ämne | Status | Anteckning |
+| --- | --- | --- | --- |
+| `09-§1.1`–`1.5` | Hur externt källmaterial förs in och hålls igenkännbart | `saknas` | `docs/09-kallor/index.md`; ADR 0016 |
+
 ---
 
 ### Vad som inte spåras här
@@ -239,7 +249,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 6 |
 | `dokumenterad` | 14 |
 | `påbörjad` | 17 |
 | `byggd` | 92 |

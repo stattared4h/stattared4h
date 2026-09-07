@@ -43,6 +43,11 @@ Varje bild har en känd upphovsman noterad i bildpostens `credit`. Bilder från
 `4h.se/stattared` används med föreningens tillstånd. Bilder utan känt ursprung
 publiceras inte. <!-- 05-§8.10 -->
 
+4H-logotypen tillhör Riksförbundet Sveriges 4H och står i källregistret,
+[`docs/09-kallor/`](../09-kallor/index.md), med adress, hämtdatum och kontrollsumma. Det
+gäller allt material vi hämtar utifrån: kommer det inte från gården hör det hemma i
+registret innan det används. <!-- 05-§8.11 -->
+
 ---
 
 ## 9. Tillgänglighet

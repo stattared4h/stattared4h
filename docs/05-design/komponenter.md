@@ -22,6 +22,12 @@ feedback som ikoner utan botten till höger (`02-§10.3`, `02-§10.7`). <!-- 05-
 - Aktuell sida markeras med djupgrön text och en grön underlinje — aldrig enbart med
   färg, så att markeringen syns även för den som inte skiljer färgerna åt. <!-- 05-§6.3 -->
 - Logotypen länkar till startsidan och har alltid en textalternativbeskrivning. <!-- 05-§6.4 -->
+- Runt 4H-logotypen — i sidhuvudet, i menykortet och i sidfoten — är en fri yta där inget
+  annat får synas. Förbundets profil mäter den i `H`:ets nedre högra kvadrat: en hel
+  kvadrat till höger om och under logotypen, en halv upptill och till vänster. Kvadraten är
+  12,6 % av logotypens bredd, vilket vid sidhuvudets 44 px höga logotyp blir 8 px till
+  höger och under och 4 px upptill och till vänster — `--space-xs` respektive halva. Alla
+  tre placeringarna ligger på eller över det. <!-- 05-§6.38 -->
 - Sidhuvudets höjd är densamma på varje sida och vid varje rullningsläge, så att
   innehållet aldrig hoppar när det klistras fast. <!-- 05-§6.37 -->
 

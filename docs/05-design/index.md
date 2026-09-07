@@ -48,7 +48,7 @@ avsnitt kan flyttas mellan filer utan att referenser går sönder.
 | `05-§2.9` | Sol | `#f2b134` | Accent reserverad för framtida spel enligt ADR 0009. Används inte i fas 1 |
 | `05-§2.10` | Solbläck | `#7a4b00` | Text på ljus botten när solaccenten behöver ord |
 | `05-§2.11` | Varning | `#b3261e` | Felmeddelanden, destruktiva åtgärder |
-| `05-§2.19` | Logotypgrön | `#467c45` | Bara inne i 4H-logotypens egen SVG (ADR 0007). Aldrig som token, yta eller text |
+| `05-§2.19` | Logotypgrön | `#00693f` | Bara inne i 4H-logotypens egna SVG-filer (ADR 0016). Aldrig som token, yta eller text |
 | `05-§2.20` | Bakgrundsskikt | `rgb(64 64 64 / 60%)` | Skiktet bakom en dialog: bläck med 60 % opacitet |
 
 ### Varför den gröna inte är exakt 4H:s
@@ -57,6 +57,26 @@ avsnitt kan flyttas mellan filer utan att referenser går sönder.
 AA-gränsen 4,5:1. Vi levererar därför `#00863f`, ett snäpp mörkare och i praktiken
 omöjlig att skilja från originalet, som landar på 4,69:1. Djupgrön `#15623e` och
 ljusgrön `#e7fdf3` är hämtade oförändrade ur temat. <!-- 05-§2.12 -->
+
+### Förhållandet till förbundets grafiska profil
+
+Källan för 4H:s identitet är Riksförbundet Sveriges 4H:s grafiska profil från 2023, inte
+temats stilmall (ADR 0016). Profilen står i källregistret,
+[`docs/09-kallor/`](../09-kallor/index.md), med adress, datum och kontrollsumma; dess
+palett skrivs inte av hit. <!-- 05-§2.21 -->
+
+De gröna tokens ovan är hämtade ur temat och sammanfaller inte med profilen. Avvikelsen är
+känd och står här hellre än att vara osynlig:
+
+| Token | Vårt värde | Profilens närmaste | Läge |
+| --- | --- | --- | --- |
+| `--color-green` | `#00863f` | `#008b44` | Avviker. Profilens värde bär inte vit text: 4,40:1 |
+| `--color-green-deep` | `#15623e` | `#00693f` | Avviker. Profilens värde klarar både vit text på sig och sig själv som text |
+| `--color-green-pale` | `#e7fdf3` | `#82c381` | Avviker. Profilen har ingen ljus bakgrundston |
+
+Att flytta paletten dit är en egen ändring, eftersom profilens två gröna inte kan vara yta
+och hovring åt varandra när bara den ena bär vit text. Logotypgrönt `05-§2.19` följer
+däremot profilen redan.
 
 ### Kontrastregler
 
