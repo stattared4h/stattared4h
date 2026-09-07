@@ -578,6 +578,28 @@
   z-index: 1;
 }
 
+/* The map's own buttons lie on top of the drawing, so they are light with a green icon
+   and a shadow instead of the header's green ground (05-§6.41). */
+.map__control {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-green-deep);
+}
+
+.map__control:hover,
+.map__control:active {
+  background: var(--color-green-pale);
+}
+
+.map__control:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.map__control:disabled:hover {
+  background: var(--color-surface);
+}
+
 .map__ground {
   fill: var(--color-green-pale);
 }

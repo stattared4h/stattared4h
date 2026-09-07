@@ -90,7 +90,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
   test("one link per place with the base path, the name as text and a percent position", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
-    assert.match(html, /^<div class="map"><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
+    assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
     const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);
@@ -110,6 +110,24 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
 
   test("without places the map is empty", () => {
     assert.deepEqual(renderMap([], { base: "/" }), { html: "", warnings: [] });
+  });
+
+  test("the zoom controls are written, hidden until the client code shows them (02-§5.41, 02-§5.45)", () => {
+    const { html } = renderMap(PLACES, { base: "/" });
+    // Outside the canvas, so they keep their place when the drawing is zoomed.
+    const canvasEnd = html.indexOf("</div>");
+    assert.ok(html.indexOf('data-map-controls') > canvasEnd, "the controls follow the canvas");
+    assert.match(html, /<div class="map__controls" hidden data-map-controls>/);
+    for (const [action, label] of [["in", "Zooma in"], ["out", "Zooma ut"], ["home", "Visa hela kartan"]]) {
+      assert.match(
+        html,
+        new RegExp(`<button class="icon-button map__control" type="button" aria-label="${label}"(?: hidden)? data-map-zoom="${action}">`),
+        `a button for ${action}`,
+      );
+    }
+    // "Visa hela kartan" is meaningless until the map is zoomed, so it starts hidden too.
+    assert.match(html, /aria-label="Visa hela kartan" hidden data-map-zoom="home"/);
+    assert.doesNotMatch(html, /https?:|<script|<image/, "no external resources (02-§5.26)");
   });
 
   test("every marker carries the symbol for its kind (02-§5.38)", () => {

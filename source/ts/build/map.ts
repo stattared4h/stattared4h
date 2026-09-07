@@ -5,11 +5,15 @@
  * is linear: the bounding box of the places, with a margin, is mapped onto the drawing
  * frame. At the size of a farm the curvature of the earth is negligible.
  *
- * Two layers make up the map:
+ * Three layers make up the map:
  *   - an inline SVG, the drawing: a plain plate, or the hand-drawn background
  *     (`background.svg` with `background.yaml` under source/map/) when it exists
  *     (03-§9.2), and
- *   - one HTML `<a>` per place on top of it, positioned in percent of the drawing.
+ *   - one HTML `<a>` per place on top of it, positioned in percent of the drawing, and
+ *   - the zoom controls, which lie outside the zoomed frame so they keep their place
+ *     (02-§5.41).
+ *
+ * The first two sit in `.map__canvas`, the element the zoom transforms (ADR 0020).
  *
  * The markers are HTML rather than SVG so that they keep their size — at least the
  * tap target minimum (05-§4.15) — and their readable label at every viewport width,
@@ -320,6 +324,28 @@ export function placeLabels(
   return sides;
 }
 
+/**
+ * The zoom controls (02-§5.41, 05-§6.41). Written by the build but useless without
+ * `source/ts/ui/map-zoom.ts`, so the whole group starts `hidden` and the module shows it —
+ * the same bargain the install button makes (02-§10.11). Without JavaScript the map is the
+ * still picture it has always been (02-§5.45).
+ */
+const MAP_CONTROLS =
+  `<div class="map__controls" hidden data-map-controls>` +
+  `<button class="icon-button map__control" type="button" aria-label="Zooma in" data-map-zoom="in">` +
+  `<svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">` +
+  `<path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>` +
+  `</svg></button>` +
+  `<button class="icon-button map__control" type="button" aria-label="Zooma ut" data-map-zoom="out">` +
+  `<svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">` +
+  `<path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>` +
+  `</svg></button>` +
+  `<button class="icon-button map__control" type="button" aria-label="Visa hela kartan" hidden data-map-zoom="home">` +
+  `<svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">` +
+  `<path d="M9 4H4v5M20 9V4h-5M15 20h5v-5M4 15v5h5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` +
+  `</svg></button>` +
+  `</div>`;
+
 /** The drawing layer alone: the `<svg>` with its description, ground plate and background. */
 export function renderMapSvg(frame: MapFrame, background: MapBackground | null = null): string {
   const size = `width="${frame.width}" height="${frame.height}"`;
@@ -389,7 +415,14 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   }
 
   return {
-    html: `<div class="map">${renderMapSvg(frame, options.background ?? null)}${markers.join("")}</div>`,
+    html:
+      `<div class="map" data-map>` +
+      `<div class="map__canvas" data-map-canvas>` +
+      renderMapSvg(frame, options.background ?? null) +
+      markers.join("") +
+      `</div>` +
+      MAP_CONTROLS +
+      `</div>`,
     warnings,
   };
 }
