@@ -160,8 +160,11 @@ bas-sökvägens hjälpfunktion, och att inget djur har fått ett `location`-fäl
   triggas av att arbetsflödet "Quality" avslutats på `main` och kör bara när det blev
   grönt på den commiten; "Deploy till produktion" (`deploy-prod.yml`) av "Run workflow"
   med ett godkännandejobb i miljön `production`. Det återanvändbara flödet `deploy.yml`
-  tar `version`, `qa_version`, `prod_ref` och `ref`, bygger båda miljöerna och laddar
-  upp en Pages-artefakt (`02-§9.11`). De två deploy-jobben delar `concurrency`-gruppen
+  tar `version`, `qa_version` och `production_from_latest_tag`, bygger båda miljöerna
+  och laddar upp en Pages-artefakt (`02-§9.11`). Inget flöde checkar ut en ref som
+  kommer ur indata eller ur en händelse: utcheckningen är alltid flödets egen commit på
+  `main`, QA-deployen kör bara när den gröna commiten är `main`:s huvud, och
+  släpptaggen slås upp i `main`:s historik. De två deploy-jobben delar `concurrency`-gruppen
   `pages`, så bara en deploy kör åt gången och en pågående avbryts
   aldrig. <!-- 03-§8.8 -->
 - Produktion och QA byggs i samma deploy: två byggen med olika `DATA_DIR`, `BASE_PATH`

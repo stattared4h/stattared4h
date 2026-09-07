@@ -4,8 +4,10 @@ name: Deploy till QA
 # green on that very commit (02-§9.11). A merge to main therefore reaches QA by itself,
 # and production is rebuilt from the latest tag with main's content (02-§10.35).
 #
-# workflow_run always runs in the context of main, never with code from a fork, and the
-# only value taken from the event is the commit SHA.
+# workflow_run always runs in the context of main and checks out main's head. The
+# commit the Quality run tested is never checked out from the event: the deploy only
+# proceeds when that commit IS main's head. If main has moved on, the newer commit's own
+# Quality run triggers its own deploy, so nothing is lost.
 
 on:
   workflow_run:
@@ -28,16 +30,29 @@ jobs:
       # Needed to look up which pull request the commit was merged from.
       pull-requests: read
     outputs:
+      deploy: ${{ steps.head.outputs.deploy }}
       version: ${{ steps.versions.outputs.version }}
       qa_version: ${{ steps.versions.outputs.qa_version }}
-      prod_ref: ${{ steps.versions.outputs.prod_ref }}
     steps:
-      - name: Check out the tested commit with tags
+      - name: Check out main with tags
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
           persist-credentials: false
+
+      # Deploy only the commit Quality was green on (02-§9.11): that is main's head, or
+      # this run stands down in favour of the newer commit's own run.
+      - name: Confirm the tested commit is main's head
+        id: head
+        env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ "$(git rev-parse HEAD)" = "${TESTED_SHA}" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "main has moved on since ${TESTED_SHA}; its newer commit deploys itself."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
 
       # QA's version is the latest tag vX.Y.* for the X.Y in VERSION, or X.Y.0 when the
       # series has no tag yet, followed by " – QA PR<n>" (02-§10.33). The pull request
@@ -45,10 +60,11 @@ jobs:
       # subject line; the short SHA is the fallback (03-§10.4).
       - name: Compute versions
         id: versions
+        if: steps.head.outputs.deploy == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
+          SHA="$(git rev-parse HEAD)"
           xy="$(tr -d '[:space:]' < VERSION)"
           if ! [[ "${xy}" =~ ^[0-9]+\.[0-9]+$ ]]; then
             echo "::error file=VERSION::VERSION must contain X.Y, found '${xy}'"
@@ -67,14 +83,6 @@ jobs:
             version="${xy}.0"
           fi
 
-          # Production's code is the latest release, whatever series it belongs to; only a
-          # production deploy may put unreleased code in the root. Before the first
-          # release there is no production, and main is built there instead.
-          prod_ref="$(latest_tag '[0-9]+\.[0-9]+')"
-          if [ -z "${prod_ref}" ]; then
-            prod_ref="main"
-          fi
-
           pr="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${SHA}/pulls" \
             --jq '[.[] | select(.merged_at != null)][0].number // empty' || true)"
           if [ -n "${pr}" ]; then
@@ -87,13 +95,13 @@ jobs:
           {
             echo "version=${version}"
             echo "qa_version=${qa_version}"
-            echo "prod_ref=${prod_ref}"
           } >> "$GITHUB_OUTPUT"
-          echo "QA ${qa_version}; production ${version} built from ${prod_ref}"
+          echo "QA ${qa_version}; production ${version} built from the latest release tag"
 
   deploy:
     name: Deploy
     needs: version
+    if: needs.version.outputs.deploy == 'true'
     permissions:
       contents: read
       pages: write
@@ -107,5 +115,6 @@ jobs:
     with:
       version: ${{ needs.version.outputs.version }}
       qa_version: ${{ needs.version.outputs.qa_version }}
-      prod_ref: ${{ needs.version.outputs.prod_ref }}
-      ref: ${{ github.event.workflow_run.head_sha }}
+      # Production's code is the latest release; only a production deploy may put
+      # unreleased code in the root (03-§8.9).
+      production_from_latest_tag: true

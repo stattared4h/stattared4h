@@ -74,8 +74,7 @@ jobs:
     with:
       version: ${{ needs.release.outputs.version }}
       qa_version: ${{ needs.release.outputs.version }}
-      prod_ref: main
-      ref: ${{ github.sha }}
+      production_from_latest_tag: false
 
   tag:
     name: Tag and release

@@ -6,10 +6,14 @@ name: Deploy
 # runs on its own.
 #
 # Production and QA are two builds of the same code with different DATA_DIR, BASE_PATH
-# and BUILD_VERSION (03-§8.9). When prod_ref names a tag, production's code is checked
-# out from that tag in its own directory and main's source/data/ and source/content/ are
-# copied over it, so that a content merge reaches visitors without releasing code
-# (02-§10.35).
+# and BUILD_VERSION (03-§8.9). With production_from_latest_tag, production's code comes
+# from the latest release tag in its own directory and main's source/data/ and
+# source/content/ are copied over it, so that a content merge reaches visitors without
+# releasing code (02-§10.35).
+#
+# Nothing here checks out a ref taken from an input or an event: the only checkout is
+# the workflow's own commit on main, and the release tag is looked up in main's history
+# and verified to be an ancestor of it before it is built.
 
 on:
   workflow_call:
@@ -22,16 +26,11 @@ on:
         description: "Version string for the QA build, passed as BUILD_VERSION"
         required: true
         type: string
-      prod_ref:
-        description: "Git ref for production's code. Empty or main builds it from ref"
+      production_from_latest_tag:
+        description: "Build production from the latest release tag (with main's content) instead of from main"
         required: false
-        type: string
-        default: ""
-      ref:
-        description: "Commit on main to deploy: QA, content, and production when prod_ref is empty or main. Empty means the triggering commit"
-        required: false
-        type: string
-        default: ""
+        type: boolean
+        default: false
     outputs:
       page_url:
         description: "Address of the deployed site"
@@ -48,13 +47,12 @@ jobs:
       contents: read
       # Reading the Pages configuration is what configure-pages needs for base_path.
       pages: read
-    env:
-      PROD_FROM_TAG: ${{ inputs.prod_ref != '' && inputs.prod_ref != 'main' }}
     steps:
-      - name: Check out main
+      # The workflow's own commit on main, with full history so the release tags are there.
+      - name: Check out main with tags
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref || github.sha }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Node.js
@@ -83,38 +81,52 @@ jobs:
           npm run build
           mv public qa-build
 
-      - name: Check out production code
-        if: env.PROD_FROM_TAG == 'true'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ inputs.prod_ref }}
-          path: production
-          persist-credentials: false
+      # The latest release tag, vX.Y.P whatever the series, so that unreleased code never
+      # reaches the root (03-§8.9). It must be an ancestor of the commit being deployed:
+      # tags are only ever created on main by deploy-prod.yml. Before the first release
+      # there is no tag and production is built from main.
+      - name: Find the latest release tag
+        id: release
+        if: inputs.production_from_latest_tag
+        run: |
+          tag="$(git tag --list 'v*' | { grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true; } | sort -V | tail -n 1)"
+          if [ -z "${tag}" ]; then
+            echo "No release tag yet; production is built from main."
+            echo "source=main" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! git merge-base --is-ancestor "refs/tags/${tag}" HEAD; then
+            echo "::error::Tag ${tag} is not in main's history"
+            exit 1
+          fi
+          echo "source=${tag}" >> "$GITHUB_OUTPUT"
 
       # The tag's code with main's content: the editors' changes reach production, the
       # developers' do not until someone releases (02-§9.12).
       - name: Build production from the tag with main's content
-        if: env.PROD_FROM_TAG == 'true'
-        working-directory: production
+        if: inputs.production_from_latest_tag && steps.release.outputs.source != 'main'
         env:
           DATA_DIR: source/data
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
           BUILD_VERSION: ${{ inputs.version }}
+          TAG: ${{ steps.release.outputs.source }}
         run: |
+          git worktree add production "refs/tags/${TAG}"
           for dir in source/data source/content; do
-            if [ -d "../${dir}" ]; then
-              rm -rf "${dir}"
-              mkdir -p "$(dirname "${dir}")"
-              cp -R "../${dir}" "${dir}"
+            if [ -d "${dir}" ]; then
+              rm -rf "production/${dir}"
+              mkdir -p "production/$(dirname "${dir}")"
+              cp -R "${dir}" "production/${dir}"
               echo "Copied ${dir} from main"
             fi
           done
+          cd production
           npm ci --ignore-scripts
           npm run build
           mv public ../public
 
       - name: Build production from main
-        if: env.PROD_FROM_TAG != 'true'
+        if: ${{ !inputs.production_from_latest_tag || steps.release.outputs.source == 'main' }}
         env:
           DATA_DIR: source/data
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
@@ -128,7 +140,7 @@ jobs:
           echo "QA: ${QA_VERSION}" >> "$GITHUB_STEP_SUMMARY"
         env:
           PROD_VERSION: ${{ inputs.version }}
-          PROD_SOURCE: ${{ env.PROD_FROM_TAG == 'true' && inputs.prod_ref || 'main' }}
+          PROD_SOURCE: ${{ steps.release.outputs.source || 'main' }}
           QA_VERSION: ${{ inputs.qa_version }}
 
       - name: Upload artifact
