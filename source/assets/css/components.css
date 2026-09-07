@@ -535,6 +535,12 @@
   text-decoration: underline;
 }
 
+/* Places close together overlap; the one under the finger or with focus comes to the front. */
+.map__marker:hover,
+.map__marker:focus-visible {
+  z-index: 1;
+}
+
 .map__ground {
   fill: var(--color-green-pale);
 }

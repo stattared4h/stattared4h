@@ -65,6 +65,17 @@ describe("mapFrame and projectPoint (03-§9.1)", () => {
     assert.ok(line && line.north > line.south && line.east > line.west);
   });
 
+  test("the frame follows the shape of the ground, within limits", () => {
+    // The three places span 0.003° of latitude and 0.0048° of longitude at 57.4° N:
+    // taller than wide on the ground, so the frame is taller than 4:3.
+    const tall = mapFrame(PLACES);
+    assert.ok(tall && tall.height > tall.width * 0.9 && tall.height <= tall.width * 1.25, `${tall?.width}×${tall?.height}`);
+    const wide = mapFrame([PLACES[0], { ...PLACES[0], lon: PLACES[0].lon + 0.05 }]);
+    assert.ok(wide && wide.height === Math.round(wide.width * 0.6), "never flatter than 0.6");
+    const explicit = mapFrame(PLACES, { width: 400, height: 100 });
+    assert.deepEqual([explicit?.width, explicit?.height], [400, 100]);
+  });
+
   test("no places, no frame", () => {
     assert.equal(mapFrame([]), null);
   });
@@ -74,7 +85,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
   test("one link per place with the base path, the name as text and a percent position", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
-    assert.match(html, /^<div class="map"><svg class="map__drawing" viewBox="0 0 800 600" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
+    assert.match(html, /^<div class="map"><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
     const markers = [...html.matchAll(/<a class="map__marker" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);

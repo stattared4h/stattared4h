@@ -280,6 +280,7 @@
 .facts__row {
   display: grid;
   grid-template-columns: minmax(6em, max-content) 1fr;
+  align-items: center;
   gap: 0 var(--space-sm);
   padding-block: var(--space-xs);
   border-bottom: var(--border-width) solid var(--color-border);
@@ -287,6 +288,15 @@
 
 .facts__row dd {
   margin: 0;
+}
+
+/* Family and species links are the way on from the animal page, so they get the full
+   tap target (05-§4.15) rather than a text line. */
+.facts a,
+.link-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
 }
 
 .link-list {

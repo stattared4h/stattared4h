@@ -75,22 +75,27 @@ export interface RenderedMap {
 }
 
 const DEFAULT_WIDTH = 800;
-const DEFAULT_HEIGHT = 600;
 const DEFAULT_MARGIN = 0.12;
+/** The frame follows the shape of the ground, but never beyond these height/width ratios. */
+const MIN_ASPECT = 0.6;
+const MAX_ASPECT = 1.25;
 /** Extent used when all places share a coordinate, so a single place still gets a frame. */
 const MIN_EXTENT_DEGREES = 0.0005;
 
 /**
  * The frame for `points` when there is no background: their bounding box, widened so
  * that a degree of longitude is as long on the drawing as it is on the ground, fitted
- * into `width` × `height` with `margin` around it, and centred. Null without points.
+ * into `width` × `height` with `margin` around it, and centred. Without an explicit
+ * height the frame takes the shape of the ground, within limits, so a farm that
+ * stretches north–south gets a tall map rather than empty space at the sides. Null
+ * without points.
  */
 export function mapFrame(
   points: readonly MapPoint[],
   options: { width?: number; height?: number; margin?: number } = {},
 ): MapFrame | null {
   if (points.length === 0) return null;
-  const { width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT, margin = DEFAULT_MARGIN } = options;
+  const { width = DEFAULT_WIDTH, margin = DEFAULT_MARGIN } = options;
 
   const lats = points.map((p) => p.lat);
   const lons = points.map((p) => p.lon);
@@ -113,6 +118,8 @@ export function mapFrame(
   const lonScale = Math.cos(((north + south) / 2) * (Math.PI / 180));
   const groundWidth = (east - west) * lonScale;
   const groundHeight = north - south;
+  const aspect = Math.min(MAX_ASPECT, Math.max(MIN_ASPECT, groundHeight / groundWidth));
+  const height = options.height ?? Math.round(width * aspect);
 
   // Units of drawing per degree, so the places fill the frame inside the margin.
   const innerWidth = width * (1 - 2 * margin);
