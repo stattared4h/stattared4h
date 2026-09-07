@@ -362,6 +362,34 @@
   transform: translateY(-50%);
 }
 
+/* The four slanted positions (02-§5.51). They sit corner to corner with the pin, so the
+   lane straight under and straight beside the marker stays free for a neighbour — and in
+   the pasture the label follows its own band instead of crossing the fence. */
+.map__marker--label-above-left .map__label {
+  inset: auto 100% 100% auto;
+  transform: none;
+}
+
+.map__marker--label-above-right .map__label {
+  top: auto;
+  bottom: 100%;
+  left: 100%;
+  transform: none;
+}
+
+.map__marker--label-below-left .map__label {
+  top: 100%;
+  right: 100%;
+  left: auto;
+  transform: none;
+}
+
+.map__marker--label-below-right .map__label {
+  top: 100%;
+  left: 100%;
+  transform: none;
+}
+
 /* Nowhere left to put the label (02-§5.33). It is hidden from sight only: the name is
    still the link's accessible name, it is still in the list under the map, and pointing
    at or focusing the marker brings it back. */
@@ -425,6 +453,31 @@
     right: 100%;
     left: auto;
     transform: translateY(-50%);
+  }
+
+  .map__marker--wide-above-left .map__label {
+    inset: auto 100% 100% auto;
+    transform: none;
+  }
+
+  .map__marker--wide-above-right .map__label {
+    top: auto;
+    bottom: 100%;
+    left: 100%;
+    transform: none;
+  }
+
+  .map__marker--wide-below-left .map__label {
+    top: 100%;
+    right: 100%;
+    left: auto;
+    transform: none;
+  }
+
+  .map__marker--wide-below-right .map__label {
+    top: 100%;
+    left: 100%;
+    transform: none;
   }
 
   .map__marker--wide-hidden .map__label {

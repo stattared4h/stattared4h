@@ -181,10 +181,20 @@ function assertBasePath(base: string): void {
 // --- Label placement ---------------------------------------------------------
 
 /**
- * Which side of the marker its label sits on (02-§5.33). `below` is the plain case and
- * the fallback; the others are written on the marker as a modifier and placed by CSS.
+ * Where the label sits around the marker (02-§5.33, 02-§5.51). Eight positions: four
+ * slanted and four straight. `below` is the stylesheet's base case and the fallback;
+ * every other position is written on the marker as a modifier and placed by CSS.
  */
-export type LabelSide = "below" | "above" | "right" | "left" | "hidden";
+export type LabelSide =
+  | "above-left"
+  | "above-right"
+  | "below-left"
+  | "below-right"
+  | "below"
+  | "above"
+  | "right"
+  | "left"
+  | "hidden";
 
 /**
  * Measurements the estimate needs, in pixels, mirrored from `tokens.css`. There is no
@@ -199,10 +209,21 @@ export const LABEL_METRICS = {
   fontSize: 15,
   /** `--space-xs`: the label's padding, at each end. */
   padding: 8,
-  /** The narrowest the map gets, in the mobile layout (05-§5.1). */
-  referenceWidth: 360,
-  /** The widest it gets: `--container-narrow` less the container's padding (05-§5.2). */
-  wideWidth: 648,
+  /** `--space-md`: the container's padding, which the map does not get to use. */
+  containerPadding: 24,
+  /**
+   * The map's own width, not the window's: the canvas is the viewport less the
+   * container's padding at each side. A 360 px phone — the narrowest width the design
+   * targets (05-§5.1) — leaves the map 312 px, and estimating against 360 would let a
+   * label hang over the edge.
+   */
+  referenceWidth: 360 - 2 * 24,
+  /** The same at 600 px, where the wide placement takes over (05-§5.2). */
+  wideWidth: 600 - 2 * 24,
+  /** `--space-sm`: how far the zoom controls sit in from the map's bottom-right corner. */
+  controlInset: 16,
+  /** `--space-xs`: the gap between the control buttons. */
+  controlGap: 8,
 } as const;
 
 /**
@@ -215,8 +236,27 @@ export const LABEL_METRICS = {
 const CHAR_WIDTH_RATIO = 0.7;
 /** The label is one line. Measured at 24 px against a 15 px type size. */
 const LINE_HEIGHT_RATIO = 1.6;
-/** Tried in this order, so the plain case wins whenever it is free. */
-const LABEL_SIDES: readonly LabelSide[] = ["below", "above", "right", "left"];
+/**
+ * Tried in this order (02-§5.51). The four slanted positions come first, because a
+ * slanted label leaves both the lane straight below the marker and the lane straight
+ * beside it free for a neighbour.
+ *
+ * Among the slanted four, the pasture decides the order. Its bands run north-west to
+ * south-east, so a label up-and-left or down-and-right follows the paddock it belongs to,
+ * while one on the other diagonal drifts across the fence into the next paddock. The two
+ * along that axis are therefore tried before the two across it. The straight four come
+ * last, in the order they have always had.
+ */
+const LABEL_SIDES: readonly LabelSide[] = [
+  "above-left",
+  "below-right",
+  "above-right",
+  "below-left",
+  "below",
+  "above",
+  "right",
+  "left",
+];
 
 /** A marker to place a label for, positioned in drawing units. */
 export interface LabelMarker {
@@ -260,6 +300,16 @@ function labelBox(x: number, y: number, width: number, height: number, side: Lab
       return { left: x + half, right: x + half + width, top: y - height / 2, bottom: y + height / 2 };
     case "left":
       return { left: x - half - width, right: x - half, top: y - height / 2, bottom: y + height / 2 };
+    // The slanted positions sit corner to corner with the pin's box, so they clear both
+    // the lane under the marker and the lane beside it (02-§5.51).
+    case "above-left":
+      return { left: x - half - width, right: x - half, top: y - half - height, bottom: y - half };
+    case "above-right":
+      return { left: x + half, right: x + half + width, top: y - half - height, bottom: y - half };
+    case "below-left":
+      return { left: x - half - width, right: x - half, top: y + half, bottom: y + half + height };
+    case "below-right":
+      return { left: x + half, right: x + half + width, top: y + half, bottom: y + half + height };
     case "hidden":
       // Never asked for while choosing; a hidden label occupies nothing.
       return { left: x, right: x, top: y, bottom: y };
@@ -272,10 +322,11 @@ function labelBox(x: number, y: number, width: number, height: number, side: Lab
  *
  * The boxes are worked out in pixels for a `referenceWidth` drawing — the narrowest the
  * map gets — because that is where the labels crowd. Places are taken from north to
- * south, and each label gets the first free side. A side that would push the label off
- * the drawing is not free either, so a place at the edge turns its label inwards.
+ * south, and each label gets the first free position. A position that would push the
+ * label off the drawing is not free either, so a place at the edge turns its label
+ * inwards.
  *
- * There are four sides, so a fifth marker on the same spot has nowhere to go. Its label
+ * There are eight positions, so a ninth marker on the same spot has nowhere to go. Its label
  * is then `hidden`: the pin stays, and CSS keeps the name out of sight until the marker
  * is pointed at or focused. Stacked unreadable text would be worse than none, and the
  * place is never lost — it stands in the list under the map (02-§5.24).
@@ -293,6 +344,17 @@ export function placeLabels(
   const edge: Box = { left: 0, right: referenceWidth, top: 0, bottom: drawingHeight * scale };
   const height = LABEL_METRICS.fontSize * LINE_HEIGHT_RATIO;
   const half = LABEL_METRICS.tapTarget / 2;
+
+  // The zoom controls sit over the bottom-right corner (02-§5.41), so a label placed
+  // there would end up behind a button. Only the two buttons that are always on screen
+  // are reserved: "Visa hela kartan" appears while zoomed, and a zoomed map shows every
+  // name anyway (02-§5.44), so the overview's placement is not what the visitor sees then.
+  const controls: Box = {
+    left: referenceWidth - LABEL_METRICS.controlInset - LABEL_METRICS.tapTarget,
+    right: referenceWidth - LABEL_METRICS.controlInset,
+    top: edge.bottom - LABEL_METRICS.controlInset - 2 * LABEL_METRICS.tapTarget - LABEL_METRICS.controlGap,
+    bottom: edge.bottom - LABEL_METRICS.controlInset,
+  };
 
   const points = markers.map((marker) => ({
     id: marker.id,
@@ -318,6 +380,7 @@ export function placeLabels(
       const box = labelBox(point.x, point.y, point.width, height, side);
       return (
         contains(edge, box) &&
+        !overlaps(box, controls) &&
         !taken.some((other) => overlaps(box, other)) &&
         !pins.some((pin) => overlaps(box, pin))
       );
@@ -429,9 +492,9 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   for (const { location, position } of drawn) {
     const side = sides.get(location.id) ?? "below";
     const wide = wideSides.get(location.id) ?? "below";
-    // `below` is the plain case and needs no modifier in the narrow layout, so most
-    // markers keep bare markup there. The wide class is always written: from 600 px the
-    // stylesheet starts from the default and follows it (05-§5.2).
+    // `below` is the stylesheet's base case and needs no modifier in the narrow layout.
+    // The wide class is always written: from 600 px the stylesheet starts from the
+    // default and follows it (05-§5.2).
     const className =
       (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
       ` map__marker--wide-${wide}`;

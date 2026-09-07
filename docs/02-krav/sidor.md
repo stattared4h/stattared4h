@@ -185,16 +185,18 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   ritningens kant. Ligger fler markörer på samma fläck än det finns sidor visas de
   etiketter som blir över inte på kartan: namnet är kvar som markörens tillgängliga namn, syns
   när markören pekas på eller får fokus, och står alltid i listan under kartan
-  (`02-§5.24`). Bygget räknar placeringen för en karta som är 360 px bred — den trängsta
-  vyn i mobilläget (`05-§5.1`) — och räknar deterministiskt: samma platsdata ger samma
-  placering. <!-- 02-§5.33 -->
+  (`02-§5.24`). Bygget räknar placeringen för kartans egen bredd, inte fönstrets: på en
+  360 px telefon är kartan 312 px bred, resten är behållarens innerkant. Räkningen är
+  deterministisk: samma platsdata ger samma placering. <!-- 02-§5.33 -->
 - Etiketten har åtta möjliga lägen kring markören: fyra sneda och fyra raka. De sneda
-  prövas först, i ordningen snett upp till vänster, snett upp till höger, snett ned till
-  vänster, snett ned till höger; därefter de raka i ordningen under, över, höger, vänster.
-  Ett snett läge lämnar stråket rakt under och rakt bredvid markören fritt åt grannen, och
-  i betesmarken följer det bandets riktning i stället för att gå på tvärs över staketet in
-  i grannhagen. Ordningen inom varje grupp är densamma som platserna tas i — norr före
-  söder, väster före öster — så att placeringen förblir deterministisk. <!-- 02-§5.53 -->
+  prövas först — ett snett läge lämnar stråket rakt under och rakt bredvid markören fritt
+  åt grannen. Betesmarkens band löper nordväst–sydost, så av de sneda prövas de två som
+  följer den riktningen först: snett upp till vänster och snett ned till höger. En etikett
+  på den andra diagonalen går på tvärs över staketet in i grannhagen. Ordningen är därmed
+  snett upp vänster, snett ned höger, snett upp höger, snett ned vänster, och därefter de
+  raka: under, över, höger, vänster. Ordningen är fast, så placeringen är
+  deterministisk. Hörnet där zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så
+  ingen etikett hamnar bakom en knapp. <!-- 02-§5.53 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är

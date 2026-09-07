@@ -94,7 +94,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Gethagen", "Stora hagen", "Övre hagen"]);
@@ -295,6 +295,28 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
     assert.deepEqual([...sides.values()], ["above-left", "above-left"]);
   });
 
+  test("the order tries the pasture's own diagonal before the one across it", () => {
+    // The bands run north-west to south-east, so up-left and down-right follow a paddock
+    // and the other diagonal crosses the fence (02-§5.51). A marker hemmed in on the
+    // pasture's axis falls to the crossing diagonal, never the other way round.
+    const alone = placeLabels([{ id: "a", name: "1:an", x: 400, y: 300 }], 800, 600);
+    assert.equal(alone.get("a"), "above-left", "the pasture's axis comes first");
+
+    // Blocked up-left by the drawing's left edge and down-right by a neighbour's pin.
+    const hemmed = placeLabels(
+      [
+        { id: "granne", name: "2:an", x: 173, y: 389 },
+        { id: "a", name: "1:an", x: 60, y: 300 },
+      ],
+      800,
+      600,
+    );
+    assert.ok(
+      ["above-right", "below-left"].includes(hemmed.get("a") as string),
+      `faller till den korsande diagonalen, fick ${hemmed.get("a")}`,
+    );
+  });
+
   test("a slanted position wins over a straight one that is equally free", () => {
     const sides = placeLabels([{ id: "ensam", name: "Hagen", x: 400, y: 300 }], 800, 600);
     assert.ok(
@@ -347,7 +369,7 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
     const sides = placeLabels(
       [
         { id: "topp", name: "Lygnslätt 2", x: 40, y: 20 },
-        { id: "botten", name: "Lygnslätt 2", x: 760, y: 580 },
+        { id: "botten", name: "Lygnslätt 2", x: 40, y: 580 },
       ],
       800,
       600,
@@ -357,9 +379,16 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
       `hörnet uppe till vänster vänder etiketten in och ned, fick ${sides.get("topp")}`,
     );
     assert.ok(
-      ["above-left", "above", "left"].includes(sides.get("botten") as string),
-      `hörnet nere till höger vänder etiketten in och upp, fick ${sides.get("botten")}`,
+      ["above-right", "above", "right"].includes(sides.get("botten") as string),
+      `hörnet nere till vänster vänder etiketten in och upp, fick ${sides.get("botten")}`,
     );
+  });
+
+  test("no label is placed behind the zoom controls", () => {
+    // The controls sit over the bottom-right corner (02-§5.41). A label there would be
+    // readable only to whoever moves the button out of the way.
+    const sides = placeLabels([{ id: "hornet", name: "Lygnslätt 2", x: 780, y: 570 }], 800, 600);
+    assert.equal(sides.get("hornet"), "hidden", "hellre dold än bakom en knapp");
   });
 
   test("two markers a finger apart get their labels in different positions", () => {
@@ -390,9 +419,11 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
   });
 
   test("when every position is taken the extra labels are hidden, not stacked", () => {
-    // Ten places on the same spot: there are eight positions, so two labels must give
-    // up. Hidden beats stacked — unreadable text helps nobody, and the place is still
-    // in the list under the map (02-§5.24).
+    // Ten places on the exact same spot. Six labels fit, not eight: `above` overlaps
+    // both slanted positions above the marker and `below` overlaps both below, so on a
+    // single spot the straight pair up and down is never free. Six still beats the four
+    // the straight positions alone allowed. Hidden beats stacked — unreadable text helps
+    // nobody, and the place is still in the list under the map (02-§5.24).
     const markers = Array.from({ length: 10 }, (_, i) => ({
       id: `p${i}`,
       name: "Hagen",
@@ -402,19 +433,24 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
     const sides = placeLabels(markers, 800, 600);
     assert.equal(sides.size, 10);
     assert.equal(sides.get("p0"), "above-left");
-    assert.deepEqual(
-      [...sides.values()].filter((side) => side === "hidden").length,
-      2,
-      "eight positions are used, the last two are hidden",
+    assert.equal(
+      [...sides.values()].filter((side) => side !== "hidden").length,
+      6,
+      "six labels fit on one spot",
     );
+    assert.equal([...sides.values()].filter((side) => side === "hidden").length, 4);
   });
 
   test("a hidden label leaves room for the next one", () => {
     // Otherwise a label nobody can see would push aside one that fits.
+    const granne = { id: "granne", name: "Hagen", x: 400, y: 480 };
     const crowd = Array.from({ length: 9 }, (_, i) => ({ id: `c${i}`, name: "Hagen", x: 400, y: 300 }));
-    const sides = placeLabels([...crowd, { id: "granne", name: "Hagen", x: 400, y: 480 }], 800, 600);
+    const sides = placeLabels([...crowd, granne], 800, 600);
     assert.equal(sides.get("c8"), "hidden");
-    assert.equal(sides.get("granne"), "above-left", "the neighbour is placed as if the hidden one were not there");
+    // The neighbour lands where it would have without the labels nobody can see.
+    const withoutHidden = placeLabels([...crowd.slice(0, 6), granne], 800, 600);
+    assert.equal(sides.get("granne"), withoutHidden.get("granne"));
+    assert.notEqual(sides.get("granne"), "hidden", "the neighbour still gets a label");
   });
 
   test("renderMap marks the side on the marker, and only when it is not the default", () => {
@@ -455,6 +491,20 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
     assert.equal(LABEL_METRICS.tapTarget, token("--tap-target-min"));
     assert.equal(LABEL_METRICS.fontSize, token("--font-size-small"));
     assert.equal(LABEL_METRICS.padding, token("--space-xs"));
+    assert.equal(LABEL_METRICS.containerPadding, token("--space-md"));
+    assert.equal(LABEL_METRICS.controlInset, token("--space-sm"));
+    assert.equal(LABEL_METRICS.controlGap, token("--space-xs"));
+  });
+
+  test("the reference widths are the map's own width, not the window's", async () => {
+    // The map sits in `.container`, which keeps `--space-md` at each side. Estimating
+    // against the window would let a label hang over the map's edge (02-§5.33).
+    const css = await readFile(path.join(ROOT, "source/assets/css/layout.css"), "utf8");
+    assert.match(css, /\.container\s*\{[^}]*padding-inline:\s*var\(--space-md\)/, ".container håller --space-md i sidled");
+    const gutters = 2 * LABEL_METRICS.containerPadding;
+    assert.equal(LABEL_METRICS.referenceWidth, 360 - gutters, "360 px telefon");
+    assert.equal(LABEL_METRICS.wideWidth, 600 - gutters, "600 px, där den breda placeringen tar över");
+    assert.match(css, /@media \(min-width: 600px\)/, "den breda placeringen tar över vid 600 px");
   });
 });
 
