@@ -63,6 +63,9 @@ sw.addEventListener("activate", (event) => {
 });
 
 sw.addEventListener("message", (event) => {
+  // Only this site's own pages may steer the worker. A message from anywhere else is
+  // ignored, so a page on another origin cannot make the waiting worker take over.
+  if (event.origin !== sw.location.origin) return;
   // The "Ladda om" button in the status bar asks the waiting worker to take over (02-§10.28).
   if (event.data && typeof event.data === "object" && (event.data as { type?: unknown }).type === "skipWaiting") {
     void sw.skipWaiting();
