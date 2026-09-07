@@ -69,6 +69,9 @@ namngivet djur står i hagen.
 - En plats med `active: false` behåller sin adress, visar "Den här platsen används inte
   just nu" och en länk till kartan, och finns varken på kartan eller i kartans
   lista. <!-- 02-§5.13 -->
+- Platssidan visar platsens bilder med `alt` och fotografens namn, efter faktarutan och
+  före djurlistan, så att djurslagen överst inte trängs undan (`05-§6.24`). En plats utan
+  bilder visar ingen platshållare. <!-- 02-§5.30 -->
 - `npm run qr` skriver en SVG-fil per plats till `qr/<id>.svg`, med adressen
   `<sajtens adress>plats/<id>/`, i ett format som går att skriva ut på en skylt.
   Adressen tas ur miljövariabeln `SITE_URL` med

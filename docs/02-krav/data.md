@@ -27,8 +27,9 @@ att Å, Ä och Ö hamnar sist och inte bland A och O.
 - Valideringen fäller vid varje fel i `04-§10`, och dessutom vid ett fält som inte finns i
   kontraktet. <!-- 02-§6.3 -->
 - Valideringen varnar, utan att fälla, vid ett djur utan foto, en aktiv plats utan
-  djurslag, en aktiv plats utan koordinater, en art utan bild, och en art vars djur med
-  `status: here` inte finns på någon aktiv plats. <!-- 02-§6.4 -->
+  djurslag, en aktiv plats utan koordinater, en art utan bild, en art vars djur med
+  `status: here` inte finns på någon aktiv plats, en bildpost som ingen refererar och en
+  bildfil som ingen bildpost hör till. <!-- 02-§6.4 -->
 - Varje fel och varning skrivs på svenska med fil, fält och vad som ska rättas, så att en
   redaktör förstår meddelandet i pull requestens logg. <!-- 02-§6.5 -->
 - `npm run validate` kör valideringen ensam mot `DATA_DIR` och avslutar med felkod vid
@@ -53,7 +54,9 @@ att Å, Ä och Ö hamnar sist och inte bland A och O.
 - Ett test bevakar att inget djur i något dataset har ett `location`-fält
   (`04-§4.2`). <!-- 02-§6.11 -->
 - QA-datasetet innehåller minst 100 namngivna individer och täcker varje art och ras i
-  vokabulären, så att listor, sortering och stora datamängder prövas. <!-- 02-§6.12 -->
+  vokabulären, så att listor, sortering och stora datamängder prövas. Det innehåller
+  också en bild som två djur delar och en plats med bild, så att bildposternas
+  delning prövas. <!-- 02-§6.12 -->
 - Djur som gården bara redovisar som antal lagras som räknade bestånd per art och ras,
   inte som påhittade individer. En art får inte använda båda modellerna samtidigt.
   <!-- 02-§6.13 -->
