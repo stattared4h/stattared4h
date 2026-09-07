@@ -244,6 +244,11 @@ lagringen kan bytas utan att datat rörs. <!-- 04-§9.2 -->
 Bara webbanpassade bilder läggs i repot — WebP, högst 1600 px och 250 KB. Original bevaras
 i gårdens eget arkiv. Se [ADR 0008](adr/0008-bilder-i-repot.md). <!-- 04-§9.3 -->
 
+Bildkatalogen följer datasetet: `source/data` läser bilder från `source/images`, och
+`source/data-qa` från `source/images-qa`. Bygget härleder katalogen ur datakatalogens
+namn genom att byta `data` mot `images`, så att genererade QA-platshållare aldrig
+blandas med gårdens bilder. <!-- 04-§9.4 -->
+
 ---
 
 ## 10. Validering

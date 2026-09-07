@@ -49,6 +49,9 @@ DATA_DIR=source/data-qa npm run build  # QA
 `DATA_DIR` får verkan när de datadrivna sidorna byggs. Bygget renderar i dag bara
 startsidan; se spårbarhetsmatrisen för vad som finns och vad som saknas.
 
+Bildkatalogen följer datasetet (`04-§9.4`): `source/data-qa` läser bilder från
+`source/images-qa/`, som `npm run qa:images` genererar och git ignorerar (`02-§8.4`).
+
 **Testerna körs alltid mot `source/data-qa/`, aldrig mot gårdens riktiga data.** Ett test
 får aldrig kunna börja fallera för att gården sålt en get. <!-- 06-§2.2 -->
 

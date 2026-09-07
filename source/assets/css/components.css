@@ -45,6 +45,21 @@
   color: var(--color-surface);
 }
 
+/* Shown instead of a missing photo (05-§6.20): the species name on a pale green plate, never a broken image. */
+.image-placeholder {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  background: var(--color-green-pale);
+  color: var(--color-green-deep);
+}
+
+.image-placeholder__label {
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+}
+
 .meta {
   color: var(--color-ink-soft);
   font-size: var(--font-size-small);

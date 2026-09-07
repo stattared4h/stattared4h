@@ -53,3 +53,26 @@ En kontroll i CI fäller bygget vid överskriden storlek eller fel format, och k
   `docs/01-BIDRA.md` beskriver det.
 - Ett hjälpkommando behövs för att skala om, strippa EXIF och konvertera, annars blir manuellt
   bildarbete tröttsamt nog att någon tar genvägar förbi grinden.
+
+## Beroende
+
+Hjälpkommandot och byggets storleksgenerering använder [sharp](https://github.com/lovell/sharp),
+repots första beroende med native-kod. Granskat enligt `07-SAKERHET.md` §6:
+
+- **Ursprung och underhåll.** sharp är ett Node-bindningslager runt bildbiblioteket
+  libvips, utvecklat och underhållet av Lovell Fuller sedan 2013 under Apache-2.0, med
+  regelbundna släpp och ett av de mest använda bildpaketen i npm-registret — Next.js
+  och Astro bygger sin bildoptimering på det. Paketnamnet är kort och etablerat; det
+  finns ingen känd namnförväxling att vara vaksam på.
+- **Native-binärer utan installationsskript.** Binärerna levereras förbyggda som
+  optionella beroenden, `@img/sharp-<plattform>` och `@img/sharp-libvips-<plattform>`,
+  och npm väljer den variant som passar maskinen. Paketet har inget `install`-skript,
+  så `npm ci --ignore-scripts` i CI fungerar oförändrat — verifierat vid införandet.
+  Ingenting kompileras och ingenting hämtas utanför npm-registret.
+- **Låsfilen** listar samtliga plattformsvarianter med integritetshashar, så bygget är
+  reproducerbart. Dependabot och kontrollen *Dependency review* bevakar dem.
+- **Når aldrig besökaren.** sharp körs bara vid bygget och i `npm run image` och
+  `npm run qa:images`. Det som publiceras är WebP-filer och HTML; ingen kod från sharp
+  hamnar i `public/`.
+- **Transitiva beroenden:** `@img/colour`, `detect-libc` och `semver`, samt
+  `@emnapi/runtime` och `tslib` för wasm-varianten.

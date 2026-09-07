@@ -120,6 +120,10 @@ Varje bild får `width`, `height` och `loading="lazy"` — utom den första bild
 laddas ivrigt med `fetchpriority="high"` så att den inte fördröjer hur snabb sidan
 känns. <!-- 03-§6.3 -->
 
+Mekanismen bor i `source/ts/build/images.ts` — storlekar, `renderPicture` och
+`renderPlaceholder` — och i `images-plugin.ts`, som registrerar Nunjucks-shortcoden
+`picture` i Eleventy. Bildkatalogen härleds ur datasetet (`04-§9.4`).
+
 En art kan ha en bild (`04-§6.3`) i `source/images/species/`. Den används i
 djurslagsrutorna på start- och platssidan och på artsidan. Saknas den visas artens namn
 på en ljusgrön platta (`05-§6.20`). <!-- 03-§6.4 -->

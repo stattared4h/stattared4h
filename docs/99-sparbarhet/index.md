@@ -67,9 +67,11 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§6.13` | Räknade bestånd för djur utan individsidor | `byggd` | `source/ts/domain/load.ts`, `validate.ts`, `derive.ts`; `tests/domain/qa-data.test.ts` |
 | `02-§7.1`–`7.9` | Manifest och service worker | `saknas` | |
 | `02-§7.10` | Installation på iOS och Android | `saknas` | Blir `manuell` med steget i kravet när service workern finns |
-| `02-§8.1`–`8.2` | Bildfiler och validering av dem | `saknas` | `source/images/` finns inte |
-| `02-§8.3`–`8.4` | Hjälpkommandon för bilder | `saknas` | Kräver ett bildbibliotek; granskas som beroende |
-| `02-§8.5`–`8.7` | Leverans av bilder | `saknas` | |
+| `02-§8.1` | Bara webbanpassade bilder i repot | `påbörjad` | `npm run image` skriver filer som håller gränserna; `source/images/` har ännu inga bilder. Efterlevnaden bevakas av `02-§8.2` |
+| `02-§8.2` | Validering av bildfiler | `saknas` | Valideraren (`04-§10.7`) |
+| `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` och `optimiseImage` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
+| `02-§8.4` | `npm run qa:images` | `byggd` | `scripts/qa-images.mjs` skriver till `source/images-qa/`; `tests/build/images.test.ts` |
+| `02-§8.5`–`8.7` | Leverans av bilder | `påbörjad` | `renderPicture`, `renderPlaceholder` och Eleventy-pluginen i `source/ts/build/` är testade; ingen sida använder shortcoden ännu, och `credit` visas av sidmallen |
 | `02-§9.1` | Eleventy och esbuild | `saknas` | `scripts/build.mjs` är ett provisorium som byts ut |
 | `02-§9.2` | Node 22.18 i `.nvmrc` och `engines` | `påbörjad` | Båda finns; inget test |
 | `02-§9.3` | `npm run lint` | `påbörjad` | Kör html-validate, stylelint med `declaration-strict-value`, eslint, markdownlint och yamllint; inget test som bevakar att alla fem ingår |
@@ -107,6 +109,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§4.11`–`4.15` | Rutnät och träffytor | `dokumenterad` | Rutnätet skrivs med djurkorten |
 | `05-§5` | Brytpunkter | `dokumenterad` | Tillämpas när layouten skrivs |
 | `05-§6.3` | Knappar | `påbörjad` | `.button` på startsidan, 47 px hög |
+| `05-§6.15` | Kortets bild i 4:3 | `dokumenterad` | Kortets CSS skrivs med djurkorten; platshållaren (`05-§6.20`) håller redan 4:3 |
+| `05-§6.17` | `width` och `height` på varje bild | `påbörjad` | `renderPicture` sätter dem, bevakat av `tests/build/images.test.ts`; ingen sida använder den ännu |
+| `05-§6.20` | Platshållare för saknat foto | `påbörjad` | `renderPlaceholder` och `.image-placeholder` i `components.css`; markupen är testad, utseendet kontrolleras när en sida visar den |
 | `05-§6.30` | Sidfot | `påbörjad` | Startsidans sidfot; logotyp och version saknas |
 | `05-§6.33`–`6.37` | Ikonknapp, meny, dialog, statusrad, sidhuvudets höjd | `saknas` | |
 | `05-§6` övrigt | Komponenter | `saknas` | Skrivs när markupen finns, enligt `05-§7.2` |
@@ -114,7 +119,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§7.4` | Designtokens | `byggd` | `tokens.css`, bevakad av `tests/design/tokens.test.ts` |
 | `05-§7.7`–`7.8` | Fokusmarkering, rörelse | `påbörjad` | I `base.css`; inget test |
 | `05-§7.10` | Filstruktur för CSS | `påbörjad` | Tre av fyra filer; `utilities.css` skapas vid behov |
-| `05-§8` | Bilder | `dokumenterad` | Kraven i `02-§8` |
+| `05-§8` | Bilder | `påbörjad` | `05-§8.5` genom `generateImageSizes`; `8.6`–`8.7` genom `renderPicture`, ännu utan sida; foto- och samtyckesreglerna är vägledning |
 | `05-§9` | Tillgänglighet | `dokumenterad` | Delvis testbar med html-validate |
 | `05-§10` | Vad man inte gör | `dokumenterad` | Delvis kontrollerbar med lint |
 
@@ -135,7 +140,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `06-§1.5` | QA-versionen får tillägget " – QA" | `saknas` | |
 | `06-§2.1` | `DATA_DIR` väljer dataset | `påbörjad` | `defaultDataDir()` i `source/ts/domain/index.ts` och `npm run validate` läser `DATA_DIR` (`tests/domain/validate-script.test.ts`); bygget läser ännu inget dataset |
 | `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
-| `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | 100 individer och två räknade hönsbestånd finns; bildfilerna saknas |
+| `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | 100 individer och två räknade hönsbestånd finns; bildfilerna genereras av `npm run qa:images` (`02-§8.4`) |
 | `06-§2.4` | Kontraktsändring ändrar QA-datat | `dokumenterad` | Process |
 | `06-§3.1` | `BASE_PATH` | `påbörjad` | `scripts/build.mjs`; ersätts av Eleventys `pathPrefix` |
 | `06-§3.2`–`3.3` | Hjälpfunktion och QA under `/qa/` | `saknas` | Testet är `02-§9.8` |
@@ -148,6 +153,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
 | `03-§1`–`03-§7` | Byggkedja, skikt, härledda vyer, sidor, offline, bilder, redigering | `dokumenterad` | Mekanismerna bakom `02-§5`–`02-§8` |
+| `03-§6.1` | Bygget genererar bara mindre storlekar | `byggd` | `generateImageSizes` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
+| `03-§6.2` | Upplösare från filnamn till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` |
+| `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `påbörjad` | `renderPicture` är testad; sidorna använder den inte ännu |
 | `03-§8.1` | `npm run build` | `påbörjad` | Provisoriskt skript utan Eleventy |
 | `03-§8.2`–`8.4` | Test, lint och CI | `saknas` | Kraven i `02-§9` |
 | `03-§8.5` | Merge till `main` deployar | `påbörjad` | Fungerar, men utan beroende av kvalitetsflödet (`02-§9.11`) |
@@ -173,10 +181,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 33 |
-| `dokumenterad` | 16 |
-| `påbörjad` | 26 |
-| `byggd` | 19 |
+| `saknas` | 31 |
+| `dokumenterad` | 15 |
+| `påbörjad` | 33 |
+| `byggd` | 25 |
 | `manuell` | 2 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
