@@ -33,9 +33,14 @@ export interface RequestFacts {
   precache: ReadonlySet<string>;
 }
 
-/** Pages are written as index.html in a directory, so `/karta/index.html` and `/karta/` are the same entry. */
+/**
+ * Pages are written as index.html in a directory, so `/karta/index.html` and `/karta/`
+ * are the same entry. A regular expression rather than a string with a slash: the
+ * build test reads every quoted string starting with "/" in sw.js as a site address
+ * (02-§9.8), and this one is not.
+ */
 export function normalisePathname(pathname: string): string {
-  return pathname.endsWith("/index.html") ? pathname.slice(0, -"index.html".length) : pathname;
+  return pathname.replace(/(?<=\/)index\.html$/, "");
 }
 
 export function chooseStrategy(facts: RequestFacts): FetchStrategy {
