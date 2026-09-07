@@ -77,6 +77,13 @@ Regler:
 - Arbetet går i två faser: i fas 1 underhåller en administratör datat med vanliga
   commits och det finns ingen inloggning; i fas 2 tar ett skriv-API emot redaktörernas
   ändringar. Se ADR 0013. <!-- CL-§1.14 -->
+- **Lämna det bättre än du hittade det.** Ser du något smått och trasigt i det du ändå
+  har öppet — en rubrik som inte längre stämmer med sidan, ett vilseledande namn, en
+  kommentar som ljuger, ett test som inte prövar det det påstår — rätta det i samma
+  ändring. Att bara rapportera det är att lämna kvar arbetet åt någon annan. Gränsen går
+  vid diffen: regeln gäller det du redan rör vid, inte hela filen och inte grannfilen, och
+  den är aldrig ett skäl att bygga ut uppdraget. Är rättningen större än några rader, eller
+  ändrar den beteende, blir den ett eget issue i stället. <!-- CL-§1.15 -->
 
 ### Språk
 

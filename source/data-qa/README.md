@@ -27,9 +27,9 @@ prövar större listor, svensk sortering och att samtliga arter och raser använ
 | --- | --- |
 | `rosa` | Fullständigt djur: alla fält satta, tre foton, båda föräldrarna kända |
 | `stjarna` | `born` som enbart årtal; mamma till två djur |
-| `bocken` | `status: gone`; helt utan foton; förälder som lämnat gården |
+| `bocken` | `status: gone`; förälder som lämnat gården; delar foto med andra jämtgetter |
 | `lilla-gumman` | Flerordigt namn → id med bindestreck; `born` och `breed` saknas; syskon till Rosa via samma mamma; **delar ett foto med Rosa** — fallet som gjorde bilden till en egen post (ADR 0015) |
-| `tuva` | Minsta möjliga djur — bara de obligatoriska fälten |
+| `tuva` | Bara obligatoriska fakta och ett delat foto; saknar ras, födelseuppgift och släkt |
 | `snobollen` | Ö i namnet; annan art än de föregående |
 | `bagaren` | Hane med foto, i samma hage som en annan art |
 | `majros` | Ensam individ av sin art; flera foton, där den första är porträttet |
@@ -57,17 +57,19 @@ Arten `hast` finns medvetet på **ingen** plats, så att artsidan prövas när s
 
 Varje bild är en egen post i `images/` med `alt` och `credit`
 ([ADR 0015](../../docs/adr/0015-bilden-som-egen-post.md)); djur, platser och arter
-refererar bild-id:n. Datasetet har 101 bildposter, och varje post används av minst en
-annan post — annars varnar valideringen (`02-§8.13`).
+refererar bild-id:n. Datasetet har cirka 25 bildposter som delas av flera djur, och
+varje post används av minst en annan post — annars varnar valideringen (`02-§8.13`).
+Alla 100 djur har minst en bildreferens; en plats utan bilder finns kvar för att pröva
+det tillåtna fallet.
 
-Bildfilerna genereras av `npm run qa:images` som enfärgade platshållare med bildens
-alt-text, i `source/images-qa/`. Katalogen ignoreras av git — inga påhittade fotografier
-commit:as (`02-§8.4`). Bildkatalogen följer datasetet (`04-§9.4`), så platshållarna
-blandas aldrig med gårdens bilder i `source/images/`.
+Bildfilerna i `source/images-qa/` är fotorealistiska AI-bilder med inbränd märkning och
+versionshanteras enligt ADR 0017. `npm run qa:images` skapar bara enfärgade
+platshållare för filer som ännu saknas. Bildkatalogen följer datasetet (`04-§9.4`), så
+QA-bilderna blandas aldrig med gårdens bilder i `source/images/`.
 
-Id:na här är inte hashar av platshållarna, utan bestämda när datasetet skrevs.
-Platshållarna genereras om och skulle annars byta id varje gång bildbiblioteket ändrar
-sin utdata (`04-§9.10`).
+Id:na här är inte hashar av bildfilerna, utan bestämda när datasetet skrevs. En AI-bild
+kan då genereras och importeras på nytt utan att alla referenser byter id
+(`04-§9.10`).
 
 Kör kommandot innan ett QA-bygge och när en post får en ny bildreferens. En fil som
 redan finns lämnas orörd, så en omkörning är omedelbar.

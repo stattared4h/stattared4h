@@ -1,0 +1,8 @@
+name: Ekbacken
+kind: djurplats
+species:
+  - far
+lat: 57.337300
+lon: 12.338000
+accessible: false
+active: true

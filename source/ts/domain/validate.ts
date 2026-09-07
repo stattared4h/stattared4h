@@ -28,6 +28,7 @@ import type {
   Image,
   Issue,
   Location,
+  LocationKind,
   Population,
   Sex,
   Species,
@@ -78,6 +79,7 @@ const IMAGE_FIELDS = new Set(["alt", "credit"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
+const LOCATION_KINDS: readonly LocationKind[] = ["djurplats", "besoksmal"];
 
 const ANIMAL_FIELDS = new Set([
   "name",
@@ -93,6 +95,7 @@ const ANIMAL_FIELDS = new Set([
 ]);
 const LOCATION_FIELDS = new Set([
   "name",
+  "kind",
   "species",
   "note",
   "description",
@@ -343,7 +346,7 @@ function openRecord(record: RawRecord, issues: Issues, kind: string): Obj | null
  * name check; a post with an unusable id is dropped, and every reference to it then
  * fails on its own with a message the editor can act on.
  */
-function validateImagePosts(records: readonly RawRecord[], issues: Issues): Map<string, Image> {
+function validateImagePosts(records: readonly RawRecord[], issues: Issues, allowAiCredit: boolean): Map<string, Image> {
   const images = new Map<string, Image>();
   for (const record of records) {
     if (record.parseError !== null) {
@@ -368,6 +371,9 @@ function validateImagePosts(records: readonly RawRecord[], issues: Issues): Map<
     const alt = fields.requiredString(record.data, "alt");
     const credit = fields.requiredString(record.data, "credit");
     if (alt === null || credit === null) continue;
+    if (!allowAiCredit && credit.startsWith("AI-genererad")) {
+      issues.error(record.file, "credit", "AI-genererade bilder får bara finnas i QA-datasetet.");
+    }
     images.set(record.id, { id: record.id, alt, credit });
   }
   return images;
@@ -683,6 +689,7 @@ function validateLocation(
   fields.noHtml(data, null);
 
   const name = fields.requiredString(data, "name");
+  const kind = fields.requiredEnum(data, "kind", LOCATION_KINDS);
   const note = fields.optionalString(data, "note");
   const description = fields.optionalString(data, "description");
   const lat = fields.optionalNumber(data, "lat");
@@ -732,8 +739,16 @@ function validateLocation(
     coordinatesValid = false;
   }
 
+  // A besoksmal with animals is almost always a paddock file copied for a café
+  // (ADR 0018), so it stops the build rather than passing with a warning.
+  if (kind === "besoksmal" && species !== null && species.length > 0) {
+    issues.error(record.file, "species", "ett besöksmål har inga djurslag. Skriv [], eller sätt kind: djurplats.");
+    species = null;
+  }
+
   if (
     name === null ||
+    kind === null ||
     species === null ||
     accessible === null ||
     active === null ||
@@ -742,7 +757,7 @@ function validateLocation(
   ) {
     return null;
   }
-  return { id: record.id, name, species, note, description, lat, lon, accessible, active, photos };
+  return { id: record.id, name, kind, species, note, description, lat, lon, accessible, active, photos };
 }
 
 // --- Warnings ------------------------------------------------------------------
@@ -784,7 +799,8 @@ function collectWarnings(
   for (const location of locations) {
     if (!location.active) continue;
     const file = files.get(`locations/${location.id}`) ?? `locations/${location.id}.yaml`;
-    if (location.species.length === 0) {
+    // Only a djurplats is expected to have animals; a café with none is not a mistake.
+    if (location.kind === "djurplats" && location.species.length === 0) {
       issues.warn(file, "species", "platsen är aktiv men har inget djurslag. Platssidan blir tom.");
     }
     if (location.lat === null) {
@@ -928,7 +944,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   const today = options.today ?? new Date();
   const speciesFile = raw.species?.file ?? "species.yaml";
 
-  const images = validateImagePosts(raw.images, issues);
+  const images = validateImagePosts(raw.images, issues, path.basename(raw.dir).startsWith("data-"));
   const species = validateSpecies(raw.species, images, issues);
   const speciesIds = new Set(species.map((s) => s.id));
   const breeds = validateBreeds(raw.breeds, speciesIds, issues);

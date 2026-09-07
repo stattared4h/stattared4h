@@ -27,6 +27,7 @@ import {
   type Dataset,
   type Image,
   type Location,
+  type LocationKind,
   type Population,
   type Species,
 } from "../domain/index.ts";
@@ -81,6 +82,8 @@ export interface LocationPageView {
   /** The page's meta description. */
   description: string;
   active: boolean;
+  /** What the place is (04-§5.7). A besoksmal page never mentions animals (02-§5.35). */
+  kind: LocationKind;
   species: SpeciesTileView[];
   note: string | null;
   /** The location's `description` field, Markdown. */
@@ -256,15 +259,18 @@ export function locationView(dataset: Dataset, location: Location, farm: string)
     cards: group.animals.map((animal) => animalCard(dataset, animal)),
     populationSentence: populationSentence(dataset, group.populations),
   }));
-  const description = location.active
-    ? `Vilka djurslag som går i ${location.name} på ${farm}, och djuren av de slagen.`
-    : `${location.name} på ${farm} används inte just nu.`;
+  const description = !location.active
+    ? `${location.name} på ${farm} används inte just nu.`
+    : location.kind === "besoksmal"
+      ? `${location.name} på ${farm}: var den ligger och hur man når den.`
+      : `Vilka djurslag som går i ${location.name} på ${farm}, och djuren av de slagen.`;
   return {
     id: location.id,
     name: location.name,
     url: locationUrl(location.id),
     description,
     active: location.active,
+    kind: location.kind,
     species: groups.map((group) => group.species),
     note: location.note,
     body: location.description,
@@ -347,11 +353,15 @@ export function mapView(dataset: Dataset, options: Pick<BuildViewsOptions, "base
     .filter((location) => location.active)
     .map((location) => {
       const plurals = dataset.species.filter((s) => location.species.includes(s.id)).map((s) => s.plural);
-      return {
-        name: location.name,
-        url: locationUrl(location.id),
-        species: plurals.length === 0 ? NO_SPECIES_AT_LOCATION_TEXT : joinSwedish([plurals[0], ...plurals.slice(1).map(lowerFirst)]),
-      };
+      // A besoksmal has no animals to report, and saying "inga djur just nu" about the
+      // café would be answering a question nobody asked (02-§5.35).
+      const species =
+        location.kind === "besoksmal"
+          ? ""
+          : plurals.length === 0
+            ? NO_SPECIES_AT_LOCATION_TEXT
+            : joinSwedish([plurals[0], ...plurals.slice(1).map(lowerFirst)]);
+      return { name: location.name, url: locationUrl(location.id), species };
     });
   return { html: rendered.html, list, warnings: rendered.warnings };
 }

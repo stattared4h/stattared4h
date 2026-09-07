@@ -152,6 +152,7 @@ djuren som finns där. <!-- 04-§5.1 -->
 
 ```yaml
 name: string                 # platsens namn, t.ex. "Gethagen"
+kind: djurplats | besoksmal  # hage eller djurhus, respektive allt annat besökaren går till
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
 description: string | null   # markdown
@@ -162,13 +163,17 @@ active: boolean              # false för platser som inte används just nu
 photos: [string]             # bild-id:n, se §9; den första visas överst
 ```
 
-Obligatoriskt: `name`, `species`, `accessible` och `active`. `species` får vara en tom
-lista. Övrigt får utelämnas. <!-- 04-§5.6 -->
+Obligatoriskt: `name`, `kind`, `species`, `accessible` och `active`. `species` får vara en
+tom lista. Övrigt får utelämnas. <!-- 04-§5.6 -->
 
 Regler:
 
 - `species` är listan över **djurslag**, inte individer. Flera djurslag kan gå i samma
   hage, och samma djurslag kan finnas på flera platser. <!-- 04-§5.2 -->
+- `kind` skiljer hagen och djurhuset (`djurplats`) från caféet, toaletten och lekplatsen
+  (`besoksmal`). Sorten är ett faktum om platsen och härleds aldrig ur `species` — en hage
+  vars djur tillfälligt flyttats är fortfarande en hage. Ett besöksmål med djurslag fäller
+  valideringen. Se [ADR 0018](adr/0018-platsen-har-en-sort.md). <!-- 04-§5.7 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död
@@ -292,8 +297,9 @@ i gårdens eget arkiv. Se [ADR 0008](adr/0008-bilder-i-repot.md). <!-- 04-§9.3 
 
 Bildkatalogen följer datasetet: `source/data` läser bilder från `source/images`, och
 `source/data-qa` från `source/images-qa`. Bygget härleder katalogen ur datakatalogens
-namn genom att byta `data` mot `images`, så att genererade QA-platshållare aldrig
-blandas med gårdens bilder. <!-- 04-§9.4 -->
+namn genom att byta `data` mot `images`, så att AI-genererade QA-bilder och
+platshållare aldrig blandas med gårdens bilder. QA-filer håller de snävare gränserna
+1200 px och 50 KB enligt ADR 0017. <!-- 04-§9.4 -->
 
 ---
 
@@ -310,6 +316,9 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 - Att ingen stamtavla går i cirkel, och att ingen är sin egen förälder. <!-- 04-§10.6 -->
 - Att varje bild-id en post refererar har en bildpost, och att bildposten har `alt` och
   `credit`. <!-- 04-§10.13 -->
+- Att en bildpost i `source/data/` inte har en `credit` som börjar med
+  `AI-genererad`. Den beteckningen är reserverad för det påhittade QA-datasetet.
+  <!-- 04-§10.15 -->
 - Att varje bildpost har en bildfil som finns, är WebP, saknar metadata och håller sig
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->
 - Att varje bild-id följer formen i §9, och att ingen post refererar samma bild två

@@ -55,8 +55,8 @@ att Å, Ä och Ö hamnar sist och inte bland A och O.
   (`04-§4.2`). <!-- 02-§6.11 -->
 - QA-datasetet innehåller minst 100 namngivna individer och täcker varje art och ras i
   vokabulären, så att listor, sortering och stora datamängder prövas. Det innehåller
-  också en bild som två djur delar och en plats med bild, så att bildposternas
-  delning prövas. <!-- 02-§6.12 -->
+  också cirka 25 bilder som delas av flera djur, samt en plats med bild, så att
+  bildposternas delning prövas i verklig omfattning. <!-- 02-§6.12 -->
 - Djur som gården bara redovisar som antal lagras som räknade bestånd per art och ras,
   inte som påhittade individer. En art får inte använda båda modellerna samtidigt.
   <!-- 02-§6.13 -->

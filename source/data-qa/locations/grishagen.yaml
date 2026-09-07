@@ -1,8 +1,11 @@
 name: Grishagen
+kind: djurplats
 species:
   - gris
 description: En rymlig utehage för gårdens grisar.
-lat: 57.412600
-lon: 12.212900
+lat: 57.337400
+lon: 12.339400
 accessible: true
 active: true
+photos:
+  - img-5e3d21cc3d76

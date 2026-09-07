@@ -42,9 +42,13 @@ export interface Animal {
   photos: Image[];
 }
 
+/** What a place is (04-§5.7, ADR 0018). Decides whether the page talks about animals. */
+export type LocationKind = "djurplats" | "besoksmal";
+
 export interface Location {
   id: string;
   name: string;
+  kind: LocationKind;
   species: string[];
   note: string | null;
   description: string | null;

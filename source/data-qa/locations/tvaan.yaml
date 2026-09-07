@@ -1,0 +1,8 @@
+name: "2:an"
+kind: djurplats
+species:
+  - ko
+lat: 57.337335
+lon: 12.342509
+accessible: true
+active: true

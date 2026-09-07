@@ -1,4 +1,5 @@
 name: Björkhagen
+kind: djurplats
 species:
   - get
 note: Även här går getter — de flyttas mellan hagarna under säsongen.
@@ -6,7 +7,9 @@ description: |
   Skuggig hage med björkar, används mest under varma sommardagar.
 
   ![](img-aa2c37af9e5e)
-lat: 57.413100
-lon: 12.215200
+lat: 57.337900
+lon: 12.341700
 accessible: true
 active: true
+photos:
+  - img-aa2c37af9e5e

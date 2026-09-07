@@ -1,0 +1,9 @@
+name: Stallet
+kind: djurplats
+species:
+  - katt
+note: Katten bor i höskullen.
+lat: 57.337951
+lon: 12.339839
+accessible: true
+active: true

@@ -1,13 +1,12 @@
 /**
- * Generates the placeholder images the QA dataset refers to (02-§8.4).
+ * Imports generated QA images or fills missing files with placeholders (02-§8.4, 8.23).
  *
- *   npm run qa:images [-- --data-dir <dir>] [--images-dir <dir>]
+ *   npm run qa:images [-- --import <dir>] [--data-dir <dir>] [--images-dir <dir>]
  *
- * Reads every image post in source/data-qa/images/ and writes a flat-coloured 1200×900
- * WebP with its alt text into source/images-qa/, flat and named by the id (04-§9.1).
- * That directory is ignored by git: made-up photographs are never committed (ADR 0008),
- * and QA images never mix with the farm's real ones because the images directory follows
- * the dataset (04-§9.4).
+ * Generated inputs are cropped, permanently marked and compressed into source/images-qa/.
+ * Without --import, every missing image post instead gets a flat-coloured 1200×900 WebP
+ * with its alt text. QA images never mix with the farm's real ones because the images
+ * directory follows the dataset (04-§9.4, ADR 0017).
  *
  * The placeholders are named after the ids already in the data, never re-hashed: sharp
  * may encode the same SVG differently after an upgrade, and the committed ids must not
@@ -20,12 +19,14 @@ import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { parse } from "yaml";
-import { imageFileName } from "../source/ts/domain/image-id.ts";
-import { imagesDirFor } from "../source/ts/build/images.ts";
+import { imageFileName, isImageId } from "../source/ts/domain/image-id.ts";
+import { SOURCE_EXTENSIONS, imagesDirFor, optimiseImage } from "../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const WIDTH = 1200;
 const HEIGHT = 900;
+const MAX_BYTES = 50 * 1024;
+const IMPORT_EDGES = [1200, 1000, 800, 640, 480];
 
 function fail(message) {
   console.error(message);
@@ -33,11 +34,12 @@ function fail(message) {
 }
 
 function parseArguments(argv) {
-  const options = { dataDir: path.join(ROOT, "source", "data-qa"), imagesDir: undefined };
+  const options = { dataDir: path.join(ROOT, "source", "data-qa"), imagesDir: undefined, importDir: undefined };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--data-dir") options.dataDir = path.resolve(argv[++i]);
     else if (arg === "--images-dir") options.imagesDir = path.resolve(argv[++i]);
+    else if (arg === "--import") options.importDir = path.resolve(argv[++i]);
     else fail(`Okänd flagga ${arg}. Användning: npm run qa:images [-- --data-dir <katalog>] [--images-dir <katalog>]`);
   }
   options.imagesDir ??= imagesDirFor(options.dataDir);
@@ -55,7 +57,11 @@ async function readColours() {
     if (!match) fail(`Hittar inte ${name} i tokens.css.`);
     return match[1];
   };
-  return { background: token("--color-green-pale"), text: token("--color-green-deep") };
+  return {
+    background: token("--color-green-pale"),
+    text: token("--color-green-deep"),
+    surface: token("--color-surface"),
+  };
 }
 
 async function exists(file) {
@@ -144,15 +150,112 @@ function placeholderSvg({ id, alt }, colours) {
   );
 }
 
-async function main() {
-  const { dataDir, imagesDir } = parseArguments(process.argv.slice(2));
+function badgeSvg(edge, colours) {
+  const width = Math.round(edge * 0.25);
+  const height = Math.round(edge * 0.065);
+  const fontSize = Math.round(edge * 0.024);
+  return Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+      `<rect width="100%" height="100%" rx="${Math.round(height * 0.18)}" fill="${colours.text}"/>` +
+      `<text x="50%" y="52%" font-family="sans-serif" font-size="${fontSize}" font-weight="bold" ` +
+      `fill="${colours.surface}" text-anchor="middle" dominant-baseline="middle">AI-bild · QA</text>` +
+      `</svg>`,
+  );
+}
 
-  if (path.basename(imagesDir) === "images") {
-    fail(`Vägrar skriva platshållare till ${imagesDir}: där ligger gårdens riktiga bilder.`);
+async function markedImage(input, edge, colours) {
+  const height = Math.round((edge * 3) / 4);
+  return sharp(input)
+    .rotate()
+    .resize({ width: edge, height, fit: "cover", position: "attention" })
+    .composite([{ input: badgeSvg(edge, colours), gravity: "southeast" }])
+    .png()
+    .toBuffer();
+}
+
+async function prepareGeneratedImage(input, colours) {
+  let lastError;
+  for (const edge of IMPORT_EDGES) {
+    try {
+      const marked = await markedImage(input, edge, colours);
+      return await optimiseImage(marked, { maxEdge: edge, maxBytes: MAX_BYTES });
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
+
+async function importGenerated(importDir, dataDir, imagesDir, images, colours) {
+  let entries;
+  try {
+    entries = await readdir(importDir, { withFileTypes: true });
+  } catch {
+    fail(`Hittar inte katalogen ${importDir}.`);
+  }
+
+  const known = new Set(images.map((image) => image.id));
+  const seen = new Set();
+  const sources = [];
+  const issues = [];
+  for (const entry of entries.filter((candidate) => candidate.isFile()).sort((a, b) => a.name.localeCompare(b.name))) {
+    const extension = path.extname(entry.name).toLowerCase();
+    const id = path.basename(entry.name, extension);
+    if (!SOURCE_EXTENSIONS.includes(extension)) {
+      issues.push(`${entry.name}: filen måste vara JPEG, PNG eller WebP.`);
+    } else if (!isImageId(id)) {
+      issues.push(`${entry.name}: filnamnet måste vara ett bild-id följt av filändelsen.`);
+    } else if (!known.has(id)) {
+      issues.push(`${entry.name}: okänt bild-id ${id}; det saknar bildpost i ${path.join(dataDir, "images")}.`);
+    } else if (seen.has(id)) {
+      issues.push(`${entry.name}: bild-id ${id} finns i flera källfiler.`);
+    } else {
+      seen.add(id);
+      sources.push({ id, file: path.join(importDir, entry.name) });
+    }
+  }
+  if (sources.length === 0 && issues.length === 0) issues.push(`${importDir}: katalogen innehåller inga bilder.`);
+  if (issues.length > 0) fail(`Importen har ${issues.length} fel. Ingenting skrevs.\n${issues.join("\n")}`);
+
+  const prepared = [];
+  let existing = 0;
+  const failures = [];
+  for (const source of sources) {
+    const outputPath = path.join(imagesDir, imageFileName(source.id));
+    if (await exists(outputPath)) {
+      existing += 1;
+      continue;
+    }
+    try {
+      const input = await readFile(source.file);
+      const result = await prepareGeneratedImage(input, colours);
+      prepared.push({ outputPath, data: result.data });
+    } catch (error) {
+      failures.push(`${path.basename(source.file)}: ${error.message}`);
+    }
+  }
+  if (failures.length > 0) fail(`${failures.length} bilder gick inte att bereda. Ingenting skrevs.\n${failures.join("\n")}`);
+
+  await mkdir(imagesDir, { recursive: true });
+  for (const image of prepared) await writeFile(image.outputPath, image.data);
+  const noun = prepared.length === 1 ? "AI-bild" : "AI-bilder";
+  console.log(`Importerade ${prepared.length} ${noun} (${existing} fanns redan).`);
+}
+
+async function main() {
+  const { dataDir, imagesDir, importDir } = parseArguments(process.argv.slice(2));
+
+  if (path.basename(dataDir) === "data" || path.basename(imagesDir) === "images") {
+    fail(`Vägrar skriva QA-bilder till ${imagesDir}: där ligger gårdens riktiga bilder.`);
   }
 
   const colours = await readColours();
   const images = await collectImages(dataDir);
+
+  if (importDir !== undefined) {
+    await importGenerated(importDir, dataDir, imagesDir, images, colours);
+    return;
+  }
 
   await mkdir(imagesDir, { recursive: true });
 

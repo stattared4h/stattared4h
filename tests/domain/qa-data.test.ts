@@ -8,6 +8,10 @@ test("QA represents at least 100 animals and exercises every vocabulary entry", 
   const dataset = await qaDataset();
   const counted = dataset.populations.reduce((sum, population) => sum + population.count, 0);
   assert.equal(dataset.animals.length, 100);
+  assert.ok(
+    dataset.animals.every((animal) => animal.photos.length > 0),
+    "every QA animal should have at least one photo",
+  );
   assert.equal(counted, 32);
   assert.ok(dataset.animals.length + counted >= 100);
   assert.equal(dataset.species.length, 8);
@@ -90,9 +94,10 @@ test("QA exercises a shared image and a location with photos (02-§6.12)", async
 
 test("every image post id has the form from 04-§9.7", async () => {
   const dataset = await qaDataset();
-  assert.ok(dataset.images.length >= 10);
+  assert.ok(dataset.images.length >= 20 && dataset.images.length <= 30, "QA should share about 25 images");
   for (const image of dataset.images) {
     assert.ok(isImageId(image.id), image.id);
-    assert.ok(image.alt.length > 0 && image.credit.length > 0, image.id);
+    assert.ok(image.alt.length > 0, image.id);
+    assert.equal(image.credit, "AI-genererad med OpenAI ImageGen", image.id);
   }
 });

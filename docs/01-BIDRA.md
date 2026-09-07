@@ -241,8 +241,10 @@ Andra kommandon:
 | `npm run image -- <fil> --alt <text> --credit <namn>` | Webbanpassar ett foto, skriver bildfilen och bildposten (§2) |
 | `npm run image:import -- --scan <katalog>` | Skriver en tabell med en rad per foto i katalogen, att fylla i (§2) |
 | `npm run image:import -- <tabell> --photos <katalog>` | Bereder alla foton i tabellen och skriver bildposterna (§2) |
+| `npm run qa:prompts` | Skriver en CSV-tabell med prompt och målfil för varje AI-bild i QA |
+| `npm run qa:images -- --import <katalog>` | Märker och webbanpassar genererade QA-bilder under deras befintliga id |
 | `npm run icons` | Genererar `favicon.ico`, `apple-touch-icon.png` och manifestikonerna ur `source/assets/img/favicon.svg`; kör efter en ändring av SVG:n och committa resultatet |
-| `npm run qa:images` | Genererar platshållarbilderna som QA-datat refererar, i `source/images-qa/` |
+| `npm run qa:images` | Fyller saknade QA-bilder med lokala platshållare utan att röra befintliga filer |
 | `npm run qr` | Skriver en utskrivbar QR-kod per plats till `qr/`, med adressen ur `SITE_URL` (`02-§5.29`) |
 | `npm test` | Kör testerna i `tests/` mot QA-datat; byggtesterna kör Eleventy till en tillfällig katalog |
 | `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en, och kör dokumentkontrollen — kör `npm run build` först |

@@ -142,7 +142,7 @@ describe("the animal page (02-§5.14–5.18)", () => {
     const tuva = animal(views, "tuva");
     assert.equal(tuva.breed, null);
     assert.equal(tuva.born, null);
-    assert.equal(tuva.portrait, null);
+    assert.equal(tuva.portrait?.id, "img-726495c0fd03");
     assert.equal(tuva.body, null);
     assert.equal(tuva.mother, null);
     const vinter = animal(views, "vinter");
@@ -160,7 +160,7 @@ describe("the animal page (02-§5.14–5.18)", () => {
     const card = animalCard(dataset, dataset.animals.find((a) => a.id === "bocken")!);
     assert.deepEqual(card.tags, ["Jämtget", HERITAGE_LABEL, GONE_LABEL]);
     assert.equal(card.gone, true);
-    assert.equal(card.photo, null);
+    assert.equal(card.photo?.id, "img-778c1a75a67c");
     assert.equal(card.speciesName, "Get");
   });
 
@@ -177,7 +177,7 @@ describe("the animal page (02-§5.14–5.18)", () => {
 });
 
 describe("the species page (02-§5.19–5.22)", () => {
-  test("goats: two active places, present and gone animals, and the editorial text", async () => {
+  test("goats: four active places, present and gone animals, and the editorial text", async () => {
     const { views } = await qaViews();
     const get = species(views, "get");
     assert.equal(get.url, "/arter/get/");
@@ -185,6 +185,8 @@ describe("the species page (02-§5.19–5.22)", () => {
     assert.deepEqual(get.locations, [
       { name: "Björkhagen", url: "/plats/bjorkhagen/" },
       { name: "Gethagen", url: "/plats/gethagen/" },
+      { name: "Gethuset", url: "/plats/gethuset/" },
+      { name: "Trekanten", url: "/plats/trekanten/" },
     ]);
     assert.equal(get.unknownWhere, null);
     assert.equal(get.hereHeading, "Getterna på gården");
@@ -212,17 +214,40 @@ describe("the map page (02-§5.23–5.25)", () => {
   test("a marker per active place with coordinates; the list has every active place", async () => {
     const { views } = await qaViews();
     const markers = [...views.map.html.matchAll(/data-place="([^"]+)"/g)].map((m) => m[1]);
-    assert.deepEqual(markers, ["bjorkhagen", "gethagen", "grishagen", "honshuset", "kattvinden", "smadjurshuset", "stora-hagen", "ovre-hagen"]);
+    assert.deepEqual(markers, ["ettan", "tvaan", "trean", "fyran", "bjorkhagen", "cafeet", "dalen", "dammen", "ekbacken", "gethagen", "gethuset", "grishagen", "honshuset", "kaffestugan", "kaninhagen", "kattvinden", "kapphastbanan", "lekplatsen", "lilla-grishagen", "lottas-vaffelstuga", "parkeringen-vid-infarten", "parkeringen-vid-toaletterna", "smadjurshuset", "stallet", "stora-grishagen", "stora-hagen", "stallplatsen", "toaletterna", "trekanten", "vandrarhemmet", "ovre-hagen"]);
     assert.deepEqual(
       views.map.list.map((item) => [item.name, item.species]),
       [
+        ["1:an", "Får"],
+        ["2:an", "Kor"],
+        ["3:an", "Får och kor"],
+        ["4:an", "Får"],
         ["Björkhagen", "Getter"],
+        ["Caféet", ""],
+        ["Dalen", "Kor"],
+        ["Dammen", NO_SPECIES_AT_LOCATION_TEXT],
+        ["Ekbacken", "Får"],
         ["Gethagen", "Getter"],
+        ["Gethuset", "Getter"],
         ["Grishagen", "Grisar"],
         ["Hönshuset", "Höns"],
+        ["Kaffestugan", ""],
+        ["Kaninhagen", "Kaniner"],
         ["Kattvinden", "Katter"],
+        ["Käpphästbanan", ""],
+        ["Lekplatsen", ""],
+        ["Lilla grishagen", "Grisar"],
+        ["Lottas våffelstuga", ""],
+        ["Parkeringen vid infarten", ""],
+        ["Parkeringen vid toaletterna", ""],
         ["Smådjurshuset", "Kaniner"],
+        ["Stallet", "Katter"],
+        ["Stora grishagen", "Grisar"],
         ["Stora hagen", "Får och kor"],
+        ["Ställplatsen", ""],
+        ["Toaletterna", ""],
+        ["Trekanten", "Getter"],
+        ["Vandrarhemmet", ""],
         ["Övre hagen", NO_SPECIES_AT_LOCATION_TEXT],
       ],
     );

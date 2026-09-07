@@ -30,7 +30,9 @@ import { extendedWebp, lossyWebp, paddedWebp, VP8X_EXIF } from "./webp-fixtures.
 // --- The QA dataset and the message format ---------------------------------------
 
 test("the QA dataset is valid and normalised", async () => {
-  const result = await validate(await rawQa());
+  const raw = await rawQa();
+  editAnimal(raw, "tuva", (animal) => delete animal.photos);
+  const result = await validate(raw);
   assert.deepEqual(result.errors, []);
   assert.notEqual(result.dataset, null);
   const rosa = result.dataset?.animals.find((a) => a.id === "rosa");
@@ -75,6 +77,45 @@ test("a missing required field on a location fails, including accessible and act
     const result = await validate(raw);
     assert.equal(errorsFor(result, "locations/gethagen.yaml", field).length, 1, field);
   }
+});
+
+test("kind is required on a location and only accepts the contract's values (04-§5.7)", async () => {
+  const missing = await rawQa();
+  editLocation(missing, "gethagen", (l) => delete l.kind);
+  assert.equal(errorsFor(await validate(missing), "locations/gethagen.yaml", "kind").length, 1);
+
+  const wrong = await rawQa();
+  editLocation(wrong, "gethagen", (l) => (l.kind = "hage"));
+  const result = await validate(wrong);
+  assert.match(
+    errorsFor(result, "locations/gethagen.yaml", "kind")[0].message,
+    /djurplats eller besoksmal/,
+    "the message names both values",
+  );
+});
+
+test("a besoksmal with species is an error, not a warning (ADR 0018)", async () => {
+  // The likely slip is copying a paddock file when adding a café.
+  const raw = await rawQa();
+  editLocation(raw, "gethagen", (l) => (l.kind = "besoksmal"));
+  const result = await validate(raw);
+  assert.equal(result.dataset, null, "the build stops");
+  assert.match(
+    errorsFor(result, "locations/gethagen.yaml", "species")[0].message,
+    /besöksmål/,
+    "the message says a besoksmal has no animals",
+  );
+});
+
+test("a besoksmal without species is valid and keeps its kind", async () => {
+  const raw = await rawQa();
+  editLocation(raw, "gethagen", (l) => {
+    l.kind = "besoksmal";
+    l.species = [];
+  });
+  const result = await validate(raw);
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.dataset?.locations.find((l) => l.id === "gethagen")?.kind, "besoksmal");
 });
 
 test("accessible and active must be booleans, not text", async () => {
@@ -302,6 +343,20 @@ test("an image post needs alt and credit", async () => {
   }
 });
 
+test("AI credit is accepted only by a QA dataset (04-§10.15)", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editImage(raw, id, (image) => (image.credit = "AI-genererad med OpenAI ImageGen"));
+
+  raw.dir = "/tmp/data";
+  const production = await validate(raw);
+  assert.match(errorsFor(production, `images/${id}.yaml`, "credit")[0].message, /bara.*QA/);
+
+  raw.dir = "/tmp/data-qa";
+  const qa = await validate(raw);
+  assert.equal(errorsFor(qa, `images/${id}.yaml`, "credit").length, 0);
+});
+
 test("an image post file name must be a valid image id", async () => {
   const raw = await rawQa();
   addImage(raw, "rosa-1");
@@ -388,20 +443,9 @@ test("the QA dataset yields exactly the known warnings", async () => {
   assert.deepEqual(
     result.warnings.map((w) => `${w.file}:${w.field}`).sort(),
     [
-      "animals/bocken.yaml:photos",
-      "animals/bomull.yaml:photos",
-      "animals/dagg.yaml:photos",
-      "animals/tuva.yaml:photos",
+      "locations/dammen.yaml:species",
       "locations/ovre-hagen.yaml:species",
-      "species.yaml:species[far].photo",
-      "species.yaml:species[get].photo",
-      "species.yaml:species[gris].photo",
       "species.yaml:species[hast]",
-      "species.yaml:species[hast].photo",
-      "species.yaml:species[hons].photo",
-      "species.yaml:species[kanin].photo",
-      "species.yaml:species[katt].photo",
-      "species.yaml:species[ko].photo",
     ],
   );
   const hast = result.warnings.find((w) => w.field === "species[hast]");

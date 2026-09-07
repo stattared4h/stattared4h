@@ -163,6 +163,158 @@ function assertBasePath(base: string): void {
   }
 }
 
+// --- Label placement ---------------------------------------------------------
+
+/**
+ * Which side of the marker its label sits on (02-§5.33). `below` is the plain case and
+ * the fallback; the others are written on the marker as a modifier and placed by CSS.
+ */
+export type LabelSide = "below" | "above" | "right" | "left" | "hidden";
+
+/**
+ * Measurements the estimate needs, in pixels, mirrored from `tokens.css`. There is no
+ * browser at build time, so the label's box is estimated rather than measured;
+ * `tests/build/map.test.ts` compares these three against the tokens so the code and the
+ * design decision cannot drift apart (05-§7.4).
+ */
+export const LABEL_METRICS = {
+  /** `--tap-target-min`: the pin's box, centred on the place. */
+  tapTarget: 44,
+  /** `--font-size-small`: the label's type size. */
+  fontSize: 15,
+  /** `--space-xs`: the label's padding, at each end. */
+  padding: 8,
+  /** The narrowest the map gets, in the mobile layout (05-§5.1). */
+  referenceWidth: 360,
+  /** The widest it gets: `--container-narrow` less the container's padding (05-§5.2). */
+  wideWidth: 648,
+} as const;
+
+/**
+ * Width of an average character at `--font-size-small`, as a fraction of the type size.
+ * Measured in Chromium over the QA place names, where the ratio ran between 0.62 and
+ * 0.68; this value sits above the worst of them on purpose. Overestimating moves labels
+ * apart that would have fitted; underestimating leaves them on top of each other — and
+ * only the second is visible to a visitor.
+ */
+const CHAR_WIDTH_RATIO = 0.7;
+/** The label is one line. Measured at 24 px against a 15 px type size. */
+const LINE_HEIGHT_RATIO = 1.6;
+/** Tried in this order, so the plain case wins whenever it is free. */
+const LABEL_SIDES: readonly LabelSide[] = ["below", "above", "right", "left"];
+
+/** A marker to place a label for, positioned in drawing units. */
+export interface LabelMarker {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+}
+
+interface Box {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+/** True when the two boxes share area. Boxes that only touch do not overlap. */
+function overlaps(a: Box, b: Box): boolean {
+  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+}
+
+/** True when `inner` lies wholly inside `outer`. */
+function contains(outer: Box, inner: Box): boolean {
+  return (
+    inner.left >= outer.left &&
+    inner.right <= outer.right &&
+    inner.top >= outer.top &&
+    inner.bottom <= outer.bottom
+  );
+}
+
+/** The label's box on one side of a marker standing at `x`, `y` in pixels. */
+function labelBox(x: number, y: number, width: number, height: number, side: LabelSide): Box {
+  const half = LABEL_METRICS.tapTarget / 2;
+  switch (side) {
+    case "below":
+      return { left: x - width / 2, right: x + width / 2, top: y + half, bottom: y + half + height };
+    case "above":
+      return { left: x - width / 2, right: x + width / 2, top: y - half - height, bottom: y - half };
+    case "right":
+      return { left: x + half, right: x + half + width, top: y - height / 2, bottom: y + height / 2 };
+    case "left":
+      return { left: x - half - width, right: x - half, top: y - height / 2, bottom: y + height / 2 };
+    case "hidden":
+      // Never asked for while choosing; a hidden label occupies nothing.
+      return { left: x, right: x, top: y, bottom: y };
+  }
+}
+
+/**
+ * Which side each label goes on so that labels do not cover each other or another
+ * marker's pin (02-§5.33, 03-§9.3).
+ *
+ * The boxes are worked out in pixels for a `referenceWidth` drawing — the narrowest the
+ * map gets — because that is where the labels crowd. Places are taken from north to
+ * south, and each label gets the first free side. A side that would push the label off
+ * the drawing is not free either, so a place at the edge turns its label inwards.
+ *
+ * There are four sides, so a fifth marker on the same spot has nowhere to go. Its label
+ * is then `hidden`: the pin stays, and CSS keeps the name out of sight until the marker
+ * is pointed at or focused. Stacked unreadable text would be worse than none, and the
+ * place is never lost — it stands in the list under the map (02-§5.24).
+ *
+ * The estimate is an estimate. It tells a crowded map from an airy one; it does not
+ * promise pixels.
+ */
+export function placeLabels(
+  markers: readonly LabelMarker[],
+  drawingWidth: number,
+  drawingHeight: number,
+  referenceWidth: number = LABEL_METRICS.referenceWidth,
+): Map<string, LabelSide> {
+  const scale = referenceWidth / drawingWidth;
+  const edge: Box = { left: 0, right: referenceWidth, top: 0, bottom: drawingHeight * scale };
+  const height = LABEL_METRICS.fontSize * LINE_HEIGHT_RATIO;
+  const half = LABEL_METRICS.tapTarget / 2;
+
+  const points = markers.map((marker) => ({
+    id: marker.id,
+    x: marker.x * scale,
+    y: marker.y * scale,
+    width: marker.name.length * LABEL_METRICS.fontSize * CHAR_WIDTH_RATIO + 2 * LABEL_METRICS.padding,
+  }));
+  const pins: Box[] = points.map((p) => ({
+    left: p.x - half,
+    right: p.x + half,
+    top: p.y - half,
+    bottom: p.y + half,
+  }));
+
+  // North to south, then west to east, then by id: the same places always place in the
+  // same order, whatever order they arrived in.
+  const order = [...points].sort((a, b) => a.y - b.y || a.x - b.x || (a.id < b.id ? -1 : 1));
+
+  const taken: Box[] = [];
+  const sides = new Map<string, LabelSide>();
+  for (const point of order) {
+    const free = LABEL_SIDES.find((side) => {
+      const box = labelBox(point.x, point.y, point.width, height, side);
+      return (
+        contains(edge, box) &&
+        !taken.some((other) => overlaps(box, other)) &&
+        !pins.some((pin) => overlaps(box, pin))
+      );
+    });
+    const side = free ?? "hidden";
+    sides.set(point.id, side);
+    // A hidden label takes no room, so it must not push the next one aside.
+    if (side !== "hidden") taken.push(labelBox(point.x, point.y, point.width, height, side));
+  }
+  return sides;
+}
+
 /** The drawing layer alone: the `<svg>` with its description, ground plate and background. */
 export function renderMapSvg(frame: MapFrame, background: MapBackground | null = null): string {
   const size = `width="${frame.width}" height="${frame.height}"`;
@@ -182,11 +334,14 @@ export function renderMapSvg(frame: MapFrame, background: MapBackground | null =
  */
 export function renderMap(locations: readonly MapLocation[], options: MapOptions): RenderedMap {
   assertBasePath(options.base);
+  // No places, no map — not even the drawing. The page says the dataset is empty
+  // (02-§6.2), and a drawing of the farm under that sentence would only puzzle.
+  if (locations.length === 0) return { html: "", warnings: [] };
   const frame: MapFrame | null = options.background ?? mapFrame(locations, options);
   if (frame === null) return { html: "", warnings: [] };
 
   const warnings: string[] = [];
-  const markers: string[] = [];
+  const drawn: { location: MapLocation; position: { x: number; y: number } }[] = [];
   for (const location of locations) {
     const position = projectPoint(location, frame);
     if (!isInside(position, frame)) {
@@ -195,9 +350,33 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
       );
       continue;
     }
+    drawn.push({ location, position });
+  }
+
+  // Only the markers that are actually drawn take part: a place outside the drawing
+  // cannot crowd a label (02-§5.33). The placement is worked out twice, because what
+  // crowds a 360 px map has room on a 648 px one, and the visitor sees one or the other.
+  const points = drawn.map(({ location, position }) => ({
+    id: location.id,
+    name: location.name,
+    ...position,
+  }));
+  const sides = placeLabels(points, frame.width, frame.height);
+  const wideSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.wideWidth);
+
+  const markers: string[] = [];
+  for (const { location, position } of drawn) {
+    const side = sides.get(location.id) ?? "below";
+    const wide = wideSides.get(location.id) ?? "below";
+    // `below` is the plain case and needs no modifier in the narrow layout, so most
+    // markers keep bare markup there. The wide class is always written: from 600 px the
+    // stylesheet starts from the default and follows it (05-§5.2).
+    const className =
+      (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
+      ` map__marker--wide-${wide}`;
     const style = `left: ${percent(position.x, frame.width)}; top: ${percent(position.y, frame.height)}`;
     markers.push(
-      `<a class="map__marker" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}">` +
+      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}">` +
         `<span class="map__pin" aria-hidden="true"></span>` +
         `<span class="map__label">${escapeText(location.name)}</span>` +
         `</a>`,

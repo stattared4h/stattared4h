@@ -1,0 +1,8 @@
+name: Kaninhagen
+kind: djurplats
+species:
+  - kanin
+lat: 57.338266
+lon: 12.340231
+accessible: true
+active: true

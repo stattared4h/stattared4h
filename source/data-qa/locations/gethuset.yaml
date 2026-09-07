@@ -1,0 +1,9 @@
+name: Gethuset
+kind: djurplats
+species:
+  - get
+note: Getterna sover här.
+lat: 57.338100
+lon: 12.340900
+accessible: true
+active: true

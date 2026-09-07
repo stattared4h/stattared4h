@@ -43,11 +43,12 @@ Sveriges 4H:s grafiska profil, som är källan för identiteten (ADR 0016).
 - Menyknappen visar tre streck och ordet "Meny", har `aria-expanded` och
   `aria-controls`, och öppnar menyn. <!-- 02-§10.4 -->
 - Menyn fälls ut under raden som ett kort (`05-§6.34`) med 4H-loggan överst, följd av
-  länkarna "Startsidan", "Karta över gården" och "Om sajten". <!-- 02-§10.5 -->
+  länkarna "Startsidan" och "Om sajten". Kartan har ingen egen länk: den ligger på
+  startsidan (`02-§5.1`). <!-- 02-§10.5 -->
 - Menyn stängs med Escape, med klick utanför den och när en länk väljs. Stängs den
   med Escape återgår fokus till menyknappen. <!-- 02-§10.6 -->
 - Från desktopbrytpunkten visar sidhuvudet 4H-loggan till vänster med sajtens namn
-  "Djuren på Stättared" som text intill, länkarna "Hem", "Karta" och "Om sajten" i
+  "Djuren på Stättared" som text intill, länkarna "Hem" och "Om sajten" i
   raden, och installknappen och feedbackknappen som ikoner utan botten längst till
   höger. Menyknappen och "till toppen" finns inte i den bredden. <!-- 02-§10.7 -->
 - Länken för aktuell sida är markerad enligt `05-§6.3` och har

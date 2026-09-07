@@ -1,8 +1,11 @@
 name: Kattvinden
+kind: djurplats
 species:
   - katt
 description: En lugn plats för gårdens katter.
-lat: 57.412700
-lon: 12.213800
+lat: 57.337500
+lon: 12.340300
 accessible: false
 active: true
+photos:
+  - img-806029d17a68

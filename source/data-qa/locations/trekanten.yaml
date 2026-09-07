@@ -1,0 +1,8 @@
+name: Trekanten
+kind: djurplats
+species:
+  - get
+lat: 57.336600
+lon: 12.337600
+accessible: false
+active: true
