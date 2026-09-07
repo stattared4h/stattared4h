@@ -7,6 +7,7 @@ Issues: [#6](https://github.com/stattared4h/stattared4h/issues/6),
 [#9](https://github.com/stattared4h/stattared4h/issues/9),
 [#13](https://github.com/stattared4h/stattared4h/issues/13),
 [#19](https://github.com/stattared4h/stattared4h/issues/19),
+[#50](https://github.com/stattared4h/stattared4h/issues/50),
 [#51](https://github.com/stattared4h/stattared4h/issues/51).
 
 ---
@@ -49,6 +50,14 @@ aldrig två kolumner i en telefons 312 px innehållsbredd. Platssidan för Getha
 8 249 px lång för nitton getter — tio skärmars rullning — och barnet som ska känna igen
 geten framför sig fick hålla nitton foton i minnet i stället för att jämföra dem på
 skärmen (issue #61). `02-§5.50` sätter antalet per bredd i stället.
+
+Etiketterna hade först fyra lägen — under, över, höger, vänster — och tog det första
+lediga. "Under" är ledig för de fyra numrerade hagarna, så den vann varje gång. Betesmarken
+är indelad i band som löper nordväst–sydost, och en etikett rakt under markören glider
+därför på tvärs mot bandet, mot staketet och in i grannhagen (issue #50). `02-§5.53` ger
+placeringen fyra sneda lägen till och prövar dem först. Alternativet — att låta varje plats
+välja sida i sin YAML — avvisades: utseende hör inte hemma i datat, och en regel som gäller
+alla platser lika är värd mer än handpåläggning per plats.
 
 Samma issue bad också om att kunna zooma. Åtta av gårdens platser ligger i en klunga kring
 gårdsplanen, inom några tiotal meter från varandra, och i överblick får deras namn inte
@@ -179,6 +188,13 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   (`02-§5.24`). Bygget räknar placeringen för en karta som är 360 px bred — den trängsta
   vyn i mobilläget (`05-§5.1`) — och räknar deterministiskt: samma platsdata ger samma
   placering. <!-- 02-§5.33 -->
+- Etiketten har åtta möjliga lägen kring markören: fyra sneda och fyra raka. De sneda
+  prövas först, i ordningen snett upp till vänster, snett upp till höger, snett ned till
+  vänster, snett ned till höger; därefter de raka i ordningen under, över, höger, vänster.
+  Ett snett läge lämnar stråket rakt under och rakt bredvid markören fritt åt grannen, och
+  i betesmarken följer det bandets riktning i stället för att gå på tvärs över staketet in
+  i grannhagen. Ordningen inom varje grupp är densamma som platserna tas i — norr före
+  söder, väster före öster — så att placeringen förblir deterministisk. <!-- 02-§5.53 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är
