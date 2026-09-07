@@ -38,7 +38,7 @@ export type IdDefinition = {
 const COMMENT_DEFINITION = /<!--\s*(\d{2})-§(\d+(?:\.\d+)?)\s*-->/g;
 const TABLE_DEFINITION = /^\|\s*`(\d{2})-§(\d+(?:\.\d+)?)`\s*\|/;
 
-const IGNORED_DIRECTORIES = new Set([".git", "node_modules", "public"]);
+const IGNORED_DIRECTORIES = new Set([".git", ".claude", "node_modules", "public", "source/images-qa"]);
 
 export const MATRIX_FILE = "docs/99-sparbarhet/index.md";
 
