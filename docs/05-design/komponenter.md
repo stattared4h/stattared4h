@@ -158,3 +158,16 @@ installation (`02-§10.12`). Aldrig fler än en statusrad åt gången. <!-- 05-�
 Kartan över gården visar platser ur samma data som resten av sajten. Den har alltid en
 textbaserad motsvarighet under sig — en lista över platserna — så att informationen finns
 även när kartan inte kan laddas eller inte går att använda med skärmläsare. <!-- 05-§6.31 -->
+
+Markören är en rund bricka om `--space-md`, centrerad i träffytan `--tap-target-min`
+(`05-§4.15`), med kant `--border-width` i `--color-surface` och `--shadow-raised`. Det är
+samma yta som prickens, så en symbol i stället för en prick gör inte klungan kring
+gårdsplanen trängre än den redan är (`02-§5.33`). Inuti står platsens symbol, 16 px, med
+samma streck som sidhuvudets ikoner (6.11). En `djurplats` är fylld — botten
+`--color-green`, symbolen vit — och gårdens övriga platser är ljusa: botten
+`--color-surface`, symbolen `--color-green-deep`. Så syns det redan på håll, före
+symbolens form, vilka markörer som är djur. <!-- 05-§6.39 -->
+
+I listan under kartan står samma symbol framför platsens namn, 20 px i
+`--color-green-deep`, utan bricka. Listan är därmed också symbolernas
+teckenförklaring (`02-§5.37`). <!-- 05-§6.40 -->

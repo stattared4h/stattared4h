@@ -270,6 +270,15 @@ skrivs som en modifierare på markören, och CSS lägger etiketten där. Uppskat
 just en uppskattning: den skiljer bra fall från dåliga, den garanterar inga
 pixlar. <!-- 03-§9.3 -->
 
+Markören bär en symbol per sorts plats (`02-§5.36`). `source/ts/build/symbols.ts` håller
+en symbol per `kind`-värde (`04-§5.7`) som en sträng med SVG-banor, och bygget skriver in
+den i markören och i listposten under kartan. Symbolerna är ritade i sidan av samma skäl
+som resten av kartan: sajten hämtar ingenting utifrån och ska fungera offline
+(`02-§5.26`). De ligger i kod och inte som filer under `source/assets/`, eftersom en
+`<img>` vore ett anrop per markör och en sprite-fil vore ett tredje ställe att hålla
+i takt med `kind`. Typen är knuten till `LocationKind`, så ett nytt värde utan symbol är
+ett typfel vid `npm run typecheck` och inte en tom markör i drift. <!-- 03-§9.5 -->
+
 Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
 är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting
 utifrån (`02-§5.26`). <!-- 03-§9.4 -->
