@@ -261,6 +261,23 @@ describe("npm run image:import", () => {
     await assert.rejects(readdir(path.join(cleanData, "images")), "nothing was written");
   });
 
+  test("a spreadsheet saved in its own format is recognised, not read as a header", async () => {
+    const xlsx = path.join(workDir, "bilder.xlsx");
+    // A .xlsx is a zip; the editor who never chose "save as CSV" gets this file.
+    await writeFile(xlsx, Buffer.from("PK\u0003\u0004\u0014\u0000\u0000\u0000\u0008\u0000", "binary"));
+    const result = await runScript([xlsx, "--photos", photoDir, "--data-dir", path.join(workDir, "data-xlsx")]);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /inte en textfil/);
+    assert.match(result.stderr, /CSV/);
+  });
+
+  test("a data directory that cannot name an images directory fails in Swedish", async () => {
+    const result = await runScript([tablePath, "--photos", photoDir, "--data-dir", path.join(workDir, "underlag")]);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /datakatalogen måste heta/);
+    assert.doesNotMatch(result.stderr, /at .*images\.ts/, "no stack trace reaches the editor");
+  });
+
   test("a missing photo is reported with its line before anything is written", async () => {
     const badTable = path.join(workDir, "saknas.csv");
     const cleanData = path.join(workDir, "data-tom2");

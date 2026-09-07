@@ -177,8 +177,10 @@ IMG_0002.jpg,,,
 | `fotograf` | Den som tagit bilden |
 
 Två rader med samma `post` blir två bilder på det djuret, i den ordning de står.
-Kommaset och citattecken i alt-texten är inget problem — spara som CSV och låt
-kalkylprogrammet sköta citeringen.
+Kommatecken och citattecken i alt-texten är inget problem. Välj **Spara som** och
+formatet **CSV** när du är klar — sparar du i kalkylprogrammets eget format, som `.xlsx`,
+säger importen till. Semikolon i stället för kommatecken går också bra; ett svenskt
+kalkylprogram skriver ofta det.
 
 **Steg 3. Kör importen.**
 
