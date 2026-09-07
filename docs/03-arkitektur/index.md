@@ -283,6 +283,16 @@ som resten av kartan: sajten hämtar ingenting utifrån och ska fungera offline
 i takt med `kind`. Typen är knuten till `LocationKind`, så ett nytt värde utan symbol är
 ett typfel vid `npm run typecheck` och inte en tom markör i drift. <!-- 03-§9.5 -->
 
+Zoomen bor i två delar (ADR 0020). `source/ts/domain/map-view.ts` är räknandet: vyn som
+`{ x, y, scale }`, zoom kring en ankarpunkt, panorering och gränser, utan ett enda
+webbläsar-API — därför enhetstestbart i Node (`CL-§2.14`). `source/ts/ui/map-zoom.ts` är
+kopplingen: pekar- och tangentbordshändelser in, vyn ut, satt som `transform` på omslaget
+`.map__canvas`. Markörerna motskalas med `scale(1 / z)` genom variabeln `--map-scale`, så
+de behåller sin storlek och sin träffyta medan ritningen växer (`02-§5.43`). Vid 1× har
+omslaget `touch-action: pan-y` och tar bara nyp; inzoomad byter det till `none` och tar
+också drag, så startsidan går att rulla förbi (`02-§5.42`). Knapparna är dolda tills
+modulen kör, som installknappen (`03-§10.2`). <!-- 03-§9.6 -->
+
 Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
 är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting
 utifrån (`02-§5.26`). <!-- 03-§9.4 -->

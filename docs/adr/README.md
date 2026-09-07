@@ -38,3 +38,4 @@ Mall: `NNNN-kort-titel.md` med rubrikerna **Status** (Antagen/Ersatt + datum),
 | 0017 | [AI-genererade QA-bilder i repot](0017-ai-genererade-qa-bilder-i-repot.md) |
 | 0018 | [Platsen har en sort](0018-platsen-har-en-sort.md) |
 | 0019 | [Platsens sort styr markörens symbol](0019-platsens-sort-styr-symbolen.md) |
+| 0020 | [Kartan zoomas i klienten](0020-kartan-zoomas-i-klienten.md) |

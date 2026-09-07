@@ -179,3 +179,11 @@ ritat i sidhuvudets streck.
 I listan under kartan står samma symbol framför platsens namn, 20 px i
 `--color-green-deep`, utan bricka. Listan är därmed också symbolernas
 teckenförklaring (`02-§5.39`). <!-- 05-§6.40 -->
+
+Kartans tre knappar — zooma in, zooma ut och "Visa hela kartan" — är ikonknappar (6.11)
+som ligger i kartans nedre högra hörn, staplade med `--space-xs` mellan sig och
+`--space-sm` från kanten. De ligger ovanpå ritningen, så de har alltid botten
+`--color-surface`, ikon `--color-green-deep` och `--shadow-raised` för att synas mot både
+ljus mark och mörk byggnad. "Visa hela kartan" syns bara när kartan är inzoomad; de andra
+två alltid, och den som inte kan användas mer är nedtonad och `disabled`. Alla tre är
+dolda tills JavaScript kör (`02-§5.41`). <!-- 05-§6.41 -->
