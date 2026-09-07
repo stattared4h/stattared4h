@@ -15,6 +15,7 @@ export { loadRawDataset } from "./load.ts";
 export { formatIssue, validateDataset, MAX_IMAGE_BYTES, MAX_IMAGE_SIDE, type ValidateOptions } from "./validate.ts";
 export { formatBorn, normaliseBorn, type BornResult } from "./born.ts";
 export { compareByName, sortAnimals, sortLocations } from "./sort.ts";
+export { definitePlural, joinSwedish, lowerFirst } from "./swedish.ts";
 export * from "./derive.ts";
 
 /** The dataset directory for this build: DATA_DIR, or `source/data`. */

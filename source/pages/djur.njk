@@ -1,0 +1,117 @@
+---
+layout: base.njk
+pagination:
+  data: views.animals
+  size: 1
+  alias: view
+permalink: "/djur/{{ view.id }}/"
+eleventyComputed:
+  title: "{{ view.name }}"
+  description: "{{ view.description }}"
+---
+{#-
+  The animal page (02-§5.14–5.18). Never says where the individual is; the species link
+  answers that (02-§5.17, ADR 0012). Every photo shows its credit (02-§8.7).
+#}
+<div class="container container--narrow">
+  <h1>{{ view.name }}</h1>
+  {%- if view.gone %}
+  <p><span class="tag">Har lämnat gården</span></p>
+  {%- endif %}
+  <button class="button button--secondary share-button" type="button" data-share-button hidden>Dela</button>
+
+  <figure class="photo">
+    {%- if view.portrait %}
+    {% picture view.portrait, "animals", "(min-width: 960px) 680px, 100vw", true, view.species.name %}
+    <figcaption class="photo__credit">Foto: {{ view.portrait.credit }}</figcaption>
+    {%- else %}
+    {% placeholder view.species.name %}
+    {%- endif %}
+  </figure>
+
+  <dl class="facts">
+    <div class="facts__row">
+      <dt>Art</dt>
+      <dd><a href="{{ view.species.url | url }}">{{ view.species.name }}</a></dd>
+    </div>
+    {%- if view.breed %}
+    <div class="facts__row">
+      <dt>Ras</dt>
+      <dd>{{ view.breed }}</dd>
+    </div>
+    {%- endif %}
+    {%- if view.sex %}
+    <div class="facts__row">
+      <dt>Kön</dt>
+      <dd>{{ view.sex }}</dd>
+    </div>
+    {%- endif %}
+  </dl>
+  {%- if view.born %}
+  <p class="animal__born">{{ view.born }}</p>
+  {%- endif %}
+
+  {%- if view.body %}
+  <div class="prose">{{ view.body | markdown | safe }}</div>
+  {%- endif %}
+
+  {%- if view.mother or view.father or view.offspring.length > 0 or view.siblings.length > 0 %}
+  <section class="page-section">
+    <h2>Släkt</h2>
+    <dl class="facts">
+      {%- if view.mother %}
+      <div class="facts__row">
+        <dt>Mor</dt>
+        <dd><a href="{{ view.mother.url | url }}">{{ view.mother.name }}</a></dd>
+      </div>
+      {%- endif %}
+      {%- if view.father %}
+      <div class="facts__row">
+        <dt>Far</dt>
+        <dd><a href="{{ view.father.url | url }}">{{ view.father.name }}</a></dd>
+      </div>
+      {%- endif %}
+      {%- if view.offspring.length > 0 %}
+      <div class="facts__row">
+        <dt>Avkomma</dt>
+        <dd>
+          <ul class="link-list">
+            {%- for child in view.offspring %}
+            <li><a href="{{ child.url | url }}">{{ child.name }}</a></li>
+            {%- endfor %}
+          </ul>
+        </dd>
+      </div>
+      {%- endif %}
+      {%- if view.siblings.length > 0 %}
+      <div class="facts__row">
+        <dt>Syskon</dt>
+        <dd>
+          <ul class="link-list">
+            {%- for sibling in view.siblings %}
+            <li><a href="{{ sibling.url | url }}">{{ sibling.name }}</a></li>
+            {%- endfor %}
+          </ul>
+        </dd>
+      </div>
+      {%- endif %}
+    </dl>
+  </section>
+  {%- endif %}
+
+  {%- if view.otherPhotos.length > 0 %}
+  <section class="page-section">
+    <h2>Fler bilder</h2>
+    {%- for photo in view.otherPhotos %}
+    <figure class="photo">
+      {% picture photo, "animals", "(min-width: 960px) 680px, 100vw", false, view.species.name %}
+      <figcaption class="photo__credit">Foto: {{ photo.credit }}</figcaption>
+    </figure>
+    {%- endfor %}
+  </section>
+  {%- endif %}
+
+  <section class="page-section">
+    <p><a class="button" href="{{ view.species.url | url }}">{{ view.whereQuestion }}</a></p>
+  </section>
+</div>

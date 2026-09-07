@@ -1,0 +1,56 @@
+---
+layout: base.njk
+pagination:
+  data: views.locations
+  size: 1
+  alias: view
+permalink: "/plats/{{ view.id }}/"
+eleventyComputed:
+  title: "{{ view.name }}"
+  description: "{{ view.description }}"
+---
+{#-
+  The location page (02-§5.9–5.13, 05-§6.22–6.27): the QR code's target. The species
+  boxes come right under the h1, so the answer is on screen without scrolling. The
+  share button is hidden until source/ts/ui/ shows it (02-§10.30).
+#}
+{% import "species-tile.njk" as tiles %}
+{% import "animal-card.njk" as cards %}
+<div class="container">
+  <h1>{{ view.name }}</h1>
+  <button class="button button--secondary share-button" type="button" data-share-button hidden>Dela</button>
+
+  {%- if not view.active %}
+  <p class="lead">Den här platsen används inte just nu.</p>
+  <p><a class="button" href="{{ '/karta/' | url }}">Karta över gården</a></p>
+  {%- elif view.species.length == 0 %}
+  <p class="lead">Just nu går inga djur här.</p>
+  <p><a class="button" href="{{ '/karta/' | url }}">Karta över gården</a></p>
+  {%- else %}
+  {{- tiles.speciesGrid(view.species, true) }}
+  {%- if view.note %}
+  <p class="place-note">{{ view.note }}</p>
+  {%- endif %}
+  {%- endif %}
+
+  {%- if view.active %}
+  <p class="note">{{ view.accessibility }}</p>
+  {%- if view.body %}
+  <div class="prose">{{ view.body | markdown | safe }}</div>
+  {%- endif %}
+
+  {%- for group in view.groups %}
+  <section class="page-section">
+    <h2>{{ group.heading }}</h2>
+    {%- if group.populationSentence %}
+    <p>{{ group.populationSentence }}</p>
+    {%- endif %}
+    {%- if group.cards.length > 0 %}
+    {{- cards.animalGrid(group.cards) }}
+    {%- elif not group.populationSentence %}
+    <p>Inga {{ group.species.plural | lower }} är inlagda ännu.</p>
+    {%- endif %}
+  </section>
+  {%- endfor %}
+  {%- endif %}
+</div>

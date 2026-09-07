@@ -1,0 +1,64 @@
+---
+layout: base.njk
+pagination:
+  data: views.species
+  size: 1
+  alias: view
+permalink: "/arter/{{ view.id }}/"
+eleventyComputed:
+  title: "{{ view.plural }}"
+  description: "{{ view.description }}"
+---
+{#-
+  The species page (02-§5.19–5.22): where the species is, its animals, and the
+  editorial text from source/content/arter/<id>.md when there is one.
+#}
+{% import "animal-card.njk" as cards %}
+<div class="container">
+  <h1>{{ view.plural }}</h1>
+  <button class="button button--secondary share-button" type="button" data-share-button hidden>Dela</button>
+
+  {%- if view.photo %}
+  <figure class="photo photo--wide">
+    {% picture view.photo, "species", "(min-width: 960px) 680px, 100vw", true, view.name %}
+    <figcaption class="photo__credit">Foto: {{ view.photo.credit }}</figcaption>
+  </figure>
+  {%- endif %}
+
+  <section class="page-section">
+    <h2>{{ view.whereHeading }}</h2>
+    {%- if view.unknownWhere %}
+    <p>{{ view.unknownWhere }}.</p>
+    <p><a class="button" href="{{ '/karta/' | url }}">Karta över gården</a></p>
+    {%- else %}
+    <ul class="link-list link-list--buttons">
+      {%- for location in view.locations %}
+      <li><a class="button button--secondary" href="{{ location.url | url }}">{{ location.name }}</a></li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+  </section>
+
+  {%- if view.body %}
+  <div class="prose page-section">{{ view.body | markdown | safe }}</div>
+  {%- endif %}
+
+  {%- if view.populationSentence or view.here.length > 0 %}
+  <section class="page-section">
+    <h2>{{ view.hereHeading }}</h2>
+    {%- if view.populationSentence %}
+    <p>{{ view.populationSentence }}</p>
+    {%- endif %}
+    {%- if view.here.length > 0 %}
+    {{- cards.animalGrid(view.here, not view.photo) }}
+    {%- endif %}
+  </section>
+  {%- endif %}
+
+  {%- if view.gone.length > 0 %}
+  <section class="page-section">
+    <h2>Har lämnat gården</h2>
+    {{- cards.animalGrid(view.gone) }}
+  </section>
+  {%- endif %}
+</div>

@@ -191,3 +191,109 @@
   margin: 0;
   font-size: var(--font-size-small);
 }
+
+/* --- Pages --- */
+
+/* ── Sections and grids (05-§4.11–4.14) ────────────────────────────────── */
+
+.page-section {
+  margin-top: var(--space-lg);
+}
+
+/* Species boxes: two across on a phone, more on wider screens, never stretched to
+   fill a row when there are few of them (05-§6.24). */
+.species-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  list-style: none;
+}
+
+/* Cards: one column on a phone, two on a tablet, three on a desktop, decided by the
+   width alone (05-§4.14). 280px keeps a 1200px container at three columns. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── Map (02-§5.23–5.27, 05-§6.31) ─────────────────────────────────────── */
+
+/* The drawing scales with the page; the markers are positioned over it in percent
+   and keep their size, so a marker is always at least the tap target (02-§5.27). */
+.map {
+  position: relative;
+  margin-bottom: var(--space-md);
+}
+
+.map__drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.map__marker {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: var(--tap-target-min);
+  transform: translate(-50%, calc(var(--tap-target-min) / -2));
+  text-decoration: none;
+}
+
+/* ── Place list under the map (02-§5.24) ───────────────────────────────── */
+
+.place-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.place-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-sm);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.place-list__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  font-weight: 600;
+}
+
+/* ── Facts (02-§5.14–5.15) ─────────────────────────────────────────────── */
+
+.facts {
+  margin: 0 0 var(--space-sm);
+}
+
+.facts__row {
+  display: grid;
+  grid-template-columns: minmax(6em, max-content) 1fr;
+  gap: 0 var(--space-sm);
+  padding-block: var(--space-xs);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.facts__row dd {
+  margin: 0;
+}
+
+.link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

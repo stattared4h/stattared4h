@@ -1,0 +1,25 @@
+{#
+  Species tile macro (02-§5.7, 02-§5.9, 05-§6.24): a tappable box with the species'
+  picture and its plural name, linking to the species page. The same component on the
+  home page and the location page (05-§10.8). Takes a SpeciesTileView from
+  source/ts/build/pages.ts.
+
+    {% import "species-tile.njk" as tiles %}
+    {{ tiles.speciesGrid(view.species, true) }}
+#}
+{% macro speciesTile(tile, eager = false) %}
+<a class="species-tile" href="{{ tile.url | url }}">
+  <div class="species-tile__image">
+    {%- picture tile.photo, "species", "(min-width: 960px) 25vw, (min-width: 600px) 33vw, 50vw", eager, tile.name %}
+  </div>
+  <span class="species-tile__name">{{ tile.plural }}</span>
+</a>
+{% endmacro %}
+
+{% macro speciesGrid(tiles, first = false) %}
+<ul class="species-grid">
+  {%- for tile in tiles %}
+  <li>{{ speciesTile(tile, first and loop.first) }}</li>
+  {%- endfor %}
+</ul>
+{% endmacro %}
