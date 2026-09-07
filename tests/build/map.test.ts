@@ -24,10 +24,13 @@ import { PLACE_SYMBOLS } from "../../source/ts/build/symbols.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
+/** What every place needs beyond its position, so the popup has something to show. */
+const FACTS = { note: null, accessibility: "Hit når man med rullstol och barnvagn", species: "Getter" };
+
 const PLACES: MapLocation[] = [
-  { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.4123, lon: 12.2134 },
-  { id: "stora-hagen", name: "Stora hagen", kind: "djurplats", lat: 57.411, lon: 12.212 },
-  { id: "ovre-hagen", name: "Övre hagen", kind: "djurplats", lat: 57.414, lon: 12.2168 },
+  { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.4123, lon: 12.2134, ...FACTS },
+  { id: "stora-hagen", name: "Stora hagen", kind: "djurplats", lat: 57.411, lon: 12.212, ...FACTS },
+  { id: "ovre-hagen", name: "Övre hagen", kind: "djurplats", lat: 57.414, lon: 12.2168, ...FACTS },
 ];
 
 /** A small drawing, the way an SVG editor saves one. */
@@ -91,7 +94,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Gethagen", "Stora hagen", "Övre hagen"]);
@@ -103,7 +106,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
   });
 
   test("names are escaped and the base path is checked", () => {
-    const { html } = renderMap([{ id: "x", name: "Hagen <vid> ån & bäcken", kind: "djurplats", lat: 57, lon: 12 }], { base: "/" });
+    const { html } = renderMap([{ id: "x", name: "Hagen <vid> ån & bäcken", kind: "djurplats", lat: 57, lon: 12, ...FACTS }], { base: "/" });
     assert.match(html, /Hagen &lt;vid&gt; ån &amp; bäcken/);
     assert.throws(() => renderMap(PLACES, { base: "prov" }), /Base path/);
   });
@@ -132,8 +135,8 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
 
   test("every marker carries the symbol for its kind (02-§5.38)", () => {
     const mixed: MapLocation[] = [
-      { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.4123, lon: 12.2134 },
-      { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.411, lon: 12.212 },
+      { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.4123, lon: 12.2134, ...FACTS, species: "" },
+      { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.411, lon: 12.212, ...FACTS },
     ];
     const { html } = renderMap(mixed, { base: "/" });
     assert.match(html, /<span class="map__pin map__pin--mat" aria-hidden="true"><svg class="map__symbol"/);
@@ -143,6 +146,51 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     // The name is still what the marker is called; the symbol says nothing out loud.
     assert.match(html, /<span class="map__label">Caféet<\/span>/);
     assert.doesNotMatch(html, /https?:|<script|<image/, "no external resources (02-§5.26)");
+  });
+});
+
+describe("the popup on a marker (02-§5.46–5.49, 03-§9.7)", () => {
+  test("each marker carries what the popup shows, and the empty popup rides in the canvas", () => {
+    const places: MapLocation[] = [
+      { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.4123, lon: 12.2134,
+        note: "Här går bockarna.", accessibility: "Hit når man med rullstol och barnvagn", species: "Getter" },
+      { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.411, lon: 12.212,
+        note: null, accessibility: "Hit når man inte med rullstol eller barnvagn", species: "" },
+    ];
+    const { html } = renderMap(places, { base: "/" });
+
+    const paddock = /<a class="map__marker[^"]*"[^>]*data-place="gethagen"[^>]*>/.exec(html)?.[0] ?? "";
+    assert.match(paddock, /data-kind="djurplats"/);
+    assert.match(paddock, /data-species="Getter"/);
+    assert.match(paddock, /data-note="Här går bockarna\."/);
+    assert.match(paddock, /data-access="Hit når man med rullstol och barnvagn"/);
+
+    const cafe = /<a class="map__marker[^"]*"[^>]*data-place="cafeet"[^>]*>/.exec(html)?.[0] ?? "";
+    assert.match(cafe, /data-kind="mat"/);
+    assert.doesNotMatch(cafe, /data-species=/, "only a djurplats reports animals (02-§5.47)");
+    assert.doesNotMatch(cafe, /data-note=/, "a place without a note carries no empty attribute");
+    assert.match(cafe, /data-access="Hit når man inte med rullstol eller barnvagn"/);
+
+    // The popup is written once and empty; the client fills it and opens it in the middle
+    // of the screen (03-§9.7). A <dialog> without an `open` attribute shows nothing, which
+    // is what keeps the map a still picture without JavaScript (02-§5.49).
+    assert.match(html, /<dialog class="dialog map-popup" data-map-popup aria-labelledby="map-popup-name">/);
+    // The heading is not written empty here; the client builds it (03-§9.7).
+    assert.doesNotMatch(html, /<h2[^>]*><\/h2>/, "no empty heading in the built page");
+    assert.match(html, /<button class="icon-button dialog__close" type="button" aria-label="Stäng" data-map-popup-close>/);
+    assert.match(html, /<div class="map-popup__facts" data-map-popup-facts><\/div><\/div><\/dialog>$/);
+    assert.doesNotMatch(html, /<dialog[^>]* open/, "closed until the client opens it");
+    assert.ok(html.indexOf("data-map-popup") > html.indexOf("data-map-controls"), "after the map, not inside it");
+    assert.doesNotMatch(html, /https?:|<script|<image/, "no external resources (02-§5.26)");
+  });
+
+  test("a name with markup in it is escaped in the attributes too", () => {
+    const { html } = renderMap(
+      [{ id: "x", name: "Hagen", kind: "djurplats", lat: 57, lon: 12,
+         note: 'Sa "hej" & <log> ut', accessibility: "Hit når man med rullstol och barnvagn", species: "Får" }],
+      { base: "/" },
+    );
+    assert.match(html, /data-note="Sa &quot;hej&quot; &amp; &lt;log&gt; ut"/);
   });
 });
 
@@ -316,8 +364,8 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
   test("renderMap marks the side on the marker, and only when it is not the default", () => {
     const background = parseMapBackground(DRAWING, EDGES);
     const crowded: MapLocation[] = [
-      { id: "ettan", name: "1:an", kind: "djurplats", lat: 57.4125, lon: 12.214 },
-      { id: "tvaan", name: "2:an", kind: "djurplats", lat: 57.4125, lon: 12.2142 },
+      { id: "ettan", name: "1:an", kind: "djurplats", lat: 57.4125, lon: 12.214, ...FACTS },
+      { id: "tvaan", name: "2:an", kind: "djurplats", lat: 57.4125, lon: 12.2142, ...FACTS },
     ];
     const { html } = renderMap(crowded, { base: "/", background });
     assert.match(html, /<a class="map__marker map__marker--wide-\w+" href="\/plats\/ettan\//, "the first keeps the plain narrow class");

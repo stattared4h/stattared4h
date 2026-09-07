@@ -338,6 +338,20 @@ export function speciesView(
   };
 }
 
+/**
+ * The place's animals in words: "Får och kor", or "Inga djur just nu" for an empty
+ * paddock. Only a paddock has animals to report, and saying "inga djur just nu" about the
+ * café would be answering a question nobody asked (02-§5.35), so everything else is empty.
+ * The list under the map and the popup on the marker both say it, and they say it the same
+ * because they ask here.
+ */
+function speciesText(dataset: Dataset, location: Location): string {
+  if (location.kind !== "djurplats") return "";
+  const plurals = dataset.species.filter((s) => location.species.includes(s.id)).map((s) => s.plural);
+  if (plurals.length === 0) return NO_SPECIES_AT_LOCATION_TEXT;
+  return joinSwedish([plurals[0], ...plurals.slice(1).map(lowerFirst)]);
+}
+
 /** Active locations with coordinates, for the map (02-§5.23, 02-§5.25). */
 export function mapLocations(dataset: Dataset): MapLocation[] {
   return sortLocations(dataset.locations)
@@ -348,6 +362,9 @@ export function mapLocations(dataset: Dataset): MapLocation[] {
       kind: location.kind,
       lat: location.lat as number,
       lon: location.lon as number,
+      note: location.note,
+      accessibility: location.accessible ? ACCESSIBLE_TEXT : NOT_ACCESSIBLE_TEXT,
+      species: speciesText(dataset, location),
     }));
 }
 
@@ -355,23 +372,12 @@ export function mapView(dataset: Dataset, options: Pick<BuildViewsOptions, "base
   const rendered = renderMap(mapLocations(dataset), { base: options.base, background: options.mapBackground ?? null });
   const list = sortLocations(dataset.locations)
     .filter((location) => location.active)
-    .map((location) => {
-      const plurals = dataset.species.filter((s) => location.species.includes(s.id)).map((s) => s.plural);
-      // Only a paddock has animals to report, and saying "inga djur just nu" about the
-      // café would be answering a question nobody asked (02-§5.35).
-      const species =
-        location.kind !== "djurplats"
-          ? ""
-          : plurals.length === 0
-            ? NO_SPECIES_AT_LOCATION_TEXT
-            : joinSwedish([plurals[0], ...plurals.slice(1).map(lowerFirst)]);
-      return {
-        name: location.name,
-        url: locationUrl(location.id),
-        species,
-        symbol: symbolSvg(location.kind, "place-list__symbol"),
-      };
-    });
+    .map((location) => ({
+      name: location.name,
+      url: locationUrl(location.id),
+      species: speciesText(dataset, location),
+      symbol: symbolSvg(location.kind, "place-list__symbol"),
+    }));
   return { html: rendered.html, list, warnings: rendered.warnings };
 }
 

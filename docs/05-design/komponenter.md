@@ -189,6 +189,12 @@ I listan under kartan står samma symbol framför platsens namn, 20 px i
 `--color-green-deep`, utan bricka. Listan är därmed också symbolernas
 teckenförklaring (`02-§5.39`). <!-- 05-§6.40 -->
 
+Rutan som öppnas på en markör är en dialog (6.13) mitt på skärmen, som mest 22 rem bred —
+smalare än feedbackdialogen, eftersom den rymmer ett namn och några rader, inte ett
+formulär. Överst platsens namn som dialogens rubrik med stängknappen bredvid, därunder
+djurslagen i halvfet, och upplysningen och tillgängligheten i `--color-ink-soft`. Sist
+länken som en primär knapp, och bara när platsen är en `djurplats`. <!-- 05-§6.43 -->
+
 Kartans tre knappar — zooma in, zooma ut och "Visa hela kartan" — är ikonknappar (6.11)
 som ligger i kartans nedre högra hörn, staplade med `--space-xs` mellan sig och
 `--space-sm` från kanten. De ligger ovanpå ritningen, så de har alltid botten

@@ -612,6 +612,29 @@
   z-index: 1;
 }
 
+/* ── Popup on a marker (05-§6.42) ──────────────────────────────────────── */
+
+/* A dialog (6.13) in the middle of the screen, narrower than the feedback one: it holds a
+   name and a few lines, not a form. */
+.map-popup {
+  max-width: 22rem;
+}
+
+.map-popup__species {
+  margin: 0 0 var(--space-xs);
+  font-weight: 600;
+}
+
+.map-popup__note,
+.map-popup__access {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-ink-soft);
+}
+
+.map-popup__link {
+  margin-top: var(--space-xs);
+}
+
 /* The map's own buttons lie on top of the drawing, so they are light with a green icon
    and a shadow instead of the header's green ground (05-§6.41). */
 .map__control {
