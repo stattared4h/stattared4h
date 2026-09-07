@@ -30,6 +30,7 @@ definierar detaljerna.
 | `docs/06-MILJOER.md` | Lokalt, förhandsvisning och produktion; bas-sökväg och flytt av drift |
 | `docs/07-SAKERHET.md` | Säkerhet i ett publikt repo: checklista före push, CI-härdning, GitHub-inställningar |
 | `docs/08-SLAPP.md` | Släpp till produktion: deploy, versioner, taggar, rollback |
+| `docs/09-kallor/index.md` | Källregister: externt material, adress, hämtdatum och kontrollsumma |
 | `docs/adr/` | Arkitekturbeslut: varför saker ser ut som de gör |
 | `docs/99-sparbarhet/index.md` | Spårbarhetsmatris: krav → dokumentation → test → implementation |
 
@@ -47,6 +48,7 @@ ställen är en bugg som väntar på att inträffa.
 | Färger, typografi, spacing | Beslutet i `docs/05-design/`; i kod bara som variabler i `source/assets/css/tokens.css` |
 | Innehåll om gården, djuren och hagarna | YAML och Markdown under `source/` |
 | Säkerhetsmodell och hur problem rapporteras | `SECURITY.md` |
+| Var externt material kommer ifrån | `docs/09-kallor/index.md` |
 
 Regler:
 

@@ -5,7 +5,8 @@ Del av [kravindexet](./index.md). Den här filen äger `02-§10`.
 Issue: [#24](https://github.com/stattared4h/stattared4h/issues/24).
 Beslut: [ADR 0004](../adr/0004-pwa-offline-forst.md),
 [ADR 0007](../adr/0007-designen-arver-4h-identitet.md),
-[ADR 0010](../adr/0010-ingen-sparning-av-besokare.md).
+[ADR 0010](../adr/0010-ingen-sparning-av-besokare.md),
+[ADR 0016](../adr/0016-grafiska-profilen-ar-kallan.md).
 
 ---
 
@@ -24,6 +25,9 @@ Tre saker avgjordes när kraven skrevs. Sidhuvudet bär bara 4H-loggan; gården 
 egen logga, och namnet står i text. Länken till huvudsidan ligger enbart i sidfoten, så
 att sidhuvudet får plats i 360 px bredd. Och appikonen är sajtens egen: 4H-loggan får
 inte byggas in i egna märken (ADR 0007).
+
+Reglerna för hur loggan får se ut och omges kommer inte från oss utan från Riksförbundet
+Sveriges 4H:s grafiska profil, som är källan för identiteten (ADR 0016).
 
 ### Sidhuvudet
 
@@ -48,8 +52,10 @@ inte byggas in i egna märken (ADR 0007).
   höger. Menyknappen och "till toppen" finns inte i den bredden. <!-- 02-§10.7 -->
 - Länken för aktuell sida är markerad enligt `05-§6.3` och har
   `aria-current="page"`. <!-- 02-§10.8 -->
-- 4H-loggan är förbundets egen SVG, oförändrad, med alternativtexten "4H", och länkar
+- 4H-loggan är förbundets egen logotyp, oförändrad, med alternativtexten "4H", och länkar
   till startsidan. <!-- 02-§10.9 -->
+- 4H-loggan förekommer bara i förbundets primära mörkgröna, i svart eller i vitt, aldrig
+  med något ovanpå sig, och alltid med frizonen i `05-§6.38` omkring sig. <!-- 02-§10.37 -->
 - Sidhuvudet innehåller ingen länk till huvudsidan; den finns i sidfoten
   (`02-§1.9`). <!-- 02-§10.10 -->
 
