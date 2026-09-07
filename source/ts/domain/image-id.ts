@@ -36,9 +36,17 @@ export function imageIdFor(data: Uint8Array): string {
   return `${IMAGE_ID_PREFIX}${digest.slice(0, ID_LENGTH)}`;
 }
 
+/** The only format the repository takes (ADR 0008). */
+export const IMAGE_SUFFIX = ".webp";
+
 /** `img-a3f2c1d8b901` → `img-a3f2c1d8b901.webp`. The images directory is flat (04-§9.1). */
 export function imageFileName(id: string): string {
-  return `${id}.webp`;
+  return `${id}${IMAGE_SUFFIX}`;
+}
+
+/** `img-a3f2c1d8b901.webp` → `img-a3f2c1d8b901`. Not validated; pair it with `isImageId`. */
+export function imageIdFromFileName(name: string): string {
+  return name.endsWith(IMAGE_SUFFIX) ? name.slice(0, -IMAGE_SUFFIX.length) : name;
 }
 
 /** The image post that describes `id`, relative to the dataset directory. */

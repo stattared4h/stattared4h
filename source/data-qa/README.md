@@ -25,14 +25,14 @@ prövar större listor, svensk sortering och att samtliga arter och raser använ
 
 | Post | Fall som prövas |
 | --- | --- |
-| `rosa` | Fullständigt djur: alla fält satta, två foton, båda föräldrarna kända |
+| `rosa` | Fullständigt djur: alla fält satta, tre foton, båda föräldrarna kända |
 | `stjarna` | `born` som enbart årtal; mamma till två djur |
 | `bocken` | `status: gone`; helt utan foton; förälder som lämnat gården |
-| `lilla-gumman` | Flerordigt namn → id med bindestreck; `born` och `breed` saknas; syskon till Rosa via samma mamma |
+| `lilla-gumman` | Flerordigt namn → id med bindestreck; `born` och `breed` saknas; syskon till Rosa via samma mamma; **delar ett foto med Rosa** — fallet som gjorde bilden till en egen post (ADR 0015) |
 | `tuva` | Minsta möjliga djur — bara de obligatoriska fälten |
 | `snobollen` | Ö i namnet; annan art än de föregående |
 | `bagaren` | Hane med foto, i samma hage som en annan art |
-| `majros` | Ensam individ av sin art; flera foton med ett porträtt |
+| `majros` | Ensam individ av sin art; flera foton, där den första är porträttet |
 | `vinter` | `sex: unknown`; art som inte finns på någon plats |
 | `bomull` | Förälder med `status: gone` till två djur som finns kvar |
 | `nystan` | Barn till ett bortgånget djur; syskon till Dagg |
@@ -40,8 +40,8 @@ prövar större listor, svensk sortering och att samtliga arter och raser använ
 
 | Plats | Fall som prövas |
 | --- | --- |
-| `gethagen` | Normalfallet: ett djurslag, koordinater, `note` |
-| `bjorkhagen` | **Samma djurslag på två platser** — kärnfallet i ADR 0012 |
+| `gethagen` | Normalfallet: ett djurslag, koordinater, `note`; **plats med bilder**, varav en delas med Rosa och Lilla Gumman |
+| `bjorkhagen` | **Samma djurslag på två platser** — kärnfallet i ADR 0012; `description` med en **markdown-bild**, så bygget prövar `02-§8.12` |
 | `stora-hagen` | **Flera djurslag i samma hage**; `accessible: false` |
 | `smadjurshuset` | Inomhusplats med eget djurslag |
 | `ovre-hagen` | Aktiv plats utan djurslag → tom platssida, och en varning i valideringen |
@@ -55,10 +55,19 @@ Arten `hast` finns medvetet på **ingen** plats, så att artsidan prövas när s
 
 ## Bilder
 
-Bildfilerna som posterna refererar genereras av `npm run qa:images` som enfärgade
-platshållare med postens namn i bilden, i `source/images-qa/`. Katalogen ignoreras av
-git — inga påhittade fotografier commit:as (`02-§8.4`). Bildkatalogen följer datasetet
-(`04-§9.4`), så platshållarna blandas aldrig med gårdens bilder i `source/images/`.
+Varje bild är en egen post i `images/` med `alt` och `credit`
+([ADR 0015](../../docs/adr/0015-bilden-som-egen-post.md)); djur, platser och arter
+refererar bild-id:n. Datasetet har 101 bildposter, och varje post används av minst en
+annan post — annars varnar valideringen (`02-§8.13`).
+
+Bildfilerna genereras av `npm run qa:images` som enfärgade platshållare med bildens
+alt-text, i `source/images-qa/`. Katalogen ignoreras av git — inga påhittade fotografier
+commit:as (`02-§8.4`). Bildkatalogen följer datasetet (`04-§9.4`), så platshållarna
+blandas aldrig med gårdens bilder i `source/images/`.
+
+Id:na här är inte hashar av platshållarna, utan bestämda när datasetet skrevs.
+Platshållarna genereras om och skulle annars byta id varje gång bildbiblioteket ändrar
+sin utdata (`04-§9.10`).
 
 Kör kommandot innan ett QA-bygge och när en post får en ny bildreferens. En fil som
 redan finns lämnas orörd, så en omkörning är omedelbar.

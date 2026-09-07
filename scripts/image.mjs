@@ -19,6 +19,7 @@
  */
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { stringify } from "yaml";
 import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
 import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE, imagesDirFor, optimiseImage } from "../source/ts/build/images.ts";
 
@@ -61,21 +62,9 @@ function formatKilobytes(bytes) {
   return `${Math.round(bytes / 1024)} KB`;
 }
 
-/**
- * The image post as YAML. Written by hand rather than with the yaml package's stringify
- * so the file looks like the ones an editor writes: two plain lines, no quoting unless
- * the text needs it.
- */
+/** The image post as YAML: two lines, quoted only where the yaml package says it must be. */
 function imagePostYaml({ alt, credit }) {
-  return `alt: ${quote(alt)}\ncredit: ${quote(credit)}\n`;
-}
-
-/** Double-quoted only when plain YAML text would be ambiguous. */
-function quote(value) {
-  if (/^[\wÅÄÖåäöéèü][^:#\n]*$/.test(value) && !/[:#]\s/.test(value) && !value.endsWith(":")) {
-    return value;
-  }
-  return JSON.stringify(value);
+  return stringify({ alt, credit }, { lineWidth: 0 });
 }
 
 async function main() {

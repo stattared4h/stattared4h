@@ -13,7 +13,9 @@ import path from "node:path";
 import { normaliseBorn } from "./born.ts";
 import {
   IMAGE_ID_DESCRIPTION,
+  IMAGE_SUFFIX,
   imageFileName,
+  imageIdFromFileName,
   imagePostFile,
   isImageId,
 } from "./image-id.ts";
@@ -57,6 +59,11 @@ export interface MarkdownSource {
   text: string;
 }
 
+/** A `MarkdownSource` that came from a field of a record, so messages can name it. */
+interface MarkdownField extends MarkdownSource {
+  field?: string | null;
+}
+
 /** 04-§9.3: longest side in pixels and file size in bytes. */
 export const MAX_IMAGE_SIDE = 1600;
 export const MAX_IMAGE_BYTES = 250 * 1024;
@@ -64,10 +71,9 @@ export const MAX_IMAGE_BYTES = 250 * 1024;
 /** 04-§3.2: lowercase a–z, digits and single hyphens between groups. */
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** 04-§10.9: anything that looks like the start of an HTML tag, comment or doctype. */
-const HTML_PATTERN = /<[a-zA-Z/!]/;
 /** A Markdown image, `![](img-a3f2c1d8b901)`. The address is checked with `isImageId`. */
 const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*\]\(([^)\s]*)\)/g;
-const IMAGE_SUFFIX = ".webp";
+const HTML_PATTERN = /<[a-zA-Z/!]/;
 const IMAGE_FIELDS = new Set(["alt", "credit"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
@@ -812,7 +818,7 @@ function collectWarnings(
  * a placeholder, and the editor would never learn why.
  */
 function collectMarkdownImages(
-  sources: readonly (MarkdownSource & { field?: string | null })[],
+  sources: readonly MarkdownField[],
   images: ReadonlyMap<string, Image>,
   issues: Issues,
 ): Set<string> {
@@ -908,7 +914,8 @@ async function warnAboutStrayImageFiles(
     issues.warn(
       "images/",
       null,
-      `bildfilen ${name} har ingen bildpost och visas aldrig. Lägg till ${imagePostFile(name.replace(/\.webp$/, ""))} eller ta bort filen.`,
+      `bildfilen ${name} har ingen bildpost och visas aldrig. ` +
+        `Lägg till ${imagePostFile(imageIdFromFileName(name))} eller ta bort filen.`,
     );
   }
 }
