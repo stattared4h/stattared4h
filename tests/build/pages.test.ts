@@ -142,7 +142,7 @@ describe("the animal page (02-§5.14–5.18)", () => {
     const tuva = animal(views, "tuva");
     assert.equal(tuva.breed, null);
     assert.equal(tuva.born, null);
-    assert.equal(tuva.portrait, null);
+    assert.equal(tuva.portrait?.id, "img-726495c0fd03");
     assert.equal(tuva.body, null);
     assert.equal(tuva.mother, null);
     const vinter = animal(views, "vinter");
@@ -160,7 +160,7 @@ describe("the animal page (02-§5.14–5.18)", () => {
     const card = animalCard(dataset, dataset.animals.find((a) => a.id === "bocken")!);
     assert.deepEqual(card.tags, ["Jämtget", HERITAGE_LABEL, GONE_LABEL]);
     assert.equal(card.gone, true);
-    assert.equal(card.photo, null);
+    assert.equal(card.photo?.id, "img-778c1a75a67c");
     assert.equal(card.speciesName, "Get");
   });
 

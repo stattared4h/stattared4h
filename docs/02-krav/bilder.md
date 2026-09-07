@@ -2,9 +2,11 @@
 
 Del av [kravindexet](./index.md). Den här filen äger `02-§8`.
 
-Issue: [#10](https://github.com/stattared4h/stattared4h/issues/10).
+Issue: [#10](https://github.com/stattared4h/stattared4h/issues/10),
+[#42](https://github.com/stattared4h/stattared4h/issues/42).
 Beslut: [ADR 0008](../adr/0008-bilder-i-repot.md),
-[ADR 0015](../adr/0015-bilden-som-egen-post.md).
+[ADR 0015](../adr/0015-bilden-som-egen-post.md),
+[ADR 0017](../adr/0017-ai-genererade-qa-bilder-i-repot.md).
 
 ---
 
@@ -15,8 +17,9 @@ Beslut: [ADR 0008](../adr/0008-bilder-i-repot.md),
 ADR 0008 lägger bara webbanpassade bilder i repot och konstaterar att ett hjälpkommando
 behövs, annars tar någon genvägar förbi grinden. Bildkedjan blir repots första beroende
 med native-kod, och det granskas som ett sådant enligt `07-SAKERHET.md` §6. QA-datat
-refererar bilder som inte finns; de genereras som platshållare, eftersom påhittade
-fotografier aldrig commit:as.
+använder AI-genererade fotografier för att förhandsvisningen ska visa hur en bildburen
+sajt faktiskt upplevs innan gårdens egna fotografier finns. De är tydligt märkta och
+skilda från gårdens riktiga data.
 
 Den första inmatningen av gårdens hundra djur är fas 1:s tyngsta arbete (ADR 0013), och
 `npm run image` tar en bild i taget med alt-texten på kommandoraden. Hundra bilder den
@@ -58,8 +61,10 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
   all metadata, räknar ut bild-id:t ur resultatet och skriver både bildfilen och
   bildposten. Kommandot skriver ut id:t att referera. Finns bilden redan sedan tidigare
   säger kommandot det och skriver ingenting. <!-- 02-§8.3 -->
-- Bildfilerna som QA-datat refererar genereras av `npm run qa:images` som enfärgade
-  WebP-platshållare med alt-texten i bilden, och versionshanteras inte. <!-- 02-§8.4 -->
+- QA-datasetet refererar cirka 25 delade AI-genererade fotografier som versionshanteras
+  i `source/images-qa/`. Varje fotografi är WebP, högst 1200 px på längsta sidan och
+  högst 50 KB, utan EXIF, XMP eller ICC, och bär den inbrända märkningen
+  "AI-bild · QA". <!-- 02-§8.4 -->
 - Valideringen varnar för en bildpost som ingen refererar, och för en bildfil i
   bildkatalogen som ingen bildpost hör till. Båda är utrymme som aldrig når
   besökaren. <!-- 02-§8.13 -->
@@ -86,6 +91,32 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
   ignoreras. Redaktören ska inte behöva veta vad någotdera är. <!-- 02-§8.19 -->
 - Två rader som pekar på samma bildfil, eller på två filer med identiskt innehåll, ger
   samma bild-id. Kommandot skriver bilden en gång och säger till. <!-- 02-§8.20 -->
+
+### AI-bilder för QA
+
+- Varje bildpost i QA-datasetet har `credit: AI-genererad med OpenAI ImageGen`. En
+  bildpost med en credit som börjar med `AI-genererad` är ogiltig i `source/data/`, så
+  att en genererad QA-bild inte kan publiceras som gårdens foto. <!-- 02-§8.21 -->
+- `npm run qa:prompts` läser QA-datasetet och skriver en tabell med en rad per bildpost.
+  Varje rad innehåller bild-id, målfil och en svensk bildprompt sammansatt av alt-texten
+  och de djur, arter eller platser som refererar bilden. <!-- 02-§8.22 -->
+- `npm run qa:images -- --import <katalog>` läser genererade JPEG-, PNG- eller
+  WebP-filer vars filnamn är ett befintligt bild-id, lägger märkningen "AI-bild · QA"
+  i bildens nedre hörn och skriver den webbanpassade filen under samma id i
+  `source/images-qa/`. Okända id:n och felaktiga filnamn fäller importen innan något
+  skrivs. <!-- 02-§8.23 -->
+- QA-importen är allt-eller-inget. Samtliga källbilder läses, märks och komprimeras till
+  kraven i `02-§8.4` innan den första filen skrivs. En befintlig målfil lämnas orörd, så
+  en omkörning är säker. <!-- 02-§8.24 -->
+- `npm run qa:images` utan `--import` skapar enfärgade 1200 × 900-platshållare enbart för
+  bildposter vars fil saknas och lämnar incheckade fotografier orörda. Därmed kan
+  bilderna levereras i omgångar utan att QA-bygget får trasiga bilder. <!-- 02-§8.25 -->
+- Bild-id:n härleds inte på nytt vid QA-import. Källfilen och den färdiga WebP-filen
+  behåller bildpostens befintliga id, så att QA-datat är stabilt när bilden genereras om.
+  <!-- 02-§8.26 -->
+- Varken QA-kommandona eller QA-datat skriver i `source/data/` eller `source/images/`.
+  Gårdens riktiga data och bilder kan bara ändras genom produktionsflödena.
+  <!-- 02-§8.27 -->
 
 ### Leverans
 

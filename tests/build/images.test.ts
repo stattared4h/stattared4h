@@ -6,7 +6,7 @@
  */
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdtemp, readdir, rm, stat } from "node:fs/promises";
+import { access, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, before, describe, test } from "node:test";
@@ -405,6 +405,108 @@ describe("npm run qa:images", () => {
     const result = await runScript("qa-images.mjs", ["--images-dir", path.join(workDir, "images")]);
     assert.equal(result.code, 1);
     assert.match(result.stderr, /Vägrar/);
+  });
+
+  test("imports, marks and compresses generated images under their existing ids", async () => {
+    const root = path.join(workDir, "import-valid");
+    const dataDir = path.join(root, "data-qa");
+    const imagesDir = path.join(root, "images-qa");
+    const inputDir = path.join(root, "generated");
+    const id = "img-123456789abc";
+    await mkdir(path.join(dataDir, "images"), { recursive: true });
+    await mkdir(inputDir, { recursive: true });
+    await writeFile(
+      path.join(dataDir, "images", `${id}.yaml`),
+      "alt: En vit testbild.\ncredit: AI-genererad med OpenAI ImageGen\n",
+    );
+    await sharp({
+      create: { width: 1600, height: 1200, channels: 3, background: "white" },
+    })
+      .withExif({ IFD0: { Artist: "ska bort" } })
+      .png()
+      .toFile(path.join(inputDir, `${id}.png`));
+
+    const result = await runScript("qa-images.mjs", [
+      "--data-dir",
+      dataDir,
+      "--images-dir",
+      imagesDir,
+      "--import",
+      inputDir,
+    ]);
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /Importerade 1 AI-bild/);
+
+    const output = path.join(imagesDir, `${id}.webp`);
+    const metadata = await sharp(output).metadata();
+    assert.equal(metadata.format, "webp");
+    assert.equal(metadata.width, 1200);
+    assert.equal(metadata.height, 900);
+    assert.equal(metadata.exif, undefined);
+    assert.equal(metadata.xmp, undefined);
+    assert.equal(metadata.icc, undefined);
+    assert.ok((await stat(output)).size <= 50 * 1024);
+
+    const pixel = await sharp(output)
+      .extract({ left: 1165, top: 865, width: 1, height: 1 })
+      .removeAlpha()
+      .raw()
+      .toBuffer();
+    assert.ok([...pixel].every((channel) => channel < 100), "the bottom-right badge surface should be dark");
+  });
+
+  test("QA import is all-or-nothing when a generated file has an unknown id", async () => {
+    const root = path.join(workDir, "import-invalid");
+    const dataDir = path.join(root, "data-qa");
+    const imagesDir = path.join(root, "images-qa");
+    const inputDir = path.join(root, "generated");
+    const known = "img-123456789abc";
+    const unknown = "img-ffffffffffff";
+    await mkdir(path.join(dataDir, "images"), { recursive: true });
+    await mkdir(inputDir, { recursive: true });
+    await writeFile(path.join(dataDir, "images", `${known}.yaml`), "alt: Test.\ncredit: AI-genererad\n");
+    for (const id of [known, unknown]) {
+      await sharp(syntheticPhoto(1600, 1200)).png().toFile(path.join(inputDir, `${id}.png`));
+    }
+
+    const result = await runScript("qa-images.mjs", [
+      "--data-dir",
+      dataDir,
+      "--images-dir",
+      imagesDir,
+      "--import",
+      inputDir,
+    ]);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /okänt bild-id.*img-ffffffffffff/i);
+    await assert.rejects(access(path.join(imagesDir, `${known}.webp`)));
+  });
+
+  test("QA import leaves an existing target byte-for-byte unchanged", async () => {
+    const root = path.join(workDir, "import-existing");
+    const dataDir = path.join(root, "data-qa");
+    const imagesDir = path.join(root, "images-qa");
+    const inputDir = path.join(root, "generated");
+    const id = "img-123456789abc";
+    await mkdir(path.join(dataDir, "images"), { recursive: true });
+    await mkdir(imagesDir, { recursive: true });
+    await mkdir(inputDir, { recursive: true });
+    await writeFile(path.join(dataDir, "images", `${id}.yaml`), "alt: Test.\ncredit: AI-genererad\n");
+    await sharp(syntheticPhoto(400, 300)).webp().toFile(path.join(imagesDir, `${id}.webp`));
+    const before = await readFile(path.join(imagesDir, `${id}.webp`));
+    await sharp(syntheticPhoto(1600, 1200)).png().toFile(path.join(inputDir, `${id}.png`));
+
+    const result = await runScript("qa-images.mjs", [
+      "--data-dir",
+      dataDir,
+      "--images-dir",
+      imagesDir,
+      "--import",
+      inputDir,
+    ]);
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /0 AI-bilder.*1 fanns redan/);
+    assert.deepEqual(await readFile(path.join(imagesDir, `${id}.webp`)), before);
   });
 });
 

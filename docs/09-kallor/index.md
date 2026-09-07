@@ -22,10 +22,27 @@ ritat själv. Med det går varje härlett värde att spåra tillbaka till sin k�
   *Licens*. <!-- 09-§1.4 -->
 - Härleder vi en fil ur en källa bär registret en kontrollsumma för det härledda
   innehållet, så att ett test kan slå fast att det är oförändrat. <!-- 09-§1.5 -->
+- AI-genererade filer anger generator, datum och det versionshanterade promptunderlaget
+  i stället för en extern adress och en källfils kontrollsumma. De färdiga filerna är
+  själva primärmaterialet. <!-- 09-§1.6 -->
 
 ---
 
 ## Källor
+
+### AI-genererade fotografier för QA
+
+| | |
+| --- | --- |
+| Generator | OpenAI ImageGen |
+| Genererade | 2026-09-07 |
+| Promptunderlag | `npm run qa:prompts`, härlett ur `source/data-qa/` |
+| I repot | `source/images-qa/*.webp` |
+
+Bilderna föreställer påhittade djur, innehåller inga personer och används bara av
+QA-datasetet. Importkommandot lägger in märkningen "AI-bild · QA", skalar, kodar om
+och tar bort metadata enligt ADR 0017. Bildposterna anger samma ursprung med
+`credit: AI-genererad med OpenAI ImageGen`.
 
 ### 4H-logotypen
 

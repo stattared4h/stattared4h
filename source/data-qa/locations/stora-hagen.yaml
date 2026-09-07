@@ -3,7 +3,10 @@ species:
   - far
   - ko
 description: Gårdens största betesmark. Här går fåren och Majros tillsammans.
-lat: 57.411000
-lon: 12.212000
+lat: 57.411
+lon: 12.212
 accessible: false
 active: true
+photos:
+  - img-21c7f66f51c8
+  - img-5d73b603251b

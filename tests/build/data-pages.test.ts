@@ -154,17 +154,23 @@ describe("the animal page (02-§5.14–5.18, 02-§8.5–8.7)", () => {
       assert.match(image, /\bwidth="\d+" height="\d+"/);
       assert.match(image, /\bsrcset="[^"]*400\.webp 400w/);
     }
-    assert.equal((html.match(/Foto: Anna Andersson/g) ?? []).length, 3, "a credit next to every photo (02-§8.7)");
+    assert.equal(
+      (html.match(/Foto: AI-genererad med OpenAI ImageGen/g) ?? []).length,
+      3,
+      "a credit next to every photo (02-§8.7)",
+    );
   });
 
-  test("Bocken has left the farm; Tuva has neither photo nor facts to show", async () => {
+  test("Bocken has left the farm; Tuva has a shared photo but no optional facts", async () => {
     const bocken = main(await page("djur/bocken"));
     assert.match(bocken, /<h1>Bocken<\/h1>\s*<p><span class="tag">Har lämnat gården<\/span><\/p>/);
     assert.match(bocken, /Född 2015/);
     assert.match(bocken, /<dt>Avkomma<\/dt>[\s\S]*?<a href="\/djur\/rosa\/">Rosa<\/a>/);
-    assert.match(bocken, /<div class="image-placeholder"><span class="image-placeholder__label">Get<\/span><\/div>/);
+    assert.match(bocken, /<img [^>]*img-778c1a75a67c/);
     const tuva = main(await page("djur/tuva"));
-    assert.doesNotMatch(tuva, /<dt>Ras<\/dt>|Född|<h2>Släkt<\/h2>|Foto:/);
+    assert.doesNotMatch(tuva, /<dt>Ras<\/dt>|Född|<h2>Släkt<\/h2>/);
+    assert.match(tuva, /<img [^>]*img-726495c0fd03/);
+    assert.match(tuva, /Foto: AI-genererad med OpenAI ImageGen/);
     const vinter = main(await page("djur/vinter"));
     assert.doesNotMatch(vinter, /<dt>Kön<\/dt>/, "unknown sex is not shown");
   });
@@ -194,7 +200,7 @@ describe("images as their own posts (02-§8.8–8.12, ADR 0015)", () => {
 
     for (const animal of users) {
       const html = main(await page(`djur/${animal.id}`));
-      assert.match(html, new RegExp(`${shared}-800\\.webp`), animal.id);
+      assert.match(html, new RegExp(`${shared}-[0-9]+\\.webp`), animal.id);
     }
   });
 
@@ -205,13 +211,13 @@ describe("images as their own posts (02-§8.8–8.12, ADR 0015)", () => {
 
     const html = main(await page(`plats/${withPhotos.id}`));
     for (const photo of withPhotos.photos) {
-      assert.match(html, new RegExp(`${photo.id}-800\\.webp`));
+      assert.match(html, new RegExp(`${photo.id}-[0-9]+\\.webp`));
     }
     assert.match(html, new RegExp(`Foto: ${withPhotos.photos[0].credit}`));
     // The species tiles stay above the photos, so they are still reachable without
     // scrolling on a phone (05-§6.24).
     const tiles = html.indexOf("species-tile");
-    const firstPhoto = html.indexOf(`${withPhotos.photos[0].id}-800.webp`);
+    const firstPhoto = html.indexOf(withPhotos.photos[0].id);
     assert.ok(tiles >= 0, "the location page should have species tiles");
     assert.ok(firstPhoto >= 0, "the location page should show the first photo");
     assert.ok(tiles < firstPhoto, "the species tiles come before the photos");
@@ -231,7 +237,7 @@ describe("images as their own posts (02-§8.8–8.12, ADR 0015)", () => {
     assert.ok(location, "the QA data should have a location whose description contains an image");
     const id = /!\[\]\((img-[0-9a-f]{12})\)/.exec(location.description ?? "")?.[1];
     const html = main(await page(`plats/${location.id}`));
-    assert.match(html, new RegExp(`<img [^>]*src="/images/${id}-800\\.webp"`));
+    assert.match(html, new RegExp(`<img [^>]*src="/images/${id}-[0-9]+\\.webp"`));
     assert.match(html, /<img [^>]*\balt="[^"]+"/, "the alt text comes from the image post");
     assert.doesNotMatch(html, /!\[\]/, "the Markdown source never reaches the page");
   });
