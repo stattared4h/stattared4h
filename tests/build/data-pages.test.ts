@@ -279,7 +279,15 @@ describe("the map (02-§5.23–5.27)", () => {
     const list = html.slice(html.indexOf('<ul class="place-list">'));
     assert.match(list, /href="\/plats\/stora-hagen\/">Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/);
     assert.doesNotMatch(list, /gamla-stallet/);
-    assert.doesNotMatch(html, /https?:\/\//, "no external calls (02-§5.26)");
+    // 02-§5.26 forbids fetching anything from outside; 02-§5.34 adds two ordinary
+    // links out. Checking the two separately keeps both requirements honest.
+    assert.doesNotMatch(html, /(?:src|srcset)="https?:|url\(\s*https?:/, "nothing is fetched from outside (02-§5.26)");
+    assert.match(html, /<h2>Fler kartor i området<\/h2>/);
+    assert.deepEqual(
+      [...html.matchAll(/href="(https?:[^"]+)"/g)].map((m) => m[1]),
+      ["https://www.4h.se/stattared/vandring-fiske/", "https://www.naturkartan.se/sv/kungsbacka"],
+      "only the two maps in 02-§5.34 lead out of the site",
+    );
   });
 });
 

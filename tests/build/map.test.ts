@@ -4,20 +4,24 @@
  * to a temporary directory only for `loadMapBackground`.
  */
 import assert from "node:assert/strict";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, test } from "node:test";
 import {
+  LABEL_METRICS,
   loadMapBackground,
   MAP_DESCRIPTION,
   mapFrame,
   parseMapBackground,
+  placeLabels,
   projectPoint,
   renderMap,
   renderMapSvg,
   type MapLocation,
 } from "../../source/ts/build/map.ts";
+
+const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
 const PLACES: MapLocation[] = [
   { id: "gethagen", name: "Gethagen", lat: 57.4123, lon: 12.2134 },
@@ -185,6 +189,97 @@ describe("drawn background (02-§5.30, 03-§9.2)", () => {
       assert.equal(background?.width, 400);
     } finally {
       await rm(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("label placement (02-§5.33, 03-§9.3)", () => {
+  /** Drawing units per pixel at the reference width the build calculates for. */
+  const UNITS_PER_PX = 800 / 360;
+
+  test("places far apart keep their label under the marker", () => {
+    const sides = placeLabels(
+      [
+        { id: "a", name: "Ettan", x: 100, y: 100 },
+        { id: "b", name: "Tvåan", x: 600, y: 500 },
+      ],
+      800,
+    );
+    assert.deepEqual([...sides.values()], ["below", "below"]);
+  });
+
+  test("two markers a finger apart get their labels on different sides", () => {
+    // 30 px apart at 360 px width: well inside the 44 px tap target, so the two
+    // labels under the markers would cover each other.
+    const sides = placeLabels(
+      [
+        { id: "a", name: "Ettan", x: 400, y: 300 },
+        { id: "b", name: "Tvåan", x: 400 + 30 * UNITS_PER_PX, y: 300 },
+      ],
+      800,
+    );
+    assert.equal(sides.get("a"), "below");
+    assert.notEqual(sides.get("b"), "below", "the second label moves out of the way");
+  });
+
+  test("the placement does not depend on the order the places arrive in", () => {
+    const markers = [
+      { id: "a", name: "Ettan", x: 400, y: 300 },
+      { id: "b", name: "Tvåan", x: 420, y: 310 },
+      { id: "c", name: "Trean", x: 440, y: 295 },
+      { id: "d", name: "Fyran", x: 405, y: 340 },
+    ];
+    const forwards = placeLabels(markers, 800);
+    const backwards = placeLabels([...markers].reverse(), 800);
+    assert.deepEqual([...forwards].sort(), [...backwards].sort());
+  });
+
+  test("when every side is taken the label stays under its own marker", () => {
+    // Six places on the same spot: there are four sides, so two must give up. A label
+    // that stays put is honest; one flung across the map would point at nothing.
+    const markers = Array.from({ length: 6 }, (_, i) => ({
+      id: `p${i}`,
+      name: "Hagen",
+      x: 400,
+      y: 300,
+    }));
+    const sides = placeLabels(markers, 800);
+    assert.equal(sides.size, 6);
+    assert.equal(sides.get("p0"), "below");
+    for (const side of sides.values()) {
+      assert.ok(["below", "above", "right", "left"].includes(side), side);
+    }
+  });
+
+  test("renderMap marks the side on the marker, and only when it is not the default", () => {
+    const background = parseMapBackground(DRAWING, EDGES);
+    const crowded: MapLocation[] = [
+      { id: "ettan", name: "1:an", lat: 57.4125, lon: 12.214 },
+      { id: "tvaan", name: "2:an", lat: 57.4125, lon: 12.2142 },
+    ];
+    const { html } = renderMap(crowded, { base: "/", background });
+    assert.match(html, /<a class="map__marker" href="\/plats\/ettan\//, "the first keeps the plain class");
+    assert.match(html, /<a class="map__marker map__marker--label-\w+" href="\/plats\/tvaan\//);
+  });
+
+  test("the estimate uses the measurements in tokens.css", async () => {
+    const css = await readFile(path.join(ROOT, "source/assets/css/tokens.css"), "utf8");
+    const token = (name: string): number => {
+      const match = css.match(new RegExp(`${name}\\s*:\\s*(\\d+)px`));
+      assert.ok(match, `${name} saknas i tokens.css`);
+      return Number(match[1]);
+    };
+    assert.equal(LABEL_METRICS.tapTarget, token("--tap-target-min"));
+    assert.equal(LABEL_METRICS.fontSize, token("--font-size-small"));
+    assert.equal(LABEL_METRICS.padding, token("--space-xs"));
+  });
+});
+
+describe("the map never shows which animals are where (02-§5.32)", () => {
+  test("a marker carries the place name and nothing else", () => {
+    const { html } = renderMap(PLACES, { base: "/" });
+    for (const marker of html.matchAll(/<a class="map__marker[^"]*"[^>]*>(.*?)<\/a>/g)) {
+      assert.match(marker[1], /^<span class="map__pin" aria-hidden="true"><\/span><span class="map__label">[^<]+<\/span>$/);
     }
   });
 });
