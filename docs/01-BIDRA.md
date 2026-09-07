@@ -234,10 +234,9 @@ som förvaltar repot.
 
 ## 7. Lintning och stil
 
-- CSS använder enbart variablerna i `source/assets/css/tokens.css`. Lintregeln som fäller
-  ett hårdkodat värde tillkommer med verktygskedjan (`02-§9.3`); tills dess granskas det
-  för hand.
+- CSS använder enbart variablerna i `source/assets/css/tokens.css`. Stylelint fäller ett
+  hårdkodat färg-, spacing- eller typografivärde utanför den filen (`02-§9.3`).
 - Markdown lintas. Rader bryts vid rimlig längd.
-- TypeScript typkontrolleras strikt så snart domänskiktet finns.
+- TypeScript typkontrolleras strikt med `npm run typecheck`.
 - Kod och fältnamn på engelska, allt en människa läser på svenska
   ([ADR 0006](adr/0006-sprak-i-kod-och-dokumentation.md)).
