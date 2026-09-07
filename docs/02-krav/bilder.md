@@ -80,8 +80,10 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
 - Fel rapporteras med radnummer, kolumn och vad som ska rättas, på svenska, på samma
   form som datavalideringens meddelanden (`02-§6.5`). <!-- 02-§8.18 -->
 - Tabellen läses som CSV med citerade fält, så att en alt-text får innehålla kommatecken,
-  citattecken och radbrytningar — en alt-text som beskriver ett djur gör oftast
-  det. <!-- 02-§8.19 -->
+  citattecken och radbrytningar — en alt-text som beskriver ett djur gör oftast det.
+  Både kommatecken och semikolon godtas som avgränsare, eftersom ett kalkylprogram med
+  svenska inställningar sparar semikolon, och en inledande byteordningsmarkering
+  ignoreras. Redaktören ska inte behöva veta vad någotdera är. <!-- 02-§8.19 -->
 - Två rader som pekar på samma bildfil, eller på två filer med identiskt innehåll, ger
   samma bild-id. Kommandot skriver bilden en gång och säger till. <!-- 02-§8.20 -->
 
