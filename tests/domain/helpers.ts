@@ -7,9 +7,9 @@
 import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { validateDataset } from "../../source/ts/domain/index.ts";
+import { loadDataset } from "../../source/ts/domain/index.ts";
 import { loadRawDataset, type RawDataset, type RawRecord } from "../../source/ts/domain/load.ts";
-import type { ValidateOptions } from "../../source/ts/domain/validate.ts";
+import { validateDataset, type ValidateOptions } from "../../source/ts/domain/validate.ts";
 import type { Dataset, Issue, ValidationResult } from "../../source/ts/domain/types.ts";
 
 export const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -31,15 +31,26 @@ export async function rawQa(): Promise<RawDataset> {
 
 /** The validated QA dataset; fails the test if the QA data is not valid. */
 export async function qaDataset(): Promise<Dataset> {
-  const result = await validateDataset(await rawQa(), { today: TODAY });
+  const result = await loadDataset(QA_DIR, { today: TODAY });
   if (result.dataset === null) {
     throw new Error(`QA data is invalid:\n${result.errors.map((e) => `${e.file}: ${e.message}`).join("\n")}`);
   }
   return result.dataset;
 }
 
+/**
+ * Existing validator unit tests exercise the strict legacy validator directly. publicId
+ * is validated by loadDataset, so remove only that additive field from the QA fixture
+ * before those focused mutations are checked.
+ */
 export async function validate(raw: RawDataset, options: ValidateOptions = {}): Promise<ValidationResult> {
-  return validateDataset(raw, { today: TODAY, ...options });
+  const copy = structuredClone(raw);
+  for (const record of copy.animals) {
+    if (record.parseError === null && typeof record.data === "object" && record.data !== null && !Array.isArray(record.data)) {
+      delete (record.data as Obj).publicId;
+    }
+  }
+  return validateDataset(copy, { today: TODAY, ...options });
 }
 
 function record(records: RawRecord[], id: string): RawRecord {
