@@ -20,13 +20,14 @@ import {
   renderMapSvg,
   type MapLocation,
 } from "../../source/ts/build/map.ts";
+import { PLACE_SYMBOLS } from "../../source/ts/build/symbols.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
 const PLACES: MapLocation[] = [
-  { id: "gethagen", name: "Gethagen", lat: 57.4123, lon: 12.2134 },
-  { id: "stora-hagen", name: "Stora hagen", lat: 57.411, lon: 12.212 },
-  { id: "ovre-hagen", name: "Övre hagen", lat: 57.414, lon: 12.2168 },
+  { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.4123, lon: 12.2134 },
+  { id: "stora-hagen", name: "Stora hagen", kind: "djurplats", lat: 57.411, lon: 12.212 },
+  { id: "ovre-hagen", name: "Övre hagen", kind: "djurplats", lat: 57.414, lon: 12.2168 },
 ];
 
 /** A small drawing, the way an SVG editor saves one. */
@@ -102,13 +103,28 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
   });
 
   test("names are escaped and the base path is checked", () => {
-    const { html } = renderMap([{ id: "x", name: "Hagen <vid> ån & bäcken", lat: 57, lon: 12 }], { base: "/" });
+    const { html } = renderMap([{ id: "x", name: "Hagen <vid> ån & bäcken", kind: "djurplats", lat: 57, lon: 12 }], { base: "/" });
     assert.match(html, /Hagen &lt;vid&gt; ån &amp; bäcken/);
     assert.throws(() => renderMap(PLACES, { base: "prov" }), /Base path/);
   });
 
   test("without places the map is empty", () => {
     assert.deepEqual(renderMap([], { base: "/" }), { html: "", warnings: [] });
+  });
+
+  test("every marker carries the symbol for its kind (02-§5.38)", () => {
+    const mixed: MapLocation[] = [
+      { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.4123, lon: 12.2134 },
+      { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.411, lon: 12.212 },
+    ];
+    const { html } = renderMap(mixed, { base: "/" });
+    assert.match(html, /<span class="map__pin map__pin--mat" aria-hidden="true"><svg class="map__symbol"/);
+    assert.match(html, /<span class="map__pin map__pin--djurplats" aria-hidden="true"><svg class="map__symbol"/);
+    assert.ok(html.includes(PLACE_SYMBOLS.mat), "the café is drawn with the food symbol");
+    assert.ok(html.includes(PLACE_SYMBOLS.djurplats), "the paddock is drawn with the animal symbol");
+    // The name is still what the marker is called; the symbol says nothing out loud.
+    assert.match(html, /<span class="map__label">Caféet<\/span>/);
+    assert.doesNotMatch(html, /https?:|<script|<image/, "no external resources (02-§5.26)");
   });
 });
 
@@ -147,7 +163,7 @@ describe("drawn background (02-§5.30, 03-§9.2)", () => {
     assert.deepEqual([px.width, px.height], [640, 480]);
   });
 
-  test("the SVG is renderered by renderMapSvg with the description", () => {
+  test("the SVG is rendered by renderMapSvg with the description", () => {
     const frame = { width: 10, height: 5, north: 1, south: 0, west: 0, east: 1 };
     const svg = renderMapSvg(frame);
     assert.match(svg, new RegExp(`<title>${MAP_DESCRIPTION}</title>`));
@@ -282,8 +298,8 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
   test("renderMap marks the side on the marker, and only when it is not the default", () => {
     const background = parseMapBackground(DRAWING, EDGES);
     const crowded: MapLocation[] = [
-      { id: "ettan", name: "1:an", lat: 57.4125, lon: 12.214 },
-      { id: "tvaan", name: "2:an", lat: 57.4125, lon: 12.2142 },
+      { id: "ettan", name: "1:an", kind: "djurplats", lat: 57.4125, lon: 12.214 },
+      { id: "tvaan", name: "2:an", kind: "djurplats", lat: 57.4125, lon: 12.2142 },
     ];
     const { html } = renderMap(crowded, { base: "/", background });
     assert.match(html, /<a class="map__marker map__marker--wide-\w+" href="\/plats\/ettan\//, "the first keeps the plain narrow class");
@@ -304,10 +320,14 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
 });
 
 describe("the map never shows which animals are where (02-§5.32)", () => {
-  test("a marker carries the place name and nothing else", () => {
+  test("a marker carries the place name and its symbol, and nothing else", () => {
     const { html } = renderMap(PLACES, { base: "/" });
     for (const marker of html.matchAll(/<a class="map__marker[^"]*"[^>]*>(.*?)<\/a>/g)) {
-      assert.match(marker[1], /^<span class="map__pin" aria-hidden="true"><\/span><span class="map__label">[^<]+<\/span>$/);
+      assert.match(
+        marker[1],
+        /^<span class="map__pin map__pin--\w+" aria-hidden="true"><svg class="map__symbol".*?<\/svg><\/span><span class="map__label">[^<]+<\/span>$/,
+        "the pin, the symbol and the name — no species (02-§5.32)",
+      );
     }
   });
 });

@@ -1,6 +1,6 @@
 # 0018 — Platsen har en sort
 
-**Status:** Antagen, 2026-09-07
+**Status:** Ersatt av [ADR 0019](0019-platsens-sort-styr-symbolen.md), 2026-09-07
 
 ## Sammanhang
 

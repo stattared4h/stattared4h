@@ -44,6 +44,52 @@ QA-datasetet. Importkommandot lägger in märkningen "AI-bild · QA", skalar, ko
 och tar bort metadata enligt ADR 0017. Bildposterna anger samma ursprung med
 `credit: AI-genererad med OpenAI ImageGen`.
 
+### Vägmärken i kartans symboler
+
+| | |
+| --- | --- |
+| Utgivare | Vägmärkesförordningen (2007:90); filerna via Wikimedia Commons |
+| Adress | `https://commons.wikimedia.org/wiki/Special:FilePath/Sweden_road_sign_<märke>.svg` |
+| Hämtad | 2026-09-07 |
+| I repot | `docs/09-kallor/vagmarke-h5.svg`, `-h8.svg`, `-h28.svg` (5–7 KB styck) |
+
+Märkenas utformning är fastställd i författning och är därmed ett officiellt verk enligt
+9 § upphovsrättslagen. Commons-filerna bär mallen `PD-Transportstyrelsen`.
+
+Tre av kartans åtta symboler (`02-§5.38`) **är** märkets egen figur, lyft ur filen och
+omfärgad. Filerna ligger därför i repot enligt `09-§1.2`:
+
+| Sort | Märke | Figur | SHA-256 för filen |
+| --- | --- | --- | --- |
+| `mat` | H5 servering | kopp på fat | `0007fb574027d63e4b99952966c6b75af8df41d71abea4808d6b838772abaca8` |
+| `boende` | H8 vandrarhem | hus med gran | `4344e2cb74ded9ab26da2a14f276dabb050e5bebbc6f229086daeeabaa621405` |
+| `husbil` | H28 husbilsplats | alkovhusbil | `638e49394699397b27a6869ea1a8161e33819f1847fc29a11481ede766298615` |
+
+Ur varje fil är den svarta figurens `d`-attribut hämtat och lagt i
+`source/ts/build/symbols.ts`, med en `transform` som passar in märkets egna koordinater i
+en ruta om 24 × 24. Banorna är i övrigt oförändrade, och fyllningen är `currentColor` så
+att CSS bestämmer färgen. SHA-256 över det härledda `d`-attributet (`09-§1.5`):
+
+```text
+1be51ade43754e1f9f8a20b3d5000e08977bb1d3173865c198b1f5d71ce5eefd  mat (H5)
+a4f89b77f5972b9a45640127170394e42223d4f197c9c8ab87bb5c05af5be373  boende (H8)
+66a5e69a2e6dc57f681b7fb8a7cd6fd7bda56fa5a0565c79a06bbff983f30c05  husbil (H28)
+```
+
+`tests/build/symbols.test.ts` slår fast summorna, så en ändrad bana fäller testet i stället
+för att smyga sig igenom.
+
+De fem övriga symbolerna har ingen figur att hämta och är ritade för sajten:
+
+- `parkering` följer E19, men märkets P är urskuret ur den blå plattan och finns inte som
+  en figur i filen. Bokstaven är ritad.
+- `toalett` har ett vägmärke — H14 — men följer det inte. H14 ritar ett utedass med hjärta
+  på dörren, och gårdens toaletter är inget utedass. En markör ska säga vad platsen är,
+  inte påstå vilken sorts hus den ligger i, så symbolen är de två figurerna från skylten
+  på dörren.
+- `djurplats`, `grill` och `lek` har inget vägmärke alls. Djurplatsen är gårdens egen, och
+  grillen och gungorna följer motivet på vanlig svensk friluftsskyltning.
+
 ### 4H-logotypen
 
 | | |

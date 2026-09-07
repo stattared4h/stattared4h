@@ -168,7 +168,7 @@ djuren som finns där. <!-- 04-§5.1 -->
 
 ```yaml
 name: string                 # platsens namn, t.ex. "Gethagen"
-kind: djurplats | besoksmal  # hage eller djurhus, respektive allt annat besökaren går till
+kind: enum                   # vad platsen är, se regeln nedan
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
 description: string | null   # markdown
@@ -186,10 +186,24 @@ Regler:
 
 - `species` är listan över **djurslag**, inte individer. Flera djurslag kan gå i samma
   hage, och samma djurslag kan finnas på flera platser. <!-- 04-§5.2 -->
-- `kind` skiljer hagen och djurhuset (`djurplats`) från caféet, toaletten och lekplatsen
-  (`besoksmal`). Sorten är ett faktum om platsen och härleds aldrig ur `species` — en hage
-  vars djur tillfälligt flyttats är fortfarande en hage. Ett besöksmål med djurslag fäller
-  valideringen. Se [ADR 0018](adr/0018-platsen-har-en-sort.md). <!-- 04-§5.7 -->
+- `kind` säger vad platsen är, med ett av åtta värden. Varje värde bär sin egen symbol på
+  kartan (`02-§5.38`):
+
+  | Värde | Platsen är |
+  | --- | --- |
+  | `djurplats` | hage eller djurhus |
+  | `mat` | serverar mat eller dryck |
+  | `grill` | grillplats att sitta vid |
+  | `toalett` | toalett |
+  | `parkering` | parkering för bil |
+  | `lek` | lek och aktivitet |
+  | `boende` | övernattning inomhus |
+  | `husbil` | ställplats för husbilar |
+
+  Sorten är ett faktum om platsen och härleds aldrig ur `species` — en hage vars djur
+  tillfälligt flyttats är fortfarande en hage. Bara en `djurplats` får ha djurslag; på
+  någon av de sex andra sorterna fäller `species` valideringen. Se
+  [ADR 0019](adr/0019-platsens-sort-styr-symbolen.md). <!-- 04-§5.7 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död

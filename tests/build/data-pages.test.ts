@@ -32,12 +32,12 @@ function main(html: string): string {
 }
 
 describe("every page exists (02-§5.1–5.2)", () => {
-  test("a location page for all 32 places, an animal page for all 100, a species page for all eight", async () => {
+  test("a location page for all 33 places, an animal page for all 100, a species page for all eight", async () => {
     const files = await listFiles(site);
     const locations = files.filter((f) => /^plats\/[^/]+\/index\.html$/.test(f));
     const animals = files.filter((f) => /^djur\/[^/]+\/index\.html$/.test(f));
     const species = files.filter((f) => /^arter\/[^/]+\/index\.html$/.test(f));
-    assert.equal(locations.length, 32);
+    assert.equal(locations.length, 33);
     assert.ok(locations.includes(path.join("plats", "gamla-stallet", "index.html")), "the inactive place keeps its page");
     assert.equal(animals.length, 100);
     assert.equal(species.length, 8);
@@ -278,10 +278,14 @@ describe("the map on the home page (02-§5.23–5.27)", () => {
     const html = main(await page(""));
     assert.match(html, /<svg class="map__drawing" [^>]*role="img" aria-label="Karta över Stättared med gårdens hagar">/);
     const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
-    assert.equal(markers.length, 31, "32 places minus the inactive one without coordinates");
+    assert.equal(markers.length, 32, "33 places minus the inactive one without coordinates");
     assert.ok(!markers.includes("gamla-stallet"));
     const list = html.slice(html.indexOf('<ul class="place-list">'));
-    assert.match(list, /href="\/plats\/stora-hagen\/">Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/);
+    assert.match(
+      list,
+      /href="\/plats\/stora-hagen\/"><svg class="place-list__symbol"[^>]*>.*?<\/svg>Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/,
+      "the list carries the same symbol in front of the name (02-§5.39)",
+    );
     assert.doesNotMatch(list, /gamla-stallet/);
     // 02-§5.26 forbids fetching anything from outside; 02-§5.34 adds two ordinary
     // links out. Checking the two separately keeps both requirements honest.
@@ -301,7 +305,7 @@ describe("the map on the home page (02-§5.23–5.27)", () => {
   });
 });
 
-describe("a besoksmal never mentions animals (02-§5.35, ADR 0018)", () => {
+describe("a place that is not a djurplats never mentions animals (02-§5.35, ADR 0019)", () => {
   test("the café page shows its text and accessibility, and no animal sentence", async () => {
     const html = main(await page("plats/kaffestugan"));
     assert.match(html, /<h1>Kaffestugan<\/h1>/);
@@ -312,9 +316,14 @@ describe("a besoksmal never mentions animals (02-§5.35, ADR 0018)", () => {
     assert.doesNotMatch(html, /animal-card/, "no animals");
   });
 
+  // The other half of 02-§5.35: the sentence the café must not show is exactly the one an
+  // empty paddock must (02-§5.12). Övre hagen is the QA dataset's active place without
+  // species; Kattvinden has cats and would say nothing either way.
   test("a djurplats without animals still says so", async () => {
-    const html = main(await page("plats/kattvinden"));
-    assert.match(html, /<h1>Kattvinden<\/h1>/);
+    const html = main(await page("plats/ovre-hagen"));
+    assert.match(html, /<h1>Övre hagen<\/h1>/);
+    assert.match(html, /Just nu går inga djur här/);
+    assert.match(html, /Karta över gården/, "and a way back to the map (02-§5.12)");
   });
 });
 

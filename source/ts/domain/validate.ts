@@ -79,7 +79,7 @@ const IMAGE_FIELDS = new Set(["alt", "credit"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
-const LOCATION_KINDS: readonly LocationKind[] = ["djurplats", "besoksmal"];
+const LOCATION_KINDS: readonly LocationKind[] = ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende", "husbil"];
 
 const ANIMAL_FIELDS = new Set([
   "name",
@@ -739,10 +739,10 @@ function validateLocation(
     coordinatesValid = false;
   }
 
-  // A besoksmal with animals is almost always a paddock file copied for a café
-  // (ADR 0018), so it stops the build rather than passing with a warning.
-  if (kind === "besoksmal" && species !== null && species.length > 0) {
-    issues.error(record.file, "species", "ett besöksmål har inga djurslag. Skriv [], eller sätt kind: djurplats.");
+  // Animals on anything but a paddock is almost always a paddock file copied for a café
+  // (ADR 0019), so it stops the build rather than passing with a warning.
+  if (kind !== null && kind !== "djurplats" && species !== null && species.length > 0) {
+    issues.error(record.file, "species", `bara en djurplats har djurslag, och den här platsen är ${kind}. Skriv [], eller sätt kind: djurplats.`);
     species = null;
   }
 

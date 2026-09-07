@@ -32,7 +32,7 @@ description: >-
     <ul class="place-list">
       {%- for place in views.map.list %}
       <li class="place-list__item">
-        <a class="place-list__link" href="{{ place.url | url }}">{{ place.name }}</a>
+        <a class="place-list__link" href="{{ place.url | url }}">{{ place.symbol | safe }}{{ place.name }}</a>
         {%- if place.species %}
         <span class="place-list__species">{{ place.species }}</span>
         {%- endif %}

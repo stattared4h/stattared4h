@@ -6,7 +6,8 @@ Issues: [#6](https://github.com/stattared4h/stattared4h/issues/6),
 [#7](https://github.com/stattared4h/stattared4h/issues/7),
 [#9](https://github.com/stattared4h/stattared4h/issues/9),
 [#13](https://github.com/stattared4h/stattared4h/issues/13),
-[#19](https://github.com/stattared4h/stattared4h/issues/19).
+[#19](https://github.com/stattared4h/stattared4h/issues/19),
+[#51](https://github.com/stattared4h/stattared4h/issues/51).
 
 ---
 
@@ -25,6 +26,11 @@ Platssidan visar individer, som `03-§3` och `05-§6.26` säger, men under en ru
 gör det tydligt att listan är djurslagets djur på gården, inte en påstådd placering.
 Det är hur `03-§3` och ADR 0012 går ihop med #7:s regel att aldrig lova att ett
 namngivet djur står i hagen.
+
+Kartans markörer såg först likadana ut, och en besökare som letade efter en toalett fick
+läsa sig fram namn för namn. Issue #51 bad om en symbol per sorts plats, som på gårdens
+skyltar. Symbolerna är det bygget som först beror på vad en plats är, och därför bär
+`kind` sedan dess åtta värden i stället för två (ADR 0019).
 
 ### Sidtyper och adresser
 
@@ -68,9 +74,9 @@ namngivet djur står i hagen.
   (ADR 0012). <!-- 02-§5.11 -->
 - En aktiv plats med `kind: djurplats` utan djurslag visar "Just nu går inga djur här"
   och en länk till startsidan med kartan. <!-- 02-§5.12 -->
-- En plats med `kind: besoksmal` nämner inte djur: ingen djurlista, ingen rubrik per
+- En plats vars `kind` inte är `djurplats` nämner inte djur: ingen djurlista, ingen rubrik per
   djurslag och ingen mening om att inga djur går där. Sidan visar namnet, texten,
-  tillgängligheten och bilderna. I kartans lista står besöksmålet med namn och länk,
+  tillgängligheten och bilderna. I kartans lista står platsen med namn och länk,
   utan text om djurslag. <!-- 02-§5.35 -->
 - En plats med `active: false` behåller sin adress, visar "Den här platsen används inte
   just nu" och en länk till startsidan med kartan, och finns varken på kartan eller i
@@ -128,9 +134,9 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   ritningens koordinatsystem enligt de kanter `background.yaml` anger (`03-§9.2`).
   Bygget varnar om en plats hamnar utanför ritningen. Saknas filerna visas markörerna på
   en tom platta. <!-- 02-§5.30 -->
-- Kartan visar bara platsernas namn. Vilka djurslag som går var står i listan under
-  kartan, aldrig i markörerna, så att ritningen förblir läsbar när hagarna ligger
-  tätt. <!-- 02-§5.32 -->
+- Markören visar platsens namn och sortens symbol (`02-§5.38`), inget mer. Vilka djurslag
+  som går var står i listan under kartan, aldrig i markörerna, så att ritningen förblir
+  läsbar när hagarna ligger tätt. <!-- 02-§5.32 -->
 - Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
   var sin sida om markören, så att båda går att läsa, och en etikett hålls innanför
   ritningens kant. Ligger fler markörer på samma fläck än det finns sidor visas de
@@ -139,6 +145,16 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   (`02-§5.24`). Bygget räknar placeringen för en karta som är 360 px bred — den trängsta
   vyn i mobilläget (`05-§5.1`) — och räknar deterministiskt: samma platsdata ger samma
   placering. <!-- 02-§5.33 -->
+- Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
+  var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
+  svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är
+  symbolen den figuren: H5 servering, H8 vandrarhem och H28 husbilsplats. Övriga är ritade
+  för sajten, och ingen symbol påstår något om platsen som inte är sant. Symbolen påstår aldrig något om platsen som inte är sant.
+  Symbolen är ritad i sidan, hämtas inte utifrån (`02-§5.26`) och är dold för
+  skärmläsaren — markörens tillgängliga namn är platsens namn, som förut. <!-- 02-§5.38 -->
+- Samma symbol står framför platsens namn i listan under kartan. Den som möter en symbol
+  på ritningen hittar därmed dess betydelse i text på samma sida, utan egen
+  teckenförklaring (`02-§5.24`). <!-- 02-§5.39 -->
 - Startsidan länkar vidare till gårdens egen sida om vandring och fiske och till
   Naturkartan för Kungsbacka, under rubriken "Fler kartor i området". Länkarna är vanliga
   länkar; sidan bäddar inte in något från dem (`02-§5.26`). <!-- 02-§5.34 -->

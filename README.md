@@ -65,3 +65,8 @@ Koden är [MIT](LICENSE). Innehållet är det inte: texter och fotografier under
 `source/data/`, `source/content/` och `source/images/` tillhör Stättareds 4H-gård och de
 fotografer som anges i `credit`, och 4H-logotypen tillhör Riksförbundet Sveriges 4H
 (ADR 0007). Fråga före återanvändning.
+
+Kartans symboler (`source/ts/build/symbols.ts`): fem är ritade för sajten och omfattas av
+MIT-licensen. Tre är ett svenskt vägmärkes egen figur — H5, H8 och H28 — vars utformning är
+fastställd i vägmärkesförordningen (2007:90) och därmed är ett officiellt verk enligt
+9 § upphovsrättslagen. `docs/09-kallor/index.md` säger vilken fil var symbol kommer ur.

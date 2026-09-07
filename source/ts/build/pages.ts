@@ -33,6 +33,7 @@ import {
 } from "../domain/index.ts";
 import { definitePlural, joinSwedish, lowerFirst } from "../domain/swedish.ts";
 import { renderMap, type MapBackground, type MapLocation } from "./map.ts";
+import { symbolSvg } from "./symbols.ts";
 
 /** A species as a tappable box with its picture (05-§6.24), on the home and location pages. */
 export interface SpeciesTileView {
@@ -82,7 +83,7 @@ export interface LocationPageView {
   /** The page's meta description. */
   description: string;
   active: boolean;
-  /** What the place is (04-§5.7). A besoksmal page never mentions animals (02-§5.35). */
+  /** What the place is (04-§5.7). Only a djurplats page mentions animals (02-§5.35). */
   kind: LocationKind;
   species: SpeciesTileView[];
   note: string | null;
@@ -145,6 +146,8 @@ export interface SpeciesPageView {
 export interface MapListItem extends LinkView {
   /** "Får och kor", or "Inga djur just nu". */
   species: string;
+  /** The same symbol the marker carries, as an `<svg>` (02-§5.39). */
+  symbol: string;
 }
 
 export interface MapPageView {
@@ -261,7 +264,7 @@ export function locationView(dataset: Dataset, location: Location, farm: string)
   }));
   const description = !location.active
     ? `${location.name} på ${farm} används inte just nu.`
-    : location.kind === "besoksmal"
+    : location.kind !== "djurplats"
       ? `${location.name} på ${farm}: var den ligger och hur man når den.`
       : `Vilka djurslag som går i ${location.name} på ${farm}, och djuren av de slagen.`;
   return {
@@ -342,6 +345,7 @@ export function mapLocations(dataset: Dataset): MapLocation[] {
     .map((location) => ({
       id: location.id,
       name: location.name,
+      kind: location.kind,
       lat: location.lat as number,
       lon: location.lon as number,
     }));
@@ -353,15 +357,20 @@ export function mapView(dataset: Dataset, options: Pick<BuildViewsOptions, "base
     .filter((location) => location.active)
     .map((location) => {
       const plurals = dataset.species.filter((s) => location.species.includes(s.id)).map((s) => s.plural);
-      // A besoksmal has no animals to report, and saying "inga djur just nu" about the
+      // Only a paddock has animals to report, and saying "inga djur just nu" about the
       // café would be answering a question nobody asked (02-§5.35).
       const species =
-        location.kind === "besoksmal"
+        location.kind !== "djurplats"
           ? ""
           : plurals.length === 0
             ? NO_SPECIES_AT_LOCATION_TEXT
             : joinSwedish([plurals[0], ...plurals.slice(1).map(lowerFirst)]);
-      return { name: location.name, url: locationUrl(location.id), species };
+      return {
+        name: location.name,
+        url: locationUrl(location.id),
+        species,
+        symbol: symbolSvg(location.kind, "place-list__symbol"),
+      };
     });
   return { html: rendered.html, list, warnings: rendered.warnings };
 }
