@@ -147,8 +147,9 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   placering. <!-- 02-§5.33 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek och boende. Finns ett svenskt
-  vägmärke för det platsen är följer symbolen det märkets motiv, så att markören visar
-  samma sak som skylten: H5 servering, H14 toalett, H8 vandrarhem och E19 parkering.
+  vägmärke för det platsen är, och stämmer märkets motiv med gårdens plats, följer symbolen
+  det motivet så att markören visar samma sak som skylten: H5 servering, H8 vandrarhem och
+  E19 parkering. Symbolen påstår aldrig något om platsen som inte är sant.
   Symbolen är ritad i sidan, hämtas inte utifrån (`02-§5.26`) och är dold för
   skärmläsaren — markörens tillgängliga namn är platsens namn, som förut. <!-- 02-§5.36 -->
 - Samma symbol står framför platsens namn i listan under kartan. Den som möter en symbol

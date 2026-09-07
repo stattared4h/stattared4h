@@ -48,12 +48,18 @@ en hage. Den delen av ADR 0018 står kvar oförändrad.
 ### Symbolerna ritas inte fritt
 
 Var symbol som har ett svenskt vägmärke följer det märkets motiv: H5 servering (kopp på
-fat) för `mat`, H14 toalett (utedasset med hjärtat) för `toalett`, H8 vandrarhem (hus med
-gran) för `boende`, E19 för `parkering`. Besökaren har mött dem vid infarten och på
-skylten, och en egen tolkning av samma sak vore sämre av precis det skälet.
+fat) för `mat`, H8 vandrarhem (hus med gran) för `boende`, E19 för `parkering`. Besökaren
+har mött dem vid infarten och på skylten, och en egen tolkning av samma sak vore sämre av
+precis det skälet.
 
-`djurplats`, `grill` och `lek` har inget vägmärke. Djurplatsen är gårdens egen, och grillen
-och gungorna följer motivet på vanlig svensk friluftsskyltning.
+Motivet måste dock vara sant om platsen. `toalett` har ett vägmärke — H14 — men det ritar
+ett utedass med hjärta på dörren, och gårdens toaletter är inget utedass. Där följer
+symbolen i stället de två figurerna från skylten på dörren, som säger toalett utan att
+påstå något om byggnaden. Standarden är förlagan, inte ett facit som går före det som
+faktiskt finns på gården.
+
+`djurplats`, `grill` och `lek` har inget vägmärke alls. Djurplatsen är gårdens egen, och
+grillen och gungorna följer motivet på vanlig svensk friluftsskyltning.
 
 Banorna ritas ändå här, i sajtens streck. Vägmärkena är svarta fyllda figurer på blå
 platta, gjorda för en skylt i meterstorlek: i de 16 px en markör har blir de klumpar, och

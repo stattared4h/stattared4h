@@ -1,12 +1,12 @@
 /**
  * The symbol on a map marker, one per kind of place (02-§5.36, 03-§9.5, ADR 0019).
  *
- * The motifs are not ours. Where a Swedish road sign exists for the thing, the symbol
- * follows that sign's motif — the cup from H5, the outhouse with its heart from H14, the
- * house and spruce from H8, the P from E19 — so that the marker on the phone says the
- * same thing as the sign at the gate. The signs themselves are laid down in
- * vägmärkesförordningen (2007:90); `docs/09-kallor/index.md` records which märke each one
- * follows. Three kinds have no such sign, and the file says so where they are defined.
+ * The motifs are not ours. Where a Swedish road sign exists for the thing and its motif
+ * is true of the place, the symbol follows that sign — the cup from H5, the house and
+ * spruce from H8, the P from E19 — so that the marker on the phone says the same thing as
+ * the sign at the gate. The signs are laid down in vägmärkesförordningen (2007:90);
+ * `docs/09-kallor/index.md` records which märke each one follows. The rest say so where
+ * they are defined.
  *
  * They are redrawn rather than embedded: the road signs are solid black figures on a blue
  * plate, drawn for a sign a metre across, and at the 16 px a marker gets they turn into
@@ -27,8 +27,6 @@ import type { LocationKind } from "../domain/types.ts";
 
 /** Shared on every stroked path, so the seven look like one set. */
 const STROKE = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
-/** The heart on the privy door is solid; at 16 px an outlined one closes up anyway. */
-const SOLID = 'fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"';
 
 export const PLACE_SYMBOLS: Record<LocationKind, string> = {
   // No road sign exists for a paddock, and none is wanted: this is the one kind the site
@@ -48,12 +46,14 @@ export const PLACE_SYMBOLS: Record<LocationKind, string> = {
   grill:
     `<path d="M12 15.5a4 4 0 0 0 4-4c0-1.6-.9-2.7-1.7-3.8-.9-1.2-1.7-2.2-1.7-4.6-1.5 1.2-2.4 2.5-2.4 3.8 0 .8.2 1.4.5 1.8-.8 0-1.4-.7-1.7-1.6-.7 1.4-1 2.7-1 4.3a4 4 0 0 0 4 4.1z" ${STROKE}/>` +
     `<path d="M3.5 19h17" ${STROKE}/>`,
-  // H14 toalett: the privy with a heart on the door. Narrow and tall, so it is not read
-  // as the house under `boende` at the size a marker gets.
+  // Two figures, the sign on the door everywhere. Sweden's road sign H14 draws a privy
+  // with a heart instead, and that motif is not used here: the toilets on the farm are
+  // not an outhouse, and a marker may not say what the building is.
   toalett:
-    `<path d="M6 8.5h12L12 3.5z" ${STROKE}/>` +
-    `<path d="M8.5 8.5V20h7V8.5" ${STROKE}/>` +
-    `<path d="M12 16.8c-2.2-1.6-3.3-2.5-3.3-3.8a1.65 1.65 0 0 1 3.3-.7 1.65 1.65 0 0 1 3.3.7c0 1.3-1.1 2.2-3.3 3.8z" ${SOLID}/>`,
+    `<circle cx="7.5" cy="4.5" r="1.7" ${STROKE}/>` +
+    `<path d="M7.5 8v6M5.5 9.5 7.5 8l2 1.5M6 21l1.5-7M9 21 7.5 14" ${STROKE}/>` +
+    `<circle cx="16.5" cy="4.5" r="1.7" ${STROKE}/>` +
+    `<path d="m13.5 15 3-7 3 7zM15 15l-.5 6M18 15l.5 6" ${STROKE}/>`,
   // E19 parkering: the letter already standing at the entrance.
   parkering: `<path d="M8.5 20.5V3.5h4.5a5 5 0 0 1 0 10H8.5" ${STROKE}/>`,
   // No road sign for a lekplats. The motif is the farm's own: the swings, drawn mid-swing

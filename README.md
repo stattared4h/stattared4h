@@ -67,6 +67,6 @@ fotografer som anges i `credit`, och 4H-logotypen tillhör Riksförbundet Sverig
 (ADR 0007). Fråga före återanvändning.
 
 Kartans symboler (`source/ts/build/symbols.ts`) är ritade för sajten och omfattas av
-MIT-licensen. Fyra av dem följer motivet på ett svenskt vägmärke, vars utformning är
+MIT-licensen. Tre av dem följer motivet på ett svenskt vägmärke, vars utformning är
 fastställd i vägmärkesförordningen (2007:90) och därmed är ett officiellt verk enligt
 9 § upphovsrättslagen. `docs/09-kallor/index.md` säger vilket märke var symbol följer.

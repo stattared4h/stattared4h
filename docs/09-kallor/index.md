@@ -53,18 +53,22 @@ och tar bort metadata enligt ADR 0017. Bildposterna anger samma ursprung med
 | Hämtad | 2026-09-07 |
 | I repot | Ingenting — se nedan |
 
-Fyra av kartans sju symboler (`02-§5.36`) följer motivet på ett svenskt vägmärke, så att
+Tre av kartans sju symboler (`02-§5.36`) följer motivet på ett svenskt vägmärke, så att
 markören i telefonen visar samma sak som skylten vid grinden:
 
 | Sort | Märke | Motiv |
 | --- | --- | --- |
 | `mat` | H5 servering | kopp på fat |
-| `toalett` | H14 toalett | utedass med hjärta på dörren |
 | `boende` | H8 vandrarhem | hus med gran bredvid |
 | `parkering` | E19 parkering | bokstaven P |
 
 `djurplats`, `grill` och `lek` har inget vägmärke. Djurplatsen är gårdens egen, och grillen
 och gungorna följer motivet på vanlig svensk friluftsskyltning.
+
+`toalett` har ett vägmärke — H14 — men följer det inte. H14 ritar ett utedass med hjärta på
+dörren, och gårdens toaletter är inget utedass. En markör ska säga vad platsen är, inte
+påstå vilken sorts hus den ligger i, så symbolen är i stället de två figurerna från skylten
+på dörren.
 
 Märkenas utformning är fastställd i författning och är därmed ett officiellt verk enligt
 9 § upphovsrättslagen. Commons-filerna bär mallen `PD-Transportstyrelsen`.
