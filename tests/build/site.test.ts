@@ -162,6 +162,25 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
     assert.ok(overlay < card, "överlägget står före menykortet i markupen");
   });
 
+  test("varje sida utom startsidan har Tillbaka som länk till startsidan (02-§10.40–10.42)", async () => {
+    const pages = await htmlFiles(prod);
+    assert.ok(pages.length > 1);
+    for (const { file, html } of pages) {
+      const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+      if (file === "index.html") {
+        assert.doesNotMatch(header, /data-back-button/, "startsidan har ingen Tillbaka");
+        continue;
+      }
+      assert.match(header, /<a class="[^"]*site-header__back[^"]*" href="\/" aria-label="Tillbaka" data-back-button>/, `${file}: Tillbaka saknas eller ser annorlunda ut`);
+    }
+  });
+
+  test("Tillbaka står först i sidhuvudets rad (02-§10.3)", async () => {
+    const html = await readFile(path.join(prod, "om", "index.html"), "utf8");
+    const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+    assert.ok(header.indexOf("data-back-button") < header.indexOf("data-menu-button"), "Tillbaka står före menyknappen");
+  });
+
   test("versionsraden visar BUILD_VERSION och saknas i ett CI-bygge utan version", async () => {
     const withVersion = await readFile(path.join(qa, "index.html"), "utf8");
     assert.match(withVersion, new RegExp(`<p class="site-footer__version">Version ${QA_VERSION}</p>`));
