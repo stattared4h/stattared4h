@@ -74,6 +74,18 @@ function shownPath(file) {
   return relative.startsWith("..") ? file : relative;
 }
 
+/** The images directory for a dataset, with the failure phrased for an editor, not a developer. */
+function imagesDirOrFail(dataDir) {
+  try {
+    return imagesDirFor(dataDir);
+  } catch {
+    fail(
+      `Kan inte räkna ut bildkatalogen ur ${shownPath(dataDir)}: datakatalogen måste heta ` +
+        '"data" eller "data-" och något, som source/data eller source/data-qa.',
+    );
+  }
+}
+
 /** Every photo directly in `dir`, by extension. Other files are left alone. */
 async function listPhotos(dir) {
   let entries;
@@ -153,7 +165,7 @@ async function importTable(options) {
     process.exit(1);
   }
 
-  const imagesDir = imagesDirFor(options.dataDir);
+  const imagesDir = imagesDirOrFail(options.dataDir);
   const postsDir = path.join(options.dataDir, "images");
   await mkdir(imagesDir, { recursive: true });
   await mkdir(postsDir, { recursive: true });
