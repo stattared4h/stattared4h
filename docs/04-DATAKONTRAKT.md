@@ -186,7 +186,7 @@ Regler:
 
 - `species` är listan över **djurslag**, inte individer. Flera djurslag kan gå i samma
   hage, och samma djurslag kan finnas på flera platser. <!-- 04-§5.2 -->
-- `kind` säger vad platsen är, med ett av sju värden. Varje värde bär sin egen symbol på
+- `kind` säger vad platsen är, med ett av åtta värden. Varje värde bär sin egen symbol på
   kartan (`02-§5.36`):
 
   | Värde | Platsen är |
@@ -197,7 +197,8 @@ Regler:
   | `toalett` | toalett |
   | `parkering` | parkering för bil |
   | `lek` | lek och aktivitet |
-  | `boende` | övernattning |
+  | `boende` | övernattning inomhus |
+  | `husbil` | ställplats för husbilar |
 
   Sorten är ett faktum om platsen och härleds aldrig ur `species` — en hage vars djur
   tillfälligt flyttats är fortfarande en hage. Bara en `djurplats` får ha djurslag; på

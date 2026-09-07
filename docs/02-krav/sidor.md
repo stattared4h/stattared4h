@@ -30,7 +30,7 @@ namngivet djur står i hagen.
 Kartans markörer såg först likadana ut, och en besökare som letade efter en toalett fick
 läsa sig fram namn för namn. Issue #51 bad om en symbol per sorts plats, som på gårdens
 skyltar. Symbolerna är det bygget som först beror på vad en plats är, och därför bär
-`kind` sedan dess sju värden i stället för två (ADR 0019).
+`kind` sedan dess åtta värden i stället för två (ADR 0019).
 
 ### Sidtyper och adresser
 
@@ -146,10 +146,10 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   vyn i mobilläget (`05-§5.1`) — och räknar deterministiskt: samma platsdata ger samma
   placering. <!-- 02-§5.33 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
-  var sin symbol: hage, mat, grill, toalett, parkering, lek och boende. Finns ett svenskt
-  vägmärke för det platsen är, och stämmer märkets motiv med gårdens plats, följer symbolen
-  det motivet så att markören visar samma sak som skylten: H5 servering, H8 vandrarhem och
-  E19 parkering. Symbolen påstår aldrig något om platsen som inte är sant.
+  var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
+  svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är
+  symbolen den figuren: H5 servering, H8 vandrarhem och H28 husbilsplats. Övriga är ritade
+  för sajten, och ingen symbol påstår något om platsen som inte är sant. Symbolen påstår aldrig något om platsen som inte är sant.
   Symbolen är ritad i sidan, hämtas inte utifrån (`02-§5.26`) och är dold för
   skärmläsaren — markörens tillgängliga namn är platsens namn, som förut. <!-- 02-§5.36 -->
 - Samma symbol står framför platsens namn i listan under kartan. Den som möter en symbol

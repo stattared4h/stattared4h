@@ -23,7 +23,7 @@ test("QA represents at least 100 animals and exercises every vocabulary entry", 
       `arten ${species.id} saknar QA-djur`,
     );
   }
-  for (const kind of ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende"]) {
+  for (const kind of ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende", "husbil"]) {
     assert.ok(
       dataset.locations.some((location) => location.kind === kind),
       `sorten ${kind} saknar QA-plats`,

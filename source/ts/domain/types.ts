@@ -46,7 +46,15 @@ export interface Animal {
  * What a place is (04-§5.7, ADR 0019). Decides whether the page talks about animals,
  * and which symbol the map marker carries (02-§5.36).
  */
-export type LocationKind = "djurplats" | "mat" | "grill" | "toalett" | "parkering" | "lek" | "boende";
+export type LocationKind =
+  | "djurplats"
+  | "mat"
+  | "grill"
+  | "toalett"
+  | "parkering"
+  | "lek"
+  | "boende"
+  | "husbil";
 
 export interface Location {
   id: string;

@@ -89,7 +89,7 @@ test("kind is required on a location and only accepts the contract's values (04-
   const result = await validate(wrong);
   assert.match(
     errorsFor(result, "locations/gethagen.yaml", "kind")[0].message,
-    /djurplats, mat, grill, toalett, parkering, lek eller boende/,
+    /djurplats, mat, grill, toalett, parkering, lek, boende eller husbil/,
     "the message names every value",
   );
 
@@ -101,8 +101,8 @@ test("kind is required on a location and only accepts the contract's values (04-
   assert.equal(errorsFor(await validate(outdated), "locations/gethagen.yaml", "kind").length, 1);
 });
 
-test("every one of the seven kinds is accepted (04-§5.7, ADR 0019)", async () => {
-  for (const kind of ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende"]) {
+test("every one of the eight kinds is accepted (04-§5.7, ADR 0019)", async () => {
+  for (const kind of ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende", "husbil"]) {
     const raw = await rawQa();
     editLocation(raw, "gethagen", (l) => {
       l.kind = kind;

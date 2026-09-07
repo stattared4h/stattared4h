@@ -164,16 +164,17 @@ Markören är en rund bricka om `--space-md`, centrerad i träffytan `--tap-targ
 till brickans botten — grön kring den ljusa, vit kring den fyllda — så att markören
 behåller sin kant både över ritningens ljusa mark och över dess mörka byggnader. Det är
 samma yta som prickens, så en symbol i stället för en prick gör inte klungan kring
-gårdsplanen trängre än den redan är (`02-§5.33`). Inuti står platsens symbol, 16 px, med
-samma streck som sidhuvudets ikoner (6.11). En `djurplats` är fylld — botten
+gårdsplanen trängre än den redan är (`02-§5.33`). Inuti står platsens symbol, 20 px. De
+ritade symbolerna har samma streck som sidhuvudets ikoner (6.11); de tre som är ett
+vägmärkes egen figur är fyllda, och behöver de 20 px för att koppen och huset inte ska
+klumpa ihop sig. En `djurplats` är fylld — botten
 `--color-green`, symbolen vit — och gårdens övriga platser är ljusa: botten
 `--color-surface`, symbolen `--color-green-deep`. Så syns det redan på håll, före
 symbolens form, vilka markörer som är djur. <!-- 05-§6.39 -->
 
-Symbolerna delar streck med sidhuvudets ikoner (6.11) och följer, där ett svenskt
-vägmärke finns för platsen, det märkets motiv (`02-§5.36`). Nya symboler ritas inte fritt:
-finns ett känt märke är det förlagan, och saknas det följer motivet vanlig svensk
-skyltning.
+Nya symboler ritas inte fritt. Finns ett svenskt vägmärke vars figur stämmer med platsen
+är symbolen den figuren (`02-§5.36`); saknas den följer motivet vanlig svensk skyltning,
+ritat i sidhuvudets streck.
 
 I listan under kartan står samma symbol framför platsens namn, 20 px i
 `--color-green-deep`, utan bricka. Listan är därmed också symbolernas

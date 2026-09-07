@@ -21,7 +21,7 @@ grillplatsen och vandrarhemmet dela symbol — vilket är samma sak som ingen sy
 
 ## Beslut
 
-`kind` har sju värden. Varje värde bär en egen symbol på kartan, och inget värde finns
+`kind` har åtta värden. Varje värde bär en egen symbol på kartan, och inget värde finns
 utan symbol:
 
 | Värde | Platsen är | Exempel |
@@ -32,7 +32,8 @@ utan symbol:
 | `toalett` | toalett | Toaletterna |
 | `parkering` | parkering för bil | Parkeringen vid infarten |
 | `lek` | lek och aktivitet | Lekplatsen, Käpphästbanan |
-| `boende` | övernattning | Vandrarhemmet, Ställplatsen |
+| `boende` | övernattning inomhus | Vandrarhemmet |
+| `husbil` | ställplats för husbilar | Ställplatsen |
 
 `besoksmal` utgår. Det var samlingsnamnet för de sex sista raderna, och när var och en
 har ett eget värde är samlingen inget en platsfil behöver kunna säga.
@@ -47,24 +48,36 @@ en hage. Den delen av ADR 0018 står kvar oförändrad.
 
 ### Symbolerna ritas inte fritt
 
-Var symbol som har ett svenskt vägmärke följer det märkets motiv: H5 servering (kopp på
-fat) för `mat`, H8 vandrarhem (hus med gran) för `boende`, E19 för `parkering`. Besökaren
-har mött dem vid infarten och på skylten, och en egen tolkning av samma sak vore sämre av
-precis det skälet.
+Finns ett svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens
+plats, **är symbolen den figuren** — inte vår tolkning av den. Figuren lyfts ur
+märkesfilen och färgas om. Det gäller `mat` (H5 servering), `boende` (H8 vandrarhem) och
+`husbil` (H28 husbilsplats). Besökaren har mött dem vid infarten och på skylten, och en
+egen tolkning av samma sak vore sämre av precis det skälet — vilket också gick att se:
+våra egna försök att rita en alkovhusbil blev en skåpbil.
 
-Motivet måste dock vara sant om platsen. `toalett` har ett vägmärke — H14 — men det ritar
-ett utedass med hjärta på dörren, och gårdens toaletter är inget utedass. Där följer
-symbolen i stället de två figurerna från skylten på dörren, som säger toalett utan att
-påstå något om byggnaden. Standarden är förlagan, inte ett facit som går före det som
-faktiskt finns på gården.
+Fem symboler har ingen figur att hämta:
 
-`djurplats`, `grill` och `lek` har inget vägmärke alls. Djurplatsen är gårdens egen, och
-grillen och gungorna följer motivet på vanlig svensk friluftsskyltning.
+- `parkering` följer E19, men märkets P är urskuret ur den blå plattan och finns inte som
+  figur i filen. Bokstaven ritas.
+- `toalett` har ett vägmärke — H14 — men följer det inte. H14 ritar ett utedass med hjärta
+  på dörren, och gårdens toaletter är inget utedass. Där är symbolen de två figurerna från
+  skylten på dörren, som säger toalett utan att påstå något om byggnaden. Standarden är
+  förlagan, inte ett facit som går före det som faktiskt finns på gården.
+- `djurplats`, `grill` och `lek` har inget vägmärke alls. Djurplatsen är gårdens egen, och
+  grillen och gungorna följer motivet på vanlig svensk friluftsskyltning.
 
-Banorna ritas ändå här, i sajtens streck. Vägmärkena är svarta fyllda figurer på blå
-platta, gjorda för en skylt i meterstorlek: i de 16 px en markör har blir de klumpar, och
-den blå plattan hör inte hemma i en grön sajt (`05-§6.33`). Det är motivet som är hämtat,
-inte banorna. `docs/09-kallor/index.md` bär märkena, hämtdatum och kontrollsummor.
+Uppsättningen blandar därmed fyllda skyltfigurer med streckade ritningar. Det är priset
+för att bara tre av åtta sorter har en figur att hämta, och det är värt att betala: en
+riktig husbil slår en ritad, och att göra om de fem övriga till fyllda silhuetter hade
+bara bytt ut våra streck mot våra fyllningar — fortfarande våra — och samtidigt brutit mot
+sidhuvudets ikoner (`05-§6.33`).
+
+Den blå plattan följer aldrig med — bara figuren, i `currentColor`. Figurerna behöver
+också luft: i 16 px blev koppen och huset mörka klumpar, så symbolen är 20 px
+(`05-§6.39`). Husbilen klarade 16 px, för hos den *är* silhuetten informationen.
+`docs/09-kallor/index.md` bär filerna, hämtdatum och kontrollsummor — både för
+märkesfilen och för den lyfta banan, så att ett test kan slå fast att figuren är
+oförändrad.
 
 ## Övervägda alternativ
 
@@ -84,12 +97,15 @@ gäller även åt det här hållet — ett värde utan beroende är bara en etik
 namn är inget kontrakt: det byter gården när den vill, och "Trekanten" avslöjar
 ingenting.
 
-**Bädda in vägmärkesfilerna som de är.** De är public domain och hade varit trogna
-standarden in i minsta bana. Avvisat: de är oläsliga i markörens storlek, och de hade
-lagt blå skyltplattor mitt i en grön sajt. Att följa motivet ger besökaren igenkänningen
-utan att offra läsbarheten.
+**Rita alla åtta själva, i sajtens streck.** Ett sammanhållet formspråk, och det var
+vägen fram tills husbilen prövades: en alkovhusbil i streck blev en skåpbil. Avvisat för
+de tre som har en figur — men behållet för de fem som inte har det.
 
-**Följa SS-ISO 7001,** den standard som faktiskt täcker alla sju sorterna, lekplatsen
+**Göra hela uppsättningen till fyllda silhuetter,** så att de tre hämtade och de fem
+ritade ser lika ut. Avvisat: de fem hade fortfarande varit våra, bara fyllda, och en helt
+fylld uppsättning skaver mot sidhuvudets streckade ikoner (`05-§6.33`).
+
+**Följa SS-ISO 7001,** den standard som faktiskt täcker alla sorterna, lekplatsen
 inräknad. Avvisat: standarden säljs av SIS och symbolerna är upphovsrättsskyddade. Repot
 är publikt (`CL-§2.17`), och att lägga in dem utan licens vore inte vårt att göra.
 
@@ -98,9 +114,9 @@ inräknad. Avvisat: standarden säljs av SIS och symbolerna är upphovsrättssky
 Trettio platsfiler i `source/data/locations/` och trettiotvå i `source/data-qa/` byter
 värde på en rad — de tolv som inte är hagar eller djurhus.
 
-Valideringen räknar upp sju värden i stället för två. En fil med `kind: besoksmal`
+Valideringen räknar upp åtta värden i stället för två. En fil med `kind: besoksmal`
 fäller därmed valideringen med en svensk mening som säger vilka värden som finns, vilket
-är rätt: värdet finns inte längre, och en tyst översättning till någon av de sju vore en
+är rätt: värdet finns inte längre, och en tyst översättning till någon av de åtta vore en
 gissning om vad platsen är.
 
 Bygget får en symbol per värde som inline-SVG (`03-§9.5`). En framtida åttonde sort

@@ -6,11 +6,12 @@
  * (02-§5.26).
  */
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { describe, test } from "node:test";
 import { PLACE_SYMBOLS, symbolSvg } from "../../source/ts/build/symbols.ts";
 
-/** The seven kinds, written out here so the test fails when the vocabulary drifts. */
-const KINDS = ["boende", "djurplats", "grill", "lek", "mat", "parkering", "toalett"];
+/** The eight kinds, written out here so the test fails when the vocabulary drifts. */
+const KINDS = ["boende", "djurplats", "grill", "husbil", "lek", "mat", "parkering", "toalett"];
 
 describe("place symbols (02-§5.36)", () => {
   test("every kind of place has a symbol, and no two kinds share one", () => {
@@ -25,6 +26,26 @@ describe("place symbols (02-§5.36)", () => {
   test("a symbol fetches nothing and runs nothing (02-§5.26)", () => {
     for (const [kind, drawing] of Object.entries(PLACE_SYMBOLS)) {
       assert.doesNotMatch(drawing, /<script|<image|<style|https?:|url\(|xlink:href/i, kind);
+    }
+  });
+
+  // 09-§1.5: the register carries a checksum for what we derive from a source, so that a
+  // test can say it is unchanged. The three lifted road sign figures are that derivation.
+  test("the lifted road sign figures are the ones the source register records", () => {
+    const registered: Record<string, string> = {
+      mat: "1be51ade43754e1f9f8a20b3d5000e08977bb1d3173865c198b1f5d71ce5eefd",
+      boende: "a4f89b77f5972b9a45640127170394e42223d4f197c9c8ab87bb5c05af5be373",
+      husbil: "66a5e69a2e6dc57f681b7fb8a7cd6fd7bda56fa5a0565c79a06bbff983f30c05",
+    };
+    for (const [kind, sha] of Object.entries(registered)) {
+      const drawing = PLACE_SYMBOLS[kind as keyof typeof PLACE_SYMBOLS];
+      const d = /<path d="([^"]+)"/.exec(drawing)?.[1];
+      assert.ok(d, `${kind} carries a path`);
+      assert.equal(
+        createHash("sha256").update(d).digest("hex"),
+        sha,
+        `${kind} is still the figure registered in docs/09-kallor/index.md`,
+      );
     }
   });
 

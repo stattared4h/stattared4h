@@ -79,7 +79,7 @@ const IMAGE_FIELDS = new Set(["alt", "credit"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
-const LOCATION_KINDS: readonly LocationKind[] = ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende"];
+const LOCATION_KINDS: readonly LocationKind[] = ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende", "husbil"];
 
 const ANIMAL_FIELDS = new Set([
   "name",
