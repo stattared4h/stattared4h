@@ -362,7 +362,7 @@
   transform: translateY(-50%);
 }
 
-/* The four slanted positions (02-§5.51). They sit corner to corner with the pin, so the
+/* The four slanted positions (02-§5.53). They sit corner to corner with the pin, so the
    lane straight under and straight beside the marker stays free for a neighbour — and in
    the pasture the label follows its own band instead of crossing the fence. */
 .map__marker--label-above-left .map__label {

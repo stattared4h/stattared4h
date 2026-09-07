@@ -181,7 +181,7 @@ function assertBasePath(base: string): void {
 // --- Label placement ---------------------------------------------------------
 
 /**
- * Where the label sits around the marker (02-§5.33, 02-§5.51). Eight positions: four
+ * Where the label sits around the marker (02-§5.33, 02-§5.53). Eight positions: four
  * slanted and four straight. `below` is the stylesheet's base case and the fallback;
  * every other position is written on the marker as a modifier and placed by CSS.
  */
@@ -237,7 +237,7 @@ const CHAR_WIDTH_RATIO = 0.7;
 /** The label is one line. Measured at 24 px against a 15 px type size. */
 const LINE_HEIGHT_RATIO = 1.6;
 /**
- * Tried in this order (02-§5.51). The four slanted positions come first, because a
+ * Tried in this order (02-§5.53). The four slanted positions come first, because a
  * slanted label leaves both the lane straight below the marker and the lane straight
  * beside it free for a neighbour.
  *
@@ -301,7 +301,7 @@ function labelBox(x: number, y: number, width: number, height: number, side: Lab
     case "left":
       return { left: x - half - width, right: x - half, top: y - height / 2, bottom: y + height / 2 };
     // The slanted positions sit corner to corner with the pin's box, so they clear both
-    // the lane under the marker and the lane beside it (02-§5.51).
+    // the lane under the marker and the lane beside it (02-§5.53).
     case "above-left":
       return { left: x - half - width, right: x - half, top: y - half - height, bottom: y - half };
     case "above-right":

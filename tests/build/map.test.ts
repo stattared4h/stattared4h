@@ -275,15 +275,15 @@ describe("drawn background (02-§5.30, 03-§9.2)", () => {
   });
 });
 
-describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
+describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
   /** Drawing units per pixel at the reference width the build calculates for. */
   const UNITS_PER_PX = 800 / 360;
-  /** The four slanted positions, tried before the four straight ones (02-§5.51). */
+  /** The four slanted positions, tried before the four straight ones (02-§5.53). */
   const SLANTED = ["above-left", "above-right", "below-left", "below-right"];
 
   test("places far apart both get the preferred slanted position", () => {
     // A slanted label leaves the lane straight below and straight beside the marker
-    // free for the neighbour, so it is tried before any straight one (02-§5.51).
+    // free for the neighbour, so it is tried before any straight one (02-§5.53).
     const sides = placeLabels(
       [
         { id: "a", name: "Ettan", x: 300, y: 150 },
@@ -297,7 +297,7 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
 
   test("the order tries the pasture's own diagonal before the one across it", () => {
     // The bands run north-west to south-east, so up-left and down-right follow a paddock
-    // and the other diagonal crosses the fence (02-§5.51). A marker hemmed in on the
+    // and the other diagonal crosses the fence (02-§5.53). A marker hemmed in on the
     // pasture's axis falls to the crossing diagonal, never the other way round.
     const alone = placeLabels([{ id: "a", name: "1:an", x: 400, y: 300 }], 800, 600);
     assert.equal(alone.get("a"), "above-left", "the pasture's axis comes first");
@@ -349,7 +349,7 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
 
   test("no label crosses the edge of the drawing, wherever the marker stands", () => {
     // Every position along the border, so a marker in each corner and along each side
-    // has to turn its label inwards (02-§5.51).
+    // has to turn its label inwards (02-§5.53).
     const markers = [];
     for (let x = 20; x <= 780; x += 60) {
       for (let y = 20; y <= 580; y += 60) {
@@ -466,7 +466,7 @@ describe("label placement (02-§5.33, 02-§5.51, 03-§9.3)", () => {
 
   test("every position the build can choose has a rule in the stylesheet", async () => {
     // The build writes the position as a modifier and the stylesheet places the label.
-    // A position with no rule would silently fall back to below — the very bug 02-§5.51
+    // A position with no rule would silently fall back to below — the very bug 02-§5.53
     // fixes — so the two are checked against each other here.
     const css = await readFile(path.join(ROOT, "source/assets/css/layout.css"), "utf8");
     for (const side of [...SLANTED, "above", "right", "left", "hidden"]) {
