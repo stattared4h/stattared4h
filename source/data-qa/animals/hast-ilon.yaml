@@ -1,0 +1,11 @@
+name: Ilon
+species: hast
+breed: nordsvensk-hast
+sex: female
+born: 2017
+status: here
+photos:
+  - file: hast-ilon-1.webp
+    alt: Porträtt av Ilon.
+    credit: QA
+    portrait: true

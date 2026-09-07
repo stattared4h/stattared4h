@@ -1,0 +1,11 @@
+name: Asta
+species: ko
+breed: bohuskulla
+sex: female
+born: 2017
+status: here
+photos:
+  - file: ko-asta-1.webp
+    alt: Porträtt av Asta.
+    credit: QA
+    portrait: true

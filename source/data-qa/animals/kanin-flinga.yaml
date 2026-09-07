@@ -1,0 +1,11 @@
+name: Flinga
+species: kanin
+breed: mellerudskanin
+sex: male
+born: 2022
+status: here
+photos:
+  - file: kanin-flinga-1.webp
+    alt: Porträtt av Flinga.
+    credit: QA
+    portrait: true

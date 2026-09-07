@@ -8,12 +8,13 @@ import { loadRawDataset } from "../../source/ts/domain/load.ts";
 import { loadDataset, loadValidDataset } from "../../source/ts/domain/index.ts";
 import { PROD_DIR, QA_DIR, tempDir, writeInto } from "./helpers.ts";
 
-test("reads species.yaml, breeds.yaml, animals/ and locations/ from the QA dataset", async () => {
+test("reads vocabulary, populations, animals and locations from the QA dataset", async () => {
   const raw = await loadRawDataset(QA_DIR);
   assert.equal(raw.species?.file, "species.yaml");
   assert.equal(raw.breeds?.file, "breeds.yaml");
-  assert.equal(raw.animals.length, 12);
-  assert.equal(raw.locations.length, 6);
+  assert.equal(raw.populations?.file, "populations.yaml");
+  assert.equal(raw.animals.length, 100);
+  assert.equal(raw.locations.length, 9);
   assert.deepEqual(
     raw.animals.map((a) => a.id).slice(0, 3),
     ["bagaren", "bocken", "bomull"],
@@ -31,6 +32,7 @@ test("ignores files that are not *.yaml and treats missing directories as empty"
   const raw = await loadRawDataset(dir);
   assert.equal(raw.species, null);
   assert.equal(raw.breeds, null);
+  assert.equal(raw.populations, null);
   assert.deepEqual(
     raw.animals.map((a) => a.id),
     ["tuva"],

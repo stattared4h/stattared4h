@@ -1,0 +1,11 @@
+name: Linn
+species: far
+breed: varmlandsfar
+sex: male
+born: 2020
+status: here
+photos:
+  - file: far-linn-1.webp
+    alt: Porträtt av Linn.
+    credit: QA
+    portrait: true

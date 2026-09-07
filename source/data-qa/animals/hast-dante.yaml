@@ -1,0 +1,11 @@
+name: Dante
+species: hast
+breed: gotlandsruss
+sex: male
+born: 2020
+status: here
+photos:
+  - file: hast-dante-1.webp
+    alt: Porträtt av Dante.
+    credit: QA
+    portrait: true

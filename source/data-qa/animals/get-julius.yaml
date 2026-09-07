@@ -1,0 +1,11 @@
+name: Julius
+species: get
+breed: goingeget
+sex: male
+born: 2018
+status: here
+photos:
+  - file: get-julius-1.webp
+    alt: Porträtt av Julius.
+    credit: QA
+    portrait: true

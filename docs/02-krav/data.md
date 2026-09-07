@@ -52,3 +52,8 @@ att Å, Ä och Ö hamnar sist och inte bland A och O.
   datasetet. <!-- 02-§6.10 -->
 - Ett test bevakar att inget djur i något dataset har ett `location`-fält
   (`04-§4.2`). <!-- 02-§6.11 -->
+- QA-datasetet innehåller minst 100 namngivna individer och täcker varje art och ras i
+  vokabulären, så att listor, sortering och stora datamängder prövas. <!-- 02-§6.12 -->
+- Djur som gården bara redovisar som antal lagras som räknade bestånd per art och ras,
+  inte som påhittade individer. En art får inte använda båda modellerna samtidigt.
+  <!-- 02-§6.13 -->

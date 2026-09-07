@@ -1,0 +1,11 @@
+name: Pricken
+species: kanin
+breed: mellerudskanin
+sex: male
+born: 2022
+status: here
+photos:
+  - file: kanin-pricken-1.webp
+    alt: Porträtt av Pricken.
+    credit: QA
+    portrait: true

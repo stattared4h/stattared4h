@@ -9,10 +9,19 @@ Strukturen är identisk med `source/data/` och följer
 [datakontraktet](../../docs/04-DATAKONTRAKT.md). Ändras kontraktet ändras det här
 datasetet i samma commit — annars slutar testerna bevaka det de påstår sig bevaka.
 
+Datasetet har **100 namngivna individer** och **32 höns i två räknade bestånd**. De
+100 individerna är fördelade på 20 getter, 20 får, 10 kor, 10 hästar, 20 grisar,
+18 kaniner och 2 katter. Hönsen är 18 Svarta dvärghöns och 14 Orusthöns. Alla namn,
+antal och övriga uppgifter är påhittade.
+
+Art- och rasurvalet följer gårdens sida
+[Våra djur](https://www.4h.se/stattared/varadjur/), kompletterat med de två hönsraser
+som gården har uppgett för projektet.
+
 ## Vad datasetet täcker
 
-Varje post finns för att pröva något bestämt. Lägg till en post när ett nytt fall
-tillkommer, och skriv in det i tabellen.
+De namngivna posterna nedan prövar särskilda kontraktsfall. De övriga individerna
+prövar större listor, svensk sortering och att samtliga arter och raser används.
 
 | Post | Fall som prövas |
 | --- | --- |
@@ -37,6 +46,9 @@ tillkommer, och skriv in det i tabellen.
 | `smadjurshuset` | Inomhusplats med eget djurslag |
 | `ovre-hagen` | Aktiv plats utan djurslag → tom platssida, och en varning i valideringen |
 | `gamla-stallet` | Inaktiv plats utan koordinater → QR-koden får inte leda till en död sida |
+| `grishagen` | Nytt djurslag med många individer |
+| `honshuset` | Ett djurslag som representeras av räknade bestånd i stället för individer |
+| `kattvinden` | Ett litet bestånd med bara två individer |
 
 Arten `hast` finns medvetet på **ingen** plats, så att artsidan prövas när svaret på
 "var finns hästarna?" är att vi inte vet.

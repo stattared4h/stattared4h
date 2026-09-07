@@ -1,12 +1,13 @@
 # Gårdens data
 
-Här bor Stättareds verkliga data om djur, arter, raser och platser, enligt
+Här bor Stättareds verkliga data om djur, arter, raser, räknade bestånd och platser, enligt
 [datakontraktet](../../docs/04-DATAKONTRAKT.md).
 
 ```text
 source/data/
 ├── species.yaml
 ├── breeds.yaml
+├── populations.yaml
 ├── animals/<djur-id>.yaml
 └── locations/<plats-id>.yaml
 ```

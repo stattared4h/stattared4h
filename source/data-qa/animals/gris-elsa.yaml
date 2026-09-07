@@ -1,0 +1,11 @@
+name: Elsa
+species: gris
+breed: linderodssvin
+sex: female
+born: 2021
+status: here
+photos:
+  - file: gris-elsa-1.webp
+    alt: Porträtt av Elsa.
+    credit: QA
+    portrait: true

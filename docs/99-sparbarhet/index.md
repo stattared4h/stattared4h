@@ -63,6 +63,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§6.9` | Deterministisk svensk sortering | `byggd` | `source/ts/domain/sort.ts`; `tests/domain/sort.test.ts` |
 | `02-§6.10` | Tester mot QA-datat, ogiltiga poster i testet | `byggd` | `tests/domain/helpers.ts` läser `source/data-qa/`; ogiltiga poster byggs i minnet |
 | `02-§6.11` | Test: inget `location`-fält | `byggd` | `tests/domain/no-location.test.ts` läser både `source/data` och `source/data-qa` |
+| `02-§6.12` | QA har minst 100 individer och täcker vokabulären | `byggd` | `tests/domain/qa-data.test.ts`; `source/data-qa/` har 100 individer |
+| `02-§6.13` | Räknade bestånd för djur utan individsidor | `byggd` | `source/ts/domain/load.ts`, `validate.ts`, `derive.ts`; `tests/domain/qa-data.test.ts` |
 | `02-§7.1`–`7.9` | Manifest och service worker | `saknas` | |
 | `02-§7.10` | Installation på iOS och Android | `saknas` | Blir `manuell` med steget i kravet när service workern finns |
 | `02-§8.1`–`8.2` | Bildfiler och validering av dem | `saknas` | `source/images/` finns inte |
@@ -120,7 +122,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `04-§1`–`04-§9` | Modell för djur, arter, raser, platser och bilder | `dokumenterad` | QA-datat i `source/data-qa/` följer kontraktet; ingen kod läser det ännu |
+| `04-§1`–`04-§9` | Modell för djur, arter, raser, bestånd, platser och bilder | `påbörjad` | Domänlagret läser och validerar modellen, inklusive räknade bestånd; bildfilerna saknas ännu |
 | `04-§4.2` | Djur har inget `location`-fält | `byggd` | Valideraren fäller (`tests/domain/validate.test.ts`) och `tests/domain/no-location.test.ts` bevakar datat |
 | `04-§10` | Validering | `byggd` | `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts`. Bildkontrollen (`04-§10.7`) prövas med handbyggda WebP-filer i `tests/domain/webp.test.ts` tills `source/images-qa/` finns |
 
@@ -133,7 +135,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `06-§1.5` | QA-versionen får tillägget " – QA" | `saknas` | |
 | `06-§2.1` | `DATA_DIR` väljer dataset | `påbörjad` | `defaultDataDir()` i `source/ts/domain/index.ts` och `npm run validate` läser `DATA_DIR` (`tests/domain/validate-script.test.ts`); bygget läser ännu inget dataset |
 | `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
-| `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | Datasetet finns och `source/data-qa/README.md` listar fallen; bildfilerna saknas |
+| `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | 100 individer och två räknade hönsbestånd finns; bildfilerna saknas |
 | `06-§2.4` | Kontraktsändring ändrar QA-datat | `dokumenterad` | Process |
 | `06-§3.1` | `BASE_PATH` | `påbörjad` | `scripts/build.mjs`; ersätts av Eleventys `pathPrefix` |
 | `06-§3.2`–`3.3` | Hjälpfunktion och QA under `/qa/` | `saknas` | Testet är `02-§9.8` |

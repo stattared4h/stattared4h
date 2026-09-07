@@ -1,0 +1,11 @@
+name: Grynet
+species: gris
+breed: linderodssvin
+sex: female
+born: 2023
+status: here
+photos:
+  - file: gris-grynet-1.webp
+    alt: Porträtt av Grynet.
+    credit: QA
+    portrait: true

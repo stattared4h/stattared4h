@@ -53,8 +53,9 @@ startsidan; se spårbarhetsmatrisen för vad som finns och vad som saknas.
 får aldrig kunna börja fallera för att gården sålt en get. <!-- 06-§2.2 -->
 
 Datasetet i [`source/data-qa/`](../source/data-qa/README.md) är påhittat och valt för att
-pröva kontraktets gränsfall — samma djurslag på flera platser, flera djurslag i samma hage,
-en tom hage, ett djur utan foton. Dess README listar vad varje post finns för. <!-- 06-§2.3 -->
+pröva kontraktets gränsfall — 100 individer, räknade hönsbestånd, samma djurslag på
+flera platser, flera djurslag i samma hage, en tom hage och djur utan foton. Dess README
+listar vad posterna finns för. <!-- 06-§2.3 -->
 
 Ändras datakontraktet ändras QA-datat i samma commit. Annars slutar testerna bevaka det de
 påstår sig bevaka. <!-- 06-§2.4 -->

@@ -1,0 +1,11 @@
+name: Astrid
+species: far
+breed: varmlandsfar
+sex: female
+born: 2017
+status: here
+photos:
+  - file: far-astrid-1.webp
+    alt: Porträtt av Astrid.
+    credit: QA
+    portrait: true

@@ -1,0 +1,11 @@
+name: Freja
+species: far
+breed: varmlandsfar
+sex: male
+born: 2022
+status: here
+photos:
+  - file: far-freja-1.webp
+    alt: Porträtt av Freja.
+    credit: QA
+    portrait: true

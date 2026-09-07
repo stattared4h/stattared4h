@@ -1,0 +1,11 @@
+name: Joar
+species: far
+breed: varmlandsfar
+sex: male
+born: 2018
+status: here
+photos:
+  - file: far-joar-1.webp
+    alt: Porträtt av Joar.
+    credit: QA
+    portrait: true

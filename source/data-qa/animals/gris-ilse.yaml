@@ -1,0 +1,11 @@
+name: Ilse
+species: gris
+breed: linderodssvin
+sex: female
+born: 2017
+status: here
+photos:
+  - file: gris-ilse-1.webp
+    alt: Porträtt av Ilse.
+    credit: QA
+    portrait: true

@@ -1,0 +1,11 @@
+name: Brunte
+species: get
+breed: goingeget
+sex: male
+born: 2018
+status: here
+photos:
+  - file: get-brunte-1.webp
+    alt: Porträtt av Brunte.
+    credit: QA
+    portrait: true

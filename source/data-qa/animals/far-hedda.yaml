@@ -1,0 +1,11 @@
+name: Hedda
+species: far
+breed: varmlandsfar
+sex: male
+born: 2024
+status: here
+photos:
+  - file: far-hedda-1.webp
+    alt: Porträtt av Hedda.
+    credit: QA
+    portrait: true

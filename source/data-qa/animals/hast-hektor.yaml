@@ -1,0 +1,11 @@
+name: Hektor
+species: hast
+breed: gotlandsruss
+sex: male
+born: 2024
+status: here
+photos:
+  - file: hast-hektor-1.webp
+    alt: Porträtt av Hektor.
+    credit: QA
+    portrait: true

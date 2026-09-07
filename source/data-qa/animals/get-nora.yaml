@@ -1,0 +1,11 @@
+name: Nora
+species: get
+breed: goingeget
+sex: male
+born: 2022
+status: here
+photos:
+  - file: get-nora-1.webp
+    alt: Porträtt av Nora.
+    credit: QA
+    portrait: true

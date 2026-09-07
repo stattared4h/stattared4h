@@ -14,3 +14,12 @@ species:
   - id: kanin
     name: Kanin
     plural: Kaniner
+  - id: gris
+    name: Gris
+    plural: Grisar
+  - id: hons
+    name: Höna
+    plural: Höns
+  - id: katt
+    name: Katt
+    plural: Katter

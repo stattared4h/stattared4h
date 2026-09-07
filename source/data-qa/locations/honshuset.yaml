@@ -1,0 +1,8 @@
+name: Hönshuset
+species:
+  - hons
+description: Här hålls hönsen som räknade bestånd per ras.
+lat: 57.412500
+lon: 12.214500
+accessible: true
+active: true

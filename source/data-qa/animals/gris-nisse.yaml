@@ -1,0 +1,11 @@
+name: Nisse
+species: gris
+breed: linderodssvin
+sex: male
+born: 2022
+status: here
+photos:
+  - file: gris-nisse-1.webp
+    alt: Porträtt av Nisse.
+    credit: QA
+    portrait: true

@@ -1,0 +1,11 @@
+name: Ingrid
+species: ko
+breed: bohuskulla
+sex: male
+born: 2024
+status: here
+photos:
+  - file: ko-ingrid-1.webp
+    alt: Porträtt av Ingrid.
+    credit: QA
+    portrait: true

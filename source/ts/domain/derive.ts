@@ -9,12 +9,13 @@
  * Every list returned is sorted (02-§6.9). Species keep the order of species.yaml.
  */
 import { sortAnimals, sortLocations } from "./sort.ts";
-import type { Animal, Breed, Dataset, Location, Species, Status } from "./types.ts";
+import type { Animal, Breed, Dataset, Location, Population, Species, Status } from "./types.ts";
 
 /** One species and the animals of it that are present, for a location page. */
 export interface SpeciesGroup {
   species: Species;
   animals: Animal[];
+  populations: Population[];
 }
 
 /** The species with `id`, or null when it is unknown. */
@@ -40,6 +41,18 @@ export function animalsByBreed(dataset: Dataset, breedId: string): Animal[] {
   return sortAnimals(dataset.animals.filter((a) => a.breed === breedId));
 }
 
+/** Counted populations of a species. */
+export function populationsOfSpecies(dataset: Dataset, speciesId: string): Population[] {
+  return dataset.populations.filter((population) => population.species === speciesId);
+}
+
+/** Total number of animals in counted populations, optionally for one species. */
+export function populationCount(dataset: Dataset, speciesId?: string): number {
+  return dataset.populations
+    .filter((population) => speciesId === undefined || population.species === speciesId)
+    .reduce((sum, population) => sum + population.count, 0);
+}
+
 /**
  * The animals a visitor can meet at a location: the present animals of each species
  * listed on it, grouped per species in species.yaml order. A listed species with no
@@ -48,7 +61,11 @@ export function animalsByBreed(dataset: Dataset, breedId: string): Animal[] {
 export function animalsAtLocation(dataset: Dataset, location: Location): SpeciesGroup[] {
   return dataset.species
     .filter((species) => location.species.includes(species.id))
-    .map((species) => ({ species, animals: animalsOfSpecies(dataset, species.id, "here") }));
+    .map((species) => ({
+      species,
+      animals: animalsOfSpecies(dataset, species.id, "here"),
+      populations: populationsOfSpecies(dataset, species.id),
+    }));
 }
 
 /** Active locations where a species is listed (04-§8.1). */
@@ -83,5 +100,9 @@ export function parents(dataset: Dataset, animal: Animal): { mother: Animal | nu
 
 /** Species with at least one present animal (02-§5.7), in species.yaml order. */
 export function speciesOnFarm(dataset: Dataset): Species[] {
-  return dataset.species.filter((s) => dataset.animals.some((a) => a.species === s.id && a.status === "here"));
+  return dataset.species.filter(
+    (s) =>
+      dataset.animals.some((a) => a.species === s.id && a.status === "here") ||
+      dataset.populations.some((population) => population.species === s.id && population.count > 0),
+  );
 }

@@ -1,0 +1,11 @@
+name: Enzo
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2021
+status: here
+photos:
+  - file: kanin-enzo-1.webp
+    alt: Porträtt av Enzo.
+    credit: QA
+    portrait: true

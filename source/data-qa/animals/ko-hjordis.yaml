@@ -1,0 +1,11 @@
+name: Hjördis
+species: ko
+breed: bohuskulla
+sex: female
+born: 2023
+status: here
+photos:
+  - file: ko-hjordis-1.webp
+    alt: Porträtt av Hjördis.
+    credit: QA
+    portrait: true

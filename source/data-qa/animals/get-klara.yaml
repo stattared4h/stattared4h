@@ -1,0 +1,11 @@
+name: Klara
+species: get
+breed: jamtget
+sex: female
+born: 2019
+status: here
+photos:
+  - file: get-klara-1.webp
+    alt: Porträtt av Klara.
+    credit: QA
+    portrait: true

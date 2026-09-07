@@ -1,0 +1,11 @@
+name: Atlas
+species: hast
+breed: nordsvensk-hast
+sex: female
+born: 2017
+status: here
+photos:
+  - file: hast-atlas-1.webp
+    alt: Porträtt av Atlas.
+    credit: QA
+    portrait: true

@@ -35,8 +35,10 @@ if (result.dataset === null) {
   process.exit(1);
 }
 
-const { species, breeds, animals, locations } = result.dataset;
+const { species, breeds, populations, animals, locations } = result.dataset;
+const countedAnimals = populations.reduce((sum, population) => sum + population.count, 0);
 console.log(
-  `Datat i ${dataDir} är giltigt: ${animals.length} djur, ${locations.length} platser, ` +
+  `Datat i ${dataDir} är giltigt: ${animals.length} individer, ${countedAnimals} djur i ` +
+    `${populations.length} räknade bestånd, ${locations.length} platser, ` +
     `${species.length} arter, ${breeds.length} raser. ${result.warnings.length} varningar${imagesNote}.`,
 );

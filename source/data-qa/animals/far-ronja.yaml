@@ -1,0 +1,11 @@
+name: Ronja
+species: far
+breed: varmlandsfar
+sex: female
+born: 2017
+status: here
+photos:
+  - file: far-ronja-1.webp
+    alt: Porträtt av Ronja.
+    credit: QA
+    portrait: true

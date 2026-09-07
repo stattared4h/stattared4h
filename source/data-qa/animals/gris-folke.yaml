@@ -1,0 +1,11 @@
+name: Folke
+species: gris
+breed: linderodssvin
+sex: male
+born: 2022
+status: here
+photos:
+  - file: gris-folke-1.webp
+    alt: Porträtt av Folke.
+    credit: QA
+    portrait: true

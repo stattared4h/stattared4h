@@ -66,15 +66,25 @@ test("the validated QA dataset is already sorted", async () => {
     dataset.animals.map((a) => a.name),
     [...dataset.animals].sort(compareByName).map((a) => a.name),
   );
-  assert.equal(dataset.animals[0].name, "Bagaren");
+  assert.equal(dataset.animals[0].name, "Agda");
   assert.equal(dataset.animals.at(-1)?.name, "Vinter");
   assert.deepEqual(
     dataset.locations.map((l) => l.id),
-    ["bjorkhagen", "gamla-stallet", "gethagen", "smadjurshuset", "stora-hagen", "ovre-hagen"],
+    [
+      "bjorkhagen",
+      "gamla-stallet",
+      "gethagen",
+      "grishagen",
+      "honshuset",
+      "kattvinden",
+      "smadjurshuset",
+      "stora-hagen",
+      "ovre-hagen",
+    ],
   );
   assert.deepEqual(
     dataset.species.map((s) => s.id),
-    ["get", "far", "ko", "hast", "kanin"],
+    ["get", "far", "ko", "hast", "kanin", "gris", "hons", "katt"],
     "species keep the order of species.yaml",
   );
 });

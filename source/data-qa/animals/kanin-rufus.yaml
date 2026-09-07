@@ -1,0 +1,11 @@
+name: Rufus
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2023
+status: here
+photos:
+  - file: kanin-rufus-1.webp
+    alt: Porträtt av Rufus.
+    credit: QA
+    portrait: true

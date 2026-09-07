@@ -1,0 +1,7 @@
+populations:
+  - species: hons
+    breed: svart-dvarghons
+    count: 18
+  - species: hons
+    breed: orusthons
+    count: 14

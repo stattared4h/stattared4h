@@ -1,0 +1,11 @@
+name: Pelle
+species: far
+breed: varmlandsfar
+sex: male
+born: 2024
+status: here
+photos:
+  - file: far-pelle-1.webp
+    alt: Porträtt av Pelle.
+    credit: QA
+    portrait: true

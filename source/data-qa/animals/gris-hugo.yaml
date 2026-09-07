@@ -1,0 +1,11 @@
+name: Hugo
+species: gris
+breed: linderodssvin
+sex: male
+born: 2024
+status: here
+photos:
+  - file: gris-hugo-1.webp
+    alt: Porträtt av Hugo.
+    credit: QA
+    portrait: true

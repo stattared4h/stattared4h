@@ -1,0 +1,11 @@
+name: Lakrits
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2019
+status: here
+photos:
+  - file: kanin-lakrits-1.webp
+    alt: Porträtt av Lakrits.
+    credit: QA
+    portrait: true

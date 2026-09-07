@@ -1,0 +1,8 @@
+name: Grishagen
+species:
+  - gris
+description: En rymlig utehage för gårdens grisar.
+lat: 57.412600
+lon: 12.212900
+accessible: true
+active: true
