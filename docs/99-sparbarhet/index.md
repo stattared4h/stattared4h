@@ -76,6 +76,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.44` | Alla platsnamn syns inzoomad | `manuell` | `.map--zoomed` upphäver döljandet i `layout.css`. Bygg med `DATA_DIR=source/data-qa`, öppna `/` i 360 px och tryck `+` tre gånger: varje plats i klungan ska synas med namn, också de vars etikett är dold i överblick (`02-§5.33`). Vid ett eller två tryck ska de dolda förbli dolda — där finns ännu inte plats |
 | `02-§5.45` | Utan JavaScript är kartan en stillbild | `byggd` | Knappgruppen skrivs `hidden` av bygget och visas av `map-zoom.ts`; `tests/build/map.test.ts` kräver att den är dold i utdatan och att markören fortfarande är en länk till platssidan. Stäng av JavaScript i webbläsaren och bekräfta att kartan syns och listan fungerar |
 | `02-§5.39` | Samma symbol framför namnet i listan under kartan | `byggd` | `symbol` på `MapListItem` i `source/ts/build/pages.ts`, skriven i länken av `source/pages/index.njk`; `tests/build/pages.test.ts` kräver rätt symbol för Caféet och en symbol på varje listad plats, `data-pages.test.ts` att den står före namnet i den byggda sidan |
+| `04-§5.8` | Koordinaten är den punkt besökaren ska gå till, för en yta dess mitt | `dokumenterad` | Konventionen gäller datat, inte koden: bygget projicerar den punkt som står i filen. De fyra numrerade hagarna bär bandens tyngdpunkter, härledda ur ritningen enligt `docs/09-kallor/index.md`; de elva utan koordinater väntar på gården (#56) |
 | `04-§5.7` | Platsen har en sort | `byggd` | ADR 0019; obligatoriskt `kind` med åtta värden i `source/ts/domain/validate.ts`. `tests/domain/validate.test.ts` prövar att var och en tas emot, att `besoksmal` avvisas, att felmeddelandet räknar upp värdena och att djurslag på annat än en `djurplats` fäller bygget; `tests/domain/qa-data.test.ts` kräver att QA-datat innehåller varje sort |
 | `02-§5.33` (dold etikett) | Etiketten kommer fram vid fokus | `manuell` | Bygg med `DATA_DIR=source/data-qa`, öppna `/karta/` i 360 px bredd och tabba till en markör i klungan i mitten: namnet ska komma fram, och markören ska ligga överst |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
@@ -294,7 +295,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | Status | Antal rader |
 | --- | --- |
 | `saknas` | 1 |
-| `dokumenterad` | 17 |
+| `dokumenterad` | 18 |
 | `påbörjad` | 15 |
 | `byggd` | 128 |
 | `manuell` | 47 |
