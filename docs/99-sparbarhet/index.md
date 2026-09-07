@@ -27,9 +27,9 @@ färdig den än ser ut — det är testet som gör att den förblir färdig. <!-
 ## Läget nu
 
 Repot innehåller ramverket — process, beslut, datakontrakt, design och krav för fas 1 —
-samt Eleventy-bygget med grundlayout, sidhuvud, sidfot och versionsmodul, manifest,
-service worker, feedbackdialog och om-sida. Ingen datadriven sida finns. Statusen nedan
-speglar det.
+samt Eleventy-bygget med grundlayout, sidhuvud, sidfot, versionsmodul, manifest,
+service worker, feedbackdialog, om-sida och de datadrivna sidorna: start, plats, djur,
+art och karta, byggda ur det validerade datasetet. Statusen nedan speglar det.
 
 ### Krav (`02-§`)
 
@@ -41,21 +41,24 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§1.10` | Tumregel för vad som hör hit | `dokumenterad` | Vägledande |
 | `02-§2` | Målgrupp | `dokumenterad` | Vägledande |
 | `02-§3.1`–`3.4` | Roller via GitHub, ingen egen inloggning | `manuell` | Kontrollera under *Settings → Rules* att regelverket *Protect main* är aktivt och kräver pull request |
-| `02-§3.5` | Djur som lämnat gården behålls | `påbörjad` | Valideraren tar emot `status: gone` och härledningarna behåller djuret (`tests/domain/derive.test.ts`); sidan tillkommer med djursidan (`02-§5.14`) |
+| `02-§3.5` | Djur som lämnat gården behålls | `byggd` | Valideraren tar emot `status: gone`, härledningarna behåller djuret (`tests/domain/derive.test.ts`) och djursidan finns kvar med märkningen; `tests/build/data-pages.test.ts` öppnar `djur/bocken/` |
 | `02-§4` | Kravintag via issues | `dokumenterad` | Process |
-| `02-§5.1` | Sidtyper och adresser | `påbörjad` | Startsidan finns i `source/pages/`; plats-, djur-, art- och kartsidan tillkommer med domänskiktet |
+| `02-§5.1` | Sidtyper och adresser | `byggd` | `source/pages/index.njk`, `plats.njk`, `djur.njk`, `arter.njk`, `karta.njk` paginerar över `views`; `tests/build/data-pages.test.ts` kräver en sida per plats, djur och art |
 | `02-§5.2`–`5.3` | `index.html` i katalog; egen 404-sida | `byggd` | `source/pages/404.njk`; adressformen och 404-sidans text och länkar bevakas av `tests/build/site.test.ts` |
 | `02-§5.4` | Sidhuvud | `påbörjad` | `source/layouts/header.njk` på varje sida; status per krav under `02-§10.1`–`10.10` |
 | `02-§5.5` | Sidfot | `byggd` | `source/layouts/footer.njk` på varje sida; innehåll och versionsrad bevakas av `tests/build/site.test.ts` |
 | `02-§5.6` | En `h1`, `lang`, `title`, `description` | `byggd` | `source/layouts/base.njk`; bevakas per byggd sida av `tests/build/site.test.ts` |
-| `02-§5.7`–`5.8` | Startsidan | `saknas` | Dagens startsida är en platshållare utan djurslag |
-| `02-§5.9`–`5.13` | Platssidan | `saknas` | |
-| `02-§5.14`–`5.18` | Djursidan | `saknas` | |
-| `02-§5.19`–`5.22` | Artsidan | `saknas` | |
-| `02-§5.23`–`5.27` | Kartan | `saknas` | Mekanismen i `03-§9` |
-| `02-§5.28` | Djurkortet | `saknas` | |
+| `02-§5.7`–`5.8` | Startsidan | `byggd` | `source/pages/index.njk` med `homeView` i `source/ts/build/pages.ts`; artvalet i `tests/build/pages.test.ts`, sidan och det tomma datasetet i `tests/build/data-pages.test.ts` |
+| `02-§5.9`–`5.13` | Platssidan | `byggd` | `source/pages/plats.njk` med `locationView`; Björkhagen, Gethagen, Stora hagen, Övre hagen, Gamla stallet och Hönshuset prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
+| `02-§5.14`–`5.18` | Djursidan | `byggd` | `source/pages/djur.njk` med `animalView`; Rosa, Bocken, Tuva och Vinter prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
+| `02-§5.19`–`5.22` | Artsidan | `byggd` | `source/pages/arter.njk` med `speciesView` och `readSpeciesContent` i `source/ts/build/content.ts`; getter, hästar och höns prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
+| `02-§5.23`–`5.26` | Kartan | `byggd` | `source/ts/build/map.ts` och `source/pages/karta.njk`; projektion, markörer och lista i `tests/build/map.test.ts`, `pages.test.ts` och `data-pages.test.ts`, som också kräver att inget anrop går utanför sajten |
+| `02-§5.27` | Markörer minst 44 px; textbeskrivning | `manuell` | Beskrivningen bevakas av `tests/build/map.test.ts`. Öppna `/karta/` i 360 px och bekräfta att varje markör är minst 44 px hög och bred (mätt till 68 px hög i Chromium) |
+| `02-§5.28` | Djurkortet | `byggd` | Makrot i `source/layouts/animal-card.njk` med `animalCard` i `pages.ts`; etiketter och platshållare i `tests/build/pages.test.ts` och `data-pages.test.ts` |
+| `02-§5.29` | `npm run qr` | `byggd` | `scripts/qr.mjs` och `source/ts/build/qr.ts`; `tests/build/qr.test.ts` kör skriptet mot QA-datat och kontrollerar en fil per plats med adressen som `<title>` |
+| `02-§5.30` | Ritad kartbakgrund | `byggd` | `parseMapBackground` och `loadMapBackground` i `source/ts/build/map.ts`, konventionen i `source/map/README.md`; `tests/build/map.test.ts` bäddar in en liten SVG och prövar varningen för en plats utanför |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
-| `02-§6.2` | Valideringen körs först i bygget | `påbörjad` | `loadValidDataset` i `source/ts/domain/index.ts` kastar vid fel; bygget anropar den när Eleventy tillkommer (`02-§9.1`) |
+| `02-§6.2` | Valideringen körs först i bygget | `byggd` | `eleventy.config.js` anropar `loadValidDataset` i `eleventy.before`, i sekventiellt händelseläge före bildpluginen; `tests/build/data-pages.test.ts` bygger ett ogiltigt dataset och kräver en tom utkatalog |
 | `02-§6.3` | Fäller vid allt i `04-§10` och vid okända fält | `byggd` | `source/ts/domain/validate.ts`; varje regel prövas i `tests/domain/validate.test.ts` |
 | `02-§6.4` | Varningar | `byggd` | `collectWarnings` i `validate.ts`; QA-datats exakta varningar i `tests/domain/validate.test.ts` |
 | `02-§6.5` | Meddelanden på svenska med fil och fält | `byggd` | `formatIssue` i `validate.ts`; `tests/domain/validate.test.ts` och `load.test.ts` |
@@ -80,7 +83,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§8.2` | Validering av bildfiler | `saknas` | Valideraren (`04-§10.7`) |
 | `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` och `optimiseImage` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `02-§8.4` | `npm run qa:images` | `byggd` | `scripts/qa-images.mjs` skriver till `source/images-qa/`; `tests/build/images.test.ts` |
-| `02-§8.5`–`8.7` | Leverans av bilder | `påbörjad` | `renderPicture`, `renderPlaceholder` och Eleventy-pluginen i `source/ts/build/` är testade och inkopplade i `eleventy.config.js`; ingen sida använder shortcoden ännu, och `credit` visas av sidmallen |
+| `02-§8.5`–`8.7` | Leverans av bilder | `byggd` | `picture`-shortcoden i djurkortet, djurslagsrutan och djur- och artsidan, `credit` i `source/pages/djur.njk` och `arter.njk`; `tests/build/data-pages.test.ts` kontrollerar `srcset`, `width`, `height`, `loading`, `fetchpriority`, `alt`, platshållaren och fototexten på Rosas och Bockens sidor |
 | `02-§9.1` | Eleventy och esbuild | `byggd` | `eleventy.config.js` med esbuild i `eleventy.before`; `erasableSyntaxOnly` i `tsconfig.json` fäller `enum` och `namespace`; byggtesterna kör Eleventy som barnprocess |
 | `02-§9.2` | Node 22.18 i `.nvmrc` och `engines` | `påbörjad` | Båda finns, och `eleventy.config.js` importerar `.ts` direkt; inget test |
 | `02-§9.3` | `npm run lint` | `påbörjad` | Kör html-validate, stylelint med `declaration-strict-value`, eslint, markdownlint och yamllint; inget test som bevakar att alla fem ingår |
@@ -130,23 +133,31 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§2.20` | Bakgrundsskikt för dialog | `byggd` | `--color-backdrop` i `tokens.css`, bevakad av testet |
 | `05-§3` | Typografi | `påbörjad` | Tokens bevakas av testet; navigeringen (`05-§3.9`) i `layout.css` utan test |
 | `05-§4.1`–`4.10` | Behållare och spacing | `påbörjad` | Tokens bevakas av testet; `layout.css` använder dem i behållare, sidhuvud och sidfot utan test |
-| `05-§4.11`–`4.15` | Rutnät och träffytor | `dokumenterad` | Rutnätet skrivs med djurkorten |
+| `05-§4.11`–`4.14` | Rutnät | `manuell` | `.card-grid` och `.species-grid` i `layout.css` med `auto-fit`/`auto-fill` och `minmax`. Öppna `/plats/stora-hagen/` i 360, 700 och 1280 px och bekräfta en, två respektive tre kortkolumner utan mediefrågor |
+| `05-§4.15` | Träffytor minst 44 px | `manuell` | Öppna `/karta/`, `/plats/stora-hagen/` och `/djur/rosa/` i 360 px och bekräfta att markörer, djurslagsrutor, kort, knappar och släktlänkar är minst 44 px höga (mätt i Chromium: markörer 68 px, rutor 155 px, länkar 44 px) |
 | `05-§5` | Brytpunkter | `dokumenterad` | Tillämpas när layouten skrivs |
 | `05-§6.9`–`6.12` | Knappar | `manuell` | `.button`, `.button--secondary` och `.button:disabled` i `components.css`. Öppna feedbackdialogen: Skicka är grön med vit text och halvgenomskinlig med en förklarande mening tills fälten är ifyllda; statusradens Ladda om är sekundär med djupgrön kant |
 | `05-§6.1`–`6.4` | Sidhuvud | `manuell` | `layout.css`. Öppna startsidan i 360 px och 1280 px: vitt sidhuvud med kantlinje som ligger kvar vid rullning, ikonknappar på mobil, logga och länkar på desktop, aktuell sida understruken |
-| `05-§6.15` | Kortets bild i 4:3 | `dokumenterad` | Kortets CSS skrivs med djurkorten; platshållaren (`05-§6.20`) håller redan 4:3 |
-| `05-§6.17` | `width` och `height` på varje bild | `påbörjad` | `renderPicture` sätter dem, bevakat av `tests/build/images.test.ts`; ingen sida använder den ännu |
-| `05-§6.20` | Platshållare för saknat foto | `påbörjad` | `renderPlaceholder` och `.image-placeholder` i `components.css`; markupen är testad, utseendet kontrolleras när en sida visar den |
+| `05-§6.13`–`6.14` | Kortet | `manuell` | `.card` och `.animal-card` i `components.css`. Öppna `/arter/get/` och bekräfta vit yta, rundade hörn, skugga och innermarginal i kortets textdel |
+| `05-§6.15` | Kortets bild i 4:3 | `manuell` | `.animal-card__image` med `aspect-ratio: 4 / 3` och `object-fit: cover`. Öppna `/plats/stora-hagen/` och bekräfta att korten med foto och korten med platshållare är lika höga |
+| `05-§6.16` | Rubriken är länk, hela kortet klickbart | `manuell` | `.card__link::after` täcker kortet. Öppna `/arter/get/`, klicka på ett korts bild och bekräfta att djursidan öppnas; tabba till kortet och bekräfta att namnet får fokusring |
+| `05-§6.17` | `width` och `height` på varje bild | `byggd` | `renderPicture` sätter dem; `tests/build/data-pages.test.ts` kräver dem på varje bild på Rosas sida |
+| `05-§6.18`–`6.19` | Djurkortets etiketter | `byggd` | `tags` i `animalCard` och `.tag` i `components.css`; ras, "Lantras" och "Har lämnat gården" prövas i `tests/build/pages.test.ts` och `data-pages.test.ts`. Utseendet: öppna `/arter/get/` och bekräfta ljusgröna etiketter med djupgrön text |
+| `05-§6.20` | Platshållare för saknat foto | `byggd` | `renderPlaceholder` med artnamnet som etikett; `tests/build/data-pages.test.ts` kräver plattan med "Get" på Bockens sida |
+| `05-§6.21` | Faktaruta | `manuell` | `.note` för tillgängligheten på platssidan. Öppna `/plats/gethagen/` och bekräfta en ljusgrön ruta utan kantlinje under djurslagen |
+| `05-§6.22`–`6.27` | Platssida | `byggd` | `source/pages/plats.njk`: `h1`, djurslagsrutor, `note` i dämpad text, rubriken "Getterna på gården" och den tomma platsens text prövas i `tests/build/data-pages.test.ts`. Öppna `/plats/stora-hagen/` i 360 px och bekräfta att båda djurslagsrutorna syns utan att rulla |
 | `05-§6.28`–`6.29`, `6.32` | Formulärfält | `manuell` | `.field` i `components.css`. Öppna feedbackdialogen: etiketterna Rubrik och Beskrivning står ovanför fälten, som är vita med ram, rundade hörn och minst 44 px höga. Felmeddelanden (`05-§6.29`) har ingen markup ännu: dialogen förebygger fel genom att Skicka är inaktiv tills fälten är ifyllda |
+| `05-§6.31` | Kartan har en textlista | `byggd` | `views.map.list` i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver varje aktiv plats i listan |
 | `05-§6.30` | Sidfot | `manuell` | `source/layouts/footer.njk`, `layout.css`. Öppna en sida och bekräfta djupgrön botten, vit text, och ordningen logga, huvudsidelänk, repolänk, integritetsmening, version |
 | `05-§6.33`–`6.34`, `6.37` | Ikonknapp, meny, sidhuvudets höjd | `manuell` | `components.css`, `layout.css`. I 360 px: knapparna är 44 px, menykortet är grönt med vita länkar och glider in under sidhuvudet; sidhuvudets höjd är densamma före och efter rullning och i 1280 px |
 | `05-§6.35`–`6.36` | Dialog, statusrad | `manuell` | `.dialog` och `.status-bar` i `components.css`. Öppna feedbackdialogen i 360 px och 1280 px: mörkt bakgrundsskikt, vit yta med rundade hörn och kryssknapp uppe till höger, som mest 680 px bred, intonad på under 200 ms; sätt DevTools → Network → Offline: ljusgrön rad med djupgrön text direkt under sidhuvudet |
-| `05-§6` övrigt | Komponenter | `saknas` | Skrivs när markupen finns, enligt `05-§7.2` |
+| `05-§6` övrigt | Hero | `saknas` | Skrivs när markupen finns, enligt `05-§7.2`; heron väntar på ett fotografi från gården |
 | `05-§7.1`, `7.5` | Inga hårdkodade värden | `byggd` | stylelint-regeln `declaration-strict-value` fäller literaler utanför `tokens.css` |
 | `05-§7.4` | Designtokens | `byggd` | `tokens.css`, bevakad av `tests/design/tokens.test.ts` |
 | `05-§7.7`–`7.8` | Fokusmarkering, rörelse | `påbörjad` | I `base.css`; inget test |
 | `05-§7.10` | Filstruktur för CSS | `påbörjad` | Fyra filer, laddade i ordning av `source/layouts/base.njk`; `utilities.css` skapas vid behov; inget test |
-| `05-§8` | Bilder | `påbörjad` | `05-§8.5` genom `generateImageSizes`; `8.6`–`8.7` genom `renderPicture`, ännu utan sida; foto- och samtyckesreglerna är vägledning |
+| `05-§8.1`–`8.4`, `8.8`–`8.10` | Fotoregler, personer, upphovsrätt | `dokumenterad` | Vägledning för den som fotograferar; `credit` visas intill varje bild (`02-§8.7`) |
+| `05-§8.5`–`8.7` | Tekniska bildregler | `byggd` | `generateImageSizes` och `renderPicture`, använda av sidorna; `srcset`, `width`, `height` och `loading` bevakas av `tests/build/data-pages.test.ts` |
 | `05-§9` | Tillgänglighet | `dokumenterad` | Delvis testbar med html-validate |
 | `05-§10` | Vad man inte gör | `dokumenterad` | Delvis kontrollerbar med lint |
 
@@ -156,6 +167,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | --- | --- | --- | --- |
 | `04-§1`–`04-§9` | Modell för djur, arter, raser, bestånd, platser och bilder | `påbörjad` | Domänlagret läser och validerar modellen, inklusive räknade bestånd; bildfilerna saknas ännu |
 | `04-§4.2` | Djur har inget `location`-fält | `byggd` | Valideraren fäller (`tests/domain/validate.test.ts`) och `tests/domain/no-location.test.ts` bevakar datat |
+| `04-§8` | Härledda vyer | `byggd` | `source/ts/domain/derive.ts` matar vymodellerna i `source/ts/build/pages.ts`; `tests/domain/derive.test.ts` och `tests/build/pages.test.ts`. Djursidan påstår aldrig var individen står (`04-§8.2`): `tests/build/data-pages.test.ts` kräver att ordet `location` inte finns på någon sida |
 | `04-§10` | Validering | `byggd` | `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts`. Bildkontrollen (`04-§10.7`) prövas med handbyggda WebP-filer i `tests/domain/webp.test.ts` tills `source/images-qa/` finns |
 
 ### Miljöer (`06-§`)
@@ -166,7 +178,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `06-§1.3` | QA-sidor bär `noindex` | `byggd` | `source/layouts/base.njk` när `DATA_DIR` slutar på `data-qa`; `tests/build/site.test.ts` bygger QA och produktion och jämför |
 | `06-§1.4` | QA har egen service worker och eget manifest-`id` | `byggd` | Scope, `start_url`, `id` och cachenamn följer bas-sökvägen; `tests/build/pwa.test.ts` bygger under `/prov/qa/` |
 | `06-§1.5` | QA-versionen får tillägget " – QA" | `manuell` | Kontrollpunkten för `02-§10.33` |
-| `06-§2.1` | `DATA_DIR` väljer dataset | `påbörjad` | `defaultDataDir()` i `source/ts/domain/index.ts` och `npm run validate` läser `DATA_DIR` (`tests/domain/validate-script.test.ts`); bygget läser ännu inget dataset |
+| `06-§2.1` | `DATA_DIR` väljer dataset | `byggd` | `eleventy.config.js` läser `DATA_DIR` och bygger sidorna ur det datasetet; `tests/build/data-pages.test.ts` bygger QA-datat och ett tomt dataset i en tillfällig katalog |
 | `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
 | `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | 100 individer och två räknade hönsbestånd finns; bildfilerna genereras av `npm run qa:images` (`02-§8.4`) |
 | `06-§2.4` | Kontraktsändring ändrar QA-datat | `dokumenterad` | Process |
@@ -181,18 +193,22 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `03-§1`–`03-§4`, `03-§6`–`03-§7` | Byggkedja, skikt, härledda vyer, sidor, bilder, redigering | `dokumenterad` | Mekanismerna bakom `02-§5`–`02-§8` |
+| `03-§1`–`03-§2` | Byggkedja och skikt | `dokumenterad` | Mekanismerna bakom `02-§5`–`02-§8` |
+| `03-§3` | Härledda vyer | `byggd` | `source/ts/domain/derive.ts`, sorterat och utan webbläsar-API:er; `tests/domain/derive.test.ts` och `sort.test.ts` |
+| `03-§4` | Sidor, vymodeller, bestämd form, makron, Markdown, QR | `byggd` | `source/ts/build/pages.ts`, `source/ts/domain/swedish.ts`, `source/layouts/animal-card.njk`, `species-tile.njk`, `scripts/qr.mjs`; `tests/build/pages.test.ts`, `tests/domain/swedish.test.ts`, `tests/build/qr.test.ts` |
 | `03-§5` | Offline och service worker | `byggd` | `source/ts/sw.ts`, `source/pages/sw.njk`, `source/ts/build/pwa.ts`, `source/ts/ui/sw-register.ts`; strategin i `tests/domain/offline.test.ts`, bygget i `tests/build/pwa.test.ts` |
+| `03-§7` | Redigering | `dokumenterad` | Process |
+| `03-§6.4` | Artens bild i rutor och på artsidan | `byggd` | `species-tile.njk` och `source/pages/arter.njk`; platshållaren med artnamnet bevakas av `tests/build/data-pages.test.ts` |
 | `03-§6.1` | Bygget genererar bara mindre storlekar | `byggd` | `generateImageSizes` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `03-§6.2` | Upplösare från filnamn till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` |
-| `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `påbörjad` | `renderPicture` är testad; sidorna använder den inte ännu |
+| `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `byggd` | `renderPicture` med `eager` för sidans första bild; `tests/build/data-pages.test.ts` kräver `fetchpriority="high"` på porträttet och `loading="lazy"` på nästa bild |
 | `03-§8.1` | `npm run build` | `byggd` | `eleventy` med `eleventy.config.js`; byggtesterna kör samma bygge till en tillfällig katalog |
 | `03-§8.2`–`8.4` | Test, lint och CI | `påbörjad` | `npm test`, `npm run lint` och CI kör dem (`02-§9.7`); valideringen körs av bygget först när datat kopplas in |
 | `03-§8.5` | Merge till `main` deployar | `manuell` | Merga till `main` och bekräfta att *Deploy till QA* startar när *Quality* blivit grön (`02-§9.11`) |
 | `03-§8.6` | Bevakande tester | `byggd` | Bas-sökvägen i `tests/build/site.test.ts` (`02-§9.8`); `location`-fältet i `tests/domain/no-location.test.ts` (`02-§6.11`) |
 | `03-§8.7` | Node 22.18; Eleventy importerar TypeScript direkt | `påbörjad` | `eleventy.config.js` importerar `source/ts/domain/version.ts`; `erasableSyntaxOnly` bevakas av typkontrollen, inte av ett test |
 | `03-§8.8`–`8.9` | Två deploy-flöden med ett återanvändbart; dubbelbygge | `manuell` | Kontrollpunkterna för `02-§9.11`–`9.12` och `02-§10.35` |
-| `03-§9` | Kartan | `dokumenterad` | |
+| `03-§9` | Kartan | `byggd` | `source/ts/build/map.ts` med `mapFrame`, `projectPoint`, `renderMap` och bakgrunden; `tests/build/map.test.ts` |
 | `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
 
@@ -214,11 +230,11 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 8 |
-| `dokumenterad` | 15 |
-| `påbörjad` | 26 |
-| `byggd` | 58 |
-| `manuell` | 31 |
+| `saknas` | 2 |
+| `dokumenterad` | 14 |
+| `påbörjad` | 17 |
+| `byggd` | 83 |
+| `manuell` | 38 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
