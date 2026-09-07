@@ -138,27 +138,29 @@ Node 22.18 eller senare — bygget importerar TypeScript direkt, se `03-§8.7`.
 git clone https://github.com/stattared4h/stattared4h.git
 cd stattared4h
 npm install
-npm start          # bygger och serverar public/ på localhost:8080
+npm start          # bygger, serverar public/ på localhost:8080 och bygger om vid ändring i source/
 ```
 
 Andra kommandon:
 
 | Kommando | Gör |
 | --- | --- |
-| `npm run build` | Bygger sajten till `public/` |
-| `npm run serve` | Serverar `public/` utan att bygga om |
+| `npm run build` | Bygger sajten till `public/` med Eleventy; klientkoden buntas med esbuild |
 | `npm run image -- <fil>` | Webbanpassar ett foto och lägger det i `source/images/` (§2) |
 | `npm run qa:images` | Genererar platshållarbilderna som QA-datat refererar, i `source/images-qa/` |
-| `npm test` | Kör testerna i `tests/` mot QA-datat |
-| `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en, och kör dokumentkontrollen |
+| `npm test` | Kör testerna i `tests/` mot QA-datat; byggtesterna kör Eleventy till en tillfällig katalog |
+| `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en, och kör dokumentkontrollen — kör `npm run build` först |
 | `npm run lint:docs` | Dokumentkontrollen ensam: dubbla `§`-ID, citeringar i spårbarhetsmatrisen, dess summering, och sökvägar i kodkommentarer |
 | `npm run typecheck` | Typkontrollerar TypeScript strikt |
 | `npm run validate` | Validerar datat i `DATA_DIR` (`source/data` som standard) och avslutar med felkod vid fel |
 
-Bygget tar `BASE_PATH`, med `/` som standard:
+Bygget styrs av miljövariabler, alla med en standard som passar lokalt; vad de betyder
+står i [`06-MILJOER.md`](06-MILJOER.md):
 
 ```bash
-BASE_PATH=/stattared4h/ npm run build
+BASE_PATH=/stattared4h/ npm run build      # bas-sökväg, standard /
+DATA_DIR=source/data-qa npm run build      # dataset, standard source/data
+BUILD_VERSION=1.0.4 npm run build          # version i sidfoten; lokalt räknas den fram
 ```
 
 `npm run lint:yaml` kräver [yamllint](https://yamllint.readthedocs.io/), som installeras
