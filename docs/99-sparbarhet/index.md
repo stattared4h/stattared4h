@@ -79,8 +79,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§7.8` | Inga anrop till andra värdar | `byggd` | `tests/build/pwa.test.ts` fäller `http(s)://` i `sw.js` och `main.js`; workern rör aldrig ett annat origin (`tests/domain/offline.test.ts`) |
 | `02-§7.9` | QA har egen service worker och eget manifest-`id` | `byggd` | Scope, `id` och cachenamn följer bas-sökvägen; `tests/build/pwa.test.ts` bygger under `/prov/qa/` och jämför med `/` |
 | `02-§7.10` | Installation på iOS och Android | `manuell` | Öppna sajten i Safari på en iPhone, lägg den på hemskärmen, sätt flygplansläge och öppna en platssida och en djursida från appen; gör samma sak i Chrome på Android via installknappen |
-| `02-§8.1` | Bara webbanpassade bilder i repot | `påbörjad` | `npm run image` skriver filer som håller gränserna; `source/images/` har ännu inga bilder. Efterlevnaden bevakas av `02-§8.2` |
-| `02-§8.2` | Validering av bildfiler | `saknas` | Valideraren (`04-§10.7`) |
+| `02-§8.1` | Bara webbanpassade bilder i repot | `påbörjad` | `npm run image` skriver filer som håller gränserna och `02-§8.2` fäller vid en fil som inte gör det; `source/images/` väntar på gårdens egna fotografier |
+| `02-§8.2` | Validering av bildfiler | `byggd` | `validateImages` i `source/ts/domain/validate.ts` fäller vid saknad fil, fel format, för stora mått, för stor fil och kvarlämnad metadata; bygget skickar bildkatalogen när den finns. `tests/domain/validate.test.ts` prövar varje regel med handbyggda WebP-filer |
 | `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` och `optimiseImage` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `02-§8.4` | `npm run qa:images` | `byggd` | `scripts/qa-images.mjs` skriver till `source/images-qa/`; `tests/build/images.test.ts` |
 | `02-§8.5`–`8.7` | Leverans av bilder | `byggd` | `picture`-shortcoden i djurkortet, djurslagsrutan och djur- och artsidan, `credit` i `source/pages/djur.njk` och `arter.njk`; `tests/build/data-pages.test.ts` kontrollerar `srcset`, `width`, `height`, `loading`, `fetchpriority`, `alt`, platshållaren och fototexten på Rosas och Bockens sidor |
@@ -96,7 +96,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§9.11` | Deploy efter grön kvalitet, `npm ci` | `manuell` | Öppna en körning av *Deploy till QA* i Actions-fliken och bekräfta att den startades av *Quality* med grönt resultat på samma commit, och att steget *Install dependencies* kör `npm ci --ignore-scripts` |
 | `02-§9.12` | Produktion och QA i samma utgåva | `manuell` | Efter en körning av *Deploy till QA*: öppna `https://stattared4h.github.io/stattared4h/` och `.../stattared4h/qa/` och bekräfta att båda svarar, och att körningens sammanfattning anger vilken tagg produktionens kod kom från |
 | `02-§10.1`–`10.8` | Sidhuvud, hopp-länk, ikonrad, meny, desktopvariant, aktuell sida | `manuell` | `source/layouts/header.njk`, `source/ts/ui/menu.ts`, `layout.css`, `components.css`. Öppna startsidan i 360 px: raden visar Meny och feedback, menyn öppnas med knappen och stängs med Escape, klick utanför och länkval, och sidhuvudet ligger kvar vid rullning. I 1280 px: logga, namn och länkarna Hem, Karta och Om sajten syns, Hem är understruken. Tab från adressfältet landar på "Hoppa till innehållet" |
-| `02-§10.9` | 4H-loggan | `påbörjad` | `source/assets/img/4h-logo.svg` är en märkt platshållare; förbundets sajt publicerar loggan bara som PNG. Byts mot förbundets SVG |
+| `02-§10.9` | 4H-loggan | `påbörjad` | `source/assets/img/4h-logo.svg` är en märkt platshållare; förbundets sajt publicerar loggan bara som PNG. Byts mot förbundets SVG i #35 |
 | `02-§10.10` | Ingen huvudsidelänk i sidhuvudet | `byggd` | `tests/build/site.test.ts` |
 | `02-§10.11`–`10.13` | Installknapp | `manuell` | `source/ts/ui/install.ts`; läget avgörs av `installButtonState` i `source/ts/domain/install.ts`, testad i `tests/domain/install.test.ts`, och `aria-label` bevakas av `tests/build/pwa.test.ts`. Öppna sajten i Chrome på Android: knappen syns när installationserbjudandet kommer, ett tryck visar dialogen, och knappen försvinner efter installation; i Safari på iPhone syns den alltid och ett tryck växlar texten om Dela under sidhuvudet |
 | `02-§10.14` | Till toppen | `manuell` | `source/ts/ui/to-top.ts`. Öppna startsidan i 360 px och rulla 300 px: knappen syns; ett tryck rullar mjukt till toppen och knappen försvinner |
@@ -230,10 +230,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 2 |
+| `saknas` | 1 |
 | `dokumenterad` | 14 |
 | `påbörjad` | 17 |
-| `byggd` | 83 |
+| `byggd` | 84 |
 | `manuell` | 38 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i

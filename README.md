@@ -41,15 +41,21 @@ lösenord, nycklar, tokens eller personuppgifter.
 ## Automatiska kontroller
 
 Varje push och pull request kör hemlighetsskanning av hela historiken, CodeQL,
-granskning av nya beroenden, lintning av Markdown, YAML och arbetsflöden, samt en
-kontroll av att dokumentationens länkar pekar rätt. `main` skyddas av regelverket i
+granskning av nya beroenden, lintning av HTML, CSS, TypeScript, Markdown, YAML och
+arbetsflöden, typkontroll, enhetstesterna, bygget och en kontroll av att dokumentationens
+länkar och `§`-ID:n pekar rätt. `main` skyddas av regelverket i
 [`.github/rulesets/main-protection.json`](.github/rulesets/main-protection.json).
 
 ## Läget
 
-Ramverket är på plats: process, arkitekturbeslut, datakontrakt och designsystem.
-Själva sajten är inte byggd ännu — se
-[spårbarhetsmatrisen](docs/99-sparbarhet/index.md) för vad som finns och vad som saknas.
+Sajten är byggd: start-, plats-, djur-, art- och kartsidan genereras ur YAML-datat, den
+fungerar offline som installerbar app, och varje merge till `main` deployar QA under
+[`/qa/`](https://stattared4h.github.io/stattared4h/qa/). Produktionen släpps för hand
+enligt [`docs/08-SLAPP.md`](docs/08-SLAPP.md).
+
+Gårdens egna djur är ännu inte inlagda — `source/data/` är tom, så produktionen visar
+bara startsidan medan QA visar sajten med påhittat innehåll. Se
+[spårbarhetsmatrisen](docs/99-sparbarhet/index.md) för vad varje krav har för status.
 
 Designen ärver 4H:s visuella identitet från `4h.se/stattared`, med tillstånd.
 
