@@ -98,9 +98,9 @@ export default function (eleventyConfig) {
   // The dataset and the page view models, loaded once per build. `eleventy.before`
   // starts the load so that a validation error stops the build before any file is
   // written; the global data keys then hand the same promise to the templates.
-  let views = null;
-  const loadViews = () => {
-    views ??= (async () => {
+  let loaded = null;
+  const load = () => {
+    loaded ??= (async () => {
       const imagesDir = imagesDirFor(dataDir);
       const dataset = await loadValidDataset(dataDir, { imagesDir: existsSync(imagesDir) ? imagesDir : null });
       const [speciesContent, mapBackground] = await Promise.all([
@@ -111,14 +111,14 @@ export default function (eleventyConfig) {
       for (const warning of built.map.warnings) console.warn(`Varning: ${warning}`);
       return { dataset, views: built };
     })();
-    return views;
+    return loaded;
   };
   eleventyConfig.on("eleventy.before", async () => {
-    views = null;
-    await loadViews();
+    loaded = null;
+    await load();
   });
-  eleventyConfig.addGlobalData("dataset", async () => (await loadViews()).dataset);
-  eleventyConfig.addGlobalData("views", async () => (await loadViews()).views);
+  eleventyConfig.addGlobalData("dataset", async () => (await load()).dataset);
+  eleventyConfig.addGlobalData("views", async () => (await load()).views);
 
   // Static assets are copied as they are; CSS is hand-written and needs no build step (05-§7.3).
   eleventyConfig.addPassthroughCopy({ "source/assets/css": "assets/css", "source/assets/img": "assets/img" });

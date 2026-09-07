@@ -149,6 +149,7 @@ Andra kommandon:
 | `npm run image -- <fil>` | Webbanpassar ett foto och lägger det i `source/images/` (§2) |
 | `npm run icons` | Genererar `favicon.ico`, `apple-touch-icon.png` och manifestikonerna ur `source/assets/img/favicon.svg`; kör efter en ändring av SVG:n och committa resultatet |
 | `npm run qa:images` | Genererar platshållarbilderna som QA-datat refererar, i `source/images-qa/` |
+| `npm run qr` | Skriver en utskrivbar QR-kod per plats till `qr/`, med adressen ur `SITE_URL` (`02-§5.29`) |
 | `npm test` | Kör testerna i `tests/` mot QA-datat; byggtesterna kör Eleventy till en tillfällig katalog |
 | `npm run lint` | Lintar CSS, TypeScript, Markdown, YAML och den byggda HTML:en, och kör dokumentkontrollen — kör `npm run build` först |
 | `npm run lint:docs` | Dokumentkontrollen ensam: dubbla `§`-ID, citeringar i spårbarhetsmatrisen, dess summering, och sökvägar i kodkommentarer |
