@@ -165,6 +165,15 @@ vymodellerna i `pages.ts` och mallarna arbetar med ett färdigt bildobjekt och b
 aldrig slå upp något själva. Härledningen går åt ett håll, som alla andra i
 `04-§8`. <!-- 03-§6.5 -->
 
+Importen av många bilder (`02-§8.14`–`8.20`) är samma kedja med en tabell framför:
+`scripts/lib/image-import.ts` läser CSV:n, kontrollerar varje rad och planerar arbetet;
+`scripts/image-import.mjs` utför planen med samma `optimiseImage` och `imageIdFor` som
+`npm run image`. Uppdelningen finns för att allt utom filskrivningen ska gå att
+enhetstesta i Node, på samma sätt som dokumentkontrollen i `scripts/lib/check-docs.ts`.
+Planeringen är skild från utförandet också av ett andra skäl: importen är
+allt-eller-inget (`02-§8.16`), och det kräver att varje rad är godkänd innan den första
+filen skrivs. <!-- 03-§6.7 -->
+
 Bilder i Markdown renderas av samma kedja: `renderMarkdown` tar en upplösare som
 översätter `![](img-…)` till samma markup som shortcoden ger, med alt-texten ur
 bildposten. Utan upplösare — i ett enhetstest, eller för en text utan bilder — blir

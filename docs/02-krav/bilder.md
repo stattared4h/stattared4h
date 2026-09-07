@@ -18,6 +18,11 @@ med native-kod, och det granskas som ett sådant enligt `07-SAKERHET.md` §6. QA
 refererar bilder som inte finns; de genereras som platshållare, eftersom påhittade
 fotografier aldrig commit:as.
 
+Den första inmatningen av gårdens hundra djur är fas 1:s tyngsta arbete (ADR 0013), och
+`npm run image` tar en bild i taget med alt-texten på kommandoraden. Hundra bilder den
+vägen är hundra kommandon, och kopplingen mellan foto och djur blir kvar att göra för
+hand. Därför finns ett importkommando som tar en tabell.
+
 ADR 0015 lyfter ut bilden ur djurets fil. Ett foto kan visa två djur, och ett filnamn
 som bär ett djurnamn ljuger så snart bilden lagts under fel post — och filen ligger kvar
 i historiken även efter en omdöpning. Bilden blev därför en egen post med ett id som
@@ -58,6 +63,29 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
 - Valideringen varnar för en bildpost som ingen refererar, och för en bildfil i
   bildkatalogen som ingen bildpost hör till. Båda är utrymme som aldrig når
   besökaren. <!-- 02-§8.13 -->
+
+### Många bilder på en gång
+
+- `npm run image:import -- --scan <katalog>` skriver en tabell i CSV-format med en rad
+  per bildfil i katalogen. Kolumnen `fil` är ifylld; `post`, `alt` och `fotograf` fylls i
+  av redaktören. Filnamnen skrivs av kommandot, eftersom ett kameranamn inte säger något
+  om motivet och hundra filnamn inte skrivs av för hand. <!-- 02-§8.14 -->
+- `npm run image:import -- <tabell> --photos <katalog>` bereder varje rads bild som
+  `npm run image` gör och skriver bildposterna. Kommandot rör aldrig djurens, platsernas
+  eller arternas filer. <!-- 02-§8.15 -->
+- Importen är allt-eller-inget: varje rad kontrolleras först, och hittas ett fel skrivs
+  ingenting alls. En avbruten import lämnar aldrig hälften av bilderna inlagda. <!-- 02-§8.16 -->
+- Kommandot skriver ut bild-id:na grupperade per `post`, i den form de har i en
+  YAML-fil, så att de går att klistra in i djurets eller platsens `photos`. <!-- 02-§8.17 -->
+- Fel rapporteras med radnummer, kolumn och vad som ska rättas, på svenska, på samma
+  form som datavalideringens meddelanden (`02-§6.5`). <!-- 02-§8.18 -->
+- Tabellen läses som CSV med citerade fält, så att en alt-text får innehålla kommatecken,
+  citattecken och radbrytningar — en alt-text som beskriver ett djur gör oftast det.
+  Både kommatecken och semikolon godtas som avgränsare, eftersom ett kalkylprogram med
+  svenska inställningar sparar semikolon, och en inledande byteordningsmarkering
+  ignoreras. Redaktören ska inte behöva veta vad någotdera är. <!-- 02-§8.19 -->
+- Två rader som pekar på samma bildfil, eller på två filer med identiskt innehåll, ger
+  samma bild-id. Kommandot skriver bilden en gång och säger till. <!-- 02-§8.20 -->
 
 ### Leverans
 

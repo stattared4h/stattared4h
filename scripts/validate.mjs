@@ -13,18 +13,24 @@ import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { defaultDataDir, formatIssue, loadDataset } from "../source/ts/domain/index.ts";
+import { imagesDirFor } from "../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const dataDir = defaultDataDir();
 
-/** The image directory that belongs to `dataDir`, or null when it does not exist yet. */
-function imagesDirFor(dir) {
-  const candidates = [];
-  if (path.resolve(dir) === path.resolve(ROOT, "source", "data-qa")) {
-    candidates.push(path.join(ROOT, "source", "images-qa"));
+/**
+ * The image directory that belongs to `dataDir`, or null when it does not exist yet.
+ * Derived the same way the build does it (04-§9.4), so a dataset given through DATA_DIR
+ * gets its images checked too — not only the two that live under source/.
+ */
+function imagesDirOrNull(dir) {
+  let imagesDir;
+  try {
+    imagesDir = imagesDirFor(dir);
+  } catch {
+    return null;
   }
-  candidates.push(path.join(ROOT, "source", "images"));
-  return candidates.find((candidate) => existsSync(candidate)) ?? null;
+  return existsSync(imagesDir) ? imagesDir : null;
 }
 
 /** Every `*.md` under source/content/, as `{ file, text }`, for the image references in them. */
@@ -45,7 +51,7 @@ async function readContentMarkdown() {
   return sources;
 }
 
-const imagesDir = imagesDirFor(dataDir);
+const imagesDir = imagesDirOrNull(dataDir);
 const result = await loadDataset(dataDir, { imagesDir, markdown: await readContentMarkdown() });
 
 for (const warning of result.warnings) console.warn(`Varning: ${formatIssue(warning)}`);

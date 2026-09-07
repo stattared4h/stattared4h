@@ -21,10 +21,16 @@ import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { stringify } from "yaml";
 import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
-import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE, imagesDirFor, optimiseImage } from "../source/ts/build/images.ts";
+import {
+  MAX_IMAGE_BYTES,
+  MAX_IMAGE_EDGE,
+  SOURCE_EXTENSIONS,
+  imagesDirFor,
+  optimiseImage,
+} from "../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const SUPPORTED = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+
 
 const USAGE =
   'Användning: npm run image -- <fil> --alt "<alternativtext>" --credit "<fotograf>" ' +
@@ -73,6 +79,18 @@ function imagePostYaml({ alt, credit }) {
   return stringify({ alt, credit }, { lineWidth: 0 });
 }
 
+/** The images directory for a dataset, with the failure phrased for an editor, not a developer. */
+function imagesDirOrFail(dataDir) {
+  try {
+    return imagesDirFor(dataDir);
+  } catch {
+    fail(
+      `Kan inte räkna ut bildkatalogen ur ${shownPath(dataDir)}: datakatalogen måste heta ` +
+        '"data" eller "data-" och något, som source/data eller source/data-qa.',
+    );
+  }
+}
+
 async function main() {
   const options = parseArguments(process.argv.slice(2));
   if (!options.file) fail(USAGE);
@@ -81,7 +99,7 @@ async function main() {
 
   const inputPath = path.resolve(options.file);
   if (!(await exists(inputPath))) fail(`Hittar inte filen ${options.file}.`);
-  if (!SUPPORTED.has(path.extname(inputPath).toLowerCase())) {
+  if (!SOURCE_EXTENSIONS.includes(path.extname(inputPath).toLowerCase())) {
     fail(`Filen måste vara JPEG, PNG eller WebP: ${options.file}`);
   }
 
@@ -93,7 +111,7 @@ async function main() {
   }
 
   const id = imageIdFor(result.data);
-  const imagesDir = imagesDirFor(options.dataDir);
+  const imagesDir = imagesDirOrFail(options.dataDir);
   const imagePath = path.join(imagesDir, imageFileName(id));
   const postPath = path.join(options.dataDir, imagePostFile(id));
 
