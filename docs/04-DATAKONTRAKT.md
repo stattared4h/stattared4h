@@ -77,6 +77,11 @@ inuti filen — det skulle vara samma faktum på två ställen. <!-- 04-§3.1 --
   innehåll, eftersom ett namn som beskriver motivet kan bli fel. Formen står i
   §9. <!-- 04-§3.5 -->
 
+Ett individuellt djur får dessutom ha `publicId`, ett identifierande nummer som finns
+synligt på djuret och visas för besökaren, till exempel ett öronmärke. Det är skilt från
+det tekniska filnamns-id:t ovan och används aldrig som länknyckel. Jämförelse och
+unikhetskontroll ignorerar versaler/gemener, mellanslag och bindestreck. <!-- 04-§3.6 -->
+
 ---
 
 ## 4. Djur — `animals/<id>.yaml`
@@ -89,6 +94,7 @@ sex: female | male | unknown
 born: YYYY-MM-DD | YYYY | null   # helt datum, eller bara år
 mother: string | null        # djur-id, om mamman finns i registret
 father: string | null        # djur-id, om pappan finns i registret
+publicId: string | null      # publikt märkningsnummer, t.ex. öronmärke
 status: here | gone          # finns på gården, eller har lämnat den
 description: string | null   # markdown, presentationstexten
 photos: [string]             # bild-id:n, se §9; den första är porträttet
@@ -99,6 +105,15 @@ Obligatoriskt: `name`, `species`, `sex` och `status`. Övrigt får utelämnas. <
 `born` skrivs utan citattecken. YAML läser `2021-04-12` som ett datum och `2016` som ett
 heltal; valideraren tar emot båda, och även text, och normaliserar till `YYYY-MM-DD`
 eller `YYYY` (`02-§6.7`). <!-- 04-§4.6 -->
+
+### Publikt djur-ID
+
+`publicId` är frivilligt och finns bara på individuella djur. Det är besökarinformation,
+inte ett internt administrations-, journal- eller myndighetsregister. När värdet finns
+ska det vara icke-tom text med bokstäver och siffror; mellanslag och bindestreck får
+användas som formatering. Två djur får inte ha samma normaliserade värde när skillnader i
+versaler/gemener, mellanslag och bindestreck har tagits bort. Originalvärdet behålls för
+visning. <!-- 04-§4.9 -->
 
 ### Ingen plats på djuret
 
@@ -141,7 +156,8 @@ populations:
 Alla tre fält är obligatoriska. `count` är ett positivt heltal, arten och rasen måste
 finnas i vokabulären och rasen måste höra till arten. Samma kombination får bara stå en
 gång. En art med räknade bestånd får inte samtidigt ha poster i `animals/`; det skulle
-blanda en exakt lista med ett sammanräknat antal. <!-- 04-§4.8 -->
+blanda en exakt lista med ett sammanräknat antal. Räknade bestånd har inget `publicId`,
+eftersom posten representerar ett antal och inte en individ. <!-- 04-§4.8 -->
 
 ---
 
@@ -323,6 +339,8 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->
 - Att varje bild-id följer formen i §9, och att ingen post refererar samma bild två
   gånger. <!-- 04-§10.14 -->
+- Att `publicId`, när det finns, följer formen i §4 och är unikt efter normalisering.
+  <!-- 04-§10.16 -->
 - Att inget djur har ett `location`-fält. <!-- 04-§10.8 -->
 - Att inget fält innehåller HTML. Innehåll är markdown eller ren text. <!-- 04-§10.9 -->
 - Att inget fält finns som kontraktet inte känner till, så att ett felstavat fältnamn
