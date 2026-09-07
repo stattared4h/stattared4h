@@ -2,24 +2,32 @@ species:
   - id: get
     name: Get
     plural: Getter
+    photo: img-726495c0fd03
   - id: far
     name: Får
     plural: Får
+    photo: img-aa16c8abff8c
   - id: ko
     name: Ko
     plural: Kor
+    photo: img-4a604ace393f
   - id: hast
     name: Häst
     plural: Hästar
+    photo: img-67d31cb49c75
   - id: kanin
     name: Kanin
     plural: Kaniner
+    photo: img-673af2c3df44
   - id: gris
     name: Gris
     plural: Grisar
+    photo: img-3960cb0b6606
   - id: hons
     name: Höna
     plural: Höns
+    photo: img-0b306947ec24
   - id: katt
     name: Katt
     plural: Katter
+    photo: img-806029d17a68

@@ -2,7 +2,9 @@ name: Grishagen
 species:
   - gris
 description: En rymlig utehage för gårdens grisar.
-lat: 57.412600
-lon: 12.212900
+lat: 57.4126
+lon: 12.2129
 accessible: true
 active: true
+photos:
+  - img-5e3d21cc3d76

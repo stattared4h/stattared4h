@@ -60,7 +60,9 @@ får aldrig kunna börja fallera för att gården sålt en get. <!-- 06-§2.2 --
 
 Datasetet i [`source/data-qa/`](../source/data-qa/README.md) är påhittat och valt för att
 pröva kontraktets gränsfall — 100 individer, räknade hönsbestånd, samma djurslag på
-flera platser, flera djurslag i samma hage, en tom hage och djur utan foton. Dess README
+flera platser, flera djurslag i samma hage, en tom hage och delade djurfoton. Alla
+hundra individuella QA-djur har minst ett foto, medan en aktiv plats utan foto bevarar
+reservläget för saknade platsbilder. Dess README
 listar vad posterna finns för. <!-- 06-§2.3 -->
 
 Ändras datakontraktet ändras QA-datat i samma commit. Annars slutar testerna bevaka det de

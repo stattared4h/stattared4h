@@ -3,7 +3,9 @@ species:
   - kanin
 note: Gå in tyst, kaninerna blir lätt skrämda.
 description: Litet hus vid gårdsplanen där kaninerna bor.
-lat: 57.412800
-lon: 12.214100
+lat: 57.4128
+lon: 12.2141
 accessible: true
 active: true
+photos:
+  - img-cd7a37309819

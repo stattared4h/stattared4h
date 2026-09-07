@@ -27,9 +27,9 @@ prövar större listor, svensk sortering och att samtliga arter och raser använ
 | --- | --- |
 | `rosa` | Fullständigt djur: alla fält satta, tre foton, båda föräldrarna kända |
 | `stjarna` | `born` som enbart årtal; mamma till två djur |
-| `bocken` | `status: gone`; helt utan foton; förälder som lämnat gården |
+| `bocken` | `status: gone`; förälder som lämnat gården; delar foto med andra jämtgetter |
 | `lilla-gumman` | Flerordigt namn → id med bindestreck; `born` och `breed` saknas; syskon till Rosa via samma mamma; **delar ett foto med Rosa** — fallet som gjorde bilden till en egen post (ADR 0015) |
-| `tuva` | Minsta möjliga djur — bara de obligatoriska fälten |
+| `tuva` | Bara obligatoriska fakta och ett delat foto; saknar ras, födelseuppgift och släkt |
 | `snobollen` | Ö i namnet; annan art än de föregående |
 | `bagaren` | Hane med foto, i samma hage som en annan art |
 | `majros` | Ensam individ av sin art; flera foton, där den första är porträttet |
@@ -59,6 +59,8 @@ Varje bild är en egen post i `images/` med `alt` och `credit`
 ([ADR 0015](../../docs/adr/0015-bilden-som-egen-post.md)); djur, platser och arter
 refererar bild-id:n. Datasetet har cirka 25 bildposter som delas av flera djur, och
 varje post används av minst en annan post — annars varnar valideringen (`02-§8.13`).
+Alla 100 djur har minst en bildreferens; en plats utan bilder finns kvar för att pröva
+det tillåtna fallet.
 
 Bildfilerna i `source/images-qa/` är fotorealistiska AI-bilder med inbränd märkning och
 versionshanteras enligt ADR 0017. `npm run qa:images` skapar bara enfärgade

@@ -343,7 +343,7 @@ function openRecord(record: RawRecord, issues: Issues, kind: string): Obj | null
  * name check; a post with an unusable id is dropped, and every reference to it then
  * fails on its own with a message the editor can act on.
  */
-function validateImagePosts(records: readonly RawRecord[], issues: Issues): Map<string, Image> {
+function validateImagePosts(records: readonly RawRecord[], issues: Issues, allowAiCredit: boolean): Map<string, Image> {
   const images = new Map<string, Image>();
   for (const record of records) {
     if (record.parseError !== null) {
@@ -368,6 +368,9 @@ function validateImagePosts(records: readonly RawRecord[], issues: Issues): Map<
     const alt = fields.requiredString(record.data, "alt");
     const credit = fields.requiredString(record.data, "credit");
     if (alt === null || credit === null) continue;
+    if (!allowAiCredit && credit.startsWith("AI-genererad")) {
+      issues.error(record.file, "credit", "AI-genererade bilder får bara finnas i QA-datasetet.");
+    }
     images.set(record.id, { id: record.id, alt, credit });
   }
   return images;
@@ -928,7 +931,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   const today = options.today ?? new Date();
   const speciesFile = raw.species?.file ?? "species.yaml";
 
-  const images = validateImagePosts(raw.images, issues);
+  const images = validateImagePosts(raw.images, issues, path.basename(raw.dir).startsWith("data-"));
   const species = validateSpecies(raw.species, images, issues);
   const speciesIds = new Set(species.map((s) => s.id));
   const breeds = validateBreeds(raw.breeds, speciesIds, issues);
