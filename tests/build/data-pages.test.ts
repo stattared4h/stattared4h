@@ -278,10 +278,14 @@ describe("the map on the home page (02-§5.23–5.27)", () => {
     const html = main(await page(""));
     assert.match(html, /<svg class="map__drawing" [^>]*role="img" aria-label="Karta över Stättared med gårdens hagar">/);
     const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
-    assert.equal(markers.length, 31, "32 places minus the inactive one without coordinates");
+    assert.equal(markers.length, 32, "33 places minus the inactive one without coordinates");
     assert.ok(!markers.includes("gamla-stallet"));
     const list = html.slice(html.indexOf('<ul class="place-list">'));
-    assert.match(list, /href="\/plats\/stora-hagen\/">Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/);
+    assert.match(
+      list,
+      /href="\/plats\/stora-hagen\/"><svg class="place-list__symbol"[^>]*>.*?<\/svg>Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/,
+      "the list carries the same symbol in front of the name (02-§5.37)",
+    );
     assert.doesNotMatch(list, /gamla-stallet/);
     // 02-§5.26 forbids fetching anything from outside; 02-§5.34 adds two ordinary
     // links out. Checking the two separately keeps both requirements honest.

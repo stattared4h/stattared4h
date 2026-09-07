@@ -89,33 +89,42 @@ test("kind is required on a location and only accepts the contract's values (04-
   const result = await validate(wrong);
   assert.match(
     errorsFor(result, "locations/gethagen.yaml", "kind")[0].message,
-    /djurplats eller besoksmal/,
-    "the message names both values",
+    /djurplats, mat, grill, toalett, parkering, lek eller boende/,
+    "the message names every value",
   );
+
+  // besoksmal was the one value for everything that is not a paddock (ADR 0018). Since
+  // ADR 0019 each of the six has its own value, and the old one is a mistake worth
+  // pointing out rather than translating into a guess about what the place is.
+  const outdated = await rawQa();
+  editLocation(outdated, "gethagen", (l) => (l.kind = "besoksmal"));
+  assert.equal(errorsFor(await validate(outdated), "locations/gethagen.yaml", "kind").length, 1);
 });
 
-test("a besoksmal with species is an error, not a warning (ADR 0018)", async () => {
+test("every one of the seven kinds is accepted (04-§5.7, ADR 0019)", async () => {
+  for (const kind of ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende"]) {
+    const raw = await rawQa();
+    editLocation(raw, "gethagen", (l) => {
+      l.kind = kind;
+      if (kind !== "djurplats") l.species = [];
+    });
+    const result = await validate(raw);
+    assert.deepEqual(result.errors, [], `kind: ${kind} is valid`);
+    assert.equal(result.dataset?.locations.find((l) => l.id === "gethagen")?.kind, kind);
+  }
+});
+
+test("djurslag on a place that is not a djurplats is an error, not a warning (ADR 0019)", async () => {
   // The likely slip is copying a paddock file when adding a café.
   const raw = await rawQa();
-  editLocation(raw, "gethagen", (l) => (l.kind = "besoksmal"));
+  editLocation(raw, "gethagen", (l) => (l.kind = "mat"));
   const result = await validate(raw);
   assert.equal(result.dataset, null, "the build stops");
   assert.match(
     errorsFor(result, "locations/gethagen.yaml", "species")[0].message,
-    /besöksmål/,
-    "the message says a besoksmal has no animals",
+    /bara en djurplats har djurslag/,
+    "the message says which kind may have animals",
   );
-});
-
-test("a besoksmal without species is valid and keeps its kind", async () => {
-  const raw = await rawQa();
-  editLocation(raw, "gethagen", (l) => {
-    l.kind = "besoksmal";
-    l.species = [];
-  });
-  const result = await validate(raw);
-  assert.deepEqual(result.errors, []);
-  assert.equal(result.dataset?.locations.find((l) => l.id === "gethagen")?.kind, "besoksmal");
 });
 
 test("accessible and active must be booleans, not text", async () => {

@@ -19,6 +19,7 @@ import {
   portraitOf,
   type SiteViews,
 } from "../../source/ts/build/pages.ts";
+import { PLACE_SYMBOLS } from "../../source/ts/build/symbols.ts";
 import type { Dataset } from "../../source/ts/domain/types.ts";
 import { qaDataset } from "../domain/helpers.ts";
 
@@ -214,7 +215,7 @@ describe("the map page (02-§5.23–5.25)", () => {
   test("a marker per active place with coordinates; the list has every active place", async () => {
     const { views } = await qaViews();
     const markers = [...views.map.html.matchAll(/data-place="([^"]+)"/g)].map((m) => m[1]);
-    assert.deepEqual(markers, ["ettan", "tvaan", "trean", "fyran", "bjorkhagen", "cafeet", "dalen", "dammen", "ekbacken", "gethagen", "gethuset", "grishagen", "honshuset", "kaffestugan", "kaninhagen", "kattvinden", "kapphastbanan", "lekplatsen", "lilla-grishagen", "lottas-vaffelstuga", "parkeringen-vid-infarten", "parkeringen-vid-toaletterna", "smadjurshuset", "stallet", "stora-grishagen", "stora-hagen", "stallplatsen", "toaletterna", "trekanten", "vandrarhemmet", "ovre-hagen"]);
+    assert.deepEqual(markers, ["ettan", "tvaan", "trean", "fyran", "bjorkhagen", "cafeet", "dalen", "dammen", "ekbacken", "gethagen", "gethuset", "grillplatsen", "grishagen", "honshuset", "kaffestugan", "kaninhagen", "kattvinden", "kapphastbanan", "lekplatsen", "lilla-grishagen", "lottas-vaffelstuga", "parkeringen-vid-infarten", "parkeringen-vid-toaletterna", "smadjurshuset", "stallet", "stora-grishagen", "stora-hagen", "stallplatsen", "toaletterna", "trekanten", "vandrarhemmet", "ovre-hagen"]);
     assert.deepEqual(
       views.map.list.map((item) => [item.name, item.species]),
       [
@@ -229,6 +230,7 @@ describe("the map page (02-§5.23–5.25)", () => {
         ["Ekbacken", "Får"],
         ["Gethagen", "Getter"],
         ["Gethuset", "Getter"],
+        ["Grillplatsen", ""],
         ["Grishagen", "Grisar"],
         ["Hönshuset", "Höns"],
         ["Kaffestugan", ""],
@@ -253,6 +255,20 @@ describe("the map page (02-§5.23–5.25)", () => {
     );
     assert.ok(!views.map.list.some((item) => item.url === "/plats/gamla-stallet/"), "inactive places are not listed");
     assert.deepEqual(views.map.warnings, []);
+  });
+
+  test("the list carries the same symbol as the marker (02-§5.37)", async () => {
+    const { views } = await qaViews();
+    const cafe = views.map.list.find((item) => item.name === "Caféet");
+    assert.ok(cafe);
+    assert.match(cafe.symbol, /^<svg class="place-list__symbol"/);
+    assert.ok(cafe.symbol.includes(PLACE_SYMBOLS.mat), "the café is listed with the food symbol");
+    // Also the places the map leaves out: the list is the full way to the information
+    // (02-§5.24), so it may not be the poorer of the two.
+    assert.ok(
+      views.map.list.every((item) => item.symbol.startsWith("<svg class=\"place-list__symbol\"")),
+      "every listed place has a symbol",
+    );
   });
 
   test("a place without coordinates is listed but not drawn", async () => {
