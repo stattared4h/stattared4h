@@ -51,7 +51,9 @@ katalogen slutar på `data-qa` (`06-§1.3`). Ett tomt dataset bygger: startsidan
 att djuren inte är inlagda ännu, och kartan att inga platser finns.
 
 Bildkatalogen följer datasetet (`04-§9.4`): `source/data-qa` läser bilder från
-`source/images-qa/`, som `npm run qa:images` genererar och git ignorerar (`02-§8.4`).
+`source/images-qa/`. AI-genererade QA-bilder versionshanteras där; `npm run qa:images`
+fyller bara bildposter vars fil saknas med lokala platshållare (`02-§8.4`,
+`02-§8.25`).
 
 **Testerna körs alltid mot `source/data-qa/`, aldrig mot gårdens riktiga data.** Ett test
 får aldrig kunna börja fallera för att gården sålt en get. <!-- 06-§2.2 -->

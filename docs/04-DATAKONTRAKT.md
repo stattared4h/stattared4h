@@ -292,8 +292,9 @@ i gårdens eget arkiv. Se [ADR 0008](adr/0008-bilder-i-repot.md). <!-- 04-§9.3 
 
 Bildkatalogen följer datasetet: `source/data` läser bilder från `source/images`, och
 `source/data-qa` från `source/images-qa`. Bygget härleder katalogen ur datakatalogens
-namn genom att byta `data` mot `images`, så att genererade QA-platshållare aldrig
-blandas med gårdens bilder. <!-- 04-§9.4 -->
+namn genom att byta `data` mot `images`, så att AI-genererade QA-bilder och
+platshållare aldrig blandas med gårdens bilder. QA-filer håller de snävare gränserna
+1200 px och 50 KB enligt ADR 0017. <!-- 04-§9.4 -->
 
 ---
 
@@ -310,6 +311,9 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 - Att ingen stamtavla går i cirkel, och att ingen är sin egen förälder. <!-- 04-§10.6 -->
 - Att varje bild-id en post refererar har en bildpost, och att bildposten har `alt` och
   `credit`. <!-- 04-§10.13 -->
+- Att en bildpost i `source/data/` inte har en `credit` som börjar med
+  `AI-genererad`. Den beteckningen är reserverad för det påhittade QA-datasetet.
+  <!-- 04-§10.15 -->
 - Att varje bildpost har en bildfil som finns, är WebP, saknar metadata och håller sig
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->
 - Att varje bild-id följer formen i §9, och att ingen post refererar samma bild två

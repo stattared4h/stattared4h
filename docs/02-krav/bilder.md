@@ -5,7 +5,8 @@ Del av [kravindexet](./index.md). Den här filen äger `02-§8`.
 Issue: [#10](https://github.com/stattared4h/stattared4h/issues/10),
 [#42](https://github.com/stattared4h/stattared4h/issues/42).
 Beslut: [ADR 0008](../adr/0008-bilder-i-repot.md),
-[ADR 0015](../adr/0015-bilden-som-egen-post.md).
+[ADR 0015](../adr/0015-bilden-som-egen-post.md),
+[ADR 0017](../adr/0017-ai-genererade-qa-bilder-i-repot.md).
 
 ---
 

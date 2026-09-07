@@ -48,6 +48,14 @@ publiceras inte. <!-- 05-§8.10 -->
 gäller allt material vi hämtar utifrån: kommer det inte från gården hör det hemma i
 registret innan det används. <!-- 05-§8.11 -->
 
+### Bilder i QA
+
+QA-fotografier är fotorealistiska för att layout och bildkänsla ska kunna bedömas, men
+föreställer aldrig gårdens verkliga djur och innehåller inga personer. Varje fil har en
+inbränd mörk platta med den vita texten "AI-bild · QA" i nedre hörnet. Texten ligger på
+en yta enligt `05-§10.9` och får inte beskäras bort i sajtens 4:3-visning.
+<!-- 05-§8.12 -->
+
 ---
 
 ## 9. Tillgänglighet

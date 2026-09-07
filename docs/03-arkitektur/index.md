@@ -174,6 +174,13 @@ Planeringen är skild från utförandet också av ett andra skäl: importen är
 allt-eller-inget (`02-§8.16`), och det kräver att varje rad är godkänd innan den första
 filen skrivs. <!-- 03-§6.7 -->
 
+QA-bilderna har en separat, envägs kedja enligt ADR 0017. `npm run qa:prompts` läser
+bildposterna och deras bakåtreferenser och skriver promptunderlaget. Genereringen sker
+utanför bygget. `npm run qa:images -- --import <katalog>` kontrollerar samtliga
+källfiler, lägger märkningen i en SVG-overlay och använder `optimiseImage` med QA:s
+gränser innan något skrivs. Utan `--import` fyller samma kommando bara saknade filer
+med platshållare. Båda lägena vägrar en produktionskatalog. <!-- 03-§6.8 -->
+
 Bilder i Markdown renderas av samma kedja: `renderMarkdown` tar en upplösare som
 översätter `![](img-…)` till samma markup som shortcoden ger, med alt-texten ur
 bildposten. Utan upplösare — i ett enhetstest, eller för en text utan bilder — blir

@@ -57,17 +57,17 @@ Arten `hast` finns medvetet på **ingen** plats, så att artsidan prövas när s
 
 Varje bild är en egen post i `images/` med `alt` och `credit`
 ([ADR 0015](../../docs/adr/0015-bilden-som-egen-post.md)); djur, platser och arter
-refererar bild-id:n. Datasetet har 101 bildposter, och varje post används av minst en
-annan post — annars varnar valideringen (`02-§8.13`).
+refererar bild-id:n. Datasetet har cirka 25 bildposter som delas av flera djur, och
+varje post används av minst en annan post — annars varnar valideringen (`02-§8.13`).
 
-Bildfilerna genereras av `npm run qa:images` som enfärgade platshållare med bildens
-alt-text, i `source/images-qa/`. Katalogen ignoreras av git — inga påhittade fotografier
-commit:as (`02-§8.4`). Bildkatalogen följer datasetet (`04-§9.4`), så platshållarna
-blandas aldrig med gårdens bilder i `source/images/`.
+Bildfilerna i `source/images-qa/` är fotorealistiska AI-bilder med inbränd märkning och
+versionshanteras enligt ADR 0017. `npm run qa:images` skapar bara enfärgade
+platshållare för filer som ännu saknas. Bildkatalogen följer datasetet (`04-§9.4`), så
+QA-bilderna blandas aldrig med gårdens bilder i `source/images/`.
 
-Id:na här är inte hashar av platshållarna, utan bestämda när datasetet skrevs.
-Platshållarna genereras om och skulle annars byta id varje gång bildbiblioteket ändrar
-sin utdata (`04-§9.10`).
+Id:na här är inte hashar av bildfilerna, utan bestämda när datasetet skrevs. En AI-bild
+kan då genereras och importeras på nytt utan att alla referenser byter id
+(`04-§9.10`).
 
 Kör kommandot innan ett QA-bygge och när en post får en ny bildreferens. En fil som
 redan finns lämnas orörd, så en omkörning är omedelbar.

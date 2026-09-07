@@ -205,8 +205,5 @@ Thumbs.db
 .vscode/
 public/
 
-# Generated QA placeholders (02-§8.4); never commit made-up photographs
-source/images-qa/
-
 # QR signs written by npm run qr (02-§5.29); printed, never published
 qr/
