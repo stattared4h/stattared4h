@@ -5,7 +5,4 @@ sex: female
 born: 2017
 status: here
 photos:
-  - file: hast-atlas-1.webp
-    alt: Porträtt av Atlas.
-    credit: QA
-    portrait: true
+  - img-1b709feaeeb9

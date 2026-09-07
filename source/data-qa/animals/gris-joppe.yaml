@@ -5,7 +5,4 @@ sex: male
 born: 2018
 status: here
 photos:
-  - file: gris-joppe-1.webp
-    alt: Porträtt av Joppe.
-    credit: QA
-    portrait: true
+  - img-6e3344edb740

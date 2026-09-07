@@ -5,7 +5,4 @@ sex: male
 born: 2020
 status: here
 photos:
-  - file: get-doris-1.webp
-    alt: Porträtt av Doris.
-    credit: QA
-    portrait: true
+  - img-a69150f21fd3

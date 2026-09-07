@@ -9,8 +9,13 @@ source/data/
 ├── breeds.yaml
 ├── populations.yaml
 ├── animals/<djur-id>.yaml
-└── locations/<plats-id>.yaml
+├── locations/<plats-id>.yaml
+└── images/<bild-id>.yaml
 ```
+
+Bildfilerna själva ligger i `source/images/` — en post här, en `.webp` där, båda med
+bild-id:t som namn ([ADR 0015](../../docs/adr/0015-bilden-som-egen-post.md)). Den
+katalogen skapas av `npm run image` när den första bilden läggs in.
 
 Katalogen är tom tills de första djuren förts in. Testerna körs aldrig mot den här
 datan — de använder [`source/data-qa/`](../data-qa/README.md), så att ett test aldrig

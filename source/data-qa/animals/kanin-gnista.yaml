@@ -5,7 +5,4 @@ sex: female
 born: 2023
 status: here
 photos:
-  - file: kanin-gnista-1.webp
-    alt: Porträtt av Gnista.
-    credit: QA
-    portrait: true
+  - img-0e34b01ee21a

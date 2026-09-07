@@ -40,6 +40,14 @@ eleventyComputed:
   <div class="prose">{{ view.body | markdown | safe }}</div>
   {%- endif %}
 
+  {#- The photos come after the facts so the species boxes stay above the fold (02-§5.31). #}
+  {%- for photo in view.photos %}
+  <figure class="photo photo--wide">
+    {% picture photo, "(min-width: 960px) 680px, 100vw", false, view.name %}
+    <figcaption class="photo__credit">Foto: {{ photo.credit }}</figcaption>
+  </figure>
+  {%- endfor %}
+
   {%- for group in view.groups %}
   <section class="page-section">
     <h2>{{ group.heading }}</h2>

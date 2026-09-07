@@ -18,9 +18,11 @@ Bilderna är sajtens hjärta: ett djur man inte ser är ett djur man inte minns.
 
 ### Tekniska regler
 
-- Originalet läggs i `source/images/` och commit:as. Härledda storlekar och format
-  genereras i bygget och versionshanteras inte. Se
-  [ADR 0008](../adr/0008-bilder-i-repot.md). <!-- 05-§8.5 -->
+- Originalet läggs **inte** i repot; det bevaras i gårdens eget arkiv. Det som commit:as
+  är den webbanpassade WebP-filen, och härledda storlekar genereras i bygget utan att
+  versionshanteras. Gränserna och skälen står i
+  [ADR 0008](../adr/0008-bilder-i-repot.md); hur bilden namnges och kopplas till en post
+  i [ADR 0015](../adr/0015-bilden-som-egen-post.md). <!-- 05-§8.5 -->
 - Varje bild i markupen har `width`, `height` och `loading="lazy"`, utom bilder som syns
   direkt vid sidladdning. <!-- 05-§8.6 -->
 - Bilder levereras i modernt format med reserv, och i flera bredder via
@@ -37,8 +39,9 @@ git-historiken. `docs/01-BIDRA.md` beskriver vad som då krävs. <!-- 05-§8.9 -
 
 ### Upphovsrätt
 
-Varje bild har en känd upphovsman noterad i datat. Bilder från `4h.se/stattared` används
-med föreningens tillstånd. Bilder utan känt ursprung publiceras inte. <!-- 05-§8.10 -->
+Varje bild har en känd upphovsman noterad i bildpostens `credit`. Bilder från
+`4h.se/stattared` används med föreningens tillstånd. Bilder utan känt ursprung
+publiceras inte. <!-- 05-§8.10 -->
 
 ---
 

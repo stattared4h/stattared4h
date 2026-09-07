@@ -119,8 +119,10 @@ describe("the animal page (02-§5.14–5.18)", () => {
     const rosa = animal(views, "rosa");
     assert.equal(rosa.url, "/djur/rosa/");
     assert.equal(rosa.gone, false);
-    assert.equal(rosa.portrait?.file, "rosa-1.webp");
-    assert.deepEqual(rosa.otherPhotos.map((p) => p.file), ["rosa-2.webp"]);
+    const dataset = await qaDataset();
+    const rosaData = dataset.animals.find((a) => a.id === "rosa");
+    assert.equal(rosa.portrait?.id, rosaData?.photos[0].id);
+    assert.deepEqual(rosa.otherPhotos.map((p) => p.id), rosaData?.photos.slice(1).map((p) => p.id));
     assert.equal(rosa.species.name, "Get");
     assert.equal(rosa.species.url, "/arter/get/");
     assert.equal(rosa.breed, "Jämtget (lantras)");
@@ -162,14 +164,14 @@ describe("the animal page (02-§5.14–5.18)", () => {
     assert.equal(card.speciesName, "Get");
   });
 
-  test("the portrait is the photo marked portrait, else the first", () => {
+  test("the portrait is the first photo in the list (02-§8.11)", () => {
     const photos = [
-      { file: "a-1.webp", alt: "a", credit: "c", portrait: false },
-      { file: "a-2.webp", alt: "b", credit: "c", portrait: true },
+      { id: "img-000000000001", alt: "a", credit: "c" },
+      { id: "img-000000000002", alt: "b", credit: "c" },
     ];
     const base = { id: "a", name: "A", species: "get", breed: null, sex: "female" as const, born: null, mother: null, father: null, status: "here" as const, description: null };
-    assert.equal(portraitOf({ ...base, photos })?.file, "a-2.webp");
-    assert.equal(portraitOf({ ...base, photos: [photos[0]] })?.file, "a-1.webp");
+    assert.equal(portraitOf({ ...base, photos })?.id, "img-000000000001");
+    assert.equal(portraitOf({ ...base, photos: [photos[1]] })?.id, "img-000000000002");
     assert.equal(portraitOf({ ...base, photos: [] }), null);
   });
 });
@@ -242,7 +244,7 @@ describe("the map page (02-§5.23–5.25)", () => {
 
 describe("an empty dataset (02-§5.7)", () => {
   test("builds views with no pages and no map", () => {
-    const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [] };
+    const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
     const views = buildViews(empty, { base: "/", farm: FARM });
     assert.deepEqual(views.home.species, []);
     assert.deepEqual(views.locations, []);

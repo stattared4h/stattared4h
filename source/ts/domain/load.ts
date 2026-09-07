@@ -34,6 +34,8 @@ export interface RawDataset {
   animals: RawRecord[];
   /** `locations/*.yaml`, sorted by file name. */
   locations: RawRecord[];
+  /** `images/*.yaml`, sorted by file name (04-§9.5). */
+  images: RawRecord[];
 }
 
 const YAML_SUFFIX = ".yaml";
@@ -75,14 +77,15 @@ function isMissing(error: unknown): boolean {
   return typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT";
 }
 
-/** Reads vocabulary, optional populations, animals and locations from `dir`. */
+/** Reads vocabulary, optional populations, animals, locations and images from `dir`. */
 export async function loadRawDataset(dir: string): Promise<RawDataset> {
-  const [species, breeds, populations, animals, locations] = await Promise.all([
+  const [species, breeds, populations, animals, locations, images] = await Promise.all([
     readOptionalRecord(dir, "species.yaml"),
     readOptionalRecord(dir, "breeds.yaml"),
     readOptionalRecord(dir, "populations.yaml"),
     readRecordsIn(dir, "animals"),
     readRecordsIn(dir, "locations"),
+    readRecordsIn(dir, "images"),
   ]);
-  return { dir, species, breeds, populations, animals, locations };
+  return { dir, species, breeds, populations, animals, locations, images };
 }

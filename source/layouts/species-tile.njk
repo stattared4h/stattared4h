@@ -10,7 +10,7 @@
 {% macro speciesTile(tile, eager = false) %}
 <a class="species-tile" href="{{ tile.url | url }}">
   <div class="species-tile__image">
-    {%- picture tile.photo, "species", "(min-width: 960px) 25vw, (min-width: 600px) 33vw, 50vw", eager, tile.name %}
+    {%- picture tile.photo, "(min-width: 960px) 25vw, (min-width: 600px) 33vw, 50vw", eager, tile.name %}
   </div>
   <span class="species-tile__name">{{ tile.plural }}</span>
 </a>

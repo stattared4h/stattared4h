@@ -1,0 +1,10 @@
+{
+  // Content pages write images as `![](img-a3f2c1d8b901)` (02-§8.12): the address is the
+  // image id and the alt text is deliberately empty, because it lives in the image post
+  // and must not be written twice (ADR 0015). MD045 would demand alt text here, so it is
+  // off for this directory only — docs/ keeps the rule.
+  "config": {
+    "extends": "../../.markdownlint-cli2.jsonc",
+    "MD045": false
+  }
+}

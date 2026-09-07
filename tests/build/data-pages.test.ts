@@ -9,6 +9,7 @@ import os from "node:os";
 import path from "node:path";
 import { after, before, describe, test } from "node:test";
 import { buildSite, listFiles } from "./build-site.ts";
+import { qaDataset } from "../domain/helpers.ts";
 
 let site: string;
 const cleanup: string[] = [];
@@ -143,8 +144,8 @@ describe("the animal page (02-§5.14–5.18, 02-§8.5–8.7)", () => {
     assert.doesNotMatch(html, /Har lämnat gården/);
 
     const images = [...html.matchAll(/<img [^>]+>/g)].map((m) => m[0]);
-    assert.equal(images.length, 2);
-    assert.match(images[0], /rosa-1-800\.webp/);
+    assert.equal(images.length, 3, "the portrait, a second photo, and the one shared with Lilla Gumman");
+    assert.match(images[0], /src="\/images\/img-[0-9a-f]{12}-800\.webp"/, "flat path, id as name (04-§9.1)");
     assert.match(images[0], /fetchpriority="high"/, "the first image is eager (03-§6.3)");
     assert.doesNotMatch(images[0], /loading="lazy"/);
     assert.match(images[1], /loading="lazy"/);
@@ -153,7 +154,7 @@ describe("the animal page (02-§5.14–5.18, 02-§8.5–8.7)", () => {
       assert.match(image, /\bwidth="\d+" height="\d+"/);
       assert.match(image, /\bsrcset="[^"]*400\.webp 400w/);
     }
-    assert.equal((html.match(/Foto: Anna Andersson/g) ?? []).length, 2, "a credit next to every photo (02-§8.7)");
+    assert.equal((html.match(/Foto: Anna Andersson/g) ?? []).length, 3, "a credit next to every photo (02-§8.7)");
   });
 
   test("Bocken has left the farm; Tuva has neither photo nor facts to show", async () => {
@@ -166,6 +167,73 @@ describe("the animal page (02-§5.14–5.18, 02-§8.5–8.7)", () => {
     assert.doesNotMatch(tuva, /<dt>Ras<\/dt>|Född|<h2>Släkt<\/h2>|Foto:/);
     const vinter = main(await page("djur/vinter"));
     assert.doesNotMatch(vinter, /<dt>Kön<\/dt>/, "unknown sex is not shown");
+  });
+});
+
+describe("images as their own posts (02-§8.8–8.12, ADR 0015)", () => {
+  test("no image URL carries a per-kind sub-directory", async () => {
+    for (const file of (await listFiles(site)).filter((f) => f.endsWith(".html"))) {
+      const html = await readFile(path.join(site, file), "utf8");
+      assert.doesNotMatch(html, /\/images\/(animals|species|places|content)\//, file);
+    }
+  });
+
+  test("a photo shared by two records is one file and one alt text (02-§8.10)", async () => {
+    const dataset = await qaDataset();
+    const shared = dataset.animals
+      .flatMap((animal) => animal.photos.map((photo) => photo.id))
+      .find((id, index, all) => all.indexOf(id) !== index);
+    assert.ok(shared, "the QA data should share a photo between two animals (02-§6.12)");
+
+    const users = dataset.animals.filter((animal) => animal.photos.some((photo) => photo.id === shared));
+    assert.ok(users.length >= 2);
+    const alts = new Set(
+      users.flatMap((animal) => animal.photos.filter((photo) => photo.id === shared).map((photo) => photo.alt)),
+    );
+    assert.equal(alts.size, 1, "the alt text lives in the image post, so it cannot differ");
+
+    for (const animal of users) {
+      const html = main(await page(`djur/${animal.id}`));
+      assert.match(html, new RegExp(`${shared}-800\\.webp`), animal.id);
+    }
+  });
+
+  test("the location page shows the place's photos with a credit (02-§5.31)", async () => {
+    const dataset = await qaDataset();
+    const withPhotos = dataset.locations.find((location) => location.photos.length > 0);
+    assert.ok(withPhotos, "the QA data should have a location with photos (02-§6.12)");
+
+    const html = main(await page(`plats/${withPhotos.id}`));
+    for (const photo of withPhotos.photos) {
+      assert.match(html, new RegExp(`${photo.id}-800\\.webp`));
+    }
+    assert.match(html, new RegExp(`Foto: ${withPhotos.photos[0].credit}`));
+    // The species tiles stay above the photos, so they are still reachable without
+    // scrolling on a phone (05-§6.24).
+    const tiles = html.indexOf("species-tile");
+    const firstPhoto = html.indexOf(`${withPhotos.photos[0].id}-800.webp`);
+    assert.ok(tiles >= 0, "the location page should have species tiles");
+    assert.ok(firstPhoto >= 0, "the location page should show the first photo");
+    assert.ok(tiles < firstPhoto, "the species tiles come before the photos");
+  });
+
+  test("a location without photos shows no placeholder (02-§5.31)", async () => {
+    const dataset = await qaDataset();
+    const without = dataset.locations.find((location) => location.photos.length === 0 && location.active);
+    assert.ok(without);
+    const html = main(await page(`plats/${without.id}`));
+    assert.doesNotMatch(html, /class="photo"/);
+  });
+
+  test("a Markdown image in a description becomes a responsive image (02-§8.12)", async () => {
+    const dataset = await qaDataset();
+    const location = dataset.locations.find((l) => /!\[\]\(img-/.test(l.description ?? ""));
+    assert.ok(location, "the QA data should have a location whose description contains an image");
+    const id = /!\[\]\((img-[0-9a-f]{12})\)/.exec(location.description ?? "")?.[1];
+    const html = main(await page(`plats/${location.id}`));
+    assert.match(html, new RegExp(`<img [^>]*src="/images/${id}-800\\.webp"`));
+    assert.match(html, /<img [^>]*\balt="[^"]+"/, "the alt text comes from the image post");
+    assert.doesNotMatch(html, /!\[\]/, "the Markdown source never reaches the page");
   });
 });
 

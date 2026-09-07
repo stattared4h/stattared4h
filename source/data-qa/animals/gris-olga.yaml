@@ -5,7 +5,4 @@ sex: female
 born: 2023
 status: here
 photos:
-  - file: gris-olga-1.webp
-    alt: Porträtt av Olga.
-    credit: QA
-    portrait: true
+  - img-525e9add8b50

@@ -36,7 +36,7 @@ describe("strategi per begäran", () => {
   });
 
   test("fotografier svaras nätverk först (02-§7.5)", () => {
-    assert.equal(facts({ pathname: `${BASE}images/animals/rosa-1-640.webp`, mode: "no-cors" }), "network-first");
+    assert.equal(facts({ pathname: `${BASE}images/img-a3f2c1d8b901-640.webp`, mode: "no-cors" }), "network-first");
   });
 
   test("en sida utanför förcachen är en navigering som kan sluta på offline-sidan (02-§7.7)", () => {

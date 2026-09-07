@@ -8,22 +8,29 @@
  * The validator also normalises: `born` becomes "YYYY-MM-DD" or "YYYY", missing
  * optional fields become null or [], and the resulting Dataset is sorted (02-§6.9).
  */
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { normaliseBorn } from "./born.ts";
+import {
+  IMAGE_ID_DESCRIPTION,
+  IMAGE_SUFFIX,
+  imageFileName,
+  imageIdFromFileName,
+  imagePostFile,
+  isImageId,
+} from "./image-id.ts";
 import type { RawDataset, RawRecord } from "./load.ts";
 import { sortAnimals, sortLocations } from "./sort.ts";
 import type {
   Animal,
   Breed,
   Dataset,
+  Image,
   Issue,
   Location,
   Population,
-  Photo,
   Sex,
   Species,
-  SpeciesPhoto,
   Status,
   ValidationResult,
 } from "./types.ts";
@@ -31,12 +38,30 @@ import { inspectWebp } from "./webp.ts";
 
 export interface ValidateOptions {
   /**
-   * Directory holding `animals/` and `species/` image folders. When given, every
-   * referenced image is checked on disk; when null or omitted, file checks are skipped.
+   * The flat images directory (04-§9.1). When given, every image post's file is checked
+   * on disk; when null or omitted, file checks are skipped.
    */
   imagesDir?: string | null;
   /** "Today" for the future-date check on `born`; defaults to the real date. */
   today?: Date;
+  /**
+   * Markdown that lives outside the dataset and may reference images — the content
+   * pages under `source/content/` (02-§8.12). Without it an image used only by a
+   * content page would be reported as unused, and the warning would stop being worth
+   * reading. The dataset's own Markdown fields are always checked.
+   */
+  markdown?: readonly MarkdownSource[];
+}
+
+/** One Markdown text to scan for image references. `file` is shown in messages. */
+export interface MarkdownSource {
+  file: string;
+  text: string;
+}
+
+/** A `MarkdownSource` that came from a field of a record, so messages can name it. */
+interface MarkdownField extends MarkdownSource {
+  field?: string | null;
 }
 
 /** 04-§9.3: longest side in pixels and file size in bytes. */
@@ -46,8 +71,10 @@ export const MAX_IMAGE_BYTES = 250 * 1024;
 /** 04-§3.2: lowercase a–z, digits and single hyphens between groups. */
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** 04-§10.9: anything that looks like the start of an HTML tag, comment or doctype. */
+/** A Markdown image, `![](img-a3f2c1d8b901)`. The address is checked with `isImageId`. */
+const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*\]\(([^)\s]*)\)/g;
 const HTML_PATTERN = /<[a-zA-Z/!]/;
-const IMAGE_SUFFIX = ".webp";
+const IMAGE_FIELDS = new Set(["alt", "credit"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
@@ -64,7 +91,6 @@ const ANIMAL_FIELDS = new Set([
   "description",
   "photos",
 ]);
-const PHOTO_FIELDS = new Set(["file", "alt", "credit", "portrait"]);
 const LOCATION_FIELDS = new Set([
   "name",
   "species",
@@ -74,9 +100,9 @@ const LOCATION_FIELDS = new Set([
   "lon",
   "accessible",
   "active",
+  "photos",
 ]);
 const SPECIES_FIELDS = new Set(["id", "name", "plural", "photo"]);
-const SPECIES_PHOTO_FIELDS = new Set(["file", "alt", "credit"]);
 const BREED_FIELDS = new Set(["id", "name", "species", "heritage"]);
 const POPULATION_FIELDS = new Set(["species", "breed", "count"]);
 
@@ -240,17 +266,54 @@ class Fields {
     }
   }
 
-  imageFile(field: string, value: string, id: string): void {
-    if (value.includes("/") || value.includes("\\")) {
-      this.error(field, `${quote(value)} får bara vara ett filnamn, inte en sökväg. Bygget vet var bilderna ligger.`);
-      return;
+  /**
+   * One image reference (04-§9.11): a bild-id that has a post. Returns the resolved
+   * image, or null when the reference is unusable — the caller then leaves it out.
+   */
+  imageReference(field: string, value: unknown, images: ReadonlyMap<string, Image>): Image | null {
+    if (!isImageId(value)) {
+      this.error(
+        field,
+        `${quote(value)} är inte ett bild-id. Skriv ${IMAGE_ID_DESCRIPTION}. ` +
+          "npm run image skriver ut id:t när bilden läggs till.",
+      );
+      return null;
     }
-    if (!value.endsWith(IMAGE_SUFFIX)) {
-      this.error(field, `${quote(value)} måste vara en WebP-fil med ändelsen .webp.`);
+    const image = images.get(value);
+    if (image === undefined) {
+      this.error(field, `bilden ${quote(value)} finns inte i ${imagePostFile(value)}.`);
+      return null;
     }
-    if (!value.startsWith(id)) {
-      this.error(field, `${quote(value)} ska inledas med postens id ${quote(id)}, till exempel ${id}-1.webp.`);
+    return image;
+  }
+
+  /** A record's `photos`: a list of image ids, without repeats. Null when unusable. */
+  photos(data: Obj, images: ReadonlyMap<string, Image>): Image[] | null {
+    const raw = data.photos;
+    if (raw === undefined || raw === null) return [];
+    if (!Array.isArray(raw)) {
+      this.error("photos", "måste vara en lista med bild-id:n, ett per streck.");
+      return null;
     }
+    const photos: Image[] = [];
+    const seen = new Set<string>();
+    let valid = true;
+    raw.forEach((entry, index) => {
+      const field = `photos[${index}]`;
+      const image = this.imageReference(field, entry, images);
+      if (image === null) {
+        valid = false;
+        return;
+      }
+      if (seen.has(image.id)) {
+        this.error(field, `bilden ${quote(image.id)} står med två gånger. Ta bort den ena raden.`);
+        valid = false;
+        return;
+      }
+      seen.add(image.id);
+      photos.push(image);
+    });
+    return valid ? photos : null;
   }
 }
 
@@ -271,6 +334,43 @@ function openRecord(record: RawRecord, issues: Issues, kind: string): Obj | null
     return null;
   }
   return record.data;
+}
+
+// --- Image posts ---------------------------------------------------------------
+
+/**
+ * `images/<id>.yaml` (04-§9.5). The file name is the id, so the id check is the file
+ * name check; a post with an unusable id is dropped, and every reference to it then
+ * fails on its own with a message the editor can act on.
+ */
+function validateImagePosts(records: readonly RawRecord[], issues: Issues): Map<string, Image> {
+  const images = new Map<string, Image>();
+  for (const record of records) {
+    if (record.parseError !== null) {
+      issues.error(record.file, null, `kunde inte läsas som YAML: ${record.parseError}`);
+      continue;
+    }
+    if (!isImageId(record.id)) {
+      issues.error(
+        record.file,
+        "filnamn",
+        `${quote(record.id)} är inte ett bild-id. Filnamnet ska vara ${IMAGE_ID_DESCRIPTION}.`,
+      );
+      continue;
+    }
+    if (!isObject(record.data)) {
+      issues.error(record.file, null, "filen måste innehålla alt och credit som fält och värden, en per rad.");
+      continue;
+    }
+    const fields = new Fields(record.file, issues);
+    fields.unknown(record.data, IMAGE_FIELDS);
+    fields.noHtml(record.data, null);
+    const alt = fields.requiredString(record.data, "alt");
+    const credit = fields.requiredString(record.data, "credit");
+    if (alt === null || credit === null) continue;
+    images.set(record.id, { id: record.id, alt, credit });
+  }
+  return images;
 }
 
 // --- Vocabulary files ----------------------------------------------------------
@@ -301,7 +401,7 @@ function openList(record: RawRecord | null, key: string, issues: Issues): Obj[] 
   return entries;
 }
 
-function validateSpecies(record: RawRecord | null, issues: Issues): Species[] {
+function validateSpecies(record: RawRecord | null, images: ReadonlyMap<string, Image>, issues: Issues): Species[] {
   const entries = openList(record, "species", issues);
   if (entries === null || record === null) return [];
   const fields = new Fields(record.file, issues);
@@ -323,19 +423,10 @@ function validateSpecies(record: RawRecord | null, issues: Issues): Species[] {
     }
     if (id !== null) seen.add(id);
 
-    let photo: SpeciesPhoto | null = null;
+    let photo: Image | null = null;
     if (entry.photo !== undefined && entry.photo !== null) {
-      if (!isObject(entry.photo)) {
-        issues.error(record.file, `${prefix}photo`, "måste ha fälten file, alt och credit.");
-        return;
-      }
-      fields.unknown(entry.photo, SPECIES_PHOTO_FIELDS, `${prefix}photo.`);
-      const file = fields.requiredString(entry.photo, "file");
-      const alt = fields.requiredString(entry.photo, "alt");
-      const credit = fields.requiredString(entry.photo, "credit");
-      if (file !== null && id !== null) fields.imageFile(`${prefix}photo.file`, file, id);
-      if (file === null || alt === null || credit === null) return;
-      photo = { file, alt, credit };
+      photo = fields.imageReference(`${prefix}photo`, entry.photo, images);
+      if (photo === null) return;
     }
 
     if (id === null || name === null || plural === null) return;
@@ -424,45 +515,6 @@ function validatePopulations(
 
 // --- Animals -------------------------------------------------------------------
 
-function validatePhotos(data: Obj, fields: Fields, file: string, id: string, issues: Issues): Photo[] | null {
-  const raw = data.photos;
-  if (raw === undefined || raw === null) return [];
-  if (!Array.isArray(raw)) {
-    issues.error(file, "photos", "måste vara en lista med bilder, en per streck.");
-    return null;
-  }
-  const photos: Photo[] = [];
-  let valid = true;
-  let portraits = 0;
-
-  raw.forEach((entry, index) => {
-    const prefix = `photos[${index}].`;
-    if (!isObject(entry)) {
-      issues.error(file, `photos[${index}]`, "varje bild måste ha fälten file, alt, credit och portrait.");
-      valid = false;
-      return;
-    }
-    fields.unknown(entry, PHOTO_FIELDS, prefix);
-    const photoFile = fields.requiredString(entry, "file");
-    const alt = fields.requiredString(entry, "alt");
-    const credit = fields.requiredString(entry, "credit");
-    const portrait = fields.requiredBoolean(entry, "portrait");
-    if (photoFile !== null) fields.imageFile(`${prefix}file`, photoFile, id);
-    if (photoFile === null || alt === null || credit === null || portrait === null) {
-      valid = false;
-      return;
-    }
-    if (portrait) portraits += 1;
-    photos.push({ file: photoFile, alt, credit, portrait });
-  });
-
-  if (portraits > 1) {
-    issues.error(file, "photos", `${portraits} bilder har portrait: true. Bara en bild kan vara porträttet.`);
-    valid = false;
-  }
-  return valid ? photos : null;
-}
-
 /** The reference fields of an animal, kept even when other fields in the file are invalid. */
 interface AnimalRefs {
   id: string;
@@ -480,6 +532,7 @@ interface AnimalRefs {
  */
 function validateAnimal(
   record: RawRecord,
+  images: ReadonlyMap<string, Image>,
   issues: Issues,
   today: Date,
 ): { animal: Animal | null; refs: AnimalRefs | null } {
@@ -508,7 +561,7 @@ function validateAnimal(
   const mother = fields.optionalString(data, "mother");
   const father = fields.optionalString(data, "father");
   const description = fields.optionalString(data, "description");
-  const photos = validatePhotos(data, fields, record.file, record.id, issues);
+  const photos = fields.photos(data, images);
 
   const bornResult = normaliseBorn(data.born, today);
   if (!bornResult.ok) issues.error(record.file, "born", bornResult.message);
@@ -617,7 +670,12 @@ function findCycle(start: string, animals: Map<string, AnimalRefs>): string[] | 
 
 // --- Locations -----------------------------------------------------------------
 
-function validateLocation(record: RawRecord, speciesIds: ReadonlySet<string>, issues: Issues): Location | null {
+function validateLocation(
+  record: RawRecord,
+  speciesIds: ReadonlySet<string>,
+  images: ReadonlyMap<string, Image>,
+  issues: Issues,
+): Location | null {
   const data = openRecord(record, issues, "en plats");
   if (data === null) return null;
   const fields = new Fields(record.file, issues);
@@ -631,6 +689,7 @@ function validateLocation(record: RawRecord, speciesIds: ReadonlySet<string>, is
   const lon = fields.optionalNumber(data, "lon");
   const accessible = fields.requiredBoolean(data, "accessible");
   const active = fields.requiredBoolean(data, "active");
+  const photos = fields.photos(data, images);
 
   let species: string[] | null = null;
   if (data.species === undefined || data.species === null) {
@@ -673,10 +732,17 @@ function validateLocation(record: RawRecord, speciesIds: ReadonlySet<string>, is
     coordinatesValid = false;
   }
 
-  if (name === null || species === null || accessible === null || active === null || !coordinatesValid) {
+  if (
+    name === null ||
+    species === null ||
+    accessible === null ||
+    active === null ||
+    photos === null ||
+    !coordinatesValid
+  ) {
     return null;
   }
-  return { id: record.id, name, species, note, description, lat, lon, accessible, active };
+  return { id: record.id, name, species, note, description, lat, lon, accessible, active, photos };
 }
 
 // --- Warnings ------------------------------------------------------------------
@@ -686,10 +752,29 @@ function collectWarnings(
   animals: Animal[],
   populations: Population[],
   locations: Location[],
+  images: ReadonlyMap<string, Image>,
+  inMarkdown: ReadonlySet<string>,
   files: Map<string, string>,
   speciesFile: string,
   issues: Issues,
 ): void {
+  // 02-§8.13: an image post nothing points at. The file is in the repository for good
+  // (ADR 0008), so an unused one is worth saying out loud.
+  const used = new Set([
+    ...animals.flatMap((animal) => animal.photos.map((photo) => photo.id)),
+    ...locations.flatMap((location) => location.photos.map((photo) => photo.id)),
+    ...species.flatMap((entry) => (entry.photo === null ? [] : [entry.photo.id])),
+    ...inMarkdown,
+  ]);
+  for (const id of images.keys()) {
+    if (used.has(id)) continue;
+    issues.warn(
+      imagePostFile(id),
+      null,
+      "ingen post använder bilden. Referera den från ett djur, en plats eller en art, eller ta bort posten och filen.",
+    );
+  }
+
   for (const animal of animals) {
     if (animal.photos.length === 0) {
       issues.warn(files.get(animal.id) ?? `animals/${animal.id}.yaml`, "photos", "djuret har inget foto och visas med en platshållare.");
@@ -725,53 +810,113 @@ function collectWarnings(
   }
 }
 
-// --- Image files ---------------------------------------------------------------
+// --- Images in Markdown --------------------------------------------------------
 
-interface ImageRef {
-  file: string;
-  field: string;
-  relative: string;
+/**
+ * The image ids referenced from Markdown (02-§8.12). Every reference must resolve, the
+ * same way `photos` must: a Markdown image the build cannot place would silently become
+ * a placeholder, and the editor would never learn why.
+ */
+function collectMarkdownImages(
+  sources: readonly MarkdownField[],
+  images: ReadonlyMap<string, Image>,
+  issues: Issues,
+): Set<string> {
+  const used = new Set<string>();
+  for (const source of sources) {
+    for (const match of source.text.matchAll(MARKDOWN_IMAGE_PATTERN)) {
+      const id = match[1];
+      if (isImageId(id) && images.has(id)) {
+        used.add(id);
+        continue;
+      }
+      issues.error(
+        source.file,
+        source.field ?? null,
+        isImageId(id)
+          ? `bilden ${quote(id)} finns inte i ${imagePostFile(id)}.`
+          : `bilden ${quote(id)} är inte ett bild-id. Skriv ![](<bild-id>) med ${IMAGE_ID_DESCRIPTION}.`,
+      );
+    }
+  }
+  return used;
 }
 
-async function validateImages(refs: ImageRef[], imagesDir: string, issues: Issues): Promise<void> {
-  for (const ref of refs) {
-    const fullPath = path.join(imagesDir, ref.relative);
+// --- Image files ---------------------------------------------------------------
+
+/**
+ * The file behind every image post (04-§10.7). The error is reported on the image post,
+ * not on the records that use it: the file belongs to the post, and a photo shared by
+ * three animals should not produce the same message three times.
+ */
+async function validateImageFiles(images: readonly Image[], imagesDir: string, issues: Issues): Promise<void> {
+  for (const image of images) {
+    const file = imagePostFile(image.id);
+    const name = imageFileName(image.id);
     // Read once and measure the bytes we read, so the check and the parse never
     // disagree about which file version they saw.
     let bytes: Buffer;
     try {
-      bytes = await readFile(fullPath);
+      bytes = await readFile(path.join(imagesDir, name));
     } catch {
-      issues.error(ref.file, ref.field, `bilden ${ref.relative} finns inte under ${imagesDir}.`);
+      issues.error(file, null, `bilden ${name} finns inte under ${imagesDir}.`);
       continue;
     }
     const size = bytes.byteLength;
     if (size > MAX_IMAGE_BYTES) {
       issues.error(
-        ref.file,
-        ref.field,
-        `bilden ${ref.relative} är ${Math.round(size / 1024)} KB; högst ${MAX_IMAGE_BYTES / 1024} KB tillåts. Kör npm run image.`,
+        file,
+        null,
+        `bilden ${name} är ${Math.round(size / 1024)} KB; högst ${MAX_IMAGE_BYTES / 1024} KB tillåts. Kör npm run image.`,
       );
     }
     const info = inspectWebp(new Uint8Array(bytes));
     if (!info.ok) {
-      issues.error(ref.file, ref.field, `bilden ${ref.relative} är inte en WebP-fil. Kör npm run image.`);
+      issues.error(file, null, `bilden ${name} är inte en WebP-fil. Kör npm run image.`);
       continue;
     }
     if (info.width > MAX_IMAGE_SIDE || info.height > MAX_IMAGE_SIDE) {
       issues.error(
-        ref.file,
-        ref.field,
-        `bilden ${ref.relative} är ${info.width}×${info.height} px; högst ${MAX_IMAGE_SIDE} px på längsta sidan tillåts. Kör npm run image.`,
+        file,
+        null,
+        `bilden ${name} är ${info.width}×${info.height} px; högst ${MAX_IMAGE_SIDE} px på längsta sidan tillåts. Kör npm run image.`,
       );
     }
     if (info.hasMetadata) {
       issues.error(
-        ref.file,
-        ref.field,
-        `bilden ${ref.relative} bär EXIF-, XMP- eller ICC-metadata, som kan röja var bilden togs. Kör npm run image.`,
+        file,
+        null,
+        `bilden ${name} bär EXIF-, XMP- eller ICC-metadata, som kan röja var bilden togs. Kör npm run image.`,
       );
     }
+  }
+}
+
+/**
+ * 02-§8.13: a `.webp` in the images directory that no image post accounts for. It never
+ * reaches a visitor but stays in the git history for good (ADR 0008), so it is worth a
+ * warning. Reported on the dataset's images directory, since there is no post to blame.
+ */
+async function warnAboutStrayImageFiles(
+  images: readonly Image[],
+  imagesDir: string,
+  issues: Issues,
+): Promise<void> {
+  let names: string[];
+  try {
+    names = await readdir(imagesDir);
+  } catch {
+    return;
+  }
+  const known = new Set(images.map((image) => imageFileName(image.id)));
+  for (const name of names.filter((entry) => entry.endsWith(IMAGE_SUFFIX)).sort()) {
+    if (known.has(name)) continue;
+    issues.warn(
+      "images/",
+      null,
+      `bildfilen ${name} har ingen bildpost och visas aldrig. ` +
+        `Lägg till ${imagePostFile(imageIdFromFileName(name))} eller ta bort filen.`,
+    );
   }
 }
 
@@ -783,7 +928,8 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   const today = options.today ?? new Date();
   const speciesFile = raw.species?.file ?? "species.yaml";
 
-  const species = validateSpecies(raw.species, issues);
+  const images = validateImagePosts(raw.images, issues);
+  const species = validateSpecies(raw.species, images, issues);
   const speciesIds = new Set(species.map((s) => s.id));
   const breeds = validateBreeds(raw.breeds, speciesIds, issues);
   const breedsById = new Map(breeds.map((b) => [b.id, b]));
@@ -793,7 +939,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   const animalRefs = new Map<string, AnimalRefs>();
   for (const record of raw.animals) {
     files.set(record.id, record.file);
-    const { animal, refs } = validateAnimal(record, issues, today);
+    const { animal, refs } = validateAnimal(record, images, issues, today);
     if (animal !== null) animals.push(animal);
     if (refs !== null) animalRefs.set(refs.id, refs);
   }
@@ -805,29 +951,34 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   const locations: Location[] = [];
   for (const record of raw.locations) {
     files.set(`locations/${record.id}`, record.file);
-    const location = validateLocation(record, speciesIds, issues);
+    const location = validateLocation(record, speciesIds, images, issues);
     if (location !== null) locations.push(location);
   }
 
-  collectWarnings(species, animals, populations, locations, files, speciesFile, issues);
+  const inMarkdown = collectMarkdownImages(
+    [
+      ...animals.map((animal) => ({
+        file: files.get(animal.id) ?? `animals/${animal.id}.yaml`,
+        field: "description",
+        text: animal.description ?? "",
+      })),
+      ...locations.map((location) => ({
+        file: files.get(`locations/${location.id}`) ?? `locations/${location.id}.yaml`,
+        field: "description",
+        text: location.description ?? "",
+      })),
+      ...(options.markdown ?? []),
+    ],
+    images,
+    issues,
+  );
 
+  collectWarnings(species, animals, populations, locations, images, inMarkdown, files, speciesFile, issues);
+
+  const imageList = [...images.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   if (options.imagesDir) {
-    const refs: ImageRef[] = [];
-    for (const entry of species) {
-      if (entry.photo !== null) {
-        refs.push({ file: speciesFile, field: `species[${entry.id}].photo.file`, relative: `species/${entry.photo.file}` });
-      }
-    }
-    for (const animal of animals) {
-      animal.photos.forEach((photo, index) => {
-        refs.push({
-          file: files.get(animal.id) ?? `animals/${animal.id}.yaml`,
-          field: `photos[${index}].file`,
-          relative: `animals/${photo.file}`,
-        });
-      });
-    }
-    await validateImages(refs, options.imagesDir, issues);
+    await validateImageFiles(imageList, options.imagesDir, issues);
+    await warnAboutStrayImageFiles(imageList, options.imagesDir, issues);
   }
 
   if (issues.errors.length > 0) {
@@ -839,6 +990,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
     populations,
     animals: sortAnimals(animals),
     locations: sortLocations(locations),
+    images: imageList,
   };
   return { errors: [], warnings: issues.warnings, dataset };
 }

@@ -5,7 +5,4 @@ sex: male
 born: 2020
 status: here
 photos:
-  - file: get-loke-1.webp
-    alt: Porträtt av Loke.
-    credit: QA
-    portrait: true
+  - img-62d184d3781d

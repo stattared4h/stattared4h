@@ -2,7 +2,10 @@ name: Björkhagen
 species:
   - get
 note: Även här går getter — de flyttas mellan hagarna under säsongen.
-description: Skuggig hage med björkar, används mest under varma sommardagar.
+description: |
+  Skuggig hage med björkar, används mest under varma sommardagar.
+
+  ![](img-aa2c37af9e5e)
 lat: 57.413100
 lon: 12.215200
 accessible: true

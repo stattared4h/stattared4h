@@ -5,7 +5,4 @@ sex: female
 born: 2023
 status: here
 photos:
-  - file: get-gullan-1.webp
-    alt: Porträtt av Gullan.
-    credit: QA
-    portrait: true
+  - img-32af1678bd13

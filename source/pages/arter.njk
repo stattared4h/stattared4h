@@ -21,7 +21,7 @@ eleventyComputed:
 
   {%- if view.photo %}
   <figure class="photo photo--wide">
-    {% picture view.photo, "species", "(min-width: 960px) 680px, 100vw", true, view.name %}
+    {% picture view.photo, "(min-width: 960px) 680px, 100vw", true, view.name %}
     <figcaption class="photo__credit">Foto: {{ view.photo.credit }}</figcaption>
   </figure>
   {%- endif %}

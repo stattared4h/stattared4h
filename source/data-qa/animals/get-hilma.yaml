@@ -5,7 +5,4 @@ sex: male
 born: 2024
 status: here
 photos:
-  - file: get-hilma-1.webp
-    alt: Porträtt av Hilma.
-    credit: QA
-    portrait: true
+  - img-3a59da553702

@@ -25,11 +25,10 @@ import {
   speciesOnFarm,
   type Animal,
   type Dataset,
+  type Image,
   type Location,
-  type Photo,
   type Population,
   type Species,
-  type SpeciesPhoto,
 } from "../domain/index.ts";
 import { definitePlural, joinSwedish, lowerFirst } from "../domain/swedish.ts";
 import { renderMap, type MapBackground, type MapLocation } from "./map.ts";
@@ -40,7 +39,7 @@ export interface SpeciesTileView {
   name: string;
   plural: string;
   url: string;
-  photo: SpeciesPhoto | null;
+  photo: Image | null;
 }
 
 /** One animal card (02-§5.28, 05-§6.18). */
@@ -50,7 +49,7 @@ export interface AnimalCardView {
   url: string;
   /** Singular species name, shown on the placeholder when there is no photo (05-§6.20). */
   speciesName: string;
-  photo: Photo | null;
+  photo: Image | null;
   /** Breed, "Lantras" and "Har lämnat gården", in that order, only when they apply (05-§6.19). */
   tags: string[];
   gone: boolean;
@@ -86,6 +85,8 @@ export interface LocationPageView {
   note: string | null;
   /** The location's `description` field, Markdown. */
   body: string | null;
+  /** The location's photos, in data order (02-§5.31). */
+  photos: Image[];
   /** "Hit når man med rullstol och barnvagn" or its negation (02-§5.10). */
   accessibility: string;
   groups: SpeciesGroupView[];
@@ -97,10 +98,10 @@ export interface AnimalPageView {
   url: string;
   description: string;
   gone: boolean;
-  /** The portrait photo (first `portrait: true`, else the first photo), or null. */
-  portrait: Photo | null;
+  /** The first photo in the list (02-§8.11), or null. */
+  portrait: Image | null;
   /** Every other photo, in data order. */
-  otherPhotos: Photo[];
+  otherPhotos: Image[];
   species: SpeciesTileView;
   /** Breed name with " (lantras)" when heritage; null without breed. */
   breed: string | null;
@@ -123,7 +124,7 @@ export interface SpeciesPageView {
   plural: string;
   url: string;
   description: string;
-  photo: SpeciesPhoto | null;
+  photo: Image | null;
   /** "Var finns getterna?" */
   whereHeading: string;
   locations: LinkView[];
@@ -192,9 +193,9 @@ export function speciesTile(species: Species): SpeciesTileView {
   return { id: species.id, name: species.name, plural: species.plural, url: speciesUrl(species.id), photo: species.photo };
 }
 
-/** The photo used as portrait: the one marked `portrait: true`, else the first (02-§5.14). */
-export function portraitOf(animal: Animal): Photo | null {
-  return animal.photos.find((photo) => photo.portrait) ?? animal.photos[0] ?? null;
+/** The portrait is the first photo in the list (02-§8.11). */
+export function portraitOf(animal: Animal): Image | null {
+  return animal.photos[0] ?? null;
 }
 
 export function animalCard(dataset: Dataset, animal: Animal): AnimalCardView {
@@ -267,6 +268,7 @@ export function locationView(dataset: Dataset, location: Location, farm: string)
     species: groups.map((group) => group.species),
     note: location.note,
     body: location.description,
+    photos: location.photos,
     accessibility: location.accessible ? ACCESSIBLE_TEXT : NOT_ACCESSIBLE_TEXT,
     groups,
   };
@@ -285,7 +287,7 @@ export function animalView(dataset: Dataset, animal: Animal, farm: string): Anim
     description: `${animal.name}, ${lowerFirst(species.name)} på ${farm} – art, ras, släkt och bilder.`,
     gone: animal.status === "gone",
     portrait,
-    otherPhotos: animal.photos.filter((photo) => photo !== portrait),
+    otherPhotos: animal.photos.slice(1),
     species: speciesTile(species),
     breed: breed === null ? null : breed.heritage ? `${breed.name} (lantras)` : breed.name,
     sex: animal.sex === "female" ? "Hona" : animal.sex === "male" ? "Hane" : null,

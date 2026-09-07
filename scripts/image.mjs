@@ -1,27 +1,34 @@
 /**
- * Makes a photo web-ready and puts it where the site expects it (02-§8.3, ADR 0008).
+ * Makes a photo web-ready and adds it to the dataset (02-§8.3, ADR 0008, ADR 0015).
  *
- *   npm run image -- <file> [--to animals|species|places|content] [--name <id-prefix>]
- *                          [--force] [--images-dir <dir>]
+ *   npm run image -- <fil> --alt "<alternativtext>" --credit "<fotograf>"
+ *                          [--data-dir <katalog>]
  *
  * Takes JPEG, PNG or WebP, scales to at most 1600 px on the longest side, converts to
- * WebP under 250 KB and strips all metadata (EXIF, XMP, ICC). Writes to
- * source/images/<kind>/<name>.webp and refuses to overwrite without --force.
+ * WebP under 250 KB and strips all metadata (EXIF, XMP, ICC). The id is the hash of the
+ * result, so the command writes two files and prints the id to reference:
+ *
+ *   source/images/<bild-id>.webp          the picture
+ *   source/data/images/<bild-id>.yaml     the alt text and the photographer
+ *
+ * The same photo added twice yields the same id, so a rerun reports the existing image
+ * instead of writing a copy.
  *
  * Messages are in Swedish: they are read by the editor adding a photo, not by a
  * developer.
  */
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { IMAGE_KINDS, MAX_IMAGE_BYTES, MAX_IMAGE_EDGE, optimiseImage } from "../source/ts/build/images.ts";
+import { stringify } from "yaml";
+import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
+import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE, imagesDirFor, optimiseImage } from "../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SUPPORTED = new Set([".jpg", ".jpeg", ".png", ".webp"]);
-const NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 const USAGE =
-  "Användning: npm run image -- <fil> [--to animals|species|places|content] " +
-  "[--name <namn>] [--force] [--images-dir <katalog>]";
+  'Användning: npm run image -- <fil> --alt "<alternativtext>" --credit "<fotograf>" ' +
+  "[--data-dir <katalog>]";
 
 function fail(message) {
   console.error(message);
@@ -29,29 +36,17 @@ function fail(message) {
 }
 
 function parseArguments(argv) {
-  const options = { to: "animals", name: undefined, force: false, imagesDir: undefined, file: undefined };
+  const options = { alt: undefined, credit: undefined, dataDir: path.join(ROOT, "source", "data"), file: undefined };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === "--to") options.to = argv[++i];
-    else if (arg === "--name") options.name = argv[++i];
-    else if (arg === "--images-dir") options.imagesDir = argv[++i];
-    else if (arg === "--force") options.force = true;
+    if (arg === "--alt") options.alt = argv[++i];
+    else if (arg === "--credit") options.credit = argv[++i];
+    else if (arg === "--data-dir") options.dataDir = path.resolve(argv[++i]);
     else if (arg.startsWith("--")) fail(`Okänd flagga ${arg}.\n${USAGE}`);
     else if (options.file === undefined) options.file = arg;
     else fail(`Ange bara en fil åt gången.\n${USAGE}`);
   }
   return options;
-}
-
-/** `Lilla Gumman.JPG` → `lilla-gumman`. Mirrors the id rule in 04-§3. */
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replaceAll(/[åä]/g, "a")
-    .replaceAll("ö", "o")
-    .replaceAll(/[éè]/g, "e")
-    .replaceAll(/[^a-z0-9]+/g, "-")
-    .replaceAll(/^-|-$/g, "");
 }
 
 async function exists(file) {
@@ -67,32 +62,27 @@ function formatKilobytes(bytes) {
   return `${Math.round(bytes / 1024)} KB`;
 }
 
+/** Relative to the working directory when that is shorter, absolute when it is not. */
+function shownPath(file) {
+  const relative = path.relative(process.cwd(), file);
+  return relative.startsWith("..") ? file : relative;
+}
+
+/** The image post as YAML: two lines, quoted only where the yaml package says it must be. */
+function imagePostYaml({ alt, credit }) {
+  return stringify({ alt, credit }, { lineWidth: 0 });
+}
+
 async function main() {
   const options = parseArguments(process.argv.slice(2));
   if (!options.file) fail(USAGE);
-
-  if (!IMAGE_KINDS.includes(options.to)) {
-    fail(`Okänd katalog "${options.to}". Välj ${IMAGE_KINDS.join(", ")}.`);
-  }
+  if (!options.alt) fail(`Ange --alt: en mening som beskriver vad som är viktigt i bilden.\n${USAGE}`);
+  if (!options.credit) fail(`Ange --credit: vem som tagit bilden.\n${USAGE}`);
 
   const inputPath = path.resolve(options.file);
   if (!(await exists(inputPath))) fail(`Hittar inte filen ${options.file}.`);
   if (!SUPPORTED.has(path.extname(inputPath).toLowerCase())) {
     fail(`Filen måste vara JPEG, PNG eller WebP: ${options.file}`);
-  }
-
-  const name = options.name ?? slugify(path.basename(inputPath, path.extname(inputPath)));
-  if (!NAME_PATTERN.test(name)) {
-    fail(`Namnet "${name}" får bara innehålla små bokstäver a–z, siffror och bindestreck.`);
-  }
-
-  const imagesDir = path.resolve(options.imagesDir ?? path.join(ROOT, "source", "images"));
-  const targetDir = path.join(imagesDir, options.to);
-  const outputPath = path.join(targetDir, `${name}.webp`);
-  const shownPath = path.relative(process.cwd(), outputPath);
-
-  if (!options.force && (await exists(outputPath))) {
-    fail(`${shownPath} finns redan. Använd --force för att skriva över.`);
   }
 
   let result;
@@ -102,12 +92,33 @@ async function main() {
     fail(`Kunde inte omvandla ${options.file}: ${error.message}`);
   }
 
-  await mkdir(targetDir, { recursive: true });
-  await writeFile(outputPath, result.data);
+  const id = imageIdFor(result.data);
+  const imagesDir = imagesDirFor(options.dataDir);
+  const imagePath = path.join(imagesDir, imageFileName(id));
+  const postPath = path.join(options.dataDir, imagePostFile(id));
+
+  if (await exists(imagePath)) {
+    // The id comes from the content, so this is the same photo, not a name clash. The
+    // alt text and credit given on the command line are not applied: the post already
+    // describes this picture, and silently overwriting it would lose someone's wording.
+    console.log(
+      `Bilden finns redan som ${id} och ingenting skrevs.\n` +
+        `Referera den som "${id}". Vill du ändra alt-texten eller fotografen, ` +
+        `redigera ${shownPath(postPath)}.`,
+    );
+    return;
+  }
+
+  await mkdir(imagesDir, { recursive: true });
+  await mkdir(path.dirname(postPath), { recursive: true });
+  await writeFile(imagePath, result.data);
+  await writeFile(postPath, imagePostYaml(options));
+
   console.log(
-    `Skrev ${shownPath} (${result.width}×${result.height} px, ` +
-      `${formatKilobytes(result.data.byteLength)}, kvalitet ${result.quality}). ` +
-      `Referera filen som "${name}.webp" i YAML.`,
+    `Skrev ${shownPath(imagePath)} ` +
+      `(${result.width}×${result.height} px, ${formatKilobytes(result.data.byteLength)}, kvalitet ${result.quality}) ` +
+      `och ${shownPath(postPath)}.\n` +
+      `Referera bilden som "${id}" under photos hos ett djur eller en plats, eller som photo hos en art.`,
   );
 }
 

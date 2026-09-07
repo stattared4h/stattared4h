@@ -5,7 +5,4 @@ sex: female
 born: 2021
 status: here
 photos:
-  - file: kanin-nova-1.webp
-    alt: Porträtt av Nova.
-    credit: QA
-    portrait: true
+  - img-40db7844dd0f
