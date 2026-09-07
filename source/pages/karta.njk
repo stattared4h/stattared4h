@@ -31,4 +31,18 @@ description: Karta över Stättareds 4H-gård med hagarna och vilka djurslag som
   <p class="lead">Inga platser är inlagda ännu.</p>
   <p><a class="button" href="{{ '/' | url }}">Till startsidan</a></p>
   {%- endif %}
+
+  {#- Maps of the area belong to the main site and to Naturkartan, not here (02-§5.34,
+      02-§1.8). Ordinary links: nothing is embedded and nothing is fetched (02-§5.26). #}
+  <section class="page-section">
+    <h2>Fler kartor i området</h2>
+    <ul class="place-list">
+      {%- for map in site.areaMaps %}
+      <li class="place-list__item">
+        <a class="place-list__link" href="{{ map.url }}">{{ map.name }}</a>
+        <span class="place-list__note">{{ map.about }}</span>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
 </div>

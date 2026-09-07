@@ -163,6 +163,125 @@ function assertBasePath(base: string): void {
   }
 }
 
+// --- Label placement ---------------------------------------------------------
+
+/**
+ * Which side of the marker its label sits on (02-§5.33). `below` is the plain case and
+ * the fallback; the others are written on the marker as a modifier and placed by CSS.
+ */
+export type LabelSide = "below" | "above" | "right" | "left";
+
+/**
+ * Measurements the estimate needs, in pixels, mirrored from `tokens.css`. There is no
+ * browser at build time, so the label's box is estimated rather than measured;
+ * `tests/build/map.test.ts` compares these three against the tokens so the code and the
+ * design decision cannot drift apart (05-§7.4).
+ */
+export const LABEL_METRICS = {
+  /** `--tap-target-min`: the pin's box, centred on the place. */
+  tapTarget: 44,
+  /** `--font-size-small`: the label's type size. */
+  fontSize: 15,
+  /** `--space-xs`: the label's padding, at each end. */
+  padding: 8,
+  /** The width the placement is calculated for: the narrowest map (02-§5.33). */
+  referenceWidth: 360,
+} as const;
+
+/** Width of an average character at `--font-size-small`, as a fraction of the type size. */
+const CHAR_WIDTH_RATIO = 0.55;
+/** The label is one line; its box is the line height. */
+const LINE_HEIGHT_RATIO = 1.4;
+/** Tried in this order, so the plain case wins whenever it is free. */
+const LABEL_SIDES: readonly LabelSide[] = ["below", "above", "right", "left"];
+
+/** A marker to place a label for, positioned in drawing units. */
+export interface LabelMarker {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+}
+
+interface Box {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+/** True when the two boxes share area. Boxes that only touch do not overlap. */
+function overlaps(a: Box, b: Box): boolean {
+  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+}
+
+/** The label's box on one side of a marker standing at `x`, `y` in pixels. */
+function labelBox(x: number, y: number, width: number, height: number, side: LabelSide): Box {
+  const half = LABEL_METRICS.tapTarget / 2;
+  switch (side) {
+    case "below":
+      return { left: x - width / 2, right: x + width / 2, top: y + half, bottom: y + half + height };
+    case "above":
+      return { left: x - width / 2, right: x + width / 2, top: y - half - height, bottom: y - half };
+    case "right":
+      return { left: x + half, right: x + half + width, top: y - height / 2, bottom: y + height / 2 };
+    case "left":
+      return { left: x - half - width, right: x - half, top: y - height / 2, bottom: y + height / 2 };
+  }
+}
+
+/**
+ * Which side each label goes on so that labels do not cover each other or another
+ * marker's pin (02-§5.33, 03-§9.3).
+ *
+ * The boxes are worked out in pixels for a `referenceWidth` drawing — the narrowest the
+ * map gets — because that is where the labels crowd. Places are taken from north to
+ * south, and each label gets the first free side. When all four are taken the label
+ * stays below its own marker: a label that sits still is honest, one flung across the
+ * map points at nothing.
+ *
+ * The estimate is an estimate. It tells a crowded map from an airy one; it does not
+ * promise pixels.
+ */
+export function placeLabels(
+  markers: readonly LabelMarker[],
+  drawingWidth: number,
+): Map<string, LabelSide> {
+  const scale = LABEL_METRICS.referenceWidth / drawingWidth;
+  const height = LABEL_METRICS.fontSize * LINE_HEIGHT_RATIO;
+  const half = LABEL_METRICS.tapTarget / 2;
+
+  const points = markers.map((marker) => ({
+    id: marker.id,
+    x: marker.x * scale,
+    y: marker.y * scale,
+    width: marker.name.length * LABEL_METRICS.fontSize * CHAR_WIDTH_RATIO + 2 * LABEL_METRICS.padding,
+  }));
+  const pins: Box[] = points.map((p) => ({
+    left: p.x - half,
+    right: p.x + half,
+    top: p.y - half,
+    bottom: p.y + half,
+  }));
+
+  // North to south, then west to east, then by id: the same places always place in the
+  // same order, whatever order they arrived in.
+  const order = [...points].sort((a, b) => a.y - b.y || a.x - b.x || (a.id < b.id ? -1 : 1));
+
+  const taken: Box[] = [];
+  const sides = new Map<string, LabelSide>();
+  for (const point of order) {
+    const free = LABEL_SIDES.find((side) => {
+      const box = labelBox(point.x, point.y, point.width, height, side);
+      return !taken.some((other) => overlaps(box, other)) && !pins.some((pin) => overlaps(box, pin));
+    });
+    const side = free ?? "below";
+    sides.set(point.id, side);
+    taken.push(labelBox(point.x, point.y, point.width, height, side));
+  }
+  return sides;
+}
+
 /** The drawing layer alone: the `<svg>` with its description, ground plate and background. */
 export function renderMapSvg(frame: MapFrame, background: MapBackground | null = null): string {
   const size = `width="${frame.width}" height="${frame.height}"`;
@@ -186,7 +305,7 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   if (frame === null) return { html: "", warnings: [] };
 
   const warnings: string[] = [];
-  const markers: string[] = [];
+  const drawn: { location: MapLocation; position: { x: number; y: number } }[] = [];
   for (const location of locations) {
     const position = projectPoint(location, frame);
     if (!isInside(position, frame)) {
@@ -195,9 +314,24 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
       );
       continue;
     }
+    drawn.push({ location, position });
+  }
+
+  // Only the markers that are actually drawn take part: a place outside the drawing
+  // cannot crowd a label (02-§5.33).
+  const sides = placeLabels(
+    drawn.map(({ location, position }) => ({ id: location.id, name: location.name, ...position })),
+    frame.width,
+  );
+
+  const markers: string[] = [];
+  for (const { location, position } of drawn) {
+    const side = sides.get(location.id) ?? "below";
+    // `below` is the plain case and needs no modifier, so most markers keep bare markup.
+    const className = side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`;
     const style = `left: ${percent(position.x, frame.width)}; top: ${percent(position.y, frame.height)}`;
     markers.push(
-      `<a class="map__marker" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}">` +
+      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}">` +
         `<span class="map__pin" aria-hidden="true"></span>` +
         `<span class="map__label">${escapeText(location.name)}</span>` +
         `</a>`,

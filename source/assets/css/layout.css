@@ -238,14 +238,40 @@
   border-radius: var(--radius-md);
 }
 
+/* The marker box is exactly the tap target, centred on the place; the label hangs off
+   it on the side the build picked (02-§5.33), so the pin never moves off its spot. */
 .map__marker {
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: var(--tap-target-min);
-  transform: translate(-50%, calc(var(--tap-target-min) / -2));
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  transform: translate(-50%, -50%);
   text-decoration: none;
+}
+
+/* Default: under the pin. The three modifiers below move it, and nothing else changes. */
+.map__label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.map__marker--label-above .map__label {
+  top: auto;
+  bottom: 100%;
+}
+
+.map__marker--label-right .map__label {
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+}
+
+.map__marker--label-left .map__label {
+  top: 50%;
+  right: 100%;
+  left: auto;
+  transform: translateY(-50%);
 }
 
 /* ── Place list under the map (02-§5.24) ───────────────────────────────── */

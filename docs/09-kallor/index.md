@@ -133,7 +133,12 @@ profilen (ADR 0016). Posten står kvar för att förklara var `#15623e`, `#e7fdf
 | Adress | `https://api.openstreetmap.org/api/0.6/map?bbox=12.3355,57.3355,12.3455,57.3405` |
 | Hämtad | 2026-09-07 |
 | Licens | ODbL 1.0 |
-| I repot | Nej — uttaget är ett arbetsunderlag, inget vi levererar |
+| SHA-256 | `8ff12d33f735452978bc99b9558c4ce695026035b0e206e8f524c87d2c6d848a` |
+| I repot | `docs/09-kallor/stattared-osm.xml` (84 KB) |
+
+Adressen är en levande fråga: samma adress ger ett annat svar i morgon, eftersom OSM
+ändras hela tiden. Därför ligger just det uttag arbetet vilar på i repot, med sin
+kontrollsumma — annars vore källan omöjlig att kontrollera i efterhand.
 
 Uttaget innehåller Stättaredsvägen, gårdsplanen, fyra byggnader, tre parkeringar och
 betesmarken sydost om vägen. Det användes för att kontrollera att gårdens koordinater
@@ -146,11 +151,10 @@ av satellitbilden.
 
 ### Hagarnas namn — gårdens egen skylt
 
-| | |
-| --- | --- |
-| Utgivare | Stättareds 4H-gård |
-| Adress | Skylten på gården, fotograferad 2026-09-07 |
-| I repot | Nej — fotot är inte publicerat |
+Den här källan har varken adress eller kontrollsumma, och det är avsiktligt: den är
+ingen hämtad fil utan en skylt på gården, fotograferad 2026-09-07. Reglerna ovan
+(`09-§1.1`) är skrivna för filer vi laddat ner. Posten står här ändå, eftersom frågan
+*var kom det ifrån* är precis lika viktig för hagarnas namn som för en logotyp.
 
 Namnen i `source/data/locations/` är skyltens: Tåmossen, Bräckebur, Dammen, Lilla och
 Stora grishagen, Ekbacken, Trekanten, 1:an–4:an, Dalen, Lygnslätt 1 och 2, gethuset och

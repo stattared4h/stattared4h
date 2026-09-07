@@ -273,7 +273,7 @@ describe("the map (02-§5.23–5.27)", () => {
     const html = main(await page("karta"));
     assert.match(html, /<h1>Karta över gården<\/h1>/);
     assert.match(html, /<svg class="map__drawing" [^>]*role="img" aria-label="Karta över Stättared med gårdens hagar">/);
-    const markers = [...html.matchAll(/<a class="map__marker" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left))?" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
     assert.equal(markers.length, 8, "nine places minus the inactive one without coordinates");
     assert.ok(!markers.includes("gamla-stallet"));
     const list = html.slice(html.indexOf('<ul class="place-list">'));
