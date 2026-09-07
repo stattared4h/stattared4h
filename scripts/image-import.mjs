@@ -20,18 +20,23 @@
  *
  * Messages are in Swedish: they are read by the editor, not by a developer.
  */
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { stringify } from "yaml";
 import {
-  PHOTO_EXTENSIONS,
   formatIdsByPost,
   formatIssue,
   planImport,
   templateCsv,
 } from "./lib/image-import.ts";
 import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
-import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE, imagesDirFor, optimiseImage } from "../source/ts/build/images.ts";
+import {
+  MAX_IMAGE_BYTES,
+  MAX_IMAGE_EDGE,
+  SOURCE_EXTENSIONS,
+  imagesDirFor,
+  optimiseImage,
+} from "../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const DEFAULT_TABLE = "bilder.csv";
@@ -95,14 +100,14 @@ async function listPhotos(dir) {
     fail(`Hittar inte katalogen ${dir}.`);
   }
   return entries
-    .filter((entry) => entry.isFile() && PHOTO_EXTENSIONS.includes(path.extname(entry.name).toLowerCase()))
+    .filter((entry) => entry.isFile() && SOURCE_EXTENSIONS.includes(path.extname(entry.name).toLowerCase()))
     .map((entry) => entry.name);
 }
 
 async function scan(options) {
   const photoDir = path.resolve(options.scan);
   const files = await listPhotos(photoDir);
-  if (files.length === 0) fail(`Hittar inga bilder i ${shownPath(photoDir)}. Bilder är ${PHOTO_EXTENSIONS.join(", ")}.`);
+  if (files.length === 0) fail(`Hittar inga bilder i ${shownPath(photoDir)}. Bilder är ${SOURCE_EXTENSIONS.join(", ")}.`);
 
   const outPath = path.resolve(options.out ?? DEFAULT_TABLE);
   await writeFile(outPath, templateCsv(files));
@@ -123,6 +128,14 @@ async function importTable(options) {
     text = await readFile(tablePath, "utf8");
   } catch {
     fail(`Hittar inte tabellen ${options.table}.`);
+  }
+
+  // A spreadsheet saves its own format unless told otherwise, and that file is a zip.
+  if (text.includes("\u0000") || text.startsWith("PK\u0003\u0004")) {
+    fail(
+      `${shownPath(tablePath)} är inte en textfil. Öppna tabellen i kalkylprogrammet och ` +
+        'välj "Spara som" med formatet CSV.',
+    );
   }
 
   const plan = planImport(text);
@@ -196,7 +209,6 @@ async function importTable(options) {
 }
 
 async function exists(file) {
-  const { access } = await import("node:fs/promises");
   try {
     await access(file);
     return true;

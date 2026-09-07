@@ -17,6 +17,12 @@ import sharp from "sharp";
 export const MAX_IMAGE_EDGE = 1600;
 export const MAX_IMAGE_BYTES = 250 * 1024;
 
+/**
+ * Originals `optimiseImage` accepts. WebP is in the list because a photo can already be
+ * WebP without holding the limits — it is re-encoded like any other.
+ */
+export const SOURCE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
+
 /** Widths generated for `srcset` (02-§8.5). */
 export const SRCSET_WIDTHS: readonly number[] = [400, 800, 1600];
 

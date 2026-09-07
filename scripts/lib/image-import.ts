@@ -16,9 +16,6 @@ export const TABLE_COLUMNS = ["fil", "post", "alt", "fotograf"] as const;
 /** 04-§3.2: lowercase a–z, digits and single hyphens between groups. */
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-/** Extensions `npm run image` accepts, so --scan lists what the import can actually take. */
-export const PHOTO_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
-
 /** One row to import. `line` is the line in the table, counting the header as 1. */
 export interface ImportRow {
   line: number;

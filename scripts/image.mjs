@@ -21,10 +21,16 @@ import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { stringify } from "yaml";
 import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
-import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE, imagesDirFor, optimiseImage } from "../source/ts/build/images.ts";
+import {
+  MAX_IMAGE_BYTES,
+  MAX_IMAGE_EDGE,
+  SOURCE_EXTENSIONS,
+  imagesDirFor,
+  optimiseImage,
+} from "../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const SUPPORTED = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+
 
 const USAGE =
   'Användning: npm run image -- <fil> --alt "<alternativtext>" --credit "<fotograf>" ' +
@@ -93,7 +99,7 @@ async function main() {
 
   const inputPath = path.resolve(options.file);
   if (!(await exists(inputPath))) fail(`Hittar inte filen ${options.file}.`);
-  if (!SUPPORTED.has(path.extname(inputPath).toLowerCase())) {
+  if (!SOURCE_EXTENSIONS.includes(path.extname(inputPath).toLowerCase())) {
     fail(`Filen måste vara JPEG, PNG eller WebP: ${options.file}`);
   }
 
