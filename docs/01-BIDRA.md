@@ -57,10 +57,7 @@ description: |
   Skriv några meningar om djuret. Vad är det för personlighet?
   Något besökaren känner igen det på?
 photos:
-  - file: rosa-1.webp
-    alt: Rosa, en brun get med vit nos, tittar rakt in i kameran.
-    credit: Anna Andersson
-    portrait: true
+  - img-a3f2c1d8b901
 ```
 
 Bara `name`, `species`, `sex` och `status` måste vara med. Vet du inte födelsedatumet kan
@@ -71,6 +68,10 @@ du skriva bara årtalet, `born: 2021`, eller utelämna raden.
 
 `mother` och `father` är filnamnen på föräldrarna utan `.yaml`. Finns föräldern inte i
 registret utelämnar du raden — skriv inte ett namn, för fältet vill ha ett id.
+
+`photos` är en lista med bild-id:n, och den första bilden är porträttet. Id:na får du av
+`npm run image`, se *Lägga till en bild* nedan. Har djuret ingen bild än utelämnar du
+raden — det blir en varning, inte ett fel, och sidan visar en platta med djurslagets namn.
 
 Slå upp vad varje fält betyder i [`04-DATAKONTRAKT.md`](04-DATAKONTRAKT.md).
 
