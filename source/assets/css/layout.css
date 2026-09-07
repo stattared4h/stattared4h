@@ -148,8 +148,7 @@
     grid-column: 4;
   }
 
-  .site-header__menu-button,
-  .site-header__to-top,
+  /* The menu and "to top" buttons carry .icon-button--mobile-only (components.css). */
   .site-menu {
     display: none;
   }

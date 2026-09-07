@@ -111,8 +111,13 @@
   line-height: var(--line-height-heading);
 }
 
-/* From the desktop breakpoint install and feedback lose their ground (05-§6.33). */
+/* From the desktop breakpoint the menu and "to top" buttons do not exist (02-§10.7),
+   and install and feedback lose their ground (05-§6.33). */
 @media (min-width: 960px) {
+  .icon-button--mobile-only {
+    display: none;
+  }
+
   .icon-button--plain-on-desktop {
     background: transparent;
     color: var(--color-green-deep);
