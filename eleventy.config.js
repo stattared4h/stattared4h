@@ -24,6 +24,10 @@ import path from "node:path";
 import * as esbuild from "esbuild";
 import { readBuildVersion } from "./source/ts/domain/version.ts";
 import { imagesPlugin } from "./source/ts/build/images-plugin.ts";
+import { bundleServiceWorker, listStaticAssets, readThemeColours } from "./source/ts/build/pwa.ts";
+import { readContentFiles, renderMarkdown } from "./source/ts/build/content.ts";
+
+const ROOT = import.meta.dirname;
 
 /** 06-§3.1: the base path always starts and ends with a slash, so "/" + "assets" is never "//assets". */
 function normaliseBasePath(raw) {
@@ -100,6 +104,19 @@ export default function (eleventyConfig) {
 
   // Images: srcset sizes into <output>/images/ and the `picture` shortcode (02-§8.5, 03-§6).
   eleventyConfig.addPlugin(imagesPlugin, { dataDir, outDir: "public", pathPrefix });
+
+  // Manifest and service worker (02-§7, 03-§5): the colours from tokens.css, every
+  // static asset for the precache, and the worker bundled to a string that
+  // source/pages/sw.njk writes after the build's constants. Functions, so Eleventy
+  // evaluates them per build.
+  eleventyConfig.addGlobalData("theme", () => readThemeColours(path.join(ROOT, "source/assets/css/tokens.css")));
+  eleventyConfig.addGlobalData("assets", () => listStaticAssets(path.join(ROOT, "source/assets")));
+  eleventyConfig.addGlobalData("swCode", () => bundleServiceWorker(path.join(ROOT, "source/ts/sw.ts")));
+
+  // Content pages in Markdown (CL-§2.2, 02-§10.27): source/content/*.md as `texts`,
+  // rendered by the page that owns the address with the `markdown` filter.
+  eleventyConfig.addGlobalData("texts", () => readContentFiles(path.join(ROOT, "source/content")));
+  eleventyConfig.addFilter("markdown", renderMarkdown);
 
   // The client code is a handful of small modules bundled into one file (03-§10.2).
   // No dependencies reach the visitor (02-§9.5).
