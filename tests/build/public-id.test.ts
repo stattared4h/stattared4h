@@ -26,6 +26,16 @@ test("startsidan erbjuder sökning på öronmärke med QA-id:n i sökdatat (02-�
   assert.match(html, /SE-012345-0002/);
 });
 
+test("sökningen är sista avsnittet före Fler kartor i området (02-§5.52)", async () => {
+  const html = await page("");
+  const species = html.indexOf("Djuren på gården");
+  const search = html.indexOf("Hitta ett djur via öronmärket");
+  const areaMaps = html.indexOf("Fler kartor i området");
+  assert.ok(species > 0 && search > 0 && areaMaps > 0, "alla tre avsnitten finns");
+  assert.ok(species < search, "sökningen står efter djurslagen");
+  assert.ok(search < areaMaps, "sökningen står före Fler kartor i området");
+});
+
 test("djursidan visar originalvärdet med etiketten Öronmärke (02-§5.36)", async () => {
   const html = await page("djur/far-astrid");
   assert.match(html, /<dt>Öronmärke<\/dt>/);

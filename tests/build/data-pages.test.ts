@@ -85,6 +85,10 @@ describe("the home page (02-§5.7–5.8)", () => {
         html.indexOf("place-list__link") < html.indexOf("species-tile"),
       "map, then places, then species (02-§5.7)",
     );
+    assert.ok(
+      html.indexOf("<h2>Hagar och djurhus</h2>") < html.indexOf("<h2>Annat på gården</h2>"),
+      "the animal places are listed before everything else (02-§5.51)",
+    );
     const tiles = [...html.matchAll(/<a class="species-tile" href="\/arter\/([^/]+)\/">/g)].map((m) => m[1]);
     assert.deepEqual(tiles, ["get", "far", "ko", "hast", "kanin", "gris", "hons", "katt"]);
     assert.match(html, /Getter<\/span>/);

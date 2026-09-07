@@ -26,11 +26,14 @@ description: >-
   {{ views.map.html | safe }}
   {%- endif %}
 
-  {%- if views.map.list.length > 0 %}
+  {#- The map's full text alternative (02-§5.24), in two groups so the places with animals
+      come before the parking and the toilets (02-§5.51). Every place the map shows is
+      still here, in the same order within its group. #}
+  {%- for group in views.map.groups %}
   <section class="page-section">
-    <h2>Platserna</h2>
+    <h2>{{ group.heading }}</h2>
     <ul class="place-list">
-      {%- for place in views.map.list %}
+      {%- for place in group.items %}
       <li class="place-list__item">
         <a class="place-list__link" href="{{ place.url | url }}">{{ place.symbol | safe }}{{ place.name }}</a>
         {%- if place.species %}
@@ -40,8 +43,28 @@ description: >-
       {%- endfor %}
     </ul>
   </section>
+  {%- endfor %}
+
+  {%- if views.home.species.length > 0 %}
+  <section class="page-section">
+    <h2>Djuren på gården</h2>
+    {{- tiles.speciesGrid(views.home.species, true) }}
+  </section>
+
+  {%- else %}
+  <div class="note page-section">
+    <h2>Djuren är inte inlagda ännu</h2>
+    <p>
+      Snart kan du läsa om varje djur här. Under tiden hittar du allt om gården på
+      <a href="{{ site.mainSite }}">4h.se/stattared</a>.
+    </p>
+  </div>
   {%- endif %}
 
+  {#- The ear tag search is the page's last section before the outward links (02-§5.52):
+      it needs the visitor to stand next to the animal with the number readable, which is
+      the rarest of the errands the start page serves, and in the middle it split the page
+      in two. #}
   {%- if views.home.species.length > 0 %}
   <section class="page-section">
     <h2>Hitta ett djur via öronmärket</h2>
@@ -60,20 +83,6 @@ description: >-
       </div>
     </form>
   </section>
-
-  <section class="page-section">
-    <h2>Djuren på gården</h2>
-    {{- tiles.speciesGrid(views.home.species, true) }}
-  </section>
-
-  {%- else %}
-  <div class="note page-section">
-    <h2>Djuren är inte inlagda ännu</h2>
-    <p>
-      Snart kan du läsa om varje djur här. Under tiden hittar du allt om gården på
-      <a href="{{ site.mainSite }}">4h.se/stattared</a>.
-    </p>
-  </div>
   {%- endif %}
 
   {#- Maps of the area belong to the main site and to Naturkartan, not here (02-§5.34,

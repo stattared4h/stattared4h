@@ -148,12 +148,22 @@ export interface MapListItem extends LinkView {
   species: string;
   /** The same symbol the marker carries, as an `<svg>` (02-§5.39). */
   symbol: string;
+  /** `kind: djurplats` — a paddock or an animal house, empty of animals or not (02-§5.51). */
+  animalPlace: boolean;
+}
+
+export interface MapListGroup {
+  heading: string;
+  items: MapListItem[];
 }
 
 export interface MapPageView {
   /** The map markup from renderMap; empty when no active location has coordinates. */
   html: string;
+  /** Every active place, in the dataset's order: the map's full text alternative (02-§5.24). */
   list: MapListItem[];
+  /** The same items, split in two so the animal places come first (02-§5.51). */
+  groups: MapListGroup[];
   warnings: string[];
 }
 
@@ -368,6 +378,24 @@ export function mapLocations(dataset: Dataset): MapLocation[] {
     }));
 }
 
+/** The two headings the place list is split under (02-§5.51). */
+export const ANIMAL_PLACES_HEADING = "Hagar och djurhus";
+export const OTHER_PLACES_HEADING = "Annat på gården";
+
+/**
+ * Splits the list in two so the places with animals come before the parking and the
+ * toilets (02-§5.51). Each item keeps its place in the order, and the groups hold the
+ * same objects as `list` — not copies — so the two can never say different things and
+ * the list stays the map's full text alternative (02-§5.24). A group with nothing in it
+ * is left out rather than shown as a bare heading.
+ */
+export function mapListGroups(list: readonly MapListItem[]): MapListGroup[] {
+  return [
+    { heading: ANIMAL_PLACES_HEADING, items: list.filter((item) => item.animalPlace) },
+    { heading: OTHER_PLACES_HEADING, items: list.filter((item) => !item.animalPlace) },
+  ].filter((group) => group.items.length > 0);
+}
+
 export function mapView(dataset: Dataset, options: Pick<BuildViewsOptions, "base" | "mapBackground">): MapPageView {
   const rendered = renderMap(mapLocations(dataset), { base: options.base, background: options.mapBackground ?? null });
   const list = sortLocations(dataset.locations)
@@ -377,8 +405,9 @@ export function mapView(dataset: Dataset, options: Pick<BuildViewsOptions, "base
       url: locationUrl(location.id),
       species: speciesText(dataset, location),
       symbol: symbolSvg(location.kind, "place-list__symbol"),
+      animalPlace: location.kind === "djurplats",
     }));
-  return { html: rendered.html, list, warnings: rendered.warnings };
+  return { html: rendered.html, list, groups: mapListGroups(list), warnings: rendered.warnings };
 }
 
 /** Every page's view model, in the dataset's deterministic order (02-§6.9). */

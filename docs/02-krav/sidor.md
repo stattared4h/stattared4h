@@ -32,6 +32,18 @@ läsa sig fram namn för namn. Issue #51 bad om en symbol per sorts plats, som p
 skyltar. Symbolerna är det bygget som först beror på vad en plats är, och därför bär
 `kind` sedan dess åtta värden i stället för två (ADR 0019).
 
+Platslistan under kartan var en platt alfabetisk lista på trettiotvå rader, där hagar och
+djurhus låg blandade med toaletter, parkeringar, grillplatser och vandrarhem. Den som stod
+på gården och undrade vilken hage hen skulle gå till läste sig igenom parkeringarna på
+vägen, och "Djuren på gården" började 2 462 px ned — efter kartan, listan och ett formulär
+för att skriva av ett märkningsnummer (issue #62).
+
+Det uppenbara vore att flytta upp djurslagen ovanför listan. Det gjordes inte: artrutnätet
+är omkring 760 px högt och skulle knuffa ned kartans textalternativ lika långt, och kartan
+plus listan är orienteringsverktyget för den som står i hagen. Orienteringen väger tyngre
+än ordningen. `02-§5.51` gör listan värd sina rader i stället, och `02-§5.52` flyttar det
+som inte hörde hemma mitt på sidan.
+
 Djurkorten låg först i en kolumn på mobil: `auto-fit` med ett minimum på 280 px ger
 aldrig två kolumner i en telefons 312 px innehållsbredd. Platssidan för Gethagen blev
 8 249 px lång för nitton getter — tio skärmars rullning — och barnet som ska känna igen
@@ -62,12 +74,15 @@ håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
 
 ### Startsidan
 
-- Startsidan visar först kartan över gården, sedan platslistan, och därunder djurslagen
-  som finns på gården — arter med minst ett djur med `status: here` eller ett räknat
-  bestånd (`04-§4.7`) — som tryckytor med artens bild och namn i plural, länkade till
-  artsidan. Besökaren står på gården med telefonen: kartan är det första hen behöver,
+- Startsidan visar först kartan över gården, sedan platslistan (`02-§5.51`), och därunder
+  djurslagen som finns på gården — arter med minst ett djur med `status: here` eller ett
+  räknat bestånd (`04-§4.7`) — som tryckytor med artens bild och namn i plural, länkade
+  till artsidan. Besökaren står på gården med telefonen: kartan är det första hen behöver,
   djuren det andra. Är inget djurslag inlagt säger startsidan det och pekar på
   huvudsidan. <!-- 02-§5.7 -->
+- Öronmärkessökningen (`02-§5.36`) är startsidans sista avsnitt före "Fler kartor i
+  området". Den kräver att besökaren står intill djuret med numret läsbart och är därmed
+  det ovanligaste av startsidans ärenden. <!-- 02-§5.52 -->
 - Startsidan säger i en mening vad sajten är och pekar på huvudsidan
   (`02-§1.9`). <!-- 02-§5.8 -->
 
@@ -137,6 +152,12 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   mer om platsen (`02-§5.46`). <!-- 02-§5.23 -->
 - Under kartan står en textlista med samma platser, deras djurslag i plural och länk till
   platssidan. Listan är en fullvärdig väg till informationen utan kartan. <!-- 02-§5.24 -->
+- Listan är delad i två grupper med var sin rubrik: "Hagar och djurhus" — platserna med
+  `kind: djurplats`, med eller utan djur just nu — och därefter "Annat på gården" med
+  övriga sorter. Inom varje grupp står platserna i samma ordning som förut, och
+  tillsammans innehåller grupperna varje plats kartan visar, så listan förblir en
+  fullvärdig väg till informationen (`02-§5.24`). En grupp utan platser visas
+  inte. <!-- 02-§5.51 -->
 - En aktiv plats utan koordinater finns i listan men inte på kartan. <!-- 02-§5.25 -->
 - Kartan laddar inga kartplattor och gör inga anrop utanför sajten. <!-- 02-§5.26 -->
 - Varje markör är minst 44 × 44 px, och kartan har en textbeskrivning: "Karta över

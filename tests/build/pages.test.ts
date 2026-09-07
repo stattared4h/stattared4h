@@ -11,11 +11,13 @@ import { readSpeciesContent } from "../../source/ts/build/content.ts";
 import {
   ACCESSIBLE_TEXT,
   animalCard,
+  ANIMAL_PLACES_HEADING,
   buildViews,
   GONE_LABEL,
   HERITAGE_LABEL,
   NO_SPECIES_AT_LOCATION_TEXT,
   NOT_ACCESSIBLE_TEXT,
+  OTHER_PLACES_HEADING,
   portraitOf,
   type SiteViews,
 } from "../../source/ts/build/pages.ts";
@@ -271,6 +273,44 @@ describe("the map page (02-§5.23–5.25)", () => {
     );
   });
 
+  test("the list is split in two, animal places first (02-§5.51)", async () => {
+    const { views } = await qaViews();
+    assert.deepEqual(
+      views.map.groups.map((group) => group.heading),
+      [ANIMAL_PLACES_HEADING, OTHER_PLACES_HEADING],
+    );
+    const [animals, other] = views.map.groups;
+    assert.ok(animals.items.every((item) => item.animalPlace), "the first group is only animal places");
+    assert.ok(other.items.every((item) => !item.animalPlace), "the second group has no animal places");
+    // A paddock with no animals right now is still a paddock (02-§5.51).
+    assert.ok(
+      animals.items.some((item) => item.species === NO_SPECIES_AT_LOCATION_TEXT),
+      "an empty paddock stays under the animal heading",
+    );
+    assert.ok(other.items.some((item) => item.name === "Toaletterna"), "the toilets are under the other heading");
+  });
+
+  test("the groups together are exactly the list, in the same order (02-§5.24)", async () => {
+    const { views } = await qaViews();
+    const grouped = views.map.groups.flatMap((group) => group.items);
+    assert.equal(grouped.length, views.map.list.length, "no place is lost and none is listed twice");
+    assert.deepEqual(new Set(grouped), new Set(views.map.list), "the groups hold the same items as the list");
+    for (const group of views.map.groups) {
+      const order = group.items.map((item) => views.map.list.indexOf(item));
+      assert.deepEqual(order, [...order].sort((a, b) => a - b), `${group.heading} keeps the list's order`);
+    }
+  });
+
+  test("an empty group is left out rather than shown as a bare heading (02-§5.51)", async () => {
+    const { dataset } = await qaViews();
+    const onlyAnimalPlaces: Dataset = {
+      ...dataset,
+      locations: dataset.locations.filter((location) => location.kind === "djurplats"),
+    };
+    const views = buildViews(onlyAnimalPlaces, { base: "/", farm: FARM });
+    assert.deepEqual(views.map.groups.map((group) => group.heading), [ANIMAL_PLACES_HEADING]);
+  });
+
   test("a place without coordinates is listed but not drawn", async () => {
     const { dataset } = await qaViews();
     const altered: Dataset = {
@@ -291,7 +331,8 @@ describe("an empty dataset (02-§5.7)", () => {
     assert.deepEqual(views.locations, []);
     assert.deepEqual(views.animals, []);
     assert.deepEqual(views.species, []);
-    assert.deepEqual(views.map, { html: "", list: [], warnings: [] });
+    // No place at all means no group either: an empty heading is not an answer (02-§5.51).
+    assert.deepEqual(views.map, { html: "", list: [], groups: [], warnings: [] });
   });
 });
 
