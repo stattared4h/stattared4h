@@ -7,13 +7,13 @@
  */
 import { loadRawDataset, type RawDataset, type RawRecord } from "./load.ts";
 import { isPublicIdFormat, normalisePublicId } from "./public-id.ts";
-import { formatIssue, validateDataset, type ValidateOptions } from "./validate.ts";
+import { formatIssue, validateDataset as validateCoreDataset, type ValidateOptions } from "./validate.ts";
 import type { Dataset, Issue, ValidationResult } from "./types.ts";
 
 export type * from "./types.ts";
 export type { RawDataset, RawRecord } from "./load.ts";
 export { loadRawDataset } from "./load.ts";
-export { formatIssue, validateDataset, MAX_IMAGE_BYTES, MAX_IMAGE_SIDE, type ValidateOptions } from "./validate.ts";
+export { formatIssue, MAX_IMAGE_BYTES, MAX_IMAGE_SIDE, type ValidateOptions } from "./validate.ts";
 export { formatBorn, normaliseBorn, type BornResult } from "./born.ts";
 export { isPublicIdFormat, normalisePublicId } from "./public-id.ts";
 export { compareByName, sortAnimals, sortLocations } from "./sort.ts";
@@ -32,27 +32,39 @@ interface PublicIdRead {
 }
 
 /**
- * `publicId` belongs to the public animal model but is kept outside the older generic
- * record validator so this additive field cannot weaken its strict unknown-field rule.
+ * Validates the additive visitor-facing `publicId` field before the core contract
+ * validator runs. The core validator stays strict about unknown legacy fields while
+ * this front door owns the complete current public dataset contract.
  */
 function readPublicIds(raw: RawDataset): PublicIdRead {
   const values = new Map<string, string>();
   const normalised = new Map<string, string>();
   const errors: Issue[] = [];
   const animals: RawRecord[] = raw.animals.map((record) => {
-    if (record.parseError !== null || typeof record.data !== "object" || record.data === null || Array.isArray(record.data)) return record;
+    if (record.parseError !== null || typeof record.data !== "object" || record.data === null || Array.isArray(record.data)) {
+      return record;
+    }
     const data = { ...(record.data as Record<string, unknown>) };
     const value = data.publicId;
     delete data.publicId;
     if (value === undefined || value === null) return { ...record, data };
     if (typeof value !== "string" || value.trim() === "" || !isPublicIdFormat(value)) {
-      errors.push({ file: record.file, field: "publicId", message: "måste vara ett publikt id med bokstäver och siffror; mellanslag och bindestreck får användas som avskiljare." });
+      errors.push({
+        file: record.file,
+        field: "publicId",
+        message:
+          "måste vara ett publikt id med bokstäver och siffror; mellanslag och bindestreck får användas som avskiljare.",
+      });
       return { ...record, data };
     }
     const key = normalisePublicId(value);
     const previous = normalised.get(key);
     if (previous !== undefined) {
-      errors.push({ file: record.file, field: "publicId", message: `${JSON.stringify(value)} används redan av ${previous}. Varje publikt djur-id måste vara unikt även om mellanslag eller bindestreck skrivs olika.` });
+      errors.push({
+        file: record.file,
+        field: "publicId",
+        message: `${JSON.stringify(value)} används redan av ${previous}. Varje publikt djur-id måste vara unikt även om mellanslag eller bindestreck skrivs olika.`,
+      });
     } else {
       normalised.set(key, record.file);
       values.set(record.id, value);
@@ -62,15 +74,22 @@ function readPublicIds(raw: RawDataset): PublicIdRead {
   return { stripped: { ...raw, animals }, values, errors };
 }
 
-/** Reads and validates the dataset in `dir`. Never throws on data errors. */
-export async function loadDataset(dir: string = defaultDataDir(), options: ValidateOptions = {}): Promise<ValidationResult> {
-  const raw = await loadRawDataset(dir);
+/** Validates and normalises an already loaded dataset against the complete contract. */
+export async function validateDataset(raw: RawDataset, options: ValidateOptions = {}): Promise<ValidationResult> {
   const publicIds = readPublicIds(raw);
-  const result = await validateDataset(publicIds.stripped, options);
+  const result = await validateCoreDataset(publicIds.stripped, options);
   const errors = [...result.errors, ...publicIds.errors];
   if (result.dataset === null || errors.length > 0) return { ...result, errors, dataset: null };
-  const animals = result.dataset.animals.map((animal) => ({ ...animal, publicId: publicIds.values.get(animal.id) ?? null }));
+  const animals = result.dataset.animals.map((animal) => ({
+    ...animal,
+    publicId: publicIds.values.get(animal.id) ?? null,
+  }));
   return { ...result, errors, dataset: { ...result.dataset, animals } };
+}
+
+/** Reads and validates the dataset in `dir`. Never throws on data errors. */
+export async function loadDataset(dir: string = defaultDataDir(), options: ValidateOptions = {}): Promise<ValidationResult> {
+  return validateDataset(await loadRawDataset(dir), options);
 }
 
 /**
