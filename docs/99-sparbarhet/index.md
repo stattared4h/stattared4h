@@ -31,7 +31,8 @@ samt Eleventy-bygget med grundlayout, sidhuvud, sidfot, versionsmodul, manifest,
 service worker, feedbackdialog, om-sida och de datadrivna sidorna: start, plats, djur,
 art och karta, byggda ur det validerade datasetet. Bilderna är egna poster med id ur
 innehållet (ADR 0015), och 4H-loggan är förbundets egen, härledd ur vektorfilen i
-källregistret (ADR 0016). Statusen nedan speglar det.
+källregistret (ADR 0016). QA-datasetets 100 individer delar på 25 versionshanterade,
+permanent märkta AI-bilder (ADR 0017). Statusen nedan speglar det.
 
 ### Krav (`02-§`)
 
@@ -71,7 +72,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§6.9` | Deterministisk svensk sortering | `byggd` | `source/ts/domain/sort.ts`; `tests/domain/sort.test.ts` |
 | `02-§6.10` | Tester mot QA-datat, ogiltiga poster i testet | `byggd` | `tests/domain/helpers.ts` läser `source/data-qa/`; ogiltiga poster byggs i minnet |
 | `02-§6.11` | Test: inget `location`-fält | `byggd` | `tests/domain/no-location.test.ts` läser både `source/data` och `source/data-qa` |
-| `02-§6.12` | QA har minst 100 individer och täcker vokabulären | `saknas` | `source/data-qa/` har 100 individer och täcker vokabulären, men ska samlas till cirka 25 bilder som delas av flera djur |
+| `02-§6.12` | QA har minst 100 individer och täcker vokabulären | `byggd` | `source/data-qa/` har 100 individer, täcker all vokabulär och ger varje individ minst en av 25 delade bilder; `tests/domain/qa-data.test.ts` bevakar antal, täckning, bilddelning och bild på varje individ |
 | `02-§6.13` | Räknade bestånd för djur utan individsidor | `byggd` | `source/ts/domain/load.ts`, `validate.ts`, `derive.ts`; `tests/domain/qa-data.test.ts` |
 | `02-§7.1`–`7.2` | Manifest: namn, färger ur tokens, ikoner; `start_url`, `scope` och `id` ur bas-sökvägen | `byggd` | `source/pages/manifest.njk` med färgerna från `readThemeColours` i `source/ts/build/pwa.ts`; `tests/build/pwa.test.ts` jämför med `tokens.css` och bygger under `/prov/qa/` |
 | `02-§7.3` | Registrering på `<bas>sw.js` med scope lika med bas-sökvägen | `manuell` | `source/ts/ui/sw-register.ts` läser `data-base`, som `tests/build/pwa.test.ts` bevakar. Öppna startsidan i Chromium, DevTools → Application → Service Workers: `sw.js` är registrerad med scope lika med bas-sökvägen, och under `/qa/` finns en egen med scope `…/qa/` |
@@ -85,8 +86,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§8.1` | Bara webbanpassade bilder i repot, platt katalog | `påbörjad` | `npm run image` skriver filer som håller gränserna, platt och med bild-id:t som filnamn, och `02-§8.2` fäller vid en fil som inte gör det; `source/images/` väntar på gårdens egna fotografier |
 | `02-§8.2` | Validering av bildfiler | `byggd` | `validateImageFiles` i `source/ts/domain/validate.ts` fäller vid saknad fil, fel format, för stora mått, för stor fil och kvarlämnad metadata, och rapporterar på bildposten så en delad bild bara felar en gång; bygget skickar bildkatalogen när den finns. `tests/domain/validate.test.ts` prövar varje regel med handbyggda WebP-filer |
 | `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` med `optimiseImage` i `source/ts/build/images.ts` och `imageIdFor` i `source/ts/domain/image-id.ts`; skriver bildfilen och bildposten. `tests/build/images.test.ts` prövar nedskalning, metadatarensning, att id:t är filens hash, bildposten, samma foto två gånger och kraven på `--alt` och `--credit` |
-| `02-§8.4` | Versionshanterade, märkta AI-bilder i QA | `saknas` | ADR 0017; cirka 25 filer ska tas fram och läggas i `source/images-qa/` |
-| `02-§8.5`–`8.7` | Leverans av bilder | `byggd` | `picture`-shortcoden i djurkortet, djurslagsrutan och djur- och artsidan, `credit` i `source/pages/djur.njk` och `arter.njk`; `tests/build/data-pages.test.ts` kontrollerar `srcset`, `width`, `height`, `loading`, `fetchpriority`, `alt`, platshållaren och fototexten på Rosas och Bockens sidor |
+| `02-§8.4` | Versionshanterade, märkta AI-bilder i QA | `byggd` | 25 WebP-filer i `source/images-qa/`, märkta av `scripts/qa-images.mjs`; format, mått, filstorlek och metadata bevakas av `tests/domain/validate.test.ts` och märkningen av `tests/build/qa-images.test.ts` |
+| `02-§8.5`–`8.7` | Leverans av bilder | `byggd` | `picture`-shortcoden i djurkortet, djurslagsrutan och djur- och artsidan, `credit` i `source/pages/djur.njk` och `arter.njk`; `tests/build/data-pages.test.ts` kontrollerar `srcset`, `width`, `height`, `loading`, `fetchpriority`, `alt` och fototexten på Rosas, Bockens och Tuvas sidor |
 | `02-§8.8` | Bildposten med `alt` och `credit` | `byggd` | `validateImagePosts` i `source/ts/domain/validate.ts`, `Image` i `types.ts`, `images/` i `load.ts`; `tests/domain/validate.test.ts` och `tests/domain/qa-data.test.ts`. Se [ADR 0015](../adr/0015-bilden-som-egen-post.md) |
 | `02-§8.9` | Bild-id ur innehållets SHA-256 | `byggd` | `source/ts/domain/image-id.ts`; `tests/domain/image-id.test.ts` prövar formen, att hashen är stabil och att prefixet hindrar YAML från att läsa ett id med bara siffror som heltal |
 | `02-§8.10`–`8.11` | Referenser och huvudbild | `byggd` | `Fields.photos` och `Fields.imageReference` löser upp id:n till `Image`, `portraitOf` i `source/ts/build/pages.ts` tar den första; `tests/domain/validate.test.ts` prövar delning mellan poster och dubbelreferens, `tests/build/data-pages.test.ts` att en delad bild ger en fil och en alt-text på båda sidorna |
@@ -97,9 +98,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§8.17` | Id:n grupperade per post, klistringsfärdiga | `byggd` | `formatIdsByPost` i `scripts/lib/image-import.ts`; `tests/build/image-import.test.ts` prövar formen både som funktion och i kommandots utskrift |
 | `02-§8.18`–`8.19` | Felmeddelanden och CSV med citerade fält | `byggd` | `parseTable` och `formatIssue` i `scripts/lib/image-import.ts`; `tests/build/image-import.test.ts` prövar citattecken, kommatecken och radbrytningar i ett fält, semikolon, byteordningsmarkering, CRLF, och att rad och kolumn står i varje meddelande |
 | `02-§8.20` | Samma bild två gånger skrivs en gång | `byggd` | Två rader med samma fil fälls i `planImport`; en omkörning hoppar över bilder som finns, eftersom id:t är innehållets hash. `tests/build/image-import.test.ts` |
-| `02-§8.21` | AI-credit i QA och spärr i produktion | `saknas` | ADR 0017; bildposterna och valideringen återstår |
-| `02-§8.22` | `npm run qa:prompts` | `saknas` | Promptplanering och CLI återstår |
-| `02-§8.23`–`8.24`, `8.26`–`8.27` | Säker QA-import under befintliga id:n | `saknas` | Import, märkning, gränser och katalogskydd återstår |
+| `02-§8.21` | AI-credit i QA och spärr i produktion | `byggd` | QA-bildposterna anger OpenAI ImageGen; `validateImagePosts` avvisar credit som börjar med `AI-genererad` utanför QA och bevakas av `tests/domain/validate.test.ts` |
+| `02-§8.22` | `npm run qa:prompts` | `byggd` | `buildQaPromptRows` och `qaPromptCsv` i `scripts/lib/qa-images.ts` samt `scripts/qa-prompts.mjs`; `tests/build/qa-images.test.ts` bevakar kontext, stabilt mål och kalkylarkssäker CSV |
+| `02-§8.23`–`8.24`, `8.26`–`8.27` | Säker QA-import under befintliga id:n | `byggd` | `scripts/qa-images.mjs --import` validerar alla källor före skrivning, behåller id och befintliga filer, märker, beskär och komprimerar samt vägrar produktionskataloger; `tests/build/images.test.ts` prövar flödet och felvägarna |
 | `02-§8.25` | Platshållare bara för saknade QA-filer | `byggd` | `scripts/qa-images.mjs` hoppar över varje befintlig fil; `tests/build/images.test.ts` prövar omkörning och skyddet för `source/images/` |
 | `02-§9.1` | Eleventy och esbuild | `byggd` | `eleventy.config.js` med esbuild i `eleventy.before`; `erasableSyntaxOnly` i `tsconfig.json` fäller `enum` och `namespace`; byggtesterna kör Eleventy som barnprocess |
 | `02-§9.2` | Node 22.18 i `.nvmrc` och `engines` | `påbörjad` | Båda finns, och `eleventy.config.js` importerar `.ts` direkt; inget test |
@@ -179,7 +180,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§8.1`–`8.4`, `8.8`–`8.10` | Fotoregler, personer, upphovsrätt | `dokumenterad` | Vägledning för den som fotograferar; `credit` visas intill varje bild (`02-§8.7`) |
 | `05-§8.5`–`8.7` | Tekniska bildregler | `byggd` | `generateImageSizes` och `renderPicture`, använda av sidorna; `srcset`, `width`, `height` och `loading` bevakas av `tests/build/data-pages.test.ts`. En bild i brödtext delar utseende med en bild i en figure i `source/assets/css/components.css` |
 | `05-§8.11` | Logotypens ursprung står i källregistret | `byggd` | `tests/design/logo.test.ts` kräver adress, hämtdatum och besked om filen ligger i repot för varje källa |
-| `05-§8.12` | Märkning och motiv för QA-bilder | `dokumenterad` | ADR 0017 och `docs/05-design/bilder-och-tillganglighet.md`; bilderna återstår |
+| `05-§8.12` | Märkning och motiv för QA-bilder | `byggd` | De 25 fotorealistiska motiven i `source/images-qa/` saknar personer och har permanent märkning; `tests/build/qa-images.test.ts` bevakar märkningen, medan motivvalet har verifierats visuellt |
 | `05-§9` | Tillgänglighet | `dokumenterad` | Delvis testbar med html-validate |
 | `05-§10` | Vad man inte gör | `dokumenterad` | Delvis kontrollerbar med lint |
 
@@ -190,8 +191,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `04-§1`–`04-§9` | Modell för djur, arter, raser, bestånd, platser och bilder | `påbörjad` | Domänlagret läser och validerar modellen, inklusive räknade bestånd och bildposter; gårdens egna bildfiler saknas ännu |
 | `04-§4.2` | Djur har inget `location`-fält | `byggd` | Valideraren fäller (`tests/domain/validate.test.ts`) och `tests/domain/no-location.test.ts` bevakar datat |
 | `04-§8` | Härledda vyer | `byggd` | `source/ts/domain/derive.ts` matar vymodellerna i `source/ts/build/pages.ts`; `tests/domain/derive.test.ts` och `tests/build/pages.test.ts`. Djursidan påstår aldrig var individen står (`04-§8.2`): `tests/build/data-pages.test.ts` kräver att ordet `location` inte finns på någon sida |
-| `04-§10` | Validering | `byggd` | `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts`. Bildkontrollen (`04-§10.7`) prövas med handbyggda WebP-filer i `tests/domain/webp.test.ts` tills `source/images-qa/` finns |
-| `04-§10.15` | AI-credit avvisas i produktion | `saknas` | Datasetmedveten kontroll och test återstår |
+| `04-§10` | Validering | `byggd` | `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts`. Bildkontrollen (`04-§10.7`) prövas med handbyggda WebP-filer och mot de versionshanterade filerna i `source/images-qa/` |
+| `04-§10.15` | AI-credit avvisas i produktion | `byggd` | `validateImagePosts` skiljer QA från produktion via datakatalogen; `tests/domain/validate.test.ts` prövar båda fallen |
 
 ### Miljöer (`06-§`)
 
@@ -203,7 +204,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `06-§1.5` | QA-versionen får tillägget " – QA" | `manuell` | Kontrollpunkten för `02-§10.33` |
 | `06-§2.1` | `DATA_DIR` väljer dataset | `byggd` | `eleventy.config.js` läser `DATA_DIR` och bygger sidorna ur det datasetet; `tests/build/data-pages.test.ts` bygger QA-datat och ett tomt dataset i en tillfällig katalog |
 | `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
-| `06-§2.3` | QA-datat prövar gränsfallen | `påbörjad` | 100 individer och två räknade hönsbestånd finns; bildfilerna genereras av `npm run qa:images` (`02-§8.4`) |
+| `06-§2.3` | QA-datat prövar gränsfallen | `byggd` | 100 individer, två räknade hönsbestånd, 25 delade bilder, en tom hage och en aktiv plats utan foto finns; `tests/domain/qa-data.test.ts`, `validate.test.ts` och `tests/build/data-pages.test.ts` bevakar fallen |
 | `06-§2.4` | Kontraktsändring ändrar QA-datat | `dokumenterad` | Process |
 | `06-§3.1` | `BASE_PATH` | `byggd` | Blir Eleventys `pathPrefix` i `eleventy.config.js`; `tests/build/site.test.ts` bygger med `/prov/` |
 | `06-§3.2` | Varje adress via hjälpfunktionen | `byggd` | Eleventys `url`-filter i mallarna; testet är `02-§9.8` |
@@ -226,7 +227,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§6.2` | Upplösare från bild-id till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` kontrollerar också att ingen sökväg har en underkatalog per posttyp |
 | `03-§6.5` | Bild-id löses upp när datasetet normaliseras | `byggd` | `Fields.imageReference` i `validate.ts` ger `Animal.photos`, `Location.photos` och `Species.photo` färdiga `Image`-objekt; `tests/domain/validate.test.ts` |
 | `03-§6.7` | Importen delad i planering och utförande | `byggd` | `scripts/lib/image-import.ts` är ren och testas på strängar; `scripts/image-import.mjs` gör filarbetet. `tests/build/image-import.test.ts` |
-| `03-§6.8` | Prompt- och importkedja för QA-bilder | `dokumenterad` | ADR 0017 och arkitekturdokumentet; implementation och tester återstår |
+| `03-§6.8` | Prompt- och importkedja för QA-bilder | `byggd` | `scripts/lib/qa-images.ts`, `scripts/qa-prompts.mjs` och importläget i `scripts/qa-images.mjs`; `tests/build/qa-images.test.ts` och `tests/build/images.test.ts` bevakar kedjan |
 | `03-§6.6` | Bilder i Markdown genom samma kedja | `byggd` | `renderMarkdown(text, { renderImage })` och `markdownImages` från `images-plugin.ts`; `tests/build/markdown.test.ts` |
 | `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `byggd` | `renderPicture` med `eager` för sidans första bild; `tests/build/data-pages.test.ts` kräver `fetchpriority="high"` på porträttet och `loading="lazy"` på nästa bild |
 | `03-§8.1` | `npm run build` | `byggd` | `eleventy` med `eleventy.config.js`; byggtesterna kör samma bygge till en tillfällig katalog |
@@ -265,10 +266,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 7 |
-| `dokumenterad` | 19 |
-| `påbörjad` | 15 |
-| `byggd` | 102 |
+| `saknas` | 1 |
+| `dokumenterad` | 17 |
+| `påbörjad` | 14 |
+| `byggd` | 111 |
 | `manuell` | 39 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
