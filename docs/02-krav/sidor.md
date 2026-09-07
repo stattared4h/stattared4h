@@ -5,7 +5,8 @@ Del av [kravindexet](./index.md). Den här filen äger `02-§5`.
 Issues: [#6](https://github.com/stattared4h/stattared4h/issues/6),
 [#7](https://github.com/stattared4h/stattared4h/issues/7),
 [#9](https://github.com/stattared4h/stattared4h/issues/9),
-[#13](https://github.com/stattared4h/stattared4h/issues/13).
+[#13](https://github.com/stattared4h/stattared4h/issues/13),
+[#19](https://github.com/stattared4h/stattared4h/issues/19).
 
 ---
 
@@ -45,8 +46,9 @@ namngivet djur står i hagen.
 ### Startsidan
 
 - Startsidan visar djurslagen som finns på gården — arter med minst ett djur med
-  `status: here` — som tryckytor med artens bild och namn i plural, länkade till
-  artsidan, och därefter en länk till kartan. <!-- 02-§5.7 -->
+  `status: here` eller ett räknat bestånd (`04-§4.7`) — som tryckytor med artens bild
+  och namn i plural, länkade till artsidan, och därefter en länk till kartan. Är inget
+  djurslag inlagt säger startsidan det och pekar på huvudsidan. <!-- 02-§5.7 -->
 - Startsidan säger i en mening vad sajten är och pekar på huvudsidan
   (`02-§1.9`). <!-- 02-§5.8 -->
 
@@ -58,13 +60,20 @@ namngivet djur står i hagen.
   Tillgängligheten visas i ord i en faktaruta: "Hit når man med rullstol och barnvagn"
   eller "Hit når man inte med rullstol eller barnvagn". <!-- 02-§5.10 -->
 - Under det listas djuren av platsens djurslag med `status: here` som djurkort, under en
-  rubrik per djurslag på formen "Getterna på gården". Sidan påstår inte att en namngiven
-  individ står på platsen (ADR 0012). <!-- 02-§5.11 -->
+  rubrik per djurslag på formen "Getterna på gården". Ett djurslag med räknade bestånd
+  (`04-§4.7`) får i stället en mening på formen "På gården finns 18 svarta dvärghöns och
+  14 orusthöns." Sidan påstår inte att en namngiven individ står på platsen
+  (ADR 0012). <!-- 02-§5.11 -->
 - En aktiv plats utan djurslag visar "Just nu går inga djur här" och en länk till
   kartan. <!-- 02-§5.12 -->
 - En plats med `active: false` behåller sin adress, visar "Den här platsen används inte
   just nu" och en länk till kartan, och finns varken på kartan eller i kartans
   lista. <!-- 02-§5.13 -->
+- `npm run qr` skriver en SVG-fil per plats till `qr/<id>.svg`, med adressen
+  `<sajtens adress>plats/<id>/`, i ett format som går att skriva ut på en skylt.
+  Adressen tas ur miljövariabeln `SITE_URL` med
+  `https://stattared4h.github.io/stattared4h/` som standard. Inaktiva platser får
+  också en kod, eftersom adressen är permanent. <!-- 02-§5.29 -->
 
 ### Djursidan
 
@@ -85,7 +94,8 @@ namngivet djur står i hagen.
 - Artsidan visar artens namn i plural som `h1`, artens bild, och de aktiva platser vars
   `species` innehåller arten, som länkar till platssidorna. <!-- 02-§5.19 -->
 - Artsidan listar artens djur med `status: here` som djurkort, och därunder djur med
-  `status: gone` under rubriken "Har lämnat gården". <!-- 02-§5.20 -->
+  `status: gone` under rubriken "Har lämnat gården". En art med räknade bestånd visar i
+  stället meningen "På gården finns 18 svarta dvärghöns och 14 orusthöns." <!-- 02-§5.20 -->
 - Finns arten på ingen aktiv plats säger artsidan "Just nu vet vi inte var getterna går"
   och länkar till kartan. <!-- 02-§5.21 -->
 - Finns `source/content/arter/<id>.md` renderas dess Markdown som artens redaktionella
@@ -102,6 +112,11 @@ namngivet djur står i hagen.
 - Kartan laddar inga kartplattor och gör inga anrop utanför sajten. <!-- 02-§5.26 -->
 - Varje markör är minst 44 × 44 px, och kartan har en textbeskrivning: "Karta över
   Stättared med gårdens hagar". <!-- 02-§5.27 -->
+- Finns `source/map/background.svg` och `source/map/background.yaml` ritas den filen
+  under markörerna, inbäddad i sidan utan externa resurser, och markörerna placeras i
+  ritningens koordinatsystem enligt de kanter `background.yaml` anger (`03-§9.2`).
+  Bygget varnar om en plats hamnar utanför ritningen. Saknas filerna visas markörerna på
+  en tom platta. <!-- 02-§5.30 -->
 
 ### Djurkortet
 
