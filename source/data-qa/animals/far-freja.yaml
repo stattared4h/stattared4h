@@ -3,6 +3,8 @@ species: far
 breed: varmlandsfar
 sex: male
 born: 2022
+mother: far-astrid
+father: far-bertil
 status: here
 photos:
   - img-21c7f66f51c8
