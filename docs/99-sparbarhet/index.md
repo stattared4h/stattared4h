@@ -65,12 +65,12 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.32` | Kartan visar bara platsnamn | `byggd` | Markören bär pin och namn och inget annat; `tests/build/map.test.ts` läser varje markörs innehåll, djurslagen står bara i listan under kartan |
 | `02-§5.33` | Etiketter som annars överlappar | `byggd` | `placeLabels` i `source/ts/build/map.ts` med modifierarna i `layout.css`; `tests/build/map.test.ts` prövar krock, kant, ordningsoberoende och att etiketter utöver fyra döljs. Konstanterna jämförs med `tokens.css` i samma fil |
 | `02-§5.34` | Fler kartor i området | `byggd` | `site.areaMaps` i `eleventy.config.js` och avsnittet i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver rubriken och exakt de två länkmålen, och att inget hämtas utifrån |
-| `02-§5.35` | Ett besöksmål nämner inte djur | `byggd` | `kind` i `source/ts/domain/validate.ts` och `locationView` i `pages.ts`, grenen i `source/pages/plats.njk`; `tests/build/data-pages.test.ts` öppnar QA-datats besöksmål och `tests/domain/validate.test.ts` prövar att ett besöksmål med djurslag fäller bygget |
+| `02-§5.35` | En plats som inte är en djurplats nämner inte djur | `byggd` | `kind` i `source/ts/domain/validate.ts` och `locationView` i `pages.ts`, grenen i `source/pages/plats.njk`; `tests/build/data-pages.test.ts` öppnar QA-datats caféer och toaletter och `tests/domain/validate.test.ts` prövar att djurslag på en sådan plats fäller bygget |
 | `02-§5.36` | Visa och söka på öronmärke | `manuell` | Markup och visning bevakas av `tests/build/public-id.test.ts`, söklogiken av `tests/ui/animal-id-search.test.ts`. Bygg QA-sajten, öppna `/` i 360 px, sök `se-012345-0001` och bekräfta att `/djur/far-astrid/` öppnas och visar `Öronmärke: SE 012345 0001` |
 | `02-§5.37` | Exakt normaliserad sökning, ingen suffix-sökning | `byggd` | `findAnimalByPublicId` i `source/ts/ui/animal-id-search.ts`; `tests/ui/animal-id-search.test.ts` prövar mellanslag, bindestreck, skiftläge, tom sträng och suffix |
-| `02-§5.38` | Symbol per sorts plats på markören | `saknas` | |
-| `02-§5.39` | Samma symbol framför namnet i listan under kartan | `saknas` | |
-| `04-§5.7` | Platsen har en sort | `byggd` | ADR 0018; obligatoriskt `kind` med `djurplats` och `besoksmal`, prövat i `tests/domain/validate.test.ts` |
+| `02-§5.38` | Symbol per sorts plats på markören | `byggd` | `PLACE_SYMBOLS` i `source/ts/build/symbols.ts`, en per `LocationKind`, skriven i markören av `renderMap`. `tests/build/symbols.test.ts` kräver en egen symbol per sort, att ingen delas, att inget hämtas utifrån, och räknar om SHA-256 för de tre banor som är lyfta ur ett vägmärke (`09-§1.5`); `tests/build/map.test.ts` kräver att varje markör bär sin sorts symbol och inget mer |
+| `02-§5.39` | Samma symbol framför namnet i listan under kartan | `byggd` | `symbol` på `MapListItem` i `source/ts/build/pages.ts`, skriven i länken av `source/pages/index.njk`; `tests/build/pages.test.ts` kräver rätt symbol för Caféet och en symbol på varje listad plats, `data-pages.test.ts` att den står före namnet i den byggda sidan |
+| `04-§5.7` | Platsen har en sort | `byggd` | ADR 0019; obligatoriskt `kind` med åtta värden i `source/ts/domain/validate.ts`. `tests/domain/validate.test.ts` prövar att var och en tas emot, att `besoksmal` avvisas, att felmeddelandet räknar upp värdena och att djurslag på annat än en `djurplats` fäller bygget; `tests/domain/qa-data.test.ts` kräver att QA-datat innehåller varje sort |
 | `02-§5.33` (dold etikett) | Etiketten kommer fram vid fokus | `manuell` | Bygg med `DATA_DIR=source/data-qa`, öppna `/karta/` i 360 px bredd och tabba till en markör i klungan i mitten: namnet ska komma fram, och markören ska ligga överst |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
 | `02-§6.2` | Valideringen körs först i bygget | `byggd` | `eleventy.config.js` anropar `loadValidDataset` i `eleventy.before`, i sekventiellt händelseläge före bildpluginen; `tests/build/data-pages.test.ts` bygger ett ogiltigt dataset och kräver en tom utkatalog |
@@ -181,7 +181,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.21` | Faktaruta | `manuell` | `.note` för tillgängligheten på platssidan. Öppna `/plats/gethagen/` och bekräfta en ljusgrön ruta utan kantlinje under djurslagen |
 | `05-§6.22`–`6.27` | Platssida | `byggd` | `source/pages/plats.njk`: `h1`, djurslagsrutor, `note` i dämpad text, rubriken "Getterna på gården" och den tomma platsens text prövas i `tests/build/data-pages.test.ts`. Öppna `/plats/stora-hagen/` i 360 px och bekräfta att båda djurslagsrutorna syns utan att rulla |
 | `05-§6.28`–`6.29`, `6.32` | Formulärfält | `manuell` | `.field` i `components.css`. Öppna feedbackdialogen: etiketterna Rubrik och Beskrivning står ovanför fälten, som är vita med ram, rundade hörn och minst 44 px höga. Felmeddelanden (`05-§6.29`) har ingen markup ännu: dialogen förebygger fel genom att Skicka är inaktiv tills fälten är ifyllda |
-| `05-§6.39`–`6.40` | Markörens bricka och symbolen i listan | `saknas` | |
+| `05-§6.39`–`6.40` | Markörens bricka och symbolen i listan | `manuell` | `.map__pin`, `.map__symbol` och `.place-list__symbol` i `components.css`. Bygg med `DATA_DIR=source/data-qa`, öppna `/` i 360 px och bekräfta att hagarnas markörer är fyllda gröna brickor med vit symbol och att gårdens övriga är ljusa med grön ring och grön symbol, samt att samma symbol står framför namnet i listan under kartan |
 | `05-§6.31` | Kartan har en textlista | `byggd` | `views.map.list` i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver varje aktiv plats i listan |
 | `05-§6.30` | Sidfot | `manuell` | `source/layouts/footer.njk`, `layout.css`. Öppna en sida och bekräfta djupgrön botten, vit text, och ordningen logga, huvudsidelänk, repolänk, integritetsmening, version |
 | `05-§6.33`–`6.34`, `6.37` | Ikonknapp, meny, sidhuvudets höjd | `manuell` | `components.css`, `layout.css`. I 360 px: knapparna är 44 px, menykortet är grönt med vita länkar och glider in under sidhuvudet; sidhuvudets höjd är densamma före och efter rullning och i 1280 px |
@@ -254,7 +254,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§8.7` | Node 22.18; Eleventy importerar TypeScript direkt | `påbörjad` | `eleventy.config.js` importerar `source/ts/domain/version.ts`; `erasableSyntaxOnly` bevakas av typkontrollen, inte av ett test |
 | `03-§8.8`–`8.9` | Två deploy-flöden med ett återanvändbart; dubbelbygge | `manuell` | Kontrollpunkterna för `02-§9.11`–`9.12` och `02-§10.35` |
 | `03-§9` | Kartan | `byggd` | `source/ts/build/map.ts` med `mapFrame`, `projectPoint`, `renderMap` och bakgrunden; `tests/build/map.test.ts` |
-| `03-§9.5` | Symbolerna som inline-SVG i bygget | `saknas` | |
+| `03-§9.5` | Symbolerna som inline-SVG i bygget | `byggd` | `source/ts/build/symbols.ts` med `Record<LocationKind, string>`, så att en sort utan symbol fäller `npm run typecheck`. Tre symboler är vägmärkets egen figur, registrerade med kontrollsumma i `docs/09-kallor/index.md` och bevakade av `tests/build/symbols.test.ts` |
 | `03-§9.3`–`9.4` | Etikettplacering och länkar vidare | `byggd` | `placeLabels` och kartsidans avsnitt; `tests/build/map.test.ts` och `data-pages.test.ts` |
 | `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
@@ -285,11 +285,11 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 5 |
+| `saknas` | 1 |
 | `dokumenterad` | 17 |
 | `påbörjad` | 14 |
-| `byggd` | 123 |
-| `manuell` | 41 |
+| `byggd` | 126 |
+| `manuell` | 42 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
