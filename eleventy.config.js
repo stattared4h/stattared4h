@@ -79,6 +79,10 @@ export default function (eleventyConfig) {
 
   // `npm start` rebuilds when anything under source/ changes (02-§9.4), including the code esbuild bundles.
   eleventyConfig.addWatchTarget("source/ts/");
+  // Eleventy's watch mode would otherwise parse every file this config imports with a
+  // plain JavaScript parser, which cannot read the domain layer's TypeScript (03-§8.7).
+  // The watch target above covers the same files, so nothing is lost.
+  eleventyConfig.setWatchJavaScriptDependencies(false);
 
   // Global data available in every template (03-§10).
   eleventyConfig.addGlobalData("site", {
