@@ -94,7 +94,7 @@ test("kind is required on a location and only accepts the contract's values (04-
   );
 });
 
-test("a besoksmal with species is an error, not a warning (ADR 0017)", async () => {
+test("a besoksmal with species is an error, not a warning (ADR 0018)", async () => {
   // The likely slip is copying a paddock file when adding a café.
   const raw = await rawQa();
   editLocation(raw, "gethagen", (l) => (l.kind = "besoksmal"));

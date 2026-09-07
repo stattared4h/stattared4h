@@ -1,4 +1,4 @@
-# 0017 — Platsen har en sort
+# 0018 — Platsen har en sort
 
 **Status:** Antagen, 2026-09-07
 

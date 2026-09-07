@@ -301,7 +301,7 @@ describe("the map on the home page (02-§5.23–5.27)", () => {
   });
 });
 
-describe("a besoksmal never mentions animals (02-§5.35, ADR 0017)", () => {
+describe("a besoksmal never mentions animals (02-§5.35, ADR 0018)", () => {
   test("the café page shows its text and accessibility, and no animal sentence", async () => {
     const html = main(await page("plats/kaffestugan"));
     assert.match(html, /<h1>Kaffestugan<\/h1>/);

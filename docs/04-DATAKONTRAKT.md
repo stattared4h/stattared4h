@@ -173,7 +173,7 @@ Regler:
 - `kind` skiljer hagen och djurhuset (`djurplats`) från caféet, toaletten och lekplatsen
   (`besoksmal`). Sorten är ett faktum om platsen och härleds aldrig ur `species` — en hage
   vars djur tillfälligt flyttats är fortfarande en hage. Ett besöksmål med djurslag fäller
-  valideringen. Se [ADR 0017](adr/0017-platsen-har-en-sort.md). <!-- 04-§5.7 -->
+  valideringen. Se [ADR 0018](adr/0018-platsen-har-en-sort.md). <!-- 04-§5.7 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död

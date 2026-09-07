@@ -740,7 +740,7 @@ function validateLocation(
   }
 
   // A besoksmal with animals is almost always a paddock file copied for a café
-  // (ADR 0017), so it stops the build rather than passing with a warning.
+  // (ADR 0018), so it stops the build rather than passing with a warning.
   if (kind === "besoksmal" && species !== null && species.length > 0) {
     issues.error(record.file, "species", "ett besöksmål har inga djurslag. Skriv [], eller sätt kind: djurplats.");
     species = null;
