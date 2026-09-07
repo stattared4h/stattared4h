@@ -1,0 +1,157 @@
+/**
+ * Tests on the built site (02-§9.8, 02-§5.2, 02-§5.6, 02-§10.10, 02-§10.22, 06-§1.3, 06-§3.5).
+ *
+ * Two builds are made once for the whole file: a QA build under the base path
+ * `/prov/` with a version string, and a production build at `/` without one.
+ */
+import assert from "node:assert/strict";
+import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { after, before, describe, test } from "node:test";
+import { buildSite, listFiles, ROOT } from "./build-site.ts";
+
+const PREFIX = "/prov/";
+const QA_VERSION = "1.0.4 – QA PR212";
+
+let qa: string;
+let prod: string;
+
+before(async () => {
+  [qa, prod] = await Promise.all([
+    buildSite({ env: { BASE_PATH: PREFIX, DATA_DIR: "source/data-qa", BUILD_VERSION: QA_VERSION } }),
+    buildSite({ env: { BASE_PATH: "/", DATA_DIR: "source/data" } }),
+  ]);
+});
+
+after(async () => {
+  await Promise.all([qa, prod].filter(Boolean).map((dir) => rm(dir, { recursive: true, force: true })));
+});
+
+async function htmlFiles(dir: string): Promise<Array<{ file: string; html: string }>> {
+  const files = (await listFiles(dir)).filter((file) => file.endsWith(".html"));
+  return Promise.all(files.map(async (file) => ({ file, html: await readFile(path.join(dir, file), "utf8") })));
+}
+
+/** Every site-relative address a file refers to: attributes in HTML, url() in CSS, strings in a manifest or service worker. */
+function siteReferences(file: string, text: string): string[] {
+  const refs: string[] = [];
+  if (file.endsWith(".html")) {
+    for (const match of text.matchAll(/\b(?:href|src|action|poster)="([^"]*)"/g)) refs.push(match[1]);
+    for (const match of text.matchAll(/\bsrcset="([^"]*)"/g)) {
+      for (const candidate of match[1].split(",")) refs.push(candidate.trim().split(/\s+/)[0]);
+    }
+  }
+  if (file.endsWith(".css")) {
+    for (const match of text.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) refs.push(match[1]);
+  }
+  if (file.endsWith(".webmanifest") || file.endsWith(".json")) {
+    const walk = (value: unknown): void => {
+      if (typeof value === "string") refs.push(value);
+      else if (value && typeof value === "object") Object.values(value).forEach(walk);
+    };
+    walk(JSON.parse(text));
+  }
+  if (path.basename(file) === "sw.js") {
+    for (const match of text.matchAll(/["'](\/[^"']*)["']/g)) refs.push(match[1]);
+  }
+  return refs.filter((ref) => ref.startsWith("/") && !ref.startsWith("//"));
+}
+
+describe("bas-sökvägen (02-§9.8, 06-§3.2)", () => {
+  test("varje absolut adress i utdatan börjar med bas-sökvägen", async () => {
+    const files = await listFiles(qa);
+    assert.ok(files.some((file) => file.endsWith(".html")), "bygget gav inga HTML-filer");
+    const offenders: string[] = [];
+    let prefixed = 0;
+    for (const file of files) {
+      const text = await readFile(path.join(qa, file), "utf8");
+      for (const ref of siteReferences(file, text)) {
+        if (ref.startsWith(PREFIX)) prefixed += 1;
+        else offenders.push(`${file}: ${ref}`);
+      }
+    }
+    assert.deepEqual(offenders, [], "adresser som kringgår bas-sökvägen (ADR 0005)");
+    assert.ok(prefixed > 0, "inga adresser med bas-sökvägen hittades — matchar testet fortfarande markupen?");
+  });
+
+  test("bygget vägrar en mall med handskriven absolut sökväg (06-§3.5)", async () => {
+    const input = await mkdtemp(path.join(os.tmpdir(), "stattared4h-input-"));
+    try {
+      await cp(path.join(ROOT, "source"), input, { recursive: true });
+      await writeFile(
+        path.join(input, "pages", "fel.njk"),
+        '---\nlayout: base.njk\ntitle: Fel\ndescription: Fel\n---\n<a href="/karta/">Karta</a>\n',
+      );
+      await assert.rejects(buildSite({ input }), /absolute path.*\/karta\//s);
+    } finally {
+      await rm(input, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("sidorna (02-§5.2, 02-§5.3, 02-§5.6, 02-§7.7)", () => {
+  test("varje adress är index.html i en katalog, utom 404.html", async () => {
+    const files = (await listFiles(prod)).filter((file) => file.endsWith(".html"));
+    assert.ok(files.includes("index.html"), "startsidan saknas");
+    assert.ok(files.includes("404.html"), "404-sidan saknas");
+    assert.ok(files.includes(path.join("offline", "index.html")), "offline-sidan saknas");
+    for (const file of files) {
+      assert.ok(file === "404.html" || path.basename(file) === "index.html", `${file} är inte index.html i en katalog`);
+    }
+  });
+
+  test("varje sida har en h1, lang=sv, titel och beskrivning", async () => {
+    for (const { file, html } of await htmlFiles(prod)) {
+      assert.match(html, /^<!DOCTYPE html>/, `${file}: doctype`);
+      assert.match(html, /<html lang="sv">/, `${file}: lang`);
+      assert.equal(html.match(/<h1[\s>]/g)?.length, 1, `${file}: exakt en h1`);
+      const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+      assert.match(title, /^\S.* – Stättareds 4H-gård$/, `${file}: titeln "${title}" ska börja med sidnamnet och sluta med gårdens namn`);
+      const description = html.match(/<meta name="description" content="([^"]*)">/)?.[1] ?? "";
+      assert.ok(description.trim().length > 0, `${file}: meta description saknas`);
+    }
+  });
+
+  test("404- och offline-sidan har sin text och länkar till startsidan och kartan", async () => {
+    const notFound = await readFile(path.join(prod, "404.html"), "utf8");
+    assert.match(notFound, /<h1>Sidan finns inte<\/h1>/);
+    const offline = await readFile(path.join(prod, "offline", "index.html"), "utf8");
+    assert.match(offline, /<h1>Du är offline<\/h1>/);
+    for (const html of [notFound, offline]) {
+      const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+      assert.match(main, /href="\/"/, "länk till startsidan");
+      assert.match(main, /href="\/karta\/"/, "länk till kartan");
+    }
+  });
+});
+
+describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
+  test("sidhuvudet saknar länk till 4h.se; sidfoten har den", async () => {
+    for (const { file, html } of await htmlFiles(prod)) {
+      const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+      const footer = html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
+      assert.ok(header.length > 0 && footer.length > 0, `${file}: sidhuvud och sidfot`);
+      assert.doesNotMatch(header, /4h\.se/, `${file}: sidhuvudet får inte länka till huvudsidan`);
+      assert.match(footer, /href="https:\/\/www\.4h\.se\/stattared\/"/, `${file}: sidfoten länkar till huvudsidan`);
+      assert.match(footer, /Sidan samlar inga uppgifter om dig\./, `${file}: integritetsmeningen`);
+    }
+  });
+
+  test("versionsraden visar BUILD_VERSION och saknas i ett CI-bygge utan version", async () => {
+    const withVersion = await readFile(path.join(qa, "index.html"), "utf8");
+    assert.match(withVersion, new RegExp(`<p class="site-footer__version">Version ${QA_VERSION}</p>`));
+    const without = await readFile(path.join(prod, "index.html"), "utf8");
+    assert.doesNotMatch(without, /site-footer__version/);
+  });
+});
+
+describe("QA-bygget (06-§1.3)", () => {
+  test("varje QA-sida bär noindex; ingen produktionssida gör det", async () => {
+    const noindex = /<meta name="robots" content="noindex">/;
+    const qaPages = await htmlFiles(qa);
+    assert.ok(qaPages.length > 0);
+    for (const { file, html } of qaPages) assert.match(html, noindex, `${file} i QA saknar noindex`);
+    for (const { file, html } of await htmlFiles(prod)) assert.doesNotMatch(html, noindex, `${file} i produktion har noindex`);
+  });
+});
