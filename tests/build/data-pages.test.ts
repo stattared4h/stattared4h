@@ -305,7 +305,7 @@ describe("the map on the home page (02-§5.23–5.27)", () => {
   });
 });
 
-describe("a besoksmal never mentions animals (02-§5.35, ADR 0018)", () => {
+describe("a place that is not a djurplats never mentions animals (02-§5.35, ADR 0019)", () => {
   test("the café page shows its text and accessibility, and no animal sentence", async () => {
     const html = main(await page("plats/kaffestugan"));
     assert.match(html, /<h1>Kaffestugan<\/h1>/);
@@ -316,9 +316,14 @@ describe("a besoksmal never mentions animals (02-§5.35, ADR 0018)", () => {
     assert.doesNotMatch(html, /animal-card/, "no animals");
   });
 
+  // The other half of 02-§5.35: the sentence the café must not show is exactly the one an
+  // empty paddock must (02-§5.12). Övre hagen is the QA dataset's active place without
+  // species; Kattvinden has cats and would say nothing either way.
   test("a djurplats without animals still says so", async () => {
-    const html = main(await page("plats/kattvinden"));
-    assert.match(html, /<h1>Kattvinden<\/h1>/);
+    const html = main(await page("plats/ovre-hagen"));
+    assert.match(html, /<h1>Övre hagen<\/h1>/);
+    assert.match(html, /Just nu går inga djur här/);
+    assert.match(html, /Karta över gården/, "and a way back to the map (02-§5.12)");
   });
 });
 

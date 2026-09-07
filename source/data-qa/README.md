@@ -49,6 +49,12 @@ prövar större listor, svensk sortering och att samtliga arter och raser använ
 | `grishagen` | Nytt djurslag med många individer |
 | `honshuset` | Ett djurslag som representeras av räknade bestånd i stället för individer |
 | `kattvinden` | Ett litet bestånd med bara två individer |
+| `grillplatsen` | Finns för att QA-datat ska innehålla **varje sort i `kind`** (`04-§5.7`), så att kartans åtta symboler alla byggs; `tests/domain/qa-data.test.ts` kräver det |
+
+Varje värde i `kind` finns representerat: `djurplats` i hagarna, `mat` i `cafeet`,
+`kaffestugan` och `lottas-vaffelstuga`, `grill` i `grillplatsen`, `toalett` i
+`toaletterna`, `parkering` i de två parkeringarna, `lek` i `lekplatsen` och
+`kapphastbanan`, `boende` i `vandrarhemmet` och `husbil` i `stallplatsen`.
 
 Arten `hast` finns medvetet på **ingen** plats, så att artsidan prövas när svaret på
 "var finns hästarna?" är att vi inte vet.
