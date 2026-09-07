@@ -57,10 +57,16 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto auto auto 1fr auto;
   align-items: center;
   column-gap: var(--space-xs);
   min-height: var(--tap-target-min);
+}
+
+/* The start page has no "Tillbaka" (02-§10.40), so its row is one column shorter and
+   the menu button starts at the edge like everywhere else. */
+.site-header__inner--home {
+  grid-template-columns: auto auto 1fr auto;
 }
 
 .site-header__brand,
@@ -68,20 +74,42 @@
   display: none;
 }
 
-.site-header__menu-button {
+/* The order in the row (02-§10.3): back, menu, install, "to top" centred, feedback.
+   On the start page the first column is gone and every button moves one step left. */
+.site-header__back {
   grid-column: 1;
 }
 
-.site-header__install {
+.site-header__menu-button {
   grid-column: 2;
 }
 
-.site-header__to-top {
+.site-header__install {
   grid-column: 3;
+}
+
+.site-header__to-top {
+  grid-column: 4;
   justify-self: center;
 }
 
 .site-header__feedback {
+  grid-column: 5;
+}
+
+.site-header__inner--home .site-header__menu-button {
+  grid-column: 1;
+}
+
+.site-header__inner--home .site-header__install {
+  grid-column: 2;
+}
+
+.site-header__inner--home .site-header__to-top {
+  grid-column: 3;
+}
+
+.site-header__inner--home .site-header__feedback {
   grid-column: 4;
 }
 
