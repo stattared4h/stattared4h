@@ -32,7 +32,8 @@ service worker, feedbackdialog, om-sida och de datadrivna sidorna: start, plats,
 art och karta, byggda ur det validerade datasetet. Bilderna är egna poster med id ur
 innehållet (ADR 0015), och 4H-loggan är förbundets egen, härledd ur vektorfilen i
 källregistret (ADR 0016). QA-datasetets 100 individer delar på 25 versionshanterade,
-permanent märkta AI-bilder (ADR 0017). Statusen nedan speglar det.
+permanent märkta AI-bilder (ADR 0017). Individuella djur kan dessutom ha ett publikt,
+sökbart märkningsnummer som valideras och visas för besökaren. Statusen nedan speglar det.
 
 ### Krav (`02-§`)
 
@@ -65,21 +66,26 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.33` | Etiketter som annars överlappar | `byggd` | `placeLabels` i `source/ts/build/map.ts` med modifierarna i `layout.css`; `tests/build/map.test.ts` prövar krock, kant, ordningsoberoende och att etiketter utöver fyra döljs. Konstanterna jämförs med `tokens.css` i samma fil |
 | `02-§5.34` | Fler kartor i området | `byggd` | `site.areaMaps` i `eleventy.config.js` och avsnittet i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver rubriken och exakt de två länkmålen, och att inget hämtas utifrån |
 | `02-§5.35` | Ett besöksmål nämner inte djur | `byggd` | `kind` i `source/ts/domain/validate.ts` och `locationView` i `pages.ts`, grenen i `source/pages/plats.njk`; `tests/build/data-pages.test.ts` öppnar QA-datats besöksmål och `tests/domain/validate.test.ts` prövar att ett besöksmål med djurslag fäller bygget |
+| `02-§5.36` | Visa och söka på öronmärke | `manuell` | Markup och visning bevakas av `tests/build/public-id.test.ts`, söklogiken av `tests/ui/animal-id-search.test.ts`. Bygg QA-sajten, öppna `/` i 360 px, sök `se-012345-0001` och bekräfta att `/djur/far-astrid/` öppnas och visar `Öronmärke: SE 012345 0001` |
+| `02-§5.37` | Exakt normaliserad sökning, ingen suffix-sökning | `byggd` | `findAnimalByPublicId` i `source/ts/ui/animal-id-search.ts`; `tests/ui/animal-id-search.test.ts` prövar mellanslag, bindestreck, skiftläge, tom sträng och suffix |
 | `04-§5.7` | Platsen har en sort | `byggd` | ADR 0018; obligatoriskt `kind` med `djurplats` och `besoksmal`, prövat i `tests/domain/validate.test.ts` |
 | `02-§5.33` (dold etikett) | Etiketten kommer fram vid fokus | `manuell` | Bygg med `DATA_DIR=source/data-qa`, öppna `/karta/` i 360 px bredd och tabba till en markör i klungan i mitten: namnet ska komma fram, och markören ska ligga överst |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
 | `02-§6.2` | Valideringen körs först i bygget | `byggd` | `eleventy.config.js` anropar `loadValidDataset` i `eleventy.before`, i sekventiellt händelseläge före bildpluginen; `tests/build/data-pages.test.ts` bygger ett ogiltigt dataset och kräver en tom utkatalog |
-| `02-§6.3` | Fäller vid allt i `04-§10` och vid okända fält | `byggd` | `source/ts/domain/validate.ts`; varje regel prövas i `tests/domain/validate.test.ts` |
+| `02-§6.3` | Fäller vid allt i `04-§10` och vid okända fält | `byggd` | Den kompletta domäningången i `source/ts/domain/index.ts` validerar `publicId` och delegerar resten till `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts` och `tests/domain/public-id-validation.test.ts` |
 | `02-§6.4` | Varningar | `byggd` | `collectWarnings` och `warnAboutStrayImageFiles` i `validate.ts`; QA-datats exakta varningar i `tests/domain/validate.test.ts` |
 | `02-§6.5` | Meddelanden på svenska med fil och fält | `byggd` | `formatIssue` i `validate.ts`; `tests/domain/validate.test.ts` och `load.test.ts` |
 | `02-§6.6` | `npm run validate` | `byggd` | `scripts/validate.mjs`; `tests/domain/validate-script.test.ts` kör skriptet och kontrollerar felkoden |
 | `02-§6.7` | `born` normaliseras | `byggd` | `source/ts/domain/born.ts`; `tests/domain/born.test.ts` |
 | `02-§6.8` | Härledningar utan webbläsar-API:er | `byggd` | `source/ts/domain/derive.ts`; `tests/domain/derive.test.ts` mot fallen i QA-README |
 | `02-§6.9` | Deterministisk svensk sortering | `byggd` | `source/ts/domain/sort.ts`; `tests/domain/sort.test.ts` |
-| `02-§6.10` | Tester mot QA-datat, ogiltiga poster i testet | `byggd` | `tests/domain/helpers.ts` läser `source/data-qa/`; ogiltiga poster byggs i minnet |
+| `02-§6.10` | Tester mot QA-datat, ogiltiga poster i testet | `byggd` | `tests/domain/helpers.ts` läser `source/data-qa/`; ogiltiga poster byggs i minnet och går genom samma kompletta `validateDataset` som övriga anrop |
 | `02-§6.11` | Test: inget `location`-fält | `byggd` | `tests/domain/no-location.test.ts` läser både `source/data` och `source/data-qa` |
 | `02-§6.12` | QA har minst 100 individer och täcker vokabulären | `byggd` | `source/data-qa/` har 100 individer, täcker all vokabulär och ger varje individ minst en av 25 delade bilder; `tests/domain/qa-data.test.ts` bevakar antal, täckning, bilddelning och bild på varje individ |
 | `02-§6.13` | Räknade bestånd för djur utan individsidor | `byggd` | `source/ts/domain/load.ts`, `validate.ts`, `derive.ts`; `tests/domain/qa-data.test.ts` |
+| `02-§6.14`–`6.16` | Valfritt, formaterat och unikt publikt djur-ID | `byggd` | `readPublicIds` och `validateDataset` i `source/ts/domain/index.ts`, normalisering i `source/ts/domain/public-id.ts`; `tests/domain/public-id.test.ts` och `tests/domain/public-id-validation.test.ts` |
+| `02-§6.17` | Räknade bestånd har inget individ-ID | `byggd` | `populations.yaml` saknar fältet i `04-§4.8`; `tests/domain/public-id-validation.test.ts` lägger till `publicId` på ett bestånd och kräver valideringsfel |
+| `02-§6.18` | QA-data och edge cases för publikt ID | `byggd` | Fem QA-får har olika formateringar; `tests/domain/public-id-validation.test.ts`, `tests/domain/public-id.test.ts`, `tests/ui/animal-id-search.test.ts` och `tests/build/public-id.test.ts` bevakar kedjan |
 | `02-§7.1`–`7.2` | Manifest: namn, färger ur tokens, ikoner; `start_url`, `scope` och `id` ur bas-sökvägen | `byggd` | `source/pages/manifest.njk` med färgerna från `readThemeColours` i `source/ts/build/pwa.ts`; `tests/build/pwa.test.ts` jämför med `tokens.css` och bygger under `/prov/qa/` |
 | `02-§7.3` | Registrering på `<bas>sw.js` med scope lika med bas-sökvägen | `manuell` | `source/ts/ui/sw-register.ts` läser `data-base`, som `tests/build/pwa.test.ts` bevakar. Öppna startsidan i Chromium, DevTools → Application → Service Workers: `sw.js` är registrerad med scope lika med bas-sökvägen, och under `/qa/` finns en egen med scope `…/qa/` |
 | `02-§7.4` | Förcachen | `byggd` | `source/pages/sw.njk` listar `collections.all`, offline- och 404-sidan, manifestet, `main.js` och allt under `source/assets/`; `tests/build/pwa.test.ts` jämför med filerna i utdatan |
@@ -194,11 +200,13 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `04-§1`–`04-§9` | Modell för djur, arter, raser, bestånd, platser och bilder | `påbörjad` | Domänlagret läser och validerar modellen, inklusive räknade bestånd och bildposter; gårdens egna bildfiler saknas ännu |
+| `04-§1`–`04-§9` | Modell för djur, arter, raser, bestånd, platser och bilder | `påbörjad` | Domänlagret läser och validerar modellen, inklusive räknade bestånd, publikt djur-ID och bildposter; gårdens egna bildfiler saknas ännu |
+| `04-§3.6`, `04-§4.9` | Publikt djur-ID skiljt från tekniskt id | `byggd` | Datakontraktet definierar fältet; `source/ts/domain/index.ts` behåller originalvärdet och `source/ts/domain/public-id.ts` normaliserar jämförelsen; `tests/domain/public-id-validation.test.ts` |
 | `04-§4.2` | Djur har inget `location`-fält | `byggd` | Valideraren fäller (`tests/domain/validate.test.ts`) och `tests/domain/no-location.test.ts` bevakar datat |
 | `04-§8` | Härledda vyer | `byggd` | `source/ts/domain/derive.ts` matar vymodellerna i `source/ts/build/pages.ts`; `tests/domain/derive.test.ts` och `tests/build/pages.test.ts`. Djursidan påstår aldrig var individen står (`04-§8.2`): `tests/build/data-pages.test.ts` kräver att ordet `location` inte finns på någon sida |
-| `04-§10` | Validering | `byggd` | `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts`. Bildkontrollen (`04-§10.7`) prövas med handbyggda WebP-filer och mot de versionshanterade filerna i `source/images-qa/` |
+| `04-§10` | Validering | `byggd` | Den kompletta ingången är `source/ts/domain/index.ts`, som validerar `publicId` och delegerar övriga kontraktsregler till `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts` och `tests/domain/public-id-validation.test.ts` |
 | `04-§10.15` | AI-credit avvisas i produktion | `byggd` | `validateImagePosts` skiljer QA från produktion via datakatalogen; `tests/domain/validate.test.ts` prövar båda fallen |
+| `04-§10.16` | Publikt ID har giltig form och normaliserad unikhet | `byggd` | `readPublicIds` och `normalisePublicId`; `tests/domain/public-id.test.ts` och `tests/domain/public-id-validation.test.ts` |
 
 ### Miljöer (`06-§`)
 
@@ -210,7 +218,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `06-§1.5` | QA-versionen får tillägget " – QA" | `manuell` | Kontrollpunkten för `02-§10.33` |
 | `06-§2.1` | `DATA_DIR` väljer dataset | `byggd` | `eleventy.config.js` läser `DATA_DIR` och bygger sidorna ur det datasetet; `tests/build/data-pages.test.ts` bygger QA-datat och ett tomt dataset i en tillfällig katalog |
 | `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
-| `06-§2.3` | QA-datat prövar gränsfallen | `byggd` | 100 individer, två räknade hönsbestånd, 25 delade bilder, en tom hage och en aktiv plats utan foto finns; `tests/domain/qa-data.test.ts`, `validate.test.ts` och `tests/build/data-pages.test.ts` bevakar fallen |
+| `06-§2.3` | QA-datat prövar gränsfallen | `byggd` | 100 individer, två räknade hönsbestånd, 25 delade bilder, fem formateringsvarianter av publikt djur-ID, en tom hage och en aktiv plats utan foto finns; domän-, UI- och byggtester bevakar fallen |
 | `06-§2.4` | Kontraktsändring ändrar QA-datat | `dokumenterad` | Process |
 | `06-§3.1` | `BASE_PATH` | `byggd` | Blir Eleventys `pathPrefix` i `eleventy.config.js`; `tests/build/site.test.ts` bygger med `/prov/` |
 | `06-§3.2` | Varje adress via hjälpfunktionen | `byggd` | Eleventys `url`-filter i mallarna; testet är `02-§9.8` |
@@ -276,8 +284,8 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 17 |
 | `påbörjad` | 14 |
-| `byggd` | 117 |
-| `manuell` | 40 |
+| `byggd` | 123 |
+| `manuell` | 41 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
