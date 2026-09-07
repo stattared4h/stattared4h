@@ -14,7 +14,8 @@ import { init as initFeedback } from "./feedback.ts";
 import { init as initShare } from "./share.ts";
 import { init as initOffline } from "./offline.ts";
 import { init as initServiceWorker } from "./sw-register.ts";
+import { init as initAnimalIdSearch } from "./animal-id-search.ts";
 
-for (const init of [initMenu, initInstall, initToTop, initFeedback, initShare, initOffline, initServiceWorker]) {
+for (const init of [initMenu, initInstall, initToTop, initFeedback, initShare, initOffline, initAnimalIdSearch, initServiceWorker]) {
   init();
 }
