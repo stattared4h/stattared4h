@@ -41,7 +41,13 @@ flyttad art, en ny text — når besökarna inom några minuter utan att någon 
 4. Arbetsflödet stannar och väntar på godkännande. Öppna körningen, klicka
    **Review deployments**, välj `production` och **Approve and deploy**.
 
-Efter ett par minuter är produktionen uppdaterad. Sidfoten visar den nya versionen,
+Väntan i steg 4 kommer av att miljön `production` har granskare i repots inställningar
+(se [`07-SAKERHET.md`](07-SAKERHET.md) §8). Saknar miljön granskare stannar
+arbetsflödet inte, utan deployar direkt.
+
+Jobben i körningen är *Approve and compute version*, *Deploy* (som bygger produktionen
+och QA i samma utgåva) och *Tag and release*. Efter ett par minuter är produktionen
+uppdaterad. Sidfoten visar den nya versionen,
 till exempel `1.0.5`, och QA visar samma version utan suffix tills nästa merge.
 
 ---
@@ -80,6 +86,8 @@ git log v1.0.0..HEAD --oneline                # vad som hänt sedan 1.0.0
 ```
 
 Eller läs sidfoten: produktionen visar versionen, QA visar versionen och senaste PR.
+Varje körning av *Deploy till QA* och *Deploy till produktion* skriver också ut i sin
+sammanfattning vilken version som byggdes och från vilken tagg produktionens kod kom.
 
 ---
 

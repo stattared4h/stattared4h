@@ -1,0 +1,125 @@
+name: Deploy till produktion
+
+# Started by hand from the Actions tab and approved in the production environment
+# (02-§10.24). Builds main into the root and QA with the same version, so QA shows the
+# release until the next merge (02-§10.34), then tags the commit and, for the first tag
+# in an X.Y series, creates a GitHub Release. Steps for humans: docs/08-SLAPP.md.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Approve and compute version
+    runs-on: ubuntu-latest
+    # The approval gate: the job waits for a reviewer of the production environment
+    # before anything below it runs. The environment must have required reviewers
+    # configured in the repository settings, see docs/07-SAKERHET.md §8.
+    environment: production
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      first_in_series: ${{ steps.version.outputs.first_in_series }}
+    steps:
+      - name: Check out main with tags
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The next patch after the latest tag vX.Y.* for the X.Y in VERSION, or X.Y.0 when
+      # the series has no tag yet (02-§10.24, 03-§10.4).
+      - name: Compute the next version
+        id: version
+        run: |
+          xy="$(tr -d '[:space:]' < VERSION)"
+          if ! [[ "${xy}" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "::error file=VERSION::VERSION must contain X.Y, found '${xy}'"
+            exit 1
+          fi
+
+          latest="$(git tag --list "v${xy}.*" | { grep -E "^v${xy//./\\.}\.[0-9]+$" || true; } | sort -V | tail -n 1)"
+          if [ -n "${latest}" ]; then
+            patch=$(( ${latest##*.} + 1 ))
+            first_in_series=false
+          else
+            patch=0
+            first_in_series=true
+          fi
+          version="${xy}.${patch}"
+
+          {
+            echo "version=${version}"
+            echo "tag=v${version}"
+            echo "first_in_series=${first_in_series}"
+          } >> "$GITHUB_OUTPUT"
+          echo "Releasing ${version} (previous tag: ${latest:-none})"
+
+  deploy:
+    name: Deploy
+    needs: release
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    # One deployment at a time, shared with the QA deploy, and never cancel one that is
+    # mid-flight: an interrupted Pages deployment can leave the site half published.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    uses: ./.github/workflows/deploy.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
+      qa_version: ${{ needs.release.outputs.version }}
+      production_from_latest_tag: false
+
+  tag:
+    name: Tag and release
+    needs: [release, deploy]
+    runs-on: ubuntu-latest
+    # The only job in the repository with write access, and only to contents: it creates
+    # the tag and the release through the API, so no credential is ever written to disk.
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.release.outputs.tag }}
+      VERSION: ${{ needs.release.outputs.version }}
+    steps:
+      - name: Check out main with tags
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Create the annotated tag
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          if git rev-parse -q --verify "refs/tags/${TAG}" > /dev/null; then
+            echo "Tag ${TAG} already exists; skipping"
+            exit 0
+          fi
+          tag_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/tags" \
+            -f tag="${TAG}" \
+            -f message="Version ${VERSION}" \
+            -f object="${SHA}" \
+            -f type=commit \
+            --jq .sha)"
+          gh api "repos/${GITHUB_REPOSITORY}/git/refs" \
+            -f ref="refs/tags/${TAG}" \
+            -f sha="${tag_sha}" > /dev/null
+          echo "Created tag ${TAG} at ${SHA}"
+
+      # Only the first tag in an X.Y series gets a Release; patches do not (02-§10.24).
+      - name: Create the GitHub Release
+        if: needs.release.outputs.first_in_series == 'true'
+        run: |
+          if gh release view "${TAG}" > /dev/null 2>&1; then
+            echo "Release ${TAG} already exists; skipping"
+            exit 0
+          fi
+          gh release create "${TAG}" --title "Version ${VERSION}" --generate-notes --verify-tag

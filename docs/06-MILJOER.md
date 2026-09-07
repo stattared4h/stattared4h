@@ -9,7 +9,7 @@ Var sajten körs, vilket dataset varje miljö läser, och vad som skiljer dem å
 | Miljö | Adress | Dataset | Bas-sökväg | Deployas | Version i sidfoten |
 | --- | --- | --- | --- | --- | --- |
 | Lokalt | `http://localhost:8080` | valfritt via `DATA_DIR`, `source/data/` som standard | `/` | `npm start` | `1.0.4 – lokal 2026-09-06 18:40` |
-| QA | GitHub Pages, under `/qa/` | `source/data-qa/` | `/stattared4h/qa/` | automatiskt vid merge till `main` | `1.0.4 – QA PR212`; `1.0.4` direkt efter en produktionsdeploy |
+| QA | GitHub Pages, under `/qa/` | `source/data-qa/` | `/stattared4h/qa/` | automatiskt när *Quality* är grön efter merge till `main` | `1.0.4 – QA PR212`; `1.0.4` direkt efter en produktionsdeploy |
 | Produktion | GitHub Pages, i roten | `source/data/` | `/stattared4h/` | för hand, med godkännande; innehåll direkt | `1.0.4` |
 
 QA och produktion byggs ur **samma kod** och skiljer sig bara på vilket dataset de läser

@@ -121,10 +121,10 @@ inte byggas in i egna märken (ADR 0007).
   modul som enhetstestas. <!-- 02-§10.25 -->
 - Service workerns cachenamn är versionssträngen, så att versionen i sidfoten och cachen
   aldrig pekar på olika byggen (`02-§7.6`). <!-- 02-§10.26 -->
-- QA deployas automatiskt vid varje merge till `main`. QA:s version är senaste
-  produktionsversionen, eller `X.Y.0` när ingen tagg finns, följd av " – QA PR<n>" där
-  `n` är numret på den mergade pull requesten; kan numret inte hämtas används commitens
-  korta SHA i stället. <!-- 02-§10.33 -->
+- QA deployas automatiskt vid varje merge till `main`. QA:s version är versionen i
+  senaste taggen `vX.Y.*` för `X.Y` i `VERSION`, eller `X.Y.0` när ingen sådan tagg
+  finns, följd av " – QA PR<n>" där `n` är numret på den mergade pull requesten; kan
+  numret inte hämtas används commitens korta SHA i stället. <!-- 02-§10.33 -->
 - Efter en lyckad produktionsdeploy byggs QA om med exakt produktionens version, utan
   suffix, så att det syns att QA kör släppet. Nästa merge ger QA sitt suffix
   igen. <!-- 02-§10.34 -->

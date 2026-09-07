@@ -188,6 +188,9 @@ Vissa skydd bor i repots inställningar snarare än i filer. Kontrollera under
   och tillämpas, så att `main` kräver en pull request med gröna säkerhetskontroller,
 - arbetsflödens behörighet är läsbehörig som standard, och Actions inte kan godkänna
   pull requests,
+- miljön `production` under **Environments** har minst en obligatorisk granskare, så att
+  *Deploy till produktion* faktiskt stannar för godkännande — en miljö utan granskare
+  släpper igenom direkt,
 - medarbetares åtkomst följer minsta möjliga behörighet, och varje konto med skrivrätt
   använder tvåfaktorsautentisering.
 
