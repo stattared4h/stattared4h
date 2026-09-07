@@ -185,17 +185,19 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
 - Utan JavaScript visas kartan som en stillbild i sitt utgångsläge, knapparna syns inte,
   och listan under kartan är fortfarande en fullvärdig väg till informationen
   (`02-§5.24`). Zoomen hämtar ingenting utifrån (`02-§5.26`). <!-- 02-§5.45 -->
-- Ett tryck på en markör öppnar en ruta vid platsen med mer om den: namnet, platsens
-  `note` när den finns, och tillgängligheten i ord. Rutan hämtar ingenting utifrån
-  (`02-§5.26`) — allt den visar står redan i sidan. <!-- 02-§5.46 -->
+- Ett tryck på en markör öppnar en ruta mitt på skärmen med mer om platsen: namnet,
+  platsens `note` när den finns, och tillgängligheten i ord. Mitt på skärmen finns alltid
+  plats, vilket en ruta förankrad vid markören inte har — kartan är omkring 270 px hög på
+  en telefon. Rutan hämtar ingenting utifrån (`02-§5.26`); allt den visar står redan i
+  sidan. <!-- 02-§5.46 -->
 - För en `djurplats` visar rutan också djurslagen i plural, eller "Just nu går inga djur
   här", och en länk till platssidan med texten "Se djuren här". Övriga sorter visar ingen
   länk: rutan säger allt deras sida säger, och en länk vidare till en sida som upprepar
   det vore en omväg. Deras sida finns kvar och QR-koden på plats leder dit
   (`02-§5.29`). <!-- 02-§5.47 -->
-- Högst en ruta är öppen åt gången. Den stängs med Escape, med ett tryck utanför den och
-  med sin egen stängknapp, och fokus går tillbaka till markören som öppnade
-  den. <!-- 02-§5.48 -->
+- Högst en ruta är öppen åt gången, och medan den är öppen är resten av sidan inte
+  åtkomlig. Den stängs med Escape, med ett tryck utanför den och med sin egen stängknapp,
+  och fokus går tillbaka till markören som öppnade den. <!-- 02-§5.48 -->
 - Utan JavaScript öppnas ingen ruta. Ett tryck på markören går då till platssidan, som
   bär samma uppgifter i sin helhet. <!-- 02-§5.49 -->
 

@@ -45,6 +45,12 @@ export interface MapLocation extends MapPoint {
   name: string;
   /** Decides the marker's symbol (02-§5.38, 04-§5.7). */
   kind: LocationKind;
+  /** The place's short human note, or null (02-§5.46). */
+  note: string | null;
+  /** "Hit når man med rullstol och barnvagn" or its negation (02-§5.10). */
+  accessibility: string;
+  /** "Får och kor" or "Inga djur just nu" for a djurplats; empty for the rest. */
+  species: string;
 }
 
 /**
@@ -346,6 +352,30 @@ const MAP_CONTROLS =
   `</svg></button>` +
   `</div>`;
 
+/**
+ * The popup on a marker (02-§5.46, 03-§9.7). Written once and empty: `map-popup.ts` fills
+ * it with `textContent` from the marker's own `data-` attributes and opens it.
+ *
+ * It is a `<dialog>`, opened in the middle of the screen with `showModal()` — the same
+ * component as the feedback dialog (05-§6.35). A card anchored at the marker was tried and
+ * abandoned: the map clips what leaves it so the zoom has an edge, and on a phone the map
+ * is some 270 px tall, too little for a card with a name, a line about the animals and a
+ * way onwards to fit above or below a marker in the middle. In the middle of the screen
+ * there is always room, and the browser gives Escape, the focus trap and the backdrop for
+ * free. Without JavaScript it never opens, and the marker's link goes to the place page as
+ * it always did (02-§5.49).
+ */
+const MAP_POPUP =
+  `<dialog class="dialog map-popup" data-map-popup aria-labelledby="map-popup-name">` +
+  `<div class="dialog__body">` +
+  `<div class="dialog__header" data-map-popup-header>` +
+  `<button class="icon-button dialog__close" type="button" aria-label="Stäng" data-map-popup-close>` +
+  `<svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">` +
+  `<path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>` +
+  `</svg></button></div>` +
+  `<div class="map-popup__facts" data-map-popup-facts></div>` +
+  `</div></dialog>`;
+
 /** The drawing layer alone: the `<svg>` with its description, ground plate and background. */
 export function renderMapSvg(frame: MapFrame, background: MapBackground | null = null): string {
   const size = `width="${frame.width}" height="${frame.height}"`;
@@ -406,8 +436,16 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
       (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
       ` map__marker--wide-${wide}`;
     const style = `left: ${percent(position.x, frame.width)}; top: ${percent(position.y, frame.height)}`;
+    // What the popup shows, carried on the marker so the client needs no second source
+    // (03-§9.7). Only a djurplats reports animals (02-§5.47), and a place without a note
+    // carries no empty attribute — an absent fact and an empty one are not the same.
+    const facts =
+      ` data-kind="${escapeAttribute(location.kind)}"` +
+      ` data-access="${escapeAttribute(location.accessibility)}"` +
+      (location.note === null ? "" : ` data-note="${escapeAttribute(location.note)}"`) +
+      (location.kind === "djurplats" ? ` data-species="${escapeAttribute(location.species)}"` : "");
     markers.push(
-      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}">` +
+      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}"${facts}>` +
         `<span class="map__pin map__pin--${location.kind}" aria-hidden="true">${symbolSvg(location.kind, "map__symbol")}</span>` +
         `<span class="map__label">${escapeText(location.name)}</span>` +
         `</a>`,
@@ -422,7 +460,8 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
       markers.join("") +
       `</div>` +
       MAP_CONTROLS +
-      `</div>`,
+      `</div>` +
+      MAP_POPUP,
     warnings,
   };
 }

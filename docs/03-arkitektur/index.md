@@ -301,10 +301,14 @@ feedbackdialogen skrivs tom (`03-§10.2`), och lägger det den ska visa på varj
 fyller rutan med `textContent` och flyttar den till markörens `left`/`top` — samma procent
 av ritningen, så rutan hör ihop med sin plats. Ingen `innerHTML` någonstans (`CL-§2.13`).
 
-Rutan ligger inuti `.map__canvas` och motskalas som markörerna, så den följer med när
-kartan panoreras och zoomas men behåller sin storlek. Markören förblir en `<a>` till
-platssidan; modulen fångar klicket med `preventDefault`, vilket är det som gör att sidan
-fungerar likadant som förut när JavaScript uteblir (`02-§5.49`). <!-- 03-§9.7 -->
+Rutan är en `<dialog>` som öppnas med `showModal()`, samma komponent som
+feedbackdialogen: mitt på skärmen, med fokus fångat, Escape och bakgrund gratis från
+webbläsaren. Ett kort förankrat vid markören prövades först och övergavs — kartan klipper
+det som lämnar den, eftersom zoomen behöver en kant, och på en telefon är kartan omkring
+270 px hög, för lite för ett kort som ska rymma namn, djurslag och en väg vidare. Markören
+förblir en `<a>` till platssidan; modulen fångar klicket med `preventDefault`, vilket är
+det som gör att sidan fungerar likadant som förut när JavaScript uteblir
+(`02-§5.49`). <!-- 03-§9.7 -->
 
 Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
 är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting

@@ -94,7 +94,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Gethagen", "Stora hagen", "Övre hagen"]);
@@ -171,11 +171,16 @@ describe("the popup on a marker (02-§5.46–5.49, 03-§9.7)", () => {
     assert.doesNotMatch(cafe, /data-note=/, "a place without a note carries no empty attribute");
     assert.match(cafe, /data-access="Hit når man inte med rullstol eller barnvagn"/);
 
-    // The popup is written once and empty; the client fills it (03-§9.7). It sits inside
-    // the canvas so it follows the drawing when the map is panned and zoomed.
-    assert.match(html, /<div class="map__popup" hidden data-map-popup>/);
-    const canvasEnd = html.indexOf('</div><div class="map__controls"');
-    assert.ok(html.indexOf("data-map-popup") < canvasEnd, "the popup rides inside the canvas");
+    // The popup is written once and empty; the client fills it and opens it in the middle
+    // of the screen (03-§9.7). A <dialog> without an `open` attribute shows nothing, which
+    // is what keeps the map a still picture without JavaScript (02-§5.49).
+    assert.match(html, /<dialog class="dialog map-popup" data-map-popup aria-labelledby="map-popup-name">/);
+    // The heading is not written empty here; the client builds it (03-§9.7).
+    assert.doesNotMatch(html, /<h2[^>]*><\/h2>/, "no empty heading in the built page");
+    assert.match(html, /<button class="icon-button dialog__close" type="button" aria-label="Stäng" data-map-popup-close>/);
+    assert.match(html, /<div class="map-popup__facts" data-map-popup-facts><\/div><\/div><\/dialog>$/);
+    assert.doesNotMatch(html, /<dialog[^>]* open/, "closed until the client opens it");
+    assert.ok(html.indexOf("data-map-popup") > html.indexOf("data-map-controls"), "after the map, not inside it");
     assert.doesNotMatch(html, /https?:|<script|<image/, "no external resources (02-§5.26)");
   });
 
