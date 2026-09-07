@@ -69,7 +69,7 @@ describe("parseTable", () => {
   });
 
   test("a byte order mark is ignored", () => {
-    assert.deepEqual(parseTable("﻿fil,post\nIMG.jpg,rosa\n")[0], ["fil", "post"]);
+    assert.deepEqual(parseTable("\uFEFFfil,post\nIMG.jpg,rosa\n")[0], ["fil", "post"]);
   });
 
   test("CRLF line endings and a missing final newline", () => {

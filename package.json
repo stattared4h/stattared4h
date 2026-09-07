@@ -17,6 +17,7 @@
     "build": "eleventy",
     "start": "eleventy --serve --port 8080",
     "image": "node scripts/image.mjs",
+    "image:import": "node scripts/image-import.mjs",
     "icons": "node scripts/icons.mjs",
     "qa:images": "node scripts/qa-images.mjs",
     "qr": "node scripts/qr.mjs",
