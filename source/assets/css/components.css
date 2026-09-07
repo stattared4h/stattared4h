@@ -460,11 +460,21 @@
   max-width: var(--container-narrow);
 }
 
-.photo img {
+/*
+ * A picture in a Markdown text (02-§8.12) is the same picture as one in a figure, so it
+ * gets the same look rather than a component of its own (05-§10.8). Its credit is shown
+ * by the image post, not by markup around it, so there is no figcaption to match.
+ */
+.photo img,
+.prose img {
   display: block;
   width: 100%;
   height: auto;
   border-radius: var(--radius-md);
+}
+
+.prose img {
+  margin: var(--space-md) 0;
 }
 
 .photo__credit {

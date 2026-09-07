@@ -92,14 +92,53 @@ function escapeXml(text) {
   return String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-/** The alt text large in the middle, the id small underneath, so a QA page is readable. */
+const TEXT_SIZE = 56;
+/**
+ * Characters that fit on a line, at roughly 0.62 em per character for bold sans-serif,
+ * across 90 % of the width so the text never touches the edge. Approximate on purpose:
+ * SVG cannot measure text, and this is a placeholder, not a layout.
+ */
+const CHARS_PER_LINE = Math.floor((WIDTH * 0.9) / (TEXT_SIZE * 0.62));
+
+/** Greedy word wrap. SVG has no text flow, so the lines are worked out here. */
+function wrap(text, width) {
+  const lines = [];
+  let line = "";
+  for (const word of String(text).split(/\s+/).filter(Boolean)) {
+    const candidate = line === "" ? word : `${line} ${word}`;
+    if (candidate.length > width && line !== "") {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  }
+  if (line !== "") lines.push(line);
+  return lines.length === 0 ? [""] : lines;
+}
+
+/**
+ * The alt text wrapped across the middle with the id underneath, so a QA page shows
+ * which picture is which. Long alt texts are what made the wrapping necessary: they are
+ * whole sentences now that they live in the image post.
+ */
 function placeholderSvg({ id, alt }, colours) {
+  const lines = wrap(alt, CHARS_PER_LINE);
+  const step = TEXT_SIZE * 1.25;
+  const start = HEIGHT / 2 - ((lines.length - 1) * step) / 2;
+  const text = lines
+    .map(
+      (line, index) =>
+        `<text x="50%" y="${Math.round(start + index * step)}" font-family="sans-serif" ` +
+        `font-size="${TEXT_SIZE}" font-weight="bold" fill="${colours.text}" ` +
+        `text-anchor="middle" dominant-baseline="middle">${escapeXml(line)}</text>`,
+    )
+    .join("");
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}">` +
     `<rect width="100%" height="100%" fill="${colours.background}"/>` +
-    `<text x="50%" y="50%" font-family="sans-serif" font-size="64" font-weight="bold" ` +
-    `fill="${colours.text}" text-anchor="middle" dominant-baseline="middle">${escapeXml(alt)}</text>` +
-    `<text x="50%" y="70%" font-family="sans-serif" font-size="40" ` +
+    text +
+    `<text x="50%" y="85%" font-family="sans-serif" font-size="36" ` +
     `fill="${colours.text}" text-anchor="middle">${escapeXml(id)}</text>` +
     `</svg>`
   );
