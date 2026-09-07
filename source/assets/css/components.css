@@ -433,7 +433,7 @@
   padding: 0;
 }
 
-/* Two cards share a phone's width (02-§5.46), so the body keeps the card padding at the
+/* Two cards share a phone's width (02-§5.50), so the body keeps the card padding at the
    top and bottom but narrows at the sides: a breed name is a single long word, and 24 px
    on each side of a 148 px card leaves it 100 px to live in (05-§6.14). */
 .animal-card__body {

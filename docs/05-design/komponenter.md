@@ -64,7 +64,7 @@ Tre varianter, inte fler: <!-- 05-§6.9 -->
 Kortet är sajtens arbetshäst: ett djur, ett djurslag, en plats. <!-- 05-§6.13 -->
 
 - Vit yta, `--radius-md`, `--shadow-card`, innermarginal `--space-md`. Djurkortet, som
-  delar telefonens bredd med ett till (`02-§5.46`), har `--space-sm` under
+  delar telefonens bredd med ett till (`02-§5.50`), har `--space-sm` under
   desktopbrytpunkten: en rasetikett är ett enda långt ord och behöver bredden. En etikett
   som ändå inte får plats bryts hellre än att sticka utanför kortet. <!-- 05-§6.14 -->
 - Bilden ligger överst i fast bildförhållande `4:3` med `object-fit: cover`, så att

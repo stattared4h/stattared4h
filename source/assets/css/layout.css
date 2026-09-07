@@ -243,7 +243,7 @@
   list-style: none;
 }
 
-/* Cards: two across on a phone, three from the desktop breakpoint (02-§5.46).
+/* Cards: two across on a phone, three from the desktop breakpoint (02-§5.50).
    `auto-fit` cannot say "exactly two, then exactly three" — it keeps adding columns as
    the window grows — so the count is set per width here, and the card's `sizes` in
    animal-card.njk repeats the same two numbers (05-§4.14).

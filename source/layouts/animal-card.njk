@@ -9,7 +9,7 @@
 {% macro animalCard(card, eager = false) %}
 <article class="card animal-card">
   <div class="animal-card__image">
-    {#- The grid is two columns up to the desktop breakpoint and three above it (02-§5.46),
+    {#- The grid is two columns up to the desktop breakpoint and three above it (02-§5.50),
         so these two numbers are the grid's, not a guess. #}
     {%- picture card.photo, "(min-width: 960px) 33vw, 50vw", eager, card.speciesName %}
   </div>

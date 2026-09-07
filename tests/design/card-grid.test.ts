@@ -1,5 +1,5 @@
 /**
- * 02-§5.46 and 05-§4.12–4.14: the animal cards are two across on a phone and three from
+ * 02-§5.50 and 05-§4.12–4.14: the animal cards are two across on a phone and three from
  * the desktop breakpoint, and the card's `sizes` says the same thing as the grid does.
  *
  * The two live in different files — the grid in `layout.css`, `sizes` in the card macro
@@ -45,7 +45,7 @@ async function cardSizes(): Promise<Array<[string, string]>> {
   });
 }
 
-describe("djurkortens rutnät (02-§5.46, 05-§4.12)", () => {
+describe("djurkortens rutnät (02-§5.50, 05-§4.12)", () => {
   test("två kolumner under desktopbrytpunkten, tre från den", async () => {
     const columns = await cardGridColumns();
     assert.match(columns.narrow, /repeat\(\s*2\s*,/, `två kolumner på mobil, inte "${columns.narrow}"`);
