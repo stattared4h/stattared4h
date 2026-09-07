@@ -333,6 +333,10 @@
 }
 
 .dialog__hint {
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-small);
+}
+
 .share-button {
   margin-bottom: var(--space-md);
 }
@@ -495,6 +499,7 @@
 .status-bar__text {
   font-weight: 600;
 }
+
 .animal__born {
   font-weight: 600;
 }

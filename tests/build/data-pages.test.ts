@@ -13,12 +13,6 @@ import { buildSite, listFiles } from "./build-site.ts";
 let site: string;
 const cleanup: string[] = [];
 
-/**
- * Pages the header links to that are built on another branch (02-§10.27). Remove the
- * entry once `/om/` is in the build, so the link check covers it.
- */
-const PENDING_PAGES = new Set(["/om/"]);
-
 before(async () => {
   site = await buildSite({ env: { BASE_PATH: "/", DATA_DIR: "source/data-qa" } });
   cleanup.push(site);
@@ -63,7 +57,6 @@ describe("every page exists (02-§5.1–5.2)", () => {
       }
       for (const ref of refs) {
         if (!ref.startsWith("/") || ref.startsWith("//")) continue;
-        if (PENDING_PAGES.has(ref)) continue;
         checked += 1;
         const target = ref.endsWith("/") ? `${ref.slice(1)}index.html` : ref.slice(1);
         if (!existing.has(target)) missing.push(`${file}: ${ref}`);

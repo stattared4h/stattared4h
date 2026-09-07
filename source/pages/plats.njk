@@ -4,6 +4,7 @@ pagination:
   data: views.locations
   size: 1
   alias: view
+  addAllPagesToCollections: true
 permalink: "/plats/{{ view.id }}/"
 eleventyComputed:
   title: "{{ view.name }}"

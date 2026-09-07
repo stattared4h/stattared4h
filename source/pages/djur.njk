@@ -4,6 +4,7 @@ pagination:
   data: views.animals
   size: 1
   alias: view
+  addAllPagesToCollections: true
 permalink: "/djur/{{ view.id }}/"
 eleventyComputed:
   title: "{{ view.name }}"
