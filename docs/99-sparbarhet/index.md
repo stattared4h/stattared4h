@@ -46,7 +46,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§3.1`–`3.4` | Roller via GitHub, ingen egen inloggning | `manuell` | Kontrollera under *Settings → Rules* att regelverket *Protect main* är aktivt och kräver pull request |
 | `02-§3.5` | Djur som lämnat gården behålls | `byggd` | Valideraren tar emot `status: gone`, härledningarna behåller djuret (`tests/domain/derive.test.ts`) och djursidan finns kvar med märkningen; `tests/build/data-pages.test.ts` öppnar `djur/bocken/` |
 | `02-§4` | Kravintag via issues | `dokumenterad` | Process |
-| `02-§5.1` | Sidtyper och adresser | `byggd` | `source/pages/index.njk`, `plats.njk`, `djur.njk`, `arter.njk`, `karta.njk` paginerar över `views`; `tests/build/data-pages.test.ts` kräver en sida per plats, djur och art |
+| `02-§5.1` | Sidtyper och adresser | `byggd` | `source/pages/index.njk`, `plats.njk`, `djur.njk` och `arter.njk` paginerar över `views`; kartan bor på startsidan och har ingen egen adress. `tests/build/data-pages.test.ts` kräver en sida per plats, djur och art, och att ingen `karta/` skrivs |
 | `02-§5.2`–`5.3` | `index.html` i katalog; egen 404-sida | `byggd` | `source/pages/404.njk`; adressformen och 404-sidans text och länkar bevakas av `tests/build/site.test.ts` |
 | `02-§5.4` | Sidhuvud | `påbörjad` | `source/layouts/header.njk` på varje sida; status per krav under `02-§10.1`–`10.10` |
 | `02-§5.5` | Sidfot | `byggd` | `source/layouts/footer.njk` på varje sida; innehåll och versionsrad bevakas av `tests/build/site.test.ts` |

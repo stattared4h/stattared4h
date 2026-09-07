@@ -113,7 +113,7 @@ describe("sidorna (02-§5.2, 02-§5.3, 02-§5.6, 02-§7.7)", () => {
     }
   });
 
-  test("404- och offline-sidan har sin text och länkar till startsidan och kartan", async () => {
+  test("404- och offline-sidan har sin text och länkar till startsidan", async () => {
     const notFound = await readFile(path.join(prod, "404.html"), "utf8");
     assert.match(notFound, /<h1>Sidan finns inte<\/h1>/);
     const offline = await readFile(path.join(prod, "offline", "index.html"), "utf8");
@@ -121,7 +121,7 @@ describe("sidorna (02-§5.2, 02-§5.3, 02-§5.6, 02-§7.7)", () => {
     for (const html of [notFound, offline]) {
       const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
       assert.match(main, /href="\/"/, "länk till startsidan");
-      assert.match(main, /href="\/karta\/"/, "länk till kartan");
+      assert.match(main, /<a href="\/">Karta över gården<\/a>/, "länk till startsidan med kartan");
     }
   });
 });

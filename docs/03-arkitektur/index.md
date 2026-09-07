@@ -71,11 +71,10 @@ identiska filer. <!-- 03-§3.3 -->
 
 | Sida | Adress | Innehåll |
 | --- | --- | --- |
-| Start | `/` | Djurslagen på gården som ingång till artsidorna, och kartan |
+| Start | `/` | Kartan med gårdens platser, textlistan under den, och djurslagen som ingång till artsidorna |
 | Plats | `/plats/<id>/` | QR-kodens måladress. Vilka djurslag som går här, och därifrån vidare till djuren |
 | Djur | `/djur/<id>/` | Namn, art, ras, stamtavla, bilder. Aldrig var individen står |
 | Art | `/arter/<id>/` | Om djurslaget, vilka platser det finns på, och individerna |
-| Karta | `/karta/` | Gårdens platser, med en textlista under kartan |
 | Om | `/om/` | Vad sajten är, installation, integritet, källkod, version (`02-§10.27`) |
 | 404 | `404.html` | Sajtens egen felsida; GitHub Pages serverar den för okända adresser |
 | Offline | `/offline/` | Visas av service workern vid navigering utanför cachen |
@@ -271,7 +270,7 @@ skrivs som en modifierare på markören, och CSS lägger etiketten där. Uppskat
 just en uppskattning: den skiljer bra fall från dåliga, den garanterar inga
 pixlar. <!-- 03-§9.3 -->
 
-Kartsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
+Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
 är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting
 utifrån (`02-§5.26`). <!-- 03-§9.4 -->
 
