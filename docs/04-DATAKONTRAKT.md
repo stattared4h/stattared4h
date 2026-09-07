@@ -36,6 +36,7 @@ QA-datat i samma commit. <!-- 04-§2.3 -->
 source/data/
 ├── species.yaml              # vokabulär: arterna vi känner igen
 ├── breeds.yaml               # vokabulär: raserna
+├── populations.yaml          # djur som redovisas som antal per ras
 ├── animals/<djur-id>.yaml    # en fil per djur
 └── locations/<plats-id>.yaml # en fil per hage eller plats
 ```
@@ -46,6 +47,10 @@ gemensam fil för kontrollerad vokabulär.** <!-- 04-§2.1 -->
 Djur och platser har egna sidor, växer i innehåll och redigeras var för sig — därför
 egna filer, som aldrig kolliderar när flera redigerar samtidigt. Arter och raser är ett
 femtontal poster som ändras några gånger om året och läses bäst som en lista. <!-- 04-§2.2 -->
+
+Vissa djurslag, exempelvis höns, presenteras inte som namngivna individer. De lagras i
+`populations.yaml` som ett antal per ras. En art får finnas antingen i `animals/` eller
+i `populations.yaml`, aldrig i båda. <!-- 04-§2.4 -->
 
 ---
 
@@ -113,6 +118,26 @@ isär. <!-- 04-§4.4 -->
 
 Föräldrar som inte finns i registret utelämnas. Ska en utomstående far nämnas hör det
 hemma i `description`. <!-- 04-§4.5 -->
+
+### Räknade bestånd — `populations.yaml`
+
+När gården bara redovisar antal, utan publika individsidor, lagras djuren per art och
+ras: <!-- 04-§4.7 -->
+
+```yaml
+populations:
+  - species: hons
+    breed: svart-dvarghons
+    count: 18
+  - species: hons
+    breed: orusthons
+    count: 14
+```
+
+Alla tre fält är obligatoriska. `count` är ett positivt heltal, arten och rasen måste
+finnas i vokabulären och rasen måste höra till arten. Samma kombination får bara stå en
+gång. En art med räknade bestånd får inte samtidigt ha poster i `animals/`; det skulle
+blanda en exakt lista med ett sammanräknat antal. <!-- 04-§4.8 -->
 
 ---
 
@@ -196,6 +221,7 @@ två ställen. <!-- 04-§8.1 -->
 | Vy | Härleds ur |
 | --- | --- |
 | Vilka djur finns på en plats | platsens `species` → djur med den arten och `status: here` |
+| Räknade bestånd på en plats | platsens `species` → poster med den arten i `populations.yaml` |
 | Var finns ett djurslag | alla platser vars `species` innehåller arten |
 | Ett djurs avkomma | djur vars `mother` eller `father` är detta djur |
 | Syskon | djur med samma `mother` eller `father` |
@@ -228,6 +254,8 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 - Att filnamnen följer id-formatet i §3. <!-- 04-§10.3 -->
 - Att `born` är ett giltigt datum eller årtal, och inte i framtiden. <!-- 04-§10.4 -->
 - Att varje `species`, `breed`, `mother` och `father` pekar på något som finns. <!-- 04-§10.5 -->
+- Att räknade bestånd har positiva heltalsantal, giltig art–ras-kombination och inte
+  blandas med individuella poster för samma art. <!-- 04-§10.12 -->
 - Att ingen stamtavla går i cirkel, och att ingen är sin egen förälder. <!-- 04-§10.6 -->
 - Att varje refererad bildfil finns, har alternativtext och upphovsuppgift, och håller sig
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->

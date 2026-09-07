@@ -1,0 +1,11 @@
+name: Otto
+species: get
+breed: jamtget
+sex: female
+born: 2023
+status: here
+photos:
+  - file: get-otto-1.webp
+    alt: Porträtt av Otto.
+    credit: QA
+    portrait: true

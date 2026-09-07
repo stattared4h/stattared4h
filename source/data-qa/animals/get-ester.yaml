@@ -1,0 +1,11 @@
+name: Ester
+species: get
+breed: jamtget
+sex: female
+born: 2021
+status: here
+photos:
+  - file: get-ester-1.webp
+    alt: Porträtt av Ester.
+    credit: QA
+    portrait: true

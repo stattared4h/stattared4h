@@ -1,0 +1,11 @@
+name: Nova
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2021
+status: here
+photos:
+  - file: kanin-nova-1.webp
+    alt: Porträtt av Nova.
+    credit: QA
+    portrait: true

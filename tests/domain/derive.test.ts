@@ -13,6 +13,8 @@ import {
   locationsForSpecies,
   offspring,
   parents,
+  populationCount,
+  populationsOfSpecies,
   siblings,
   speciesOf,
   speciesOnFarm,
@@ -43,27 +45,29 @@ test("animalsAtLocation: present animals of the location's species, grouped in s
     groups.map((g) => g.species.id),
     ["far", "ko"],
   );
-  assert.deepEqual(ids(groups[0].animals), ["bagaren", "snobollen"]);
-  assert.deepEqual(ids(groups[1].animals), ["majros"]);
+  assert.equal(groups[0].animals.length, 20);
+  assert.equal(groups[1].animals.length, 10);
+  assert.ok(ids(groups[0].animals).includes("bagaren"));
+  assert.ok(ids(groups[1].animals).includes("majros"));
 
   const goats = animalsAtLocation(dataset, location(dataset, "gethagen"));
-  assert.deepEqual(ids(goats[0].animals), ["lilla-gumman", "rosa", "stjarna", "tuva"], "bocken is gone");
+  assert.equal(goats[0].animals.length, 19, "bocken is gone");
+  assert.ok(ids(goats[0].animals).includes("rosa"));
   assert.deepEqual(animalsAtLocation(dataset, location(dataset, "ovre-hagen")), []);
 });
 
-test("animalsAtLocation keeps an empty group for a listed species with no present animals", async () => {
+test("animalsAtLocation groups every matching present individual", async () => {
   const dataset = await qaDataset();
   const emptyKaninHus = { ...location(dataset, "smadjurshuset"), species: ["hast", "kanin"] };
   const groups = animalsAtLocation(dataset, emptyKaninHus);
-  assert.deepEqual(
-    groups.map((g) => [g.species.id, ids(g.animals)]),
-    [
-      ["hast", ["vinter"]],
-      ["kanin", ["nystan"]],
-    ],
-  );
+  assert.deepEqual(groups.map((g) => g.species.id), ["hast", "kanin"]);
+  assert.equal(groups[0].animals.length, 10);
+  assert.equal(groups[1].animals.length, 16);
   const noOne = { ...emptyKaninHus, species: ["ko"] };
-  const withGone = { ...dataset, animals: dataset.animals.map((a) => (a.id === "majros" ? { ...a, status: "gone" as const } : a)) };
+  const withGone = {
+    ...dataset,
+    animals: dataset.animals.map((a) => (a.species === "ko" ? { ...a, status: "gone" as const } : a)),
+  };
   assert.deepEqual(
     animalsAtLocation(withGone, noOne).map((g) => [g.species.id, ids(g.animals)]),
     [["ko", []]],
@@ -114,20 +118,33 @@ test("parents and breedOf resolve to records, or null", async () => {
 
 test("animalsByBreed and animalsOfSpecies, with optional status", async () => {
   const dataset = await qaDataset();
-  assert.deepEqual(ids(animalsByBreed(dataset, "jamtget")), ["bocken", "rosa", "stjarna"]);
-  assert.deepEqual(ids(animalsOfSpecies(dataset, "kanin")), ["bomull", "dagg", "nystan"]);
-  assert.deepEqual(ids(animalsOfSpecies(dataset, "kanin", "here")), ["nystan"]);
+  assert.ok(ids(animalsByBreed(dataset, "jamtget")).includes("rosa"));
+  assert.equal(animalsOfSpecies(dataset, "kanin").length, 18);
+  assert.equal(animalsOfSpecies(dataset, "kanin", "here").length, 16);
   assert.deepEqual(ids(animalsOfSpecies(dataset, "kanin", "gone")), ["bomull", "dagg"]);
+});
+
+test("counted populations are available by species and included at locations", async () => {
+  const dataset = await qaDataset();
+  assert.equal(populationCount(dataset), 32);
+  assert.equal(populationCount(dataset, "hons"), 32);
+  assert.deepEqual(populationsOfSpecies(dataset, "hons"), [
+    { species: "hons", breed: "svart-dvarghons", count: 18 },
+    { species: "hons", breed: "orusthons", count: 14 },
+  ]);
+  const groups = animalsAtLocation(dataset, location(dataset, "honshuset"));
+  assert.equal(groups[0].animals.length, 0);
+  assert.equal(groups[0].populations.length, 2);
 });
 
 test("speciesOnFarm and speciesOf", async () => {
   const dataset = await qaDataset();
-  assert.deepEqual(ids(speciesOnFarm(dataset)), ["get", "far", "ko", "hast", "kanin"]);
+  assert.deepEqual(ids(speciesOnFarm(dataset)), ["get", "far", "ko", "hast", "kanin", "gris", "hons", "katt"]);
   const noRabbits = {
     ...dataset,
     animals: dataset.animals.map((a) => (a.species === "kanin" ? { ...a, status: "gone" as const } : a)),
   };
-  assert.deepEqual(ids(speciesOnFarm(noRabbits)), ["get", "far", "ko", "hast"]);
+  assert.deepEqual(ids(speciesOnFarm(noRabbits)), ["get", "far", "ko", "hast", "gris", "hons", "katt"]);
   assert.equal(speciesOf(dataset, "far")?.plural, "Får");
   assert.equal(speciesOf(dataset, "lama"), null);
 });

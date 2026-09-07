@@ -1,0 +1,11 @@
+name: Rakel
+species: gris
+breed: linderodssvin
+sex: female
+born: 2017
+status: here
+photos:
+  - file: gris-rakel-1.webp
+    alt: Porträtt av Rakel.
+    credit: QA
+    portrait: true

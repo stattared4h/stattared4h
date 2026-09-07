@@ -19,6 +19,7 @@ import type {
   Dataset,
   Issue,
   Location,
+  Population,
   Photo,
   Sex,
   Species,
@@ -77,6 +78,7 @@ const LOCATION_FIELDS = new Set([
 const SPECIES_FIELDS = new Set(["id", "name", "plural", "photo"]);
 const SPECIES_PHOTO_FIELDS = new Set(["file", "alt", "credit"]);
 const BREED_FIELDS = new Set(["id", "name", "species", "heritage"]);
+const POPULATION_FIELDS = new Set(["species", "breed", "count"]);
 
 type Obj = Record<string, unknown>;
 
@@ -173,6 +175,15 @@ class Fields {
       return null;
     }
     return value;
+  }
+
+  requiredPositiveInteger(obj: Obj, field: string): number | null {
+    const value = obj[field];
+    if (!Number.isInteger(value) || (value as number) < 1) {
+      this.error(field, `${quote(value)} måste vara ett positivt heltal.`);
+      return null;
+    }
+    return value as number;
   }
 
   optionalNumber(obj: Obj, field: string): number | null {
@@ -364,6 +375,50 @@ function validateBreeds(record: RawRecord | null, speciesIds: ReadonlySet<string
     result.push({ id, name, species, heritage });
   });
 
+  return result;
+}
+
+function validatePopulations(
+  record: RawRecord | null,
+  speciesIds: ReadonlySet<string>,
+  breeds: ReadonlyMap<string, Breed>,
+  individualSpecies: ReadonlySet<string>,
+  issues: Issues,
+): Population[] {
+  const entries = openList(record, "populations", issues);
+  if (entries === null || record === null) return [];
+  const fields = new Fields(record.file, issues);
+  const seen = new Set<string>();
+  const result: Population[] = [];
+
+  entries.forEach((entry, index) => {
+    const prefix = `populations[${index}].`;
+    fields.unknown(entry, POPULATION_FIELDS, prefix);
+    fields.noHtml(entry, `populations[${index}]`);
+    const species = fields.requiredString(entry, "species");
+    const breed = fields.requiredString(entry, "breed");
+    const count = fields.requiredPositiveInteger(entry, "count");
+    if (species !== null && !speciesIds.has(species)) {
+      issues.error(record.file, `${prefix}species`, `arten ${quote(species)} finns inte i species.yaml.`);
+    }
+    if (breed !== null) {
+      const knownBreed = breeds.get(breed);
+      if (knownBreed === undefined) {
+        issues.error(record.file, `${prefix}breed`, `rasen ${quote(breed)} finns inte i breeds.yaml.`);
+      } else if (species !== null && knownBreed.species !== species) {
+        issues.error(record.file, `${prefix}breed`, `rasen ${quote(breed)} hör till arten ${quote(knownBreed.species)}, inte ${quote(species)}.`);
+      }
+    }
+    if (species !== null && breed !== null) {
+      const key = `${species}/${breed}`;
+      if (seen.has(key)) issues.error(record.file, prefix.slice(0, -1), "arten och rasen finns redan som ett räknat bestånd.");
+      seen.add(key);
+      if (individualSpecies.has(species)) {
+        issues.error(record.file, `${prefix}species`, `arten ${quote(species)} finns också som individer i animals/. Välj bara en modell.`);
+      }
+    }
+    if (species !== null && breed !== null && count !== null) result.push({ species, breed, count });
+  });
   return result;
 }
 
@@ -629,6 +684,7 @@ function validateLocation(record: RawRecord, speciesIds: ReadonlySet<string>, is
 function collectWarnings(
   species: Species[],
   animals: Animal[],
+  populations: Population[],
   locations: Location[],
   files: Map<string, string>,
   speciesFile: string,
@@ -656,7 +712,9 @@ function collectWarnings(
     if (entry.photo === null) {
       issues.warn(speciesFile, `species[${entry.id}].photo`, "arten har ingen bild och visas med sitt namn på en platta.");
     }
-    const hasAnimalsHere = animals.some((a) => a.species === entry.id && a.status === "here");
+    const hasAnimalsHere =
+      animals.some((a) => a.species === entry.id && a.status === "here") ||
+      populations.some((population) => population.species === entry.id && population.count > 0);
     if (hasAnimalsHere && !speciesAtActiveLocations.has(entry.id)) {
       issues.warn(
         speciesFile,
@@ -741,6 +799,8 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   }
   validateAnimalReferences(animalRefs, speciesIds, breedsById, issues);
   validatePedigreeCycles(animalRefs, issues);
+  const individualSpecies = new Set(animals.map((animal) => animal.species));
+  const populations = validatePopulations(raw.populations, speciesIds, breedsById, individualSpecies, issues);
 
   const locations: Location[] = [];
   for (const record of raw.locations) {
@@ -749,7 +809,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
     if (location !== null) locations.push(location);
   }
 
-  collectWarnings(species, animals, locations, files, speciesFile, issues);
+  collectWarnings(species, animals, populations, locations, files, speciesFile, issues);
 
   if (options.imagesDir) {
     const refs: ImageRef[] = [];
@@ -776,6 +836,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   const dataset: Dataset = {
     species,
     breeds,
+    populations,
     animals: sortAnimals(animals),
     locations: sortLocations(locations),
   };

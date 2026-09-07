@@ -1,0 +1,11 @@
+name: Elmer
+species: far
+breed: varmlandsfar
+sex: female
+born: 2021
+status: here
+photos:
+  - file: far-elmer-1.webp
+    alt: Porträtt av Elmer.
+    credit: QA
+    portrait: true

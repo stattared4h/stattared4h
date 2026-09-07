@@ -1,0 +1,11 @@
+name: Carmen
+species: far
+breed: varmlandsfar
+sex: female
+born: 2019
+status: here
+photos:
+  - file: far-carmen-1.webp
+    alt: Porträtt av Carmen.
+    credit: QA
+    portrait: true

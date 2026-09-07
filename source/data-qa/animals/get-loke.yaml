@@ -1,0 +1,11 @@
+name: Loke
+species: get
+breed: goingeget
+sex: male
+born: 2020
+status: here
+photos:
+  - file: get-loke-1.webp
+    alt: Porträtt av Loke.
+    credit: QA
+    portrait: true

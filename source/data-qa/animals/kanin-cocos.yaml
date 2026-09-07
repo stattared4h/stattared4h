@@ -1,0 +1,11 @@
+name: Cocos
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2019
+status: here
+photos:
+  - file: kanin-cocos-1.webp
+    alt: Porträtt av Cocos.
+    credit: QA
+    portrait: true

@@ -1,0 +1,11 @@
+name: Iris
+species: get
+breed: jamtget
+sex: female
+born: 2017
+status: here
+photos:
+  - file: get-iris-1.webp
+    alt: Porträtt av Iris.
+    credit: QA
+    portrait: true

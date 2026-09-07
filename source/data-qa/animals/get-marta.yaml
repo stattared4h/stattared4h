@@ -1,0 +1,11 @@
+name: Märta
+species: get
+breed: jamtget
+sex: female
+born: 2021
+status: here
+photos:
+  - file: get-marta-1.webp
+    alt: Porträtt av Märta.
+    credit: QA
+    portrait: true

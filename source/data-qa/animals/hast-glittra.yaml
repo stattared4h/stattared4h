@@ -1,0 +1,11 @@
+name: Glittra
+species: hast
+breed: nordsvensk-hast
+sex: female
+born: 2023
+status: here
+photos:
+  - file: hast-glittra-1.webp
+    alt: Porträtt av Glittra.
+    credit: QA
+    portrait: true

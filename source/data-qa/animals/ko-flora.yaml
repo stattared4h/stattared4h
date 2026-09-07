@@ -1,0 +1,11 @@
+name: Flora
+species: ko
+breed: bohuskulla
+sex: female
+born: 2021
+status: here
+photos:
+  - file: ko-flora-1.webp
+    alt: Porträtt av Flora.
+    credit: QA
+    portrait: true

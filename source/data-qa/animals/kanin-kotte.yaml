@@ -1,0 +1,11 @@
+name: Kotte
+species: kanin
+breed: mellerudskanin
+sex: male
+born: 2018
+status: here
+photos:
+  - file: kanin-kotte-1.webp
+    alt: Porträtt av Kotte.
+    credit: QA
+    portrait: true

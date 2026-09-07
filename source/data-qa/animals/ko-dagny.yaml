@@ -1,0 +1,11 @@
+name: Dagny
+species: ko
+breed: bohuskulla
+sex: female
+born: 2019
+status: here
+photos:
+  - file: ko-dagny-1.webp
+    alt: Porträtt av Dagny.
+    credit: QA
+    portrait: true

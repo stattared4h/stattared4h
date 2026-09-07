@@ -1,0 +1,11 @@
+name: Embla
+species: ko
+breed: bohuskulla
+sex: male
+born: 2020
+status: here
+photos:
+  - file: ko-embla-1.webp
+    alt: Porträtt av Embla.
+    credit: QA
+    portrait: true

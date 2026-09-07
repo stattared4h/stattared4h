@@ -1,0 +1,11 @@
+name: Laban
+species: gris
+breed: linderodssvin
+sex: male
+born: 2020
+status: here
+photos:
+  - file: gris-laban-1.webp
+    alt: Porträtt av Laban.
+    credit: QA
+    portrait: true

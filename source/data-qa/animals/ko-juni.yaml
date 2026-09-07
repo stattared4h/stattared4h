@@ -1,0 +1,11 @@
+name: Juni
+species: ko
+breed: bohuskulla
+sex: female
+born: 2017
+status: here
+photos:
+  - file: ko-juni-1.webp
+    alt: Porträtt av Juni.
+    credit: QA
+    portrait: true

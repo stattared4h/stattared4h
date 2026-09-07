@@ -1,0 +1,11 @@
+name: Cleo
+species: hast
+breed: nordsvensk-hast
+sex: female
+born: 2019
+status: here
+photos:
+  - file: hast-cleo-1.webp
+    alt: Porträtt av Cleo.
+    credit: QA
+    portrait: true

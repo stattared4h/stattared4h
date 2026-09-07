@@ -1,0 +1,11 @@
+name: Gnista
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2023
+status: here
+photos:
+  - file: kanin-gnista-1.webp
+    alt: Porträtt av Gnista.
+    credit: QA
+    portrait: true

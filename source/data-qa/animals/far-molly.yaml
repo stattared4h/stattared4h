@@ -1,0 +1,11 @@
+name: Molly
+species: far
+breed: varmlandsfar
+sex: female
+born: 2021
+status: here
+photos:
+  - file: far-molly-1.webp
+    alt: Porträtt av Molly.
+    credit: QA
+    portrait: true

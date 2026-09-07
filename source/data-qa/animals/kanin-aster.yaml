@@ -1,0 +1,11 @@
+name: Aster
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2017
+status: here
+photos:
+  - file: kanin-aster-1.webp
+    alt: Porträtt av Aster.
+    credit: QA
+    portrait: true

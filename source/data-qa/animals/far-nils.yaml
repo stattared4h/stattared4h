@@ -1,0 +1,11 @@
+name: Nils
+species: far
+breed: varmlandsfar
+sex: male
+born: 2022
+status: here
+photos:
+  - file: far-nils-1.webp
+    alt: Porträtt av Nils.
+    credit: QA
+    portrait: true

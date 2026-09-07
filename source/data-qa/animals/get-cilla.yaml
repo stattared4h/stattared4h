@@ -1,0 +1,11 @@
+name: Cilla
+species: get
+breed: jamtget
+sex: female
+born: 2019
+status: here
+photos:
+  - file: get-cilla-1.webp
+    alt: Porträtt av Cilla.
+    credit: QA
+    portrait: true

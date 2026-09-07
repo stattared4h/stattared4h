@@ -1,0 +1,10 @@
+name: Tusse
+species: katt
+sex: male
+born: 2018
+status: here
+photos:
+  - file: katt-tusse-1.webp
+    alt: Porträtt av Tusse.
+    credit: QA
+    portrait: true

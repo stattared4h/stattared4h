@@ -1,0 +1,11 @@
+name: Fenix
+species: hast
+breed: gotlandsruss
+sex: male
+born: 2022
+status: here
+photos:
+  - file: hast-fenix-1.webp
+    alt: Porträtt av Fenix.
+    credit: QA
+    portrait: true

@@ -3,15 +3,43 @@ breeds:
     name: Jämtget
     species: get
     heritage: true
-  - id: gotlandsfar
-    name: Gotlandsfår
+  - id: goingeget
+    name: Göingeget
+    species: get
+    heritage: true
+  - id: varmlandsfar
+    name: Värmlandsfår
     species: far
     heritage: true
-  - id: fjallko
-    name: Fjällko
+  - id: bohuskulla
+    name: Bohuskulla
     species: ko
     heritage: true
-  - id: islandshast
-    name: Islandshäst
+  - id: nordsvensk-hast
+    name: Nordsvensk brukshäst
     species: hast
-    heritage: false
+    heritage: true
+  - id: gotlandsruss
+    name: Gotlandsruss
+    species: hast
+    heritage: true
+  - id: linderodssvin
+    name: Linderödssvin
+    species: gris
+    heritage: true
+  - id: gotlandskanin
+    name: Gotlandskanin
+    species: kanin
+    heritage: true
+  - id: mellerudskanin
+    name: Mellerudskanin
+    species: kanin
+    heritage: true
+  - id: svart-dvarghons
+    name: Svarta dvärghöns
+    species: hons
+    heritage: true
+  - id: orusthons
+    name: Orusthöns
+    species: hons
+    heritage: true

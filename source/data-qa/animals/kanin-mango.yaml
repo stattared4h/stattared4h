@@ -1,0 +1,11 @@
+name: Mango
+species: kanin
+breed: mellerudskanin
+sex: male
+born: 2020
+status: here
+photos:
+  - file: kanin-mango-1.webp
+    alt: Porträtt av Mango.
+    credit: QA
+    portrait: true

@@ -1,0 +1,11 @@
+name: Disa
+species: far
+breed: varmlandsfar
+sex: male
+born: 2020
+status: here
+photos:
+  - file: far-disa-1.webp
+    alt: Porträtt av Disa.
+    credit: QA
+    portrait: true

@@ -1,0 +1,11 @@
+name: Oda
+species: far
+breed: varmlandsfar
+sex: female
+born: 2023
+status: here
+photos:
+  - file: far-oda-1.webp
+    alt: Porträtt av Oda.
+    credit: QA
+    portrait: true

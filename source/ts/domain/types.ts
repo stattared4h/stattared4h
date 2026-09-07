@@ -63,10 +63,18 @@ export interface Breed {
   heritage: boolean;
 }
 
+/** A species kept as a headcount rather than named individuals. */
+export interface Population {
+  species: string;
+  breed: string;
+  count: number;
+}
+
 /** Always sorted according to 02-§6.9: animals and locations by name, species in file order. */
 export interface Dataset {
   species: Species[];
   breeds: Breed[];
+  populations: Population[];
   animals: Animal[];
   locations: Location[];
 }

@@ -1,0 +1,11 @@
+name: Hilma
+species: get
+breed: goingeget
+sex: male
+born: 2024
+status: here
+photos:
+  - file: get-hilma-1.webp
+    alt: Porträtt av Hilma.
+    credit: QA
+    portrait: true

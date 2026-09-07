@@ -182,7 +182,7 @@ test("an unknown species, breed, mother or father fails", async () => {
 
 test("a breed of another species fails", async () => {
   const raw = await rawQa();
-  editAnimal(raw, "rosa", (a) => (a.breed = "gotlandsfar"));
+  editAnimal(raw, "rosa", (a) => (a.breed = "varmlandsfar"));
   const result = await validate(raw);
   assert.match(errorsFor(result, "animals/rosa.yaml", "breed")[0].message, /hör till arten "far", inte "get"/);
 });
@@ -354,9 +354,12 @@ test("the QA dataset yields exactly the known warnings", async () => {
       "locations/ovre-hagen.yaml:species",
       "species.yaml:species[far].photo",
       "species.yaml:species[get].photo",
+      "species.yaml:species[gris].photo",
       "species.yaml:species[hast]",
       "species.yaml:species[hast].photo",
+      "species.yaml:species[hons].photo",
       "species.yaml:species[kanin].photo",
+      "species.yaml:species[katt].photo",
       "species.yaml:species[ko].photo",
     ],
   );

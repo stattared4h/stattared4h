@@ -1,0 +1,11 @@
+name: Blixten
+species: kanin
+breed: mellerudskanin
+sex: male
+born: 2018
+status: here
+photos:
+  - file: kanin-blixten-1.webp
+    alt: Porträtt av Blixten.
+    credit: QA
+    portrait: true

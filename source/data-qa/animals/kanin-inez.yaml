@@ -1,0 +1,11 @@
+name: Inez
+species: kanin
+breed: gotlandskanin
+sex: female
+born: 2017
+status: here
+photos:
+  - file: kanin-inez-1.webp
+    alt: Porträtt av Inez.
+    credit: QA
+    portrait: true

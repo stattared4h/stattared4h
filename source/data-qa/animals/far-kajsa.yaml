@@ -1,0 +1,11 @@
+name: Kajsa
+species: far
+breed: varmlandsfar
+sex: female
+born: 2019
+status: here
+photos:
+  - file: far-kajsa-1.webp
+    alt: Porträtt av Kajsa.
+    credit: QA
+    portrait: true

@@ -1,0 +1,11 @@
+name: Agda
+species: gris
+breed: linderodssvin
+sex: female
+born: 2017
+status: here
+photos:
+  - file: gris-agda-1.webp
+    alt: Porträtt av Agda.
+    credit: QA
+    portrait: true

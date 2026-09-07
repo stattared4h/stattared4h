@@ -1,0 +1,11 @@
+name: Beda
+species: ko
+breed: bohuskulla
+sex: male
+born: 2018
+status: here
+photos:
+  - file: ko-beda-1.webp
+    alt: Porträtt av Beda.
+    credit: QA
+    portrait: true
