@@ -72,12 +72,14 @@ jobs:
         run: npm ci --ignore-scripts
 
       # QA first, from main with the made-up data set, under <base_path>/qa (06-§1).
+      # Its placeholder images are generated, never committed (02-§8.4).
       - name: Build QA
         env:
           DATA_DIR: source/data-qa
           BASE_PATH: ${{ steps.pages.outputs.base_path }}/qa
           BUILD_VERSION: ${{ inputs.qa_version }}
         run: |
+          npm run qa:images
           npm run build
           mv public qa-build
 

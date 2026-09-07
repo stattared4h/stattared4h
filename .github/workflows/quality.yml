@@ -102,13 +102,16 @@ jobs:
         if: steps.detect.outputs.node == 'true'
         run: python3 -m pip install --disable-pip-version-check yamllint==1.38.0
 
-      # Every script must exist: a missing one fails the run (02-§9.7). The build runs
+      # Every script must exist: a missing one fails the run (02-§9.7). The QA
+      # placeholder images are generated first, since the tests build the QA data set
+      # (02-§8.4). The build runs
       # first because html-validate lints the rendered output in public/. The lint chain
       # ends with the documentation check, npm run lint:docs (02-§9.10). The deploy
       # workflows wait for this workflow to finish green on main (02-§9.11).
       - name: Run project scripts
         if: steps.detect.outputs.node == 'true'
         run: |
+          npm run qa:images
           npm run build
           npm run lint
           npm run typecheck

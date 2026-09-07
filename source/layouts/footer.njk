@@ -1,0 +1,18 @@
+{#
+  Site footer (02-§10.21–10.22, 05-§6.30). The only place with the link to the main
+  site (02-§1.9, 02-§10.10). The version row is printed only when the build has a
+  version (02-§10.25).
+#}
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <a class="site-footer__brand" href="{{ '/' | url }}">
+      <img class="site-footer__logo" src="{{ '/assets/img/4h-logo-white.svg' | url }}" alt="4H" width="58" height="40">
+    </a>
+    <p><a href="{{ site.mainSite }}">{{ site.farm }}</a></p>
+    <p><a href="{{ site.repo }}">Källkoden på GitHub</a></p>
+    <p>Sidan samlar inga uppgifter om dig.</p>
+    {%- if build.version %}
+    <p class="site-footer__version">Version {{ build.version }}</p>
+    {%- endif %}
+  </div>
+</footer>

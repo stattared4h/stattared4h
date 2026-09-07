@@ -34,9 +34,14 @@ import {
   type ImageInfo,
 } from "./images.ts";
 
+/** What Eleventy passes to "eleventy.before"; `directories.output` follows the --output flag. */
+export interface EleventyEventPayload {
+  directories?: { output?: string };
+}
+
 /** The slice of Eleventy's UserConfig this plugin uses. Eleventy ships no types. */
 export interface EleventyConfigLike {
-  on(event: string, handler: () => Promise<void> | void): unknown;
+  on(event: string, handler: (payload: EleventyEventPayload) => Promise<void> | void): unknown;
   addShortcode(name: string, fn: (...args: never[]) => string): unknown;
   addFilter(name: string, fn: (...args: never[]) => unknown): unknown;
 }
@@ -44,7 +49,7 @@ export interface EleventyConfigLike {
 export interface ImagesPluginOptions {
   /** Dataset directory; the images directory is derived from it (`imagesDirFor`). */
   dataDir: string;
-  /** Eleventy's output directory. */
+  /** Eleventy's output directory; overridden by `directories.output` from the build event when present. */
   outDir: string;
   /** Base path. Normalised to leading and trailing slash (ADR 0005). */
   pathPrefix?: string;
@@ -63,8 +68,9 @@ export function imagesPlugin(eleventyConfig: EleventyConfigLike, options: Images
   const base = normalisePathPrefix(options.pathPrefix);
   let infos = new Map<string, ImageInfo>();
 
-  eleventyConfig.on("eleventy.before", async () => {
-    infos = await generateImageSizes({ imagesDir, outDir: options.outDir, widths: SRCSET_WIDTHS });
+  eleventyConfig.on("eleventy.before", async (payload) => {
+    const outDir = payload?.directories?.output ?? options.outDir;
+    infos = await generateImageSizes({ imagesDir, outDir, widths: SRCSET_WIDTHS });
   });
 
   eleventyConfig.addShortcode(

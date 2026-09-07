@@ -1,0 +1,69 @@
+{#
+  Site header (02-§10.1–10.10, 05-§6.1). Markup only: the menu behaviour is in
+  source/ts/ui/menu.ts; install, "to top" and feedback get theirs from their own modules,
+  which find the buttons by their data attributes. Both layouts share one set of
+  buttons and links; CSS decides what shows at which width (05-§5.4).
+  Icons are inline SVG with aria-hidden (02-§10.32).
+#}
+{% set navLinks = [
+  { href: "/", row: "Hem", menu: "Startsidan" },
+  { href: "/karta/", row: "Karta", menu: "Karta över gården" },
+  { href: "/om/", row: "Om sajten", menu: "Om sajten" }
+] %}
+<a class="skip-link" href="#main">Hoppa till innehållet</a>
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__brand" href="{{ '/' | url }}">
+      <img class="site-header__logo" src="{{ '/assets/img/4h-logo.svg' | url }}" alt="4H" width="64" height="44">
+      <span class="site-header__name">{{ site.name }}</span>
+    </a>
+
+    <button class="icon-button icon-button--mobile-only site-header__menu-button" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-button>
+      <svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+        <path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <span class="icon-button__label">Meny</span>
+    </button>
+
+    <nav class="site-nav" aria-label="Huvudmeny">
+      <ul class="site-nav__list">
+        {%- for link in navLinks %}
+        <li>
+          <a class="site-nav__link" href="{{ link.href | url }}"{% if page.url == link.href %} aria-current="page"{% endif %}>{{ link.row }}</a>
+        </li>
+        {%- endfor %}
+      </ul>
+    </nav>
+
+    <button class="icon-button icon-button--plain-on-desktop site-header__install" type="button" aria-label="Installera appen" hidden data-install-button>
+      <svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+        <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <button class="icon-button icon-button--mobile-only site-header__to-top" type="button" aria-label="Till toppen" hidden data-to-top-button>
+      <svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+        <path d="M12 20V5m0 0-6 6m6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <button class="icon-button icon-button--plain-on-desktop site-header__feedback" type="button" aria-label="Ge feedback" data-feedback-button>
+      <svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+        <path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="site-menu" id="site-menu" aria-label="Meny">
+    <a class="site-menu__brand" href="{{ '/' | url }}">
+      <img class="site-menu__logo" src="{{ '/assets/img/4h-logo-white.svg' | url }}" alt="4H" width="58" height="40">
+    </a>
+    <ul class="site-menu__list">
+      {%- for link in navLinks %}
+      <li>
+        <a class="site-menu__link" href="{{ link.href | url }}"{% if page.url == link.href %} aria-current="page"{% endif %}>{{ link.menu }}</a>
+      </li>
+      {%- endfor %}
+    </ul>
+  </nav>
+</header>

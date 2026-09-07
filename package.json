@@ -14,9 +14,8 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "start": "node scripts/build.mjs && node --run serve",
-    "serve": "node scripts/serve.mjs",
+    "build": "eleventy",
+    "start": "eleventy --serve --port 8080",
     "image": "node scripts/image.mjs",
     "qa:images": "node scripts/qa-images.mjs",
     "test": "node --test \"tests/**/*.test.ts\"",

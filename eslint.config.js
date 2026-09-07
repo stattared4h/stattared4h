@@ -4,7 +4,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["public/**", "node_modules/**"] },
+  { ignores: ["public/**", "node_modules/**", ".claude/**", "source/images-qa/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
