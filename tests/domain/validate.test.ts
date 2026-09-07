@@ -302,6 +302,20 @@ test("an image post needs alt and credit", async () => {
   }
 });
 
+test("AI credit is accepted only by a QA dataset (04-§10.15)", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editImage(raw, id, (image) => (image.credit = "AI-genererad med OpenAI ImageGen"));
+
+  raw.dir = "/tmp/data";
+  const production = await validate(raw);
+  assert.match(errorsFor(production, `images/${id}.yaml`, "credit")[0].message, /bara i QA/);
+
+  raw.dir = "/tmp/data-qa";
+  const qa = await validate(raw);
+  assert.equal(errorsFor(qa, `images/${id}.yaml`, "credit").length, 0);
+});
+
 test("an image post file name must be a valid image id", async () => {
   const raw = await rawQa();
   addImage(raw, "rosa-1");
