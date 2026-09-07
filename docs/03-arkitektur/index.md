@@ -94,10 +94,15 @@ Service workern förcachar sidskal, CSS, buntad JS, ikoner samt plats- och djurs
 Strategin är cache först för dessa, och nätverk först med cache som reserv för
 fotografier. <!-- 03-§5.1 -->
 
-Cachenamnet är versionssträngen (`02-§10.26`) och sätts av bygget, aldrig för hand. Vid
-aktivering raderas cacher med annat namn. En ny worker som väntar på att ta över
-signalerar till sidan, som visar statusraden "Ny version finns"; knappen skickar
-`skipWaiting` och laddar om (`02-§10.28`). <!-- 03-§5.2 -->
+Cachenamnet är bas-sökvägen följd av versionssträngen (`02-§10.26`) och sätts av bygget,
+aldrig för hand: mallen `source/pages/sw.njk` skriver konstanterna `BASE`, `CACHE_NAME`
+och `PRECACHE` och därefter `source/ts/sw.ts`, buntad till en sträng av esbuild i
+`source/ts/build/pwa.ts`. Vid aktivering raderas cacher med annat namn under samma
+bas-sökväg; produktionens worker rör därför aldrig QA:s cache under `/qa/` och tvärtom.
+Sidan registrerar workern via `source/ts/ui/sw-register.ts`; en ny worker som väntar på
+att ta över visar statusraden "Ny version finns", och knappen skickar `skipWaiting` och
+laddar om när kontrollen bytts (`02-§10.28`). Valet av strategi per begäran är en ren
+funktion i `source/ts/domain/offline.ts`, testad i Node. <!-- 03-§5.2 -->
 
 Service workerns scope och manifestets `start_url` byggs från bas-sökvägen i
 [ADR 0005](../adr/0005-konfigurerbar-bassokvag.md). <!-- 03-§5.3 -->

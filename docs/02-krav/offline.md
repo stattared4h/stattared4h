@@ -34,8 +34,11 @@ QA aldrig får QA-innehåll i produktionens cache.
   ikonerna. <!-- 02-§7.4 -->
 - Sidor och tillgångar i förcachen svaras cache först. Fotografier svaras nätverk först
   med cache som reserv, och läggs i cachen när de hämtats. <!-- 02-§7.5 -->
-- Cachens namn är versionssträngen (`02-§10.26`). Vid aktivering raderas alla cacher med
-  annat namn (`03-§5.2`). <!-- 02-§7.6 -->
+- Cachens namn är bas-sökvägen följd av versionssträngen, `/stattared4h/1.0.4`
+  (`02-§10.26`); saknar bygget version heter cachen `<bas>s4h-dev`. Vid aktivering
+  raderas alla cacher under samma bas-sökväg med annat namn; cacher under en annan
+  bas-sökväg på samma värd, som QA:s under produktionens, rörs inte
+  (`03-§5.2`). <!-- 02-§7.6 -->
 - Efter en första laddning går varje sida i förcachen att öppna utan uppkoppling. En
   navigering till något utanför cachen visar offline-sidan, med texten "Du är offline"
   och länkar till startsidan och kartan. <!-- 02-§7.7 -->
