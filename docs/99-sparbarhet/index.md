@@ -56,7 +56,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.9`–`5.13` | Platssidan | `byggd` | `source/pages/plats.njk` med `locationView`; Björkhagen, Gethagen, Stora hagen, Övre hagen, Gamla stallet och Hönshuset prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
 | `02-§5.14`–`5.18` | Djursidan | `byggd` | `source/pages/djur.njk` med `animalView`; Rosa, Bocken, Tuva och Vinter prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
 | `02-§5.19`–`5.22` | Artsidan | `byggd` | `source/pages/arter.njk` med `speciesView` och `readSpeciesContent` i `source/ts/build/content.ts`; getter, hästar och höns prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
-| `02-§5.23`–`5.26` | Kartan | `byggd` | `source/ts/build/map.ts` och `source/pages/karta.njk`; projektion, markörer och lista i `tests/build/map.test.ts`, `pages.test.ts` och `data-pages.test.ts`, som också kräver att inget anrop går utanför sajten |
+| `02-§5.23`–`5.26` | Kartan | `byggd` | `source/ts/build/map.ts` och `source/pages/index.njk`; projektion, markörer och lista i `tests/build/map.test.ts`, `pages.test.ts` och `data-pages.test.ts`, som också kräver att inget anrop går utanför sajten |
+| `02-§5.51` | Platslistan i två grupper | `byggd` | `mapListGroups` i `source/ts/build/pages.ts`, renderad av `source/pages/index.njk`; `tests/build/pages.test.ts` kräver rubrikerna, ordningen och att grupperna tillsammans är exakt hela listan, `tests/build/data-pages.test.ts` att båda rubrikerna står på den byggda startsidan |
+| `02-§5.52` | Öronmärkessökningen sist på startsidan | `byggd` | `source/pages/index.njk`; `tests/build/public-id.test.ts` kräver att sökformuläret står efter djurslagen och före Fler kartor i området |
 | `02-§5.27` | Markörer minst 44 px; textbeskrivning | `manuell` | Beskrivningen bevakas av `tests/build/map.test.ts`. Öppna `/karta/` i 360 px och bekräfta att varje markör är minst 44 px hög och bred (mätt till 68 px hög i Chromium) |
 | `02-§5.50` | Två djurkort i bredd på mobil, tre från desktopbrytpunkten | `byggd` | `.card-grid` i `layout.css` och kortets `sizes` i `source/layouts/animal-card.njk`; `tests/design/card-grid.test.ts` kräver båda och att de säger samma sak. Öppna `/plats/gethagen/` i 360 px: två getter i bredd |
 | `02-§5.28` | Djurkortet | `byggd` | Makrot i `source/layouts/animal-card.njk` med `animalCard` i `pages.ts`; etiketter och platshållare i `tests/build/pages.test.ts` och `data-pages.test.ts` |
@@ -308,7 +310,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 18 |
 | `påbörjad` | 17 |
-| `byggd` | 134 |
+| `byggd` | 136 |
 | `manuell` | 50 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
