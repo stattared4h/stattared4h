@@ -26,6 +26,8 @@ export interface Image {
 
 export interface Animal {
   id: string;
+  /** Public identifier visible on the animal, for example an ear-tag number. */
+  publicId?: string | null;
   name: string;
   species: string;
   breed: string | null;
