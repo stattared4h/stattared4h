@@ -256,11 +256,15 @@ Platsernas geometri bor ändå i YAML, aldrig i ritningen. <!-- 03-§9.2 -->
 Etiketterna placeras vid bygget så att de inte döljer varandra (`02-§5.33`). Bygget kan
 inte mäta text — det finns ingen webbläsare vid bygget — så det uppskattar etikettens
 ruta ur namnets längd och de mått som gäller i `tokens.css`: teckenstorlek, innerkant och
-träffytans minsta mått. Rutorna räknas i pixlar för en 360 px bred karta, den trängsta
-vyn, och prövas mot varandra i en bestämd ordning: platserna tas norrifrån och söderut,
-och varje etikett får den första av sidorna under, över, höger, vänster som är ledig.
-En sida som skulle skjuta etiketten utanför ritningen räknas också som upptagen, så en
-plats vid kanten vänder etiketten inåt. Räcker ingen av de fyra döljs etiketten visuellt
+träffytans minsta mått. Rutorna räknas i pixlar för kartans egen bredd i den trängsta vyn — 312 px, alltså en
+360 px telefon minus behållarens innerkant på var sida — och prövas mot varandra i en
+bestämd ordning: platserna tas norrifrån och söderut,
+och varje etikett får det första lediga av åtta lägen (`02-§5.51`). De fyra sneda prövas
+före de fyra raka, och bland de sneda går de två som följer betesmarkens band
+(nordväst–sydost) före de två som korsar det: snett upp vänster, snett ned höger, snett
+upp höger, snett ned vänster, och därefter under, över, höger, vänster. Ett läge som skulle skjuta
+etiketten utanför ritningen räknas också som upptaget, så en plats vid kanten vänder
+etiketten inåt. Räcker inget av de åtta döljs etiketten visuellt
 i stället för att staplas oläslig ovanpå en annan; namnet finns kvar för skärmläsaren och
 kommer fram vid fokus. Konstanterna för teckenbredd och radhöjd är uppmätta i Chromium
 och satta strax över det värsta uppmätta fallet: att gissa för brett flyttar en etikett i
