@@ -433,8 +433,17 @@
   padding: 0;
 }
 
+/* Two cards share a phone's width (02-§5.50), so the body keeps the card padding at the
+   top and bottom but narrows at the sides: a breed name is a single long word, and 24 px
+   on each side of a 148 px card leaves it 100 px to live in (05-§6.14). */
 .animal-card__body {
-  padding: var(--space-sm) var(--space-md) var(--space-md);
+  padding: var(--space-sm);
+}
+
+@media (min-width: 960px) {
+  .animal-card__body {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
 }
 
 .animal-card__title {
@@ -468,9 +477,16 @@
   list-style: none;
 }
 
+/* A breed name is one long word — "Mellerudskanin" is wider than a card column on a
+   phone — so the pill is allowed to break it rather than reach outside the card.
+   `hyphens` gives Swedish word breaks where the browser can; `overflow-wrap` is the
+   fallback where it cannot. */
 .tag {
   display: inline-block;
+  max-width: 100%;
   padding: 0 var(--space-xs);
+  overflow-wrap: break-word;
+  hyphens: auto;
   border-radius: var(--radius-full);
   background: var(--color-green-pale);
   color: var(--color-green-deep);

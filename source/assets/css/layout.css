@@ -243,15 +243,35 @@
   list-style: none;
 }
 
-/* Cards: one column on a phone, two on a tablet, three on a desktop, decided by the
-   width alone (05-§4.14). 280px keeps a 1200px container at three columns. */
+/* Cards: two across on a phone, three from the desktop breakpoint (02-§5.50).
+   `auto-fit` cannot say "exactly two, then exactly three" — it keeps adding columns as
+   the window grows — so the count is set per width here, and the card's `sizes` in
+   animal-card.njk repeats the same two numbers (05-§4.14).
+   `minmax(0, 1fr)` rather than `1fr`: a long animal name must not push its column
+   wider than its share. */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-sm);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+@media (min-width: 960px) {
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Cards standing side by side reach the bottom of their row, so a card whose breed name
+   wraps does not leave its neighbour hanging short. */
+.card-grid > li {
+  display: flex;
+}
+
+.card-grid > li > .card {
+  flex: 1;
 }
 
 /* ── Map (02-§5.23–5.27, 05-§6.31) ─────────────────────────────────────── */

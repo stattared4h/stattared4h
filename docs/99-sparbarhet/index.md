@@ -58,6 +58,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.19`–`5.22` | Artsidan | `byggd` | `source/pages/arter.njk` med `speciesView` och `readSpeciesContent` i `source/ts/build/content.ts`; getter, hästar och höns prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
 | `02-§5.23`–`5.26` | Kartan | `byggd` | `source/ts/build/map.ts` och `source/pages/karta.njk`; projektion, markörer och lista i `tests/build/map.test.ts`, `pages.test.ts` och `data-pages.test.ts`, som också kräver att inget anrop går utanför sajten |
 | `02-§5.27` | Markörer minst 44 px; textbeskrivning | `manuell` | Beskrivningen bevakas av `tests/build/map.test.ts`. Öppna `/karta/` i 360 px och bekräfta att varje markör är minst 44 px hög och bred (mätt till 68 px hög i Chromium) |
+| `02-§5.50` | Två djurkort i bredd på mobil, tre från desktopbrytpunkten | `byggd` | `.card-grid` i `layout.css` och kortets `sizes` i `source/layouts/animal-card.njk`; `tests/design/card-grid.test.ts` kräver båda och att de säger samma sak. Öppna `/plats/gethagen/` i 360 px: två getter i bredd |
 | `02-§5.28` | Djurkortet | `byggd` | Makrot i `source/layouts/animal-card.njk` med `animalCard` i `pages.ts`; etiketter och platshållare i `tests/build/pages.test.ts` och `data-pages.test.ts` |
 | `02-§5.31` | Platssidan visar platsens bilder | `byggd` | `photos` på platsen i `04-§5.6`, `view.photos` i `source/pages/plats.njk` efter faktarutan; `tests/build/data-pages.test.ts` kontrollerar bilderna, fototexten, att djurslagsrutorna står före dem och att en plats utan bilder inte visar någon platshållare |
 | `02-§5.29` | `npm run qr` | `byggd` | `scripts/qr.mjs` och `source/ts/build/qr.ts`; `tests/build/qr.test.ts` kör skriptet mot QA-datat och kontrollerar en fil per plats med adressen som `<title>` |
@@ -180,8 +181,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§2.20` | Bakgrundsskikt för dialog | `byggd` | `--color-backdrop` i `tokens.css`, bevakad av testet |
 | `05-§3` | Typografi | `påbörjad` | Tokens bevakas av testet; navigeringen (`05-§3.9`) i `layout.css` utan test |
 | `05-§4.1`–`4.10` | Behållare och spacing | `påbörjad` | Tokens bevakas av testet; `layout.css` använder dem i behållare, sidhuvud och sidfot utan test |
-| `05-§4.11`–`4.14` | Rutnät | `manuell` | `.card-grid` och `.species-grid` i `layout.css` med `auto-fit`/`auto-fill` och `minmax`. Öppna `/plats/stora-hagen/` i 360, 700 och 1280 px och bekräfta en, två respektive tre kortkolumner utan mediefrågor |
-| `05-§4.15` | Träffytor minst 44 px | `manuell` | Öppna `/karta/`, `/plats/stora-hagen/` och `/djur/rosa/` i 360 px och bekräfta att markörer, djurslagsrutor, kort, knappar och släktlänkar är minst 44 px höga (mätt i Chromium: markörer 68 px, rutor 155 px, länkar 44 px) |
+| `05-§4.11`–`4.14` | Rutnät | `byggd` | `.card-grid` och `.species-grid` i `layout.css`: djurslagsrutorna med `auto-fill` och `minmax`, djurkorten med två kolumner som blir tre vid desktopbrytpunkten. Kolumnantalet och kortens `sizes` bevakas av `tests/design/card-grid.test.ts` |
+| `05-§4.15` | Träffytor minst 44 px | `manuell` | Öppna `/`, `/plats/stora-hagen/` och `/djur/rosa/` i 360 px och bekräfta att markörer, djurslagsrutor, kort, knappar och släktlänkar är minst 44 px höga (mätt i Chromium: markörer 68 px, rutor 155 px, länkar 44 px) |
 | `05-§5` | Brytpunkter | `dokumenterad` | Tillämpas när layouten skrivs |
 | `05-§6.9`–`6.12` | Knappar | `manuell` | `.button`, `.button--secondary` och `.button:disabled` i `components.css`. Öppna feedbackdialogen: Skicka är grön med vit text och halvgenomskinlig med en förklarande mening tills fälten är ifyllda; statusradens Ladda om är sekundär med djupgrön kant |
 | `05-§6.1`–`6.4` | Sidhuvud | `manuell` | `layout.css`. Öppna startsidan i 360 px och 1280 px: vitt sidhuvud med kantlinje som ligger kvar vid rullning, ikonknappar på mobil, logga och länkar på desktop, aktuell sida understruken |
@@ -307,8 +308,8 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 18 |
 | `påbörjad` | 17 |
-| `byggd` | 132 |
-| `manuell` | 51 |
+| `byggd` | 134 |
+| `manuell` | 50 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->

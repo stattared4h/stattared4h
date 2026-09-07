@@ -32,6 +32,12 @@ läsa sig fram namn för namn. Issue #51 bad om en symbol per sorts plats, som p
 skyltar. Symbolerna är det bygget som först beror på vad en plats är, och därför bär
 `kind` sedan dess åtta värden i stället för två (ADR 0019).
 
+Djurkorten låg först i en kolumn på mobil: `auto-fit` med ett minimum på 280 px ger
+aldrig två kolumner i en telefons 312 px innehållsbredd. Platssidan för Gethagen blev
+8 249 px lång för nitton getter — tio skärmars rullning — och barnet som ska känna igen
+geten framför sig fick hålla nitton foton i minnet i stället för att jämföra dem på
+skärmen (issue #61). `02-§5.50` sätter antalet per bredd i stället.
+
 Samma issue bad också om att kunna zooma. Åtta av gårdens platser ligger i en klunga kring
 gårdsplanen, inom några tiotal meter från varandra, och i överblick får deras namn inte
 plats. Zoomen är sajtens första riktiga klientkod, och vad den får kosta i en sajt som
@@ -205,3 +211,7 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
 
 - Djurkortet (`05-§6.18`) visar porträttbild eller platshållare, namn och djurslag, och
   hela kortet länkar till djursidan. <!-- 02-§5.28 -->
+- Djurkorten ligger två i bredd under desktopbrytpunkten (`05-§5.3`) och tre från den, så
+  att flera djur syns samtidigt på en telefon. Kortets `sizes` motsvarar den kolumnbredd
+  kortet faktiskt får, så att en telefon inte hämtar bilder för en helskärmsbredd
+  (`02-§8.5`). <!-- 02-§5.50 -->
