@@ -124,3 +124,39 @@ Källan till färgerna i ADR 0007, hämtad innan den grafiska profilen var känd
 **inte** längre en giltig källa för färg: där temat och profilen säger emot varandra gäller
 profilen (ADR 0016). Posten står kvar för att förklara var `#15623e`, `#e7fdf3` och
 `#00863f` kommer ifrån.
+
+### OpenStreetMap över Stättared
+
+| | |
+| --- | --- |
+| Utgivare | OpenStreetMap-bidragsgivarna |
+| Adress | `https://api.openstreetmap.org/api/0.6/map?bbox=12.3355,57.3355,12.3455,57.3405` |
+| Hämtad | 2026-09-07 |
+| Licens | ODbL 1.0 |
+| I repot | Nej — uttaget är ett arbetsunderlag, inget vi levererar |
+
+Uttaget innehåller Stättaredsvägen, gårdsplanen, fyra byggnader, tre parkeringar och
+betesmarken sydost om vägen. Det användes för att kontrollera att gårdens koordinater
+ligger rätt, och är underlaget när den ritade bakgrunden (`02-§5.30`) en gång ritas.
+
+En ritning härledd ur OSM är ett *produced work* i ODbL:s mening: den ska bära
+"© OpenStreetMap contributors", men gör inte resten av repot till ODbL. Google Maps och
+Google Earth är **inte** användbara här — deras villkor förbjuder uttryckligen att rita
+av satellitbilden.
+
+### Hagarnas namn — gårdens egen skylt
+
+| | |
+| --- | --- |
+| Utgivare | Stättareds 4H-gård |
+| Adress | Skylten på gården, fotograferad 2026-09-07 |
+| I repot | Nej — fotot är inte publicerat |
+
+Namnen i `source/data/locations/` är skyltens: Tåmossen, Bräckebur, Dammen, Lilla och
+Stora grishagen, Ekbacken, Trekanten, 1:an–4:an, Dalen, Lygnslätt 1 och 2, gethuset och
+kanin- och hönshuset. Gården har godkänt att uppgifterna används.
+
+Skylten är också enda kända källan till vilken hage som är vilken. Gården har två skyltar
+med **olika** bokstavssystem — pappersskylten märker husen A–D, den målade tavlan märker
+platserna A–Q och husen 1–5 — och de går inte att lägga ihop. Sajten följer
+pappersskylten.

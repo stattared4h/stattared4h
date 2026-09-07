@@ -254,6 +254,22 @@ varning i loggen. Ritningen får inte innehålla skript, stilmallar, bilder elle
 utåt — bygget vägrar då. Konventionen i detalj står i `source/map/README.md`.
 Platsernas geometri bor ändå i YAML, aldrig i ritningen. <!-- 03-§9.2 -->
 
+Etiketterna placeras vid bygget så att de inte döljer varandra (`02-§5.33`). Bygget kan
+inte mäta text — det finns ingen webbläsare vid bygget — så det uppskattar etikettens
+ruta ur namnets längd och de mått som gäller i `tokens.css`: teckenstorlek, innerkant och
+träffytans minsta mått. Rutorna räknas i pixlar för en 360 px bred karta, den trängsta
+vyn, och prövas mot varandra i en bestämd ordning: platserna tas norrifrån och söderut,
+och varje etikett får den första av sidorna under, över, höger, vänster som är ledig.
+Krockar alla fyra behåller etiketten sin plats under markören — då räcker inte kartan
+till, och det syns hellre än att en etikett flyttar långt bort från sin markör. Sidan
+skrivs som en modifierare på markören, och CSS lägger etiketten där. Uppskattningen är
+just en uppskattning: den skiljer bra fall från dåliga, den garanterar inga
+pixlar. <!-- 03-§9.3 -->
+
+Kartsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
+är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting
+utifrån (`02-§5.26`). <!-- 03-§9.4 -->
+
 ---
 
 ## 10. Sidhuvud, sidfot och version
