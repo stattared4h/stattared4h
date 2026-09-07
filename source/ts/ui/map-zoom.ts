@@ -65,7 +65,15 @@ export function init(): void {
     button.addEventListener("click", () => {
       if (action === "home") show(HOME);
       else show(zoomBy(view, action === "in" ? BUTTON_STEP : 1 / BUTTON_STEP, centre));
-      button.focus();
+      // A press that reaches a limit disables the button under the finger. Focus would
+      // then fall to the body and the keyboard visitor would lose their place, so it is
+      // handed to the button that still does something.
+      if (button.disabled || button.hidden) {
+        const other = action === "in" ? buttons.get("out") : buttons.get("in");
+        other?.focus();
+      } else {
+        button.focus();
+      }
     });
   }
 
@@ -76,9 +84,12 @@ export function init(): void {
     // first pointer here would refuse the first finger of a pinch as well.
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     dragged = false;
-    if (pointers.size === 1) canvas.setPointerCapture(event.pointerId);
+    // Only capture when there is something to drag; at 1x the gesture belongs to the page.
+    if (pointers.size === 1 && !isHome(view)) {
+      canvas.setPointerCapture(event.pointerId);
+      map.classList.add("map--dragging");
+    }
     if (pointers.size === 2) pinchDistance = spread(pointers);
-    map.classList.add("map--dragging");
   });
 
   canvas.addEventListener("pointermove", (event) => {
@@ -142,6 +153,21 @@ export function init(): void {
     event.preventDefault();
     // The arrow moves the view, so the drawing goes the other way.
     show(panBy(view, -move[0], -move[1]));
+  });
+
+  // Tabbing through the markers while zoomed in would otherwise put focus on a marker
+  // outside the frame, with nothing to see. The view follows the focus instead.
+  canvas.addEventListener("focusin", (event) => {
+    if (isHome(view) || !(event.target instanceof Element)) return;
+    const marker = event.target.closest(".map__marker");
+    if (!marker) return;
+    const frame = map.getBoundingClientRect();
+    const pin = marker.getBoundingClientRect();
+    const dx = (frame.left + frame.width / 2 - (pin.left + pin.width / 2)) / frame.width;
+    const dy = (frame.top + frame.height / 2 - (pin.top + pin.height / 2)) / frame.height;
+    // Only when it is actually out of sight; otherwise every tab would recentre the map.
+    const outside = pin.right < frame.left || pin.left > frame.right || pin.bottom < frame.top || pin.top > frame.bottom;
+    if (outside) show(panBy(view, dx, dy));
   });
 
   controls.hidden = false;
