@@ -15,14 +15,15 @@
  *   - Data-driven pages: add a global data key next to `site` and `build` below
  *     (`eleventyConfig.addGlobalData("dataset", () => loadValidDataset(dataDir))`), or a
  *     file under source/_data/, and paginate over it from a template in source/pages/.
- *   - Images: the image pipeline in source/ts/build/ can run in the "eleventy.before"
- *     hook below, next to esbuild, writing under `directories.output`.
+ *   - Images: source/ts/build/images-plugin.ts generates the srcset sizes before the
+ *     build and provides the `picture` and `placeholder` shortcodes (02-§8.5).
  */
 
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import * as esbuild from "esbuild";
 import { readBuildVersion } from "./source/ts/domain/version.ts";
+import { imagesPlugin } from "./source/ts/build/images-plugin.ts";
 
 /** 06-§3.1: the base path always starts and ends with a slash, so "/" + "assets" is never "//assets". */
 function normaliseBasePath(raw) {
@@ -96,6 +97,9 @@ export default function (eleventyConfig) {
     version: readBuildVersion(),
     dataDir,
   });
+
+  // Images: srcset sizes into <output>/images/ and the `picture` shortcode (02-§8.5, 03-§6).
+  eleventyConfig.addPlugin(imagesPlugin, { dataDir, outDir: "public", pathPrefix });
 
   // The client code is a handful of small modules bundled into one file (03-§10.2).
   // No dependencies reach the visitor (02-§9.5).
