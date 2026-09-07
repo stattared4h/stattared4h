@@ -32,12 +32,12 @@ function main(html: string): string {
 }
 
 describe("every page exists (02-§5.1–5.2)", () => {
-  test("a location page for all 32 places, an animal page for all 100, a species page for all eight", async () => {
+  test("a location page for all 33 places, an animal page for all 100, a species page for all eight", async () => {
     const files = await listFiles(site);
     const locations = files.filter((f) => /^plats\/[^/]+\/index\.html$/.test(f));
     const animals = files.filter((f) => /^djur\/[^/]+\/index\.html$/.test(f));
     const species = files.filter((f) => /^arter\/[^/]+\/index\.html$/.test(f));
-    assert.equal(locations.length, 32);
+    assert.equal(locations.length, 33);
     assert.ok(locations.includes(path.join("plats", "gamla-stallet", "index.html")), "the inactive place keeps its page");
     assert.equal(animals.length, 100);
     assert.equal(species.length, 8);

@@ -24,8 +24,9 @@ eleventyComputed:
   {%- if not view.active %}
   <p class="lead">Den här platsen används inte just nu.</p>
   <p><a class="button" href="{{ '/' | url }}">Karta över gården</a></p>
-  {#- A besoksmal — café, toilet, playground — says nothing about animals (02-§5.35). #}
-  {%- elif view.kind == "besoksmal" %}
+  {#- Everything but a paddock — café, toilet, playground — says nothing about
+      animals (02-§5.35). #}
+  {%- elif view.kind != "djurplats" %}
   {%- if view.note %}
   <p class="place-note">{{ view.note }}</p>
   {%- endif %}

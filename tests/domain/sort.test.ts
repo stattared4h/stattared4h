@@ -83,6 +83,7 @@ test("the validated QA dataset is already sorted", async () => {
       "gamla-stallet",
       "gethagen",
       "gethuset",
+      "grillplatsen",
       "grishagen",
       "honshuset",
       "kaffestugan",

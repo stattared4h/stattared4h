@@ -160,7 +160,9 @@ textbaserad motsvarighet under sig — en lista över platserna — så att info
 även när kartan inte kan laddas eller inte går att använda med skärmläsare. <!-- 05-§6.31 -->
 
 Markören är en rund bricka om `--space-md`, centrerad i träffytan `--tap-target-min`
-(`05-§4.15`), med kant `--border-width` i `--color-surface` och `--shadow-raised`. Det är
+(`05-§4.15`), med en ring `--border-width` och `--shadow-raised`. Ringen är motsatsen
+till brickans botten — grön kring den ljusa, vit kring den fyllda — så att markören
+behåller sin kant både över ritningens ljusa mark och över dess mörka byggnader. Det är
 samma yta som prickens, så en symbol i stället för en prick gör inte klungan kring
 gårdsplanen trängre än den redan är (`02-§5.33`). Inuti står platsens symbol, 16 px, med
 samma streck som sidhuvudets ikoner (6.11). En `djurplats` är fylld — botten

@@ -13,13 +13,16 @@
  *
  * The markers are HTML rather than SVG so that they keep their size — at least the
  * tap target minimum (05-§4.15) — and their readable label at every viewport width,
- * while the drawing scales with the page. Pure functions: everything comes in as
+ * while the drawing scales with the page. Each one carries the symbol for its kind of
+ * place (02-§5.36), drawn in the page like everything else on the map. Pure functions: everything comes in as
  * arguments, so the tests never touch the file system except in `loadMapBackground`.
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import { escapeAttribute, escapeText } from "./images.ts";
+import { symbolSvg } from "./symbols.ts";
+import type { LocationKind } from "../domain/types.ts";
 
 export const MAP_DESCRIPTION = "Karta över Stättared med gårdens hagar";
 
@@ -36,6 +39,8 @@ export interface MapPoint {
 export interface MapLocation extends MapPoint {
   id: string;
   name: string;
+  /** Decides the marker's symbol (02-§5.36, 04-§5.7). */
+  kind: LocationKind;
 }
 
 /**
@@ -377,7 +382,7 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
     const style = `left: ${percent(position.x, frame.width)}; top: ${percent(position.y, frame.height)}`;
     markers.push(
       `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}">` +
-        `<span class="map__pin" aria-hidden="true"></span>` +
+        `<span class="map__pin map__pin--${location.kind}" aria-hidden="true">${symbolSvg(location.kind, "map__symbol")}</span>` +
         `<span class="map__label">${escapeText(location.name)}</span>` +
         `</a>`,
     );

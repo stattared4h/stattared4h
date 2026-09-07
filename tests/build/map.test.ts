@@ -320,10 +320,14 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
 });
 
 describe("the map never shows which animals are where (02-§5.32)", () => {
-  test("a marker carries the place name and nothing else", () => {
+  test("a marker carries the place name and its symbol, and nothing else", () => {
     const { html } = renderMap(PLACES, { base: "/" });
     for (const marker of html.matchAll(/<a class="map__marker[^"]*"[^>]*>(.*?)<\/a>/g)) {
-      assert.match(marker[1], /^<span class="map__pin" aria-hidden="true"><\/span><span class="map__label">[^<]+<\/span>$/);
+      assert.match(
+        marker[1],
+        /^<span class="map__pin map__pin--\w+" aria-hidden="true"><svg class="map__symbol".*?<\/svg><\/span><span class="map__label">[^<]+<\/span>$/,
+        "the pin, the symbol and the name — no species (02-§5.32)",
+      );
     }
   });
 });
