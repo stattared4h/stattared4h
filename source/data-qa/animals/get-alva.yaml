@@ -5,7 +5,4 @@ sex: female
 born: 2017
 status: here
 photos:
-  - file: get-alva-1.webp
-    alt: Porträtt av Alva.
-    credit: QA
-    portrait: true
+  - img-97ac0899c4f4

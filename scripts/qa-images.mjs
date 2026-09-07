@@ -3,11 +3,15 @@
  *
  *   npm run qa:images [-- --data-dir <dir>] [--images-dir <dir>]
  *
- * Reads the `photos[].file` of every animal and the `photo.file` of every species in
- * source/data-qa/ and writes a flat-coloured 1200×900 WebP with the record's name for
- * each one into source/images-qa/. That directory is ignored by git: made-up photographs
- * are never committed (ADR 0008), and QA images never mix with the farm's real ones
- * because the images directory follows the dataset (04-§9.4).
+ * Reads every image post in source/data-qa/images/ and writes a flat-coloured 1200×900
+ * WebP with its alt text into source/images-qa/, flat and named by the id (04-§9.1).
+ * That directory is ignored by git: made-up photographs are never committed (ADR 0008),
+ * and QA images never mix with the farm's real ones because the images directory follows
+ * the dataset (04-§9.4).
+ *
+ * The placeholders are named after the ids already in the data, never re-hashed: sharp
+ * may encode the same SVG differently after an upgrade, and the committed ids must not
+ * move when it does (04-§9.10).
  *
  * Idempotent: a file that already exists is left alone, so a rerun is instant.
  */
@@ -16,6 +20,7 @@ import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { parse } from "yaml";
+import { imageFileName } from "../source/ts/domain/image-id.ts";
 import { imagesDirFor } from "../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -66,26 +71,20 @@ async function readYaml(file) {
   return parse(await readFile(file, "utf8"));
 }
 
-/** Every image the dataset refers to: `{ kind, file, title }`. */
+/** Every image post in the dataset: `{ id, alt }`, sorted by id. */
 async function collectImages(dataDir) {
+  const imagesDir = path.join(dataDir, "images");
+  let entries;
+  try {
+    entries = await readdir(imagesDir);
+  } catch {
+    return [];
+  }
   const images = [];
-
-  const animalsDir = path.join(dataDir, "animals");
-  for (const entry of (await readdir(animalsDir)).filter((f) => f.endsWith(".yaml")).sort()) {
-    const animal = await readYaml(path.join(animalsDir, entry));
-    for (const photo of animal.photos ?? []) {
-      if (photo?.file) images.push({ kind: "animals", file: photo.file, title: animal.name });
-    }
+  for (const entry of entries.filter((name) => name.endsWith(".yaml")).sort()) {
+    const post = await readYaml(path.join(imagesDir, entry));
+    images.push({ id: path.basename(entry, ".yaml"), alt: post?.alt ?? "" });
   }
-
-  const speciesFile = path.join(dataDir, "species.yaml");
-  if (await exists(speciesFile)) {
-    const { species = [] } = await readYaml(speciesFile);
-    for (const entry of species) {
-      if (entry.photo?.file) images.push({ kind: "species", file: entry.photo.file, title: entry.name });
-    }
-  }
-
   return images;
 }
 
@@ -93,14 +92,15 @@ function escapeXml(text) {
   return String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-function placeholderSvg({ title, file }, colours) {
+/** The alt text large in the middle, the id small underneath, so a QA page is readable. */
+function placeholderSvg({ id, alt }, colours) {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}">` +
     `<rect width="100%" height="100%" fill="${colours.background}"/>` +
-    `<text x="50%" y="50%" font-family="sans-serif" font-size="120" font-weight="bold" ` +
-    `fill="${colours.text}" text-anchor="middle" dominant-baseline="middle">${escapeXml(title)}</text>` +
-    `<text x="50%" y="70%" font-family="sans-serif" font-size="48" ` +
-    `fill="${colours.text}" text-anchor="middle">${escapeXml(file)}</text>` +
+    `<text x="50%" y="50%" font-family="sans-serif" font-size="64" font-weight="bold" ` +
+    `fill="${colours.text}" text-anchor="middle" dominant-baseline="middle">${escapeXml(alt)}</text>` +
+    `<text x="50%" y="70%" font-family="sans-serif" font-size="40" ` +
+    `fill="${colours.text}" text-anchor="middle">${escapeXml(id)}</text>` +
     `</svg>`
   );
 }
@@ -115,14 +115,12 @@ async function main() {
   const colours = await readColours();
   const images = await collectImages(dataDir);
 
-  for (const kind of ["animals", "species", "places"]) {
-    await mkdir(path.join(imagesDir, kind), { recursive: true });
-  }
+  await mkdir(imagesDir, { recursive: true });
 
   let written = 0;
   let skipped = 0;
   for (const image of images) {
-    const outputPath = path.join(imagesDir, image.kind, image.file);
+    const outputPath = path.join(imagesDir, imageFileName(image.id));
     if (await exists(outputPath)) {
       skipped += 1;
       continue;

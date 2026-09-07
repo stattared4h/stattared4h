@@ -144,7 +144,7 @@ describe("the animal page (02-§5.14–5.18, 02-§8.5–8.7)", () => {
     assert.doesNotMatch(html, /Har lämnat gården/);
 
     const images = [...html.matchAll(/<img [^>]+>/g)].map((m) => m[0]);
-    assert.equal(images.length, 2);
+    assert.equal(images.length, 3, "the portrait, a second photo, and the one shared with Lilla Gumman");
     assert.match(images[0], /src="\/images\/img-[0-9a-f]{12}-800\.webp"/, "flat path, id as name (04-§9.1)");
     assert.match(images[0], /fetchpriority="high"/, "the first image is eager (03-§6.3)");
     assert.doesNotMatch(images[0], /loading="lazy"/);
@@ -154,7 +154,7 @@ describe("the animal page (02-§5.14–5.18, 02-§8.5–8.7)", () => {
       assert.match(image, /\bwidth="\d+" height="\d+"/);
       assert.match(image, /\bsrcset="[^"]*400\.webp 400w/);
     }
-    assert.equal((html.match(/Foto: Anna Andersson/g) ?? []).length, 2, "a credit next to every photo (02-§8.7)");
+    assert.equal((html.match(/Foto: Anna Andersson/g) ?? []).length, 3, "a credit next to every photo (02-§8.7)");
   });
 
   test("Bocken has left the farm; Tuva has neither photo nor facts to show", async () => {

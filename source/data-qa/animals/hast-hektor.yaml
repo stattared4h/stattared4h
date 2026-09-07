@@ -5,7 +5,4 @@ sex: male
 born: 2024
 status: here
 photos:
-  - file: hast-hektor-1.webp
-    alt: Porträtt av Hektor.
-    credit: QA
-    portrait: true
+  - img-5d75c655ed3f

@@ -5,7 +5,4 @@ sex: female
 born: 2019
 status: here
 photos:
-  - file: hast-cleo-1.webp
-    alt: Porträtt av Cleo.
-    credit: QA
-    portrait: true
+  - img-643c8a60d30c

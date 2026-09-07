@@ -10,16 +10,44 @@
  *
  * The `markdown` filter is markdown-it with raw HTML turned off: the text comes from
  * editors, and a page built from it should never carry markup they did not intend.
+ *
+ * Images go through the image posts (02-§8.12): `![](img-a3f2c1d8b901)` becomes the same
+ * responsive markup the `picture` shortcode produces, with the alt text taken from the
+ * post rather than from the Markdown, so it is written once. Anything the resolver
+ * cannot place — an unknown id, or an address that is not an id at all — renders as the
+ * placeholder, because no page shows a broken image (02-§8.6).
  */
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import MarkdownIt from "markdown-it";
+import MarkdownIt, { type RenderRule } from "markdown-it";
+import { isImageId } from "../domain/image-id.ts";
+import { renderPlaceholder } from "./images.ts";
+
+const MISSING_LABEL = "Bild saknas";
 
 const markdownIt = new MarkdownIt({ html: false, linkify: false, typographer: false });
 
+export interface MarkdownOptions {
+  /** Markup for one image id, or null when the id is unknown. */
+  renderImage?: (id: string) => string | null;
+}
+
+/** What `render` carries through to the image rule; markdown-it calls it `env`. */
+interface MarkdownEnv {
+  renderImage?: (id: string) => string | null;
+}
+
+const imageRule: RenderRule<MarkdownEnv> = (tokens, index, _options, env): string => {
+  const id = tokens[index].attrGet("src") ?? "";
+  const html = isImageId(id) ? (env?.renderImage?.(id) ?? null) : null;
+  return html ?? renderPlaceholder({ label: MISSING_LABEL });
+};
+markdownIt.renderer.rules.image = imageRule as RenderRule<never>;
+
 /** Markdown to HTML. Used as an Eleventy filter. */
-export function renderMarkdown(text: string): string {
-  return markdownIt.render(text);
+export function renderMarkdown(text: string, options: MarkdownOptions = {}): string {
+  const env: MarkdownEnv = { renderImage: options.renderImage };
+  return markdownIt.render(text, env);
 }
 
 /** `{ om: "# Om sajten\n…" }` for source/content/om.md. An empty directory gives an empty object. */

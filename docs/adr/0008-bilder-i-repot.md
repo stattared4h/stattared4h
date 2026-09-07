@@ -1,6 +1,7 @@
 # 0008 — Bara webbanpassade bilder, i repot, utan LFS
 
-**Status:** Antagen, 2026-09-06
+**Status:** Antagen, 2026-09-06. Namngivningen och mappstrukturen nedan är ersatta av
+[ADR 0015](0015-bilden-som-egen-post.md); gränserna, lagringsvalet och beroendegranskningen gäller.
 
 ## Sammanhang
 

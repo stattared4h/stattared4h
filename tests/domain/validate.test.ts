@@ -35,7 +35,7 @@ test("the QA dataset is valid and normalised", async () => {
   assert.notEqual(result.dataset, null);
   const rosa = result.dataset?.animals.find((a) => a.id === "rosa");
   assert.equal(rosa?.born, "2021-04-12");
-  assert.equal(rosa?.photos.length, 2);
+  assert.equal(rosa?.photos.length, 3);
   const stjarna = result.dataset?.animals.find((a) => a.id === "stjarna");
   assert.equal(stjarna?.born, "2016", "an integer year becomes text");
   const tuva = result.dataset?.animals.find((a) => a.id === "tuva");
@@ -256,13 +256,13 @@ test("a location field on an animal fails with a pointer to ADR 0012", async () 
 test("HTML in any field fails, markdown and comparisons pass", async () => {
   const raw = await rawQa();
   editAnimal(raw, "rosa", (a) => (a.description = "Rosa är <b>framfusig</b>."));
-  editAnimal(raw, "stjarna", (a) => ((a.photos as { alt: string }[])[0].alt = "<img src=x>"));
+  editImage(raw, await photoId("stjarna"), (image) => (image.alt = "<img src=x>"));
   editLocation(raw, "gethagen", (l) => (l.note = "<!-- dold -->"));
   speciesList(raw)[0].name = "</Get>";
   editAnimal(raw, "tuva", (a) => (a.description = "Tuva är **liten** och väger < 5 kg, se [gården](https://4h.se)."));
   const result = await validate(raw);
   assert.match(errorsFor(result, "animals/rosa.yaml", "description")[0].message, /innehåller HTML/);
-  assert.equal(errorsFor(result, "animals/stjarna.yaml", "photos[0].alt").length, 1);
+  assert.equal(errorsFor(result, `images/${await photoId("stjarna")}.yaml`, "alt").length, 1);
   assert.equal(errorsFor(result, "locations/gethagen.yaml", "note").length, 1);
   assert.equal(errorsFor(result, "species.yaml", "species[get].name").length, 1);
   assert.deepEqual(errorsFor(result, "animals/tuva.yaml"), []);
@@ -306,7 +306,7 @@ test("an image post file name must be a valid image id", async () => {
   const raw = await rawQa();
   addImage(raw, "rosa-1");
   const result = await validate(raw);
-  assert.match(errorsFor(result, "images/rosa-1.yaml", "filnamn")[0].message, /img- och tolv/);
+  assert.match(errorsFor(result, "images/rosa-1.yaml", "filnamn")[0].message, /och tolv tecken 0–9 och a–f/);
 });
 
 test("a photo reference must name an image post that exists", async () => {
@@ -324,7 +324,7 @@ test("a photo reference that is not an image id fails with the form in the messa
   const raw = await rawQa();
   editAnimal(raw, "rosa", (a) => ((a.photos as unknown[])[0] = "rosa-1.webp"));
   const result = await validate(raw);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /img- och tolv/);
+  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /och tolv tecken 0–9 och a–f/);
 });
 
 test("photos must be a list of ids, not a list of mappings", async () => {

@@ -102,11 +102,20 @@ export default function (eleventyConfig) {
   const load = () => {
     loaded ??= (async () => {
       const imagesDir = imagesDirFor(dataDir);
-      const dataset = await loadValidDataset(dataDir, { imagesDir: existsSync(imagesDir) ? imagesDir : null });
-      const [speciesContent, mapBackground] = await Promise.all([
+      const [speciesContent, contentTexts, mapBackground] = await Promise.all([
         readSpeciesContent(path.join("source", SPECIES_CONTENT_DIR)),
+        readContentFiles(path.join(ROOT, "source/content")),
         loadMapBackground(path.join("source", MAP_DIR)),
       ]);
+      // The content Markdown goes in too, so an image used only there is not reported
+      // as unused (02-§8.13) and a broken reference in it still fails the build.
+      const dataset = await loadValidDataset(dataDir, {
+        imagesDir: existsSync(imagesDir) ? imagesDir : null,
+        markdown: [
+          ...Object.entries(speciesContent).map(([id, text]) => ({ file: `source/${SPECIES_CONTENT_DIR}/${id}.md`, text })),
+          ...Object.entries(contentTexts).map(([id, text]) => ({ file: `source/content/${id}.md`, text })),
+        ],
+      });
       const built = buildViews(dataset, { base: pathPrefix, farm, speciesContent, mapBackground });
       for (const warning of built.map.warnings) console.warn(`Varning: ${warning}`);
       return { dataset, views: built };
@@ -148,7 +157,16 @@ export default function (eleventyConfig) {
   });
 
   // Images: srcset sizes into <output>/images/ and the `picture` shortcode (02-§8.5, 03-§6).
-  eleventyConfig.addPlugin(imagesPlugin, { dataDir, outDir: "public", pathPrefix });
+  // The plugin fills in `markdownImages.render`, which the `markdown` filter below uses
+  // to turn `![](img-…)` into the same markup the shortcode produces (02-§8.12, 03-§6.6).
+  const markdownImages = { render: () => null };
+  eleventyConfig.addPlugin(imagesPlugin, {
+    dataDir,
+    outDir: "public",
+    pathPrefix,
+    getImages: async () => (await load()).dataset.images,
+    markdownImages,
+  });
 
   // Manifest and service worker (02-§7, 03-§5): the colours from tokens.css, every
   // static asset for the precache, and the worker bundled to a string that
@@ -163,7 +181,9 @@ export default function (eleventyConfig) {
   eleventyConfig.addGlobalData("texts", () => readContentFiles(path.join(ROOT, "source/content")));
   // Markdown from YAML and content files (02-§5.14, 02-§5.22): `html: false` in
   // source/ts/build/markdown.ts escapes any tag, which the validator already refuses (04-§10.9).
-  eleventyConfig.addFilter("markdown", (text) => (text ? renderMarkdown(String(text)) : ""));
+  eleventyConfig.addFilter("markdown", (text) =>
+    text ? renderMarkdown(String(text), { renderImage: (id) => markdownImages.render(id) }) : "",
+  );
 
   // The client code is a handful of small modules bundled into one file (03-§10.2).
   // No dependencies reach the visitor (02-§9.5).

@@ -13,10 +13,6 @@ import { copyFile, mkdir, readdir, stat, utimes } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
-/** The sub-directories an images directory may contain (04-§9.1). */
-export const IMAGE_KINDS = ["animals", "species", "places", "content"] as const;
-export type ImageKind = (typeof IMAGE_KINDS)[number];
-
 /** Limits from ADR 0008: longest edge in pixels and file size in bytes. */
 export const MAX_IMAGE_EDGE = 1600;
 export const MAX_IMAGE_BYTES = 250 * 1024;
@@ -65,9 +61,9 @@ export function targetWidths(originalWidth: number, widths: readonly number[]): 
 }
 
 export interface GenerateImageSizesOptions {
-  /** Directory with `animals/`, `species/`, `places/` and `content/` (see `imagesDirFor`). */
+  /** The flat images directory (see `imagesDirFor`), one `<bild-id>.webp` per image. */
   imagesDir: string;
-  /** Build output directory; files are written under `<outDir>/images/<kind>/`. */
+  /** Build output directory; files are written under `<outDir>/images/`. */
   outDir: string;
   widths?: readonly number[];
   /** Called for every file actually written. Files that are up to date are skipped. */
@@ -75,8 +71,8 @@ export interface GenerateImageSizesOptions {
 }
 
 /**
- * Writes `<outDir>/images/<kind>/<name>-<width>.webp` for every source image and returns
- * `{ width, height, widths }` keyed by `<kind>/<file>`.
+ * Writes `<outDir>/images/<bild-id>-<width>.webp` for every source image and returns
+ * `{ width, height, widths }` keyed by the image id.
  *
  * Output files carry the source file's mtime, so a file whose mtime already matches is
  * skipped. That keeps rebuilds fast and makes the step idempotent.
@@ -86,38 +82,34 @@ export async function generateImageSizes(
 ): Promise<Map<string, ImageInfo>> {
   const { imagesDir, outDir, widths = SRCSET_WIDTHS, onWrite } = options;
   const infos = new Map<string, ImageInfo>();
+  const files = (await listWebpFiles(imagesDir)).sort();
+  if (files.length === 0) return infos;
 
-  for (const kind of IMAGE_KINDS) {
-    const sourceDir = path.join(imagesDir, kind);
-    const files = (await listWebpFiles(sourceDir)).sort();
-    if (files.length === 0) continue;
+  const targetDir = path.join(outDir, "images");
+  await mkdir(targetDir, { recursive: true });
 
-    const targetDir = path.join(outDir, "images", kind);
-    await mkdir(targetDir, { recursive: true });
+  for (const file of files) {
+    const sourcePath = path.join(imagesDir, file);
+    const sourceStat = await stat(sourcePath);
+    const metadata = await sharp(sourcePath).metadata();
+    const { width, height } = metadata;
+    const id = file.replace(/\.webp$/, "");
+    const sizes = targetWidths(width, widths);
 
-    for (const file of files) {
-      const sourcePath = path.join(sourceDir, file);
-      const sourceStat = await stat(sourcePath);
-      const metadata = await sharp(sourcePath).metadata();
-      const { width, height } = metadata;
-      const name = file.replace(/\.webp$/, "");
-      const sizes = targetWidths(width, widths);
+    for (const size of sizes) {
+      const outPath = path.join(targetDir, `${id}-${size}.webp`);
+      if (await isUpToDate(outPath, sourceStat.mtime)) continue;
 
-      for (const size of sizes) {
-        const outPath = path.join(targetDir, `${name}-${size}.webp`);
-        if (await isUpToDate(outPath, sourceStat.mtime)) continue;
-
-        if (size === width) {
-          await copyFile(sourcePath, outPath);
-        } else {
-          await sharp(sourcePath).resize({ width: size }).webp({ quality: DERIVED_QUALITY }).toFile(outPath);
-        }
-        await utimes(outPath, new Date(), sourceStat.mtime);
-        onWrite?.(outPath);
+      if (size === width) {
+        await copyFile(sourcePath, outPath);
+      } else {
+        await sharp(sourcePath).resize({ width: size }).webp({ quality: DERIVED_QUALITY }).toFile(outPath);
       }
-
-      infos.set(`${kind}/${file}`, { width, height, widths: sizes });
+      await utimes(outPath, new Date(), sourceStat.mtime);
+      onWrite?.(outPath);
     }
+
+    infos.set(id, { width, height, widths: sizes });
   }
 
   return infos;
@@ -179,9 +171,8 @@ export async function optimiseImage(
 }
 
 export interface PictureOptions {
-  kind: string;
-  /** File name as written in YAML, e.g. `rosa-1.webp`. */
-  file: string;
+  /** The image id, e.g. `img-a3f2c1d8b901` (04-§9.7). */
+  id: string;
   alt: string;
   info: ImageInfo;
   /** The `sizes` attribute. Defaults to the full viewport width. */
@@ -197,11 +188,10 @@ export interface PictureOptions {
  * `src` points at the 800 px size when it exists, since that fits most phones.
  */
 export function renderPicture(options: PictureOptions): string {
-  const { kind, file, alt, info, sizes = "100vw", eager = false, base } = options;
+  const { id, alt, info, sizes = "100vw", eager = false, base } = options;
   assertBasePath(base);
 
-  const name = file.replace(/\.webp$/, "");
-  const url = (width: number): string => `${base}images/${kind}/${name}-${width}.webp`;
+  const url = (width: number): string => `${base}images/${id}-${width}.webp`;
   const srcWidth = pickSrcWidth(info.widths);
   const srcset = info.widths.map((width) => `${url(width)} ${width}w`).join(", ");
 

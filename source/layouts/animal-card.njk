@@ -9,7 +9,7 @@
 {% macro animalCard(card, eager = false) %}
 <article class="card animal-card">
   <div class="animal-card__image">
-    {%- picture card.photo, "animals", "(min-width: 960px) 33vw, (min-width: 600px) 50vw, 100vw", eager, card.speciesName %}
+    {%- picture card.photo, "(min-width: 960px) 33vw, (min-width: 600px) 50vw, 100vw", eager, card.speciesName %}
   </div>
   <div class="animal-card__body">
     <h3 class="animal-card__title"><a class="card__link" href="{{ card.url | url }}">{{ card.name }}</a></h3>

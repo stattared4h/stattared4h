@@ -23,7 +23,7 @@ eleventyComputed:
 
   <figure class="photo">
     {%- if view.portrait %}
-    {% picture view.portrait, "animals", "(min-width: 960px) 680px, 100vw", true, view.species.name %}
+    {% picture view.portrait, "(min-width: 960px) 680px, 100vw", true, view.species.name %}
     <figcaption class="photo__credit">Foto: {{ view.portrait.credit }}</figcaption>
     {%- else %}
     {% placeholder view.species.name %}
@@ -105,7 +105,7 @@ eleventyComputed:
     <h2>Fler bilder</h2>
     {%- for photo in view.otherPhotos %}
     <figure class="photo">
-      {% picture photo, "animals", "(min-width: 960px) 680px, 100vw", false, view.species.name %}
+      {% picture photo, "(min-width: 960px) 680px, 100vw", false, view.species.name %}
       <figcaption class="photo__credit">Foto: {{ photo.credit }}</figcaption>
     </figure>
     {%- endfor %}

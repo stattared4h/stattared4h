@@ -5,7 +5,4 @@ sex: male
 born: 2022
 status: here
 photos:
-  - file: ko-greta-1.webp
-    alt: Porträtt av Greta.
-    credit: QA
-    portrait: true
+  - img-84d880b77ada

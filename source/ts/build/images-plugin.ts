@@ -14,17 +14,22 @@
  * Before the build runs, every source image gets its `srcset` sizes generated into
  * `<outDir>/images/`. Templates then use:
  *
- *   {% picture animal.photos[0], "animals", "(min-width: 960px) 33vw, 100vw", true, species.name %}
+ *   {% picture animal.photos[0], "(min-width: 960px) 33vw, 100vw", true, species.name %}
  *   {% placeholder species.name %}
- *   {{ photo.file | imageInfo("animals") }}
+ *   {{ photo.id | imageInfo }}
  *
- * `picture` takes the photo object from YAML, the kind (`animals`, `species`, `places`,
- * `content`), an optional `sizes` attribute, whether the image is the page's first
- * (eager, `fetchpriority="high"`), and the label to show if the file is missing. A
- * missing file logs a warning and renders the placeholder instead of a broken image.
- * The shortcodes return HTML; Eleventy's Nunjucks does not autoescape shortcode output,
- * so mark the result `safe` only if autoescape is turned on.
+ * `picture` takes the resolved image from the dataset (`{ id, alt, credit }`), an
+ * optional `sizes` attribute, whether the image is the page's first (eager,
+ * `fetchpriority="high"`), and the label to show if the file is missing. A missing file
+ * logs a warning and renders the placeholder instead of a broken image. The shortcodes
+ * return HTML; Eleventy's Nunjucks does not autoescape shortcode output, so mark the
+ * result `safe` only if autoescape is turned on.
+ *
+ * The same rendering is what content Markdown needs for `![](img-…)` (02-§8.12). Since
+ * only this plugin knows the generated sizes, it fills in `options.markdownImages`, a
+ * handle the configuration hands to the `markdown` filter.
  */
+import type { Image } from "../domain/types.ts";
 import {
   generateImageSizes,
   imagesDirFor,
@@ -46,6 +51,15 @@ export interface EleventyConfigLike {
   addFilter(name: string, fn: (...args: never[]) => unknown): unknown;
 }
 
+/**
+ * How the `markdown` filter reaches this plugin's rendering. The plugin replaces
+ * `render` once the build has generated the sizes; before that it returns null and the
+ * caller falls back to a placeholder.
+ */
+export interface MarkdownImages {
+  render: (id: string) => string | null;
+}
+
 export interface ImagesPluginOptions {
   /** Dataset directory; the images directory is derived from it (`imagesDirFor`). */
   dataDir: string;
@@ -53,11 +67,15 @@ export interface ImagesPluginOptions {
   outDir: string;
   /** Base path. Normalised to leading and trailing slash (ADR 0005). */
   pathPrefix?: string;
+  /** The dataset's image posts, read once per build so Markdown can resolve an id to its alt text. */
+  getImages?: () => Promise<readonly Image[]> | readonly Image[];
+  /** Filled in by the plugin; hand the same object to the `markdown` filter (03-§6.6). */
+  markdownImages?: MarkdownImages;
 }
 
-/** A `photos[]` entry for an animal or the `photo` of a species (04-§4, 04-§6). */
+/** What a template passes to `picture`: the resolved image, or nothing when the record has none. */
 export interface PhotoLike {
-  file: string;
+  id: string;
   alt: string;
 }
 
@@ -67,23 +85,30 @@ export function imagesPlugin(eleventyConfig: EleventyConfigLike, options: Images
   const imagesDir = imagesDirFor(options.dataDir);
   const base = normalisePathPrefix(options.pathPrefix);
   let infos = new Map<string, ImageInfo>();
+  let images = new Map<string, Image>();
 
   eleventyConfig.on("eleventy.before", async (payload) => {
     const outDir = payload?.directories?.output ?? options.outDir;
     infos = await generateImageSizes({ imagesDir, outDir, widths: SRCSET_WIDTHS });
+    const posts = (await options.getImages?.()) ?? [];
+    images = new Map(posts.map((image) => [image.id, image]));
   });
+
+  /** The markup for one image, or null when the build generated no sizes for it. */
+  const render = (photo: PhotoLike, sizes?: string, eager = false): string | null => {
+    const info = infos.get(photo.id);
+    if (info === undefined) {
+      console.warn(`[bilder] ${photo.id}.webp finns inte i ${imagesDir}; platshållare används.`);
+      return null;
+    }
+    return renderPicture({ id: photo.id, alt: photo.alt, info, sizes, eager, base });
+  };
 
   eleventyConfig.addShortcode(
     "picture",
-    (photo?: PhotoLike, kind = "animals", sizes?: string, eager = false, label?: string): string => {
-      const info = photo ? infos.get(`${kind}/${photo.file}`) : undefined;
-      if (!photo || !info) {
-        if (photo) {
-          console.warn(`[bilder] ${kind}/${photo.file} finns inte i ${imagesDir}; platshållare används.`);
-        }
-        return renderPlaceholder({ label: label ?? photo?.alt ?? MISSING_LABEL });
-      }
-      return renderPicture({ kind, file: photo.file, alt: photo.alt, info, sizes, eager, base });
+    (photo?: PhotoLike, sizes?: string, eager = false, label?: string): string => {
+      const html = photo ? render(photo, sizes, eager) : null;
+      return html ?? renderPlaceholder({ label: label ?? photo?.alt ?? MISSING_LABEL });
     },
   );
 
@@ -91,10 +116,14 @@ export function imagesPlugin(eleventyConfig: EleventyConfigLike, options: Images
     renderPlaceholder({ label: label ?? MISSING_LABEL }),
   );
 
-  eleventyConfig.addFilter(
-    "imageInfo",
-    (file: string, kind = "animals"): ImageInfo | undefined => infos.get(`${kind}/${file}`),
-  );
+  eleventyConfig.addFilter("imageInfo", (id: string): ImageInfo | undefined => infos.get(id));
+
+  if (options.markdownImages) {
+    options.markdownImages.render = (id: string): string | null => {
+      const image = images.get(id);
+      return image ? render(image) : null;
+    };
+  }
 }
 
 /** Always starts and ends with a slash, so `${base}images/…` is always well formed. */

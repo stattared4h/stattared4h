@@ -9,15 +9,17 @@
 export type Sex = "female" | "male" | "unknown";
 export type Status = "here" | "gone";
 
-export interface Photo {
-  file: string;
-  alt: string;
-  credit: string;
-  portrait: boolean;
-}
-
-export interface SpeciesPhoto {
-  file: string;
+/**
+ * One image, as `source/data/images/<id>.yaml` describes it (04-§9.5, ADR 0015).
+ *
+ * Records refer to images by id; the validator resolves every reference into this shape,
+ * so pages and templates never look anything up themselves (03-§6.5). The same object
+ * therefore appears in every record that uses the image, which is the point: the alt
+ * text and the credit are written once.
+ */
+export interface Image {
+  /** `img-` and twelve hex characters (04-§9.7). */
+  id: string;
   alt: string;
   credit: string;
 }
@@ -34,7 +36,8 @@ export interface Animal {
   father: string | null;
   status: Status;
   description: string | null;
-  photos: Photo[];
+  /** In data order; the first one is the portrait (02-§8.11). */
+  photos: Image[];
 }
 
 export interface Location {
@@ -47,13 +50,15 @@ export interface Location {
   lon: number | null;
   accessible: boolean;
   active: boolean;
+  /** In data order; the first one is shown at the top of the page (02-§8.11). */
+  photos: Image[];
 }
 
 export interface Species {
   id: string;
   name: string;
   plural: string;
-  photo: SpeciesPhoto | null;
+  photo: Image | null;
 }
 
 export interface Breed {
@@ -77,6 +82,8 @@ export interface Dataset {
   populations: Population[];
   animals: Animal[];
   locations: Location[];
+  /** Every image post, sorted by id. Records hold the same objects (04-§9.5). */
+  images: Image[];
 }
 
 /** One error or warning. `message` is Swedish and says what to fix (02-§6.5). */

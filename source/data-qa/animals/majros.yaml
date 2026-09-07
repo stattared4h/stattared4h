@@ -7,11 +7,5 @@ status: here
 description: |
   Majros är gårdens enda ko och tar den rollen på allvar.
 photos:
-  - file: majros-1.webp
-    alt: Majros, en vit och svart fjällko, betar i högt gräs.
-    credit: Anna Andersson
-    portrait: true
-  - file: majros-2.webp
-    alt: Närbild på Majros mule.
-    credit: Anna Andersson
-    portrait: false
+  - img-4a604ace393f
+  - img-11fc406e5f1d

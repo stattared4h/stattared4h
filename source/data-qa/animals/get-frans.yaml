@@ -5,7 +5,4 @@ sex: male
 born: 2022
 status: here
 photos:
-  - file: get-frans-1.webp
-    alt: Porträtt av Frans.
-    credit: QA
-    portrait: true
+  - img-83d94467dfc5
