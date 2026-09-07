@@ -11,6 +11,8 @@
     <p><a href="{{ site.mainSite }}">{{ site.farm }}</a></p>
     <p><a href="{{ site.repo }}">Källkoden på GitHub</a></p>
     <p>Sidan samlar inga uppgifter om dig.</p>
-    {% if build.version %}<p class="site-footer__version">Version {{ build.version }}</p>{% endif %}
+    {%- if build.version %}
+    <p class="site-footer__version">Version {{ build.version }}</p>
+    {%- endif %}
   </div>
 </footer>
