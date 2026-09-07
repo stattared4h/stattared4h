@@ -25,7 +25,7 @@ import * as esbuild from "esbuild";
 import { readBuildVersion } from "./source/ts/domain/version.ts";
 import { imagesPlugin } from "./source/ts/build/images-plugin.ts";
 import { bundleServiceWorker, listStaticAssets, readThemeColours } from "./source/ts/build/pwa.ts";
-import { readContentFiles, renderMarkdown } from "./source/ts/build/content.ts";
+import { readContentFiles, renderMarkdown } from "./source/ts/build/markdown.ts";
 
 const ROOT = import.meta.dirname;
 
