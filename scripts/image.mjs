@@ -62,6 +62,12 @@ function formatKilobytes(bytes) {
   return `${Math.round(bytes / 1024)} KB`;
 }
 
+/** Relative to the working directory when that is shorter, absolute when it is not. */
+function shownPath(file) {
+  const relative = path.relative(process.cwd(), file);
+  return relative.startsWith("..") ? file : relative;
+}
+
 /** The image post as YAML: two lines, quoted only where the yaml package says it must be. */
 function imagePostYaml({ alt, credit }) {
   return stringify({ alt, credit }, { lineWidth: 0 });
@@ -92,10 +98,13 @@ async function main() {
   const postPath = path.join(options.dataDir, imagePostFile(id));
 
   if (await exists(imagePath)) {
-    // The id comes from the content, so this is the same photo, not a name clash.
+    // The id comes from the content, so this is the same photo, not a name clash. The
+    // alt text and credit given on the command line are not applied: the post already
+    // describes this picture, and silently overwriting it would lose someone's wording.
     console.log(
-      `Bilden finns redan som ${id}. Referera den som "${id}"; ` +
-        `alt-texten står i ${path.relative(process.cwd(), postPath)}.`,
+      `Bilden finns redan som ${id} och ingenting skrevs.\n` +
+        `Referera den som "${id}". Vill du ändra alt-texten eller fotografen, ` +
+        `redigera ${shownPath(postPath)}.`,
     );
     return;
   }
@@ -106,9 +115,9 @@ async function main() {
   await writeFile(postPath, imagePostYaml(options));
 
   console.log(
-    `Skrev ${path.relative(process.cwd(), imagePath)} ` +
+    `Skrev ${shownPath(imagePath)} ` +
       `(${result.width}×${result.height} px, ${formatKilobytes(result.data.byteLength)}, kvalitet ${result.quality}) ` +
-      `och ${path.relative(process.cwd(), postPath)}.\n` +
+      `och ${shownPath(postPath)}.\n` +
       `Referera bilden som "${id}" under photos hos ett djur eller en plats, eller som photo hos en art.`,
   );
 }

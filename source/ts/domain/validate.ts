@@ -346,7 +346,6 @@ function openRecord(record: RawRecord, issues: Issues, kind: string): Obj | null
 function validateImagePosts(records: readonly RawRecord[], issues: Issues): Map<string, Image> {
   const images = new Map<string, Image>();
   for (const record of records) {
-    const fields = new Fields(record.file, issues);
     if (record.parseError !== null) {
       issues.error(record.file, null, `kunde inte läsas som YAML: ${record.parseError}`);
       continue;
@@ -363,6 +362,7 @@ function validateImagePosts(records: readonly RawRecord[], issues: Issues): Map<
       issues.error(record.file, null, "filen måste innehålla alt och credit som fält och värden, en per rad.");
       continue;
     }
+    const fields = new Fields(record.file, issues);
     fields.unknown(record.data, IMAGE_FIELDS);
     fields.noHtml(record.data, null);
     const alt = fields.requiredString(record.data, "alt");
@@ -975,7 +975,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
 
   collectWarnings(species, animals, populations, locations, images, inMarkdown, files, speciesFile, issues);
 
-  const imageList = [...images.values()].sort((a, b) => a.id.localeCompare(b.id));
+  const imageList = [...images.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   if (options.imagesDir) {
     await validateImageFiles(imageList, options.imagesDir, issues);
     await warnAboutStrayImageFiles(imageList, options.imagesDir, issues);

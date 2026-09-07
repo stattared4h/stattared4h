@@ -210,7 +210,11 @@ describe("images as their own posts (02-§8.8–8.12, ADR 0015)", () => {
     assert.match(html, new RegExp(`Foto: ${withPhotos.photos[0].credit}`));
     // The species tiles stay above the photos, so they are still reachable without
     // scrolling on a phone (05-§6.24).
-    assert.ok(html.indexOf("species-tile") < html.indexOf(`${withPhotos.photos[0].id}-800.webp`));
+    const tiles = html.indexOf("species-tile");
+    const firstPhoto = html.indexOf(`${withPhotos.photos[0].id}-800.webp`);
+    assert.ok(tiles >= 0, "the location page should have species tiles");
+    assert.ok(firstPhoto >= 0, "the location page should show the first photo");
+    assert.ok(tiles < firstPhoto, "the species tiles come before the photos");
   });
 
   test("a location without photos shows no placeholder (02-§5.31)", async () => {
