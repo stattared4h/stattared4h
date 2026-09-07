@@ -35,6 +35,14 @@ eleventyComputed:
       <dt>Art</dt>
       <dd><a href="{{ view.species.url | url }}">{{ view.species.name }}</a></dd>
     </div>
+    {%- for animal in dataset.animals %}
+      {%- if animal.id == view.id and animal.publicId %}
+    <div class="facts__row">
+      <dt>Öronmärke</dt>
+      <dd>{{ animal.publicId }}</dd>
+    </div>
+      {%- endif %}
+    {%- endfor %}
     {%- if view.breed %}
     <div class="facts__row">
       <dt>Ras</dt>

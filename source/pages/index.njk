@@ -44,6 +44,24 @@ description: >-
 
   {%- if views.home.species.length > 0 %}
   <section class="page-section">
+    <h2>Hitta ett djur via öronmärket</h2>
+    <p>Skriv av hela numret. Mellanslag och bindestreck spelar ingen roll.</p>
+    <form data-animal-id-search>
+      <label for="animal-public-id">Öronmärke</label>
+      <input id="animal-public-id" data-animal-id-input type="search" inputmode="text" autocomplete="off" placeholder="SE 012345 0001">
+      <button class="button" type="submit">Hitta djuret</button>
+      <p data-animal-id-result role="status" aria-live="polite" hidden></p>
+      <div hidden aria-hidden="true">
+        {%- for animal in dataset.animals %}
+          {%- if animal.publicId %}
+        <span data-public-id="{{ animal.publicId }}" data-name="{{ animal.name }}" data-url="{{ ('/djur/' + animal.id + '/') | url }}"></span>
+          {%- endif %}
+        {%- endfor %}
+      </div>
+    </form>
+  </section>
+
+  <section class="page-section">
     <h2>Djuren på gården</h2>
     {{- tiles.speciesGrid(views.home.species, true) }}
   </section>
