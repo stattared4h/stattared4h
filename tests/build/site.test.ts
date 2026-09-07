@@ -138,6 +138,30 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
     }
   });
 
+  test("menyn har ett överlägg och en knapp med båda lägena (02-§10.4, 02-§10.38, 05-§6.42)", async () => {
+    for (const { file, html } of await htmlFiles(prod)) {
+      const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+      assert.match(header, /<div class="site-menu-overlay" data-menu-overlay hidden><\/div>/, `${file}: överlägget saknas`);
+      const tag = header.slice(header.lastIndexOf("<button", header.indexOf("data-menu-button")), header.indexOf("data-menu-button"));
+      const button = header.slice(header.indexOf("data-menu-button"));
+      assert.match(tag, /aria-expanded="false"/, `${file}: menyknappen börjar hopfälld`);
+      assert.match(button, /icon-button__label--closed">Meny</, `${file}: etiketten Meny`);
+      assert.match(button, /icon-button__label--open">Stäng</, `${file}: etiketten Stäng`);
+      assert.match(button, /icon-button__icon--closed/, `${file}: ikonen för stängt läge`);
+      assert.match(button, /icon-button__icon--open/, `${file}: ikonen för öppet läge`);
+    }
+  });
+
+  test("överlägget ligger före menykortet och under sidhuvudets rad (02-§10.38)", async () => {
+    const html = await readFile(path.join(prod, "index.html"), "utf8");
+    const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+    const row = header.indexOf("site-header__inner");
+    const overlay = header.indexOf("data-menu-overlay");
+    const card = header.indexOf('id="site-menu"');
+    assert.ok(row < overlay, "raden står före överlägget i markupen");
+    assert.ok(overlay < card, "överlägget står före menykortet i markupen");
+  });
+
   test("versionsraden visar BUILD_VERSION och saknas i ett CI-bygge utan version", async () => {
     const withVersion = await readFile(path.join(qa, "index.html"), "utf8");
     assert.match(withVersion, new RegExp(`<p class="site-footer__version">Version ${QA_VERSION}</p>`));

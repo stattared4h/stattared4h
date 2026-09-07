@@ -1,5 +1,5 @@
 {#
-  Site header (02-§10.1–10.10, 05-§6.1). Markup only: the menu behaviour is in
+  Site header (02-§10.1–10.10, 02-§10.38–10.39, 05-§6.1). Markup only: the menu behaviour is in
   source/ts/ui/menu.ts; install, "to top" and feedback get theirs from their own modules,
   which find the buttons by their data attributes. Both layouts share one set of
   buttons and links; CSS decides what shows at which width (05-§5.4).
@@ -17,11 +17,17 @@
       <span class="site-header__name">{{ site.name }}</span>
     </a>
 
+    {#- Both states live in the markup; `aria-expanded` decides which one shows, so the
+        open/closed state is written in one place only (05-§6.42, 02-§10.4). #}
     <button class="icon-button icon-button--mobile-only site-header__menu-button" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-button>
-      <svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+      <svg class="icon-button__icon icon-button__icon--closed" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
         <path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
       </svg>
-      <span class="icon-button__label">Meny</span>
+      <svg class="icon-button__icon icon-button__icon--open" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+        <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <span class="icon-button__label icon-button__label--closed">Meny</span>
+      <span class="icon-button__label icon-button__label--open">Stäng</span>
     </button>
 
     <nav class="site-nav" aria-label="Huvudmeny">
@@ -52,6 +58,11 @@
       </svg>
     </button>
   </div>
+
+  {#- The overlay takes the press that falls outside the menu, so nothing under the card
+      is activated by the press that closes it (02-§10.38). It sits after the row, which
+      keeps its own stacking order, and before the card, which paints on top of it. #}
+  <div class="site-menu-overlay" data-menu-overlay hidden></div>
 
   <nav class="site-menu" id="site-menu" aria-label="Meny">
     <a class="site-menu__brand" href="{{ '/' | url }}">

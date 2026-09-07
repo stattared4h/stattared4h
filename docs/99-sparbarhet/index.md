@@ -134,7 +134,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§9.10` | Dokumentkontroll i CI | `byggd` | `scripts/lib/check-docs.ts` via `npm run lint:docs`, som ingår i lint-kedjan i *Project checks*; testad i `tests/docs/check-docs.test.ts` |
 | `02-§9.11` | Deploy efter grön kvalitet, `npm ci` | `manuell` | Öppna en körning av *Deploy till QA* i Actions-fliken och bekräfta att den startades av *Quality* med grönt resultat på samma commit, och att steget *Install dependencies* kör `npm ci --ignore-scripts` |
 | `02-§9.12` | Produktion och QA i samma utgåva | `manuell` | Efter en körning av *Deploy till QA*: öppna `https://stattared4h.github.io/stattared4h/` och `.../stattared4h/qa/` och bekräfta att båda svarar, och att körningens sammanfattning anger vilken tagg produktionens kod kom från |
-| `02-§10.1`–`10.8` | Sidhuvud, hopp-länk, ikonrad, meny, desktopvariant, aktuell sida | `manuell` | `source/layouts/header.njk`, `source/ts/ui/menu.ts`, `layout.css`, `components.css`. Öppna startsidan i 360 px: raden visar Meny och feedback, menyn öppnas med knappen och stängs med Escape, klick utanför och länkval, och sidhuvudet ligger kvar vid rullning. I 1280 px: logga, namn och länkarna Hem, Karta och Om sajten syns, Hem är understruken. Tab från adressfältet landar på "Hoppa till innehållet" |
+| `02-§10.1`–`10.8` | Sidhuvud, hopp-länk, ikonrad, meny, desktopvariant, aktuell sida | `manuell` | `source/layouts/header.njk`, `source/ts/ui/menu.ts`, `layout.css`, `components.css`. Öppna startsidan i 360 px: raden visar Meny och feedback, menyn öppnas med knappen och stängs med Escape, tryck utanför och länkval, och sidhuvudet ligger kvar vid rullning. I 1280 px: logga, namn och länkarna Hem och Om sajten syns, Hem är understruken. Tab från adressfältet landar på "Hoppa till innehållet" |
+| `02-§10.38` | Överlägget tar emot trycket utanför menyn | `manuell` | `[data-menu-overlay]` i `source/layouts/header.njk`, visat av `source/ts/ui/menu.ts` och format av `.site-menu-overlay` i `components.css`; att elementet finns på varje sida bevakas av `tests/build/site.test.ts`. Öppna `/plats/gethagen/` i 360 px, öppna menyn och tryck på artrutan under kortet: menyn stängs och sidan står kvar på platssidan |
+| `02-§10.39` | Menyns länkar håller träffytan | `manuell` | `.site-menu__link` i `components.css`. Öppna menyn i 360 px och mät en länk i DevTools: minst 44 px hög |
 | `02-§10.9` | 4H-loggan | `byggd` | Förbundets egna banor i `source/assets/img/4h-logo.svg`, härledda ur vektorfilen i `docs/09-kallor/`; `tests/design/logo.test.ts` jämför konstverkets kontrollsumma med registret |
 | `02-§10.10` | Ingen huvudsidelänk i sidhuvudet | `byggd` | `tests/build/site.test.ts` |
 | `02-§10.11`–`10.13` | Installknapp | `manuell` | `source/ts/ui/install.ts`; läget avgörs av `installButtonState` i `source/ts/domain/install.ts`, testad i `tests/domain/install.test.ts`, och `aria-label` bevakas av `tests/build/pwa.test.ts`. Öppna sajten i Chrome på Android: knappen syns när installationserbjudandet kommer, ett tryck visar dialogen, och knappen försvinner efter installation; i Safari på iPhone syns den alltid och ett tryck växlar texten om Dela under sidhuvudet |
@@ -192,7 +194,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.39`–`6.40` | Markörens bricka och symbolen i listan | `manuell` | `.map__pin`, `.map__symbol` och `.place-list__symbol` i `components.css`. Bygg med `DATA_DIR=source/data-qa`, öppna `/` i 360 px och bekräfta att hagarnas markörer är fyllda gröna brickor med vit symbol och att gårdens övriga är ljusa med grön ring och grön symbol, samt att samma symbol står framför namnet i listan under kartan |
 | `05-§6.31` | Kartan har en textlista | `byggd` | `views.map.list` i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver varje aktiv plats i listan |
 | `05-§6.30` | Sidfot | `manuell` | `source/layouts/footer.njk`, `layout.css`. Öppna en sida och bekräfta djupgrön botten, vit text, och ordningen logga, huvudsidelänk, repolänk, integritetsmening, version |
-| `05-§6.33`–`6.34`, `6.37` | Ikonknapp, meny, sidhuvudets höjd | `manuell` | `components.css`, `layout.css`. I 360 px: knapparna är 44 px, menykortet är grönt med vita länkar och glider in under sidhuvudet; sidhuvudets höjd är densamma före och efter rullning och i 1280 px |
+| `05-§6.33`–`6.34`, `6.37` | Ikonknapp, meny, sidhuvudets höjd | `manuell` | `components.css`, `layout.css`. I 360 px: knapparna är 44 px, menykortet är grönt med vita länkar och glider in under sidhuvudet över ett mörkt överlägg som lämnar sidhuvudets rad synlig; sidhuvudets höjd är densamma före och efter rullning och i 1280 px |
+| `05-§6.42` | Menyknappens två lägen i markupen | `byggd` | Båda ikonerna och båda etiketterna ligger i `source/layouts/header.njk` och väljs av `aria-expanded` i `components.css`; `tests/build/site.test.ts` kräver att båda finns och att knappen börjar hopfälld |
 | `05-§6.35`–`6.36` | Dialog, statusrad | `manuell` | `.dialog` och `.status-bar` i `components.css`. Öppna feedbackdialogen i 360 px och 1280 px: mörkt bakgrundsskikt, vit yta med rundade hörn och kryssknapp uppe till höger, som mest 680 px bred, intonad på under 200 ms; sätt DevTools → Network → Offline: ljusgrön rad med djupgrön text direkt under sidhuvudet |
 | `05-§6.38` | Frizon runt 4H-logotypen | `manuell` | Öppna `/` i 1280 px och mät i DevTools att avståndet från logotypen till sajtnamnet är minst 8 px och till sidhuvudets över- och underkant minst 4 respektive 8 px; öppna menyn i 360 px och sidfoten och bekräfta minst 8 px under logotypen |
 | `05-§6` övrigt | Hero | `saknas` | Skrivs när markupen finns, enligt `05-§7.2`; heron väntar på ett fotografi från gården |
@@ -297,8 +300,8 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 18 |
 | `påbörjad` | 15 |
-| `byggd` | 128 |
-| `manuell` | 47 |
+| `byggd` | 129 |
+| `manuell` | 49 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->

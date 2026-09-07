@@ -29,6 +29,13 @@ inte byggas in i egna märken (ADR 0007).
 Reglerna för hur loggan får se ut och omges kommer inte från oss utan från Riksförbundet
 Sveriges 4H:s grafiska profil, som är källan för identiteten (ADR 0016).
 
+Menyn stängdes först med en lyssnare på hela dokumentet, och samma tryck nådde då länken
+under kortet: den som tryckte bort menyn hamnade på en sida hen inte bett om (issue #59).
+Överlägget i `02-§10.38` är svaret. Det tar emot trycket i stället för innehållet, det gör
+att kortet läses som ett eget lager, och det ger en yta som uppenbart går att trycka på för
+att stänga. Krysset i `02-§10.4` finns för att målgruppen är ett barn med en telefon
+(`02-§2.3`), utan Escape-tangent och utan vana att gissa att man trycker bredvid.
+
 ### Sidhuvudet
 
 - Varje sida har samma sidhuvud överst, klistrat i fönstrets topp så att det syns vid
@@ -41,12 +48,19 @@ Sveriges 4H:s grafiska profil, som är källan för identiteten (ADR 0016).
   höger om den, "till toppen" i mitten och feedbackknappen längst till
   höger. <!-- 02-§10.3 -->
 - Menyknappen visar tre streck och ordet "Meny", har `aria-expanded` och
-  `aria-controls`, och öppnar menyn. <!-- 02-§10.4 -->
+  `aria-controls`, och öppnar menyn. Medan menyn är öppen visar samma knapp ett kryss och
+  ordet "Stäng", och ett tryck stänger menyn. <!-- 02-§10.4 -->
 - Menyn fälls ut under raden som ett kort (`05-§6.34`) med 4H-loggan överst, följd av
   länkarna "Startsidan" och "Om sajten". Kartan har ingen egen länk: den ligger på
   startsidan (`02-§5.1`). <!-- 02-§10.5 -->
-- Menyn stängs med Escape, med klick utanför den och när en länk väljs. Stängs den
-  med Escape återgår fokus till menyknappen. <!-- 02-§10.6 -->
+- Menyn stängs med Escape, med ett tryck utanför den och när en länk väljs. Ett tryck
+  utanför menyn stänger den utan att aktivera det som ligger under. Stängs den med
+  Escape återgår fokus till menyknappen. <!-- 02-§10.6 -->
+- Bakom menykortet ligger ett överlägg (`05-§6.34`) som täcker sidan medan menyn är
+  öppen. Överlägget är det som tar emot trycket utanför menyn. Sidhuvudets rad ligger
+  kvar ovanpå överlägget, så menyknappen syns och går att trycka på hela
+  tiden. <!-- 02-§10.38 -->
+- Menyns länkar är minst `--tap-target-min` höga. <!-- 02-§10.39 -->
 - Från desktopbrytpunkten visar sidhuvudet 4H-loggan till vänster med sajtens namn
   "Djuren på Stättared" som text intill, länkarna "Hem" och "Om sajten" i
   raden, och installknappen och feedbackknappen som ikoner utan botten längst till
