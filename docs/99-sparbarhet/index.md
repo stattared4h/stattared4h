@@ -29,7 +29,8 @@ färdig den än ser ut — det är testet som gör att den förblir färdig. <!-
 Repot innehåller ramverket — process, beslut, datakontrakt, design och krav för fas 1 —
 samt Eleventy-bygget med grundlayout, sidhuvud, sidfot, versionsmodul, manifest,
 service worker, feedbackdialog, om-sida och de datadrivna sidorna: start, plats, djur,
-art och karta, byggda ur det validerade datasetet. Statusen nedan speglar det.
+art och karta, byggda ur det validerade datasetet. Bilderna är egna poster med id ur
+innehållet (ADR 0015). Statusen nedan speglar det.
 
 ### Krav (`02-§`)
 
@@ -55,13 +56,13 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.23`–`5.26` | Kartan | `byggd` | `source/ts/build/map.ts` och `source/pages/karta.njk`; projektion, markörer och lista i `tests/build/map.test.ts`, `pages.test.ts` och `data-pages.test.ts`, som också kräver att inget anrop går utanför sajten |
 | `02-§5.27` | Markörer minst 44 px; textbeskrivning | `manuell` | Beskrivningen bevakas av `tests/build/map.test.ts`. Öppna `/karta/` i 360 px och bekräfta att varje markör är minst 44 px hög och bred (mätt till 68 px hög i Chromium) |
 | `02-§5.28` | Djurkortet | `byggd` | Makrot i `source/layouts/animal-card.njk` med `animalCard` i `pages.ts`; etiketter och platshållare i `tests/build/pages.test.ts` och `data-pages.test.ts` |
-| `02-§5.31` | Platssidan visar platsens bilder | `saknas` | Platsen får `photos` i datakontraktet (`04-§5.6`) |
+| `02-§5.31` | Platssidan visar platsens bilder | `byggd` | `photos` på platsen i `04-§5.6`, `view.photos` i `source/pages/plats.njk` efter faktarutan; `tests/build/data-pages.test.ts` kontrollerar bilderna, fototexten, att djurslagsrutorna står före dem och att en plats utan bilder inte visar någon platshållare |
 | `02-§5.29` | `npm run qr` | `byggd` | `scripts/qr.mjs` och `source/ts/build/qr.ts`; `tests/build/qr.test.ts` kör skriptet mot QA-datat och kontrollerar en fil per plats med adressen som `<title>` |
 | `02-§5.30` | Ritad kartbakgrund | `byggd` | `parseMapBackground` och `loadMapBackground` i `source/ts/build/map.ts`, konventionen i `source/map/README.md`; `tests/build/map.test.ts` bäddar in en liten SVG och prövar varningen för en plats utanför |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
 | `02-§6.2` | Valideringen körs först i bygget | `byggd` | `eleventy.config.js` anropar `loadValidDataset` i `eleventy.before`, i sekventiellt händelseläge före bildpluginen; `tests/build/data-pages.test.ts` bygger ett ogiltigt dataset och kräver en tom utkatalog |
 | `02-§6.3` | Fäller vid allt i `04-§10` och vid okända fält | `byggd` | `source/ts/domain/validate.ts`; varje regel prövas i `tests/domain/validate.test.ts` |
-| `02-§6.4` | Varningar | `byggd` | `collectWarnings` i `validate.ts`; QA-datats exakta varningar i `tests/domain/validate.test.ts` |
+| `02-§6.4` | Varningar | `byggd` | `collectWarnings` och `warnAboutStrayImageFiles` i `validate.ts`; QA-datats exakta varningar i `tests/domain/validate.test.ts` |
 | `02-§6.5` | Meddelanden på svenska med fil och fält | `byggd` | `formatIssue` i `validate.ts`; `tests/domain/validate.test.ts` och `load.test.ts` |
 | `02-§6.6` | `npm run validate` | `byggd` | `scripts/validate.mjs`; `tests/domain/validate-script.test.ts` kör skriptet och kontrollerar felkoden |
 | `02-§6.7` | `born` normaliseras | `byggd` | `source/ts/domain/born.ts`; `tests/domain/born.test.ts` |
@@ -69,7 +70,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§6.9` | Deterministisk svensk sortering | `byggd` | `source/ts/domain/sort.ts`; `tests/domain/sort.test.ts` |
 | `02-§6.10` | Tester mot QA-datat, ogiltiga poster i testet | `byggd` | `tests/domain/helpers.ts` läser `source/data-qa/`; ogiltiga poster byggs i minnet |
 | `02-§6.11` | Test: inget `location`-fält | `byggd` | `tests/domain/no-location.test.ts` läser både `source/data` och `source/data-qa` |
-| `02-§6.12` | QA har minst 100 individer och täcker vokabulären | `byggd` | `tests/domain/qa-data.test.ts`; `source/data-qa/` har 100 individer |
+| `02-§6.12` | QA har minst 100 individer och täcker vokabulären | `byggd` | `tests/domain/qa-data.test.ts`; `source/data-qa/` har 100 individer, 101 bildposter, en bild som två getter delar och en plats med bilder |
 | `02-§6.13` | Räknade bestånd för djur utan individsidor | `byggd` | `source/ts/domain/load.ts`, `validate.ts`, `derive.ts`; `tests/domain/qa-data.test.ts` |
 | `02-§7.1`–`7.2` | Manifest: namn, färger ur tokens, ikoner; `start_url`, `scope` och `id` ur bas-sökvägen | `byggd` | `source/pages/manifest.njk` med färgerna från `readThemeColours` i `source/ts/build/pwa.ts`; `tests/build/pwa.test.ts` jämför med `tokens.css` och bygger under `/prov/qa/` |
 | `02-§7.3` | Registrering på `<bas>sw.js` med scope lika med bas-sökvägen | `manuell` | `source/ts/ui/sw-register.ts` läser `data-base`, som `tests/build/pwa.test.ts` bevakar. Öppna startsidan i Chromium, DevTools → Application → Service Workers: `sw.js` är registrerad med scope lika med bas-sökvägen, och under `/qa/` finns en egen med scope `…/qa/` |
@@ -80,16 +81,16 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§7.8` | Inga anrop till andra värdar | `byggd` | `tests/build/pwa.test.ts` fäller `http(s)://` i `sw.js` och `main.js`; workern rör aldrig ett annat origin (`tests/domain/offline.test.ts`) |
 | `02-§7.9` | QA har egen service worker och eget manifest-`id` | `byggd` | Scope, `id` och cachenamn följer bas-sökvägen; `tests/build/pwa.test.ts` bygger under `/prov/qa/` och jämför med `/` |
 | `02-§7.10` | Installation på iOS och Android | `manuell` | Öppna sajten i Safari på en iPhone, lägg den på hemskärmen, sätt flygplansläge och öppna en platssida och en djursida från appen; gör samma sak i Chrome på Android via installknappen |
-| `02-§8.1` | Bara webbanpassade bilder i repot | `påbörjad` | `npm run image` skriver filer som håller gränserna och `02-§8.2` fäller vid en fil som inte gör det; `source/images/` väntar på gårdens egna fotografier |
-| `02-§8.2` | Validering av bildfiler | `byggd` | `validateImages` i `source/ts/domain/validate.ts` fäller vid saknad fil, fel format, för stora mått, för stor fil och kvarlämnad metadata; bygget skickar bildkatalogen när den finns. `tests/domain/validate.test.ts` prövar varje regel med handbyggda WebP-filer |
-| `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` och `optimiseImage` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
-| `02-§8.4` | `npm run qa:images` | `byggd` | `scripts/qa-images.mjs` skriver till `source/images-qa/`; `tests/build/images.test.ts` |
+| `02-§8.1` | Bara webbanpassade bilder i repot, platt katalog | `påbörjad` | `npm run image` skriver filer som håller gränserna, platt och med bild-id:t som filnamn, och `02-§8.2` fäller vid en fil som inte gör det; `source/images/` väntar på gårdens egna fotografier |
+| `02-§8.2` | Validering av bildfiler | `byggd` | `validateImageFiles` i `source/ts/domain/validate.ts` fäller vid saknad fil, fel format, för stora mått, för stor fil och kvarlämnad metadata, och rapporterar på bildposten så en delad bild bara felar en gång; bygget skickar bildkatalogen när den finns. `tests/domain/validate.test.ts` prövar varje regel med handbyggda WebP-filer |
+| `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` med `optimiseImage` i `source/ts/build/images.ts` och `imageIdFor` i `source/ts/domain/image-id.ts`; skriver bildfilen och bildposten. `tests/build/images.test.ts` prövar nedskalning, metadatarensning, att id:t är filens hash, bildposten, samma foto två gånger och kraven på `--alt` och `--credit` |
+| `02-§8.4` | `npm run qa:images` | `byggd` | `scripts/qa-images.mjs` läser bildposterna och skriver en platt platshållare per post till `source/images-qa/`; `tests/build/images.test.ts` |
 | `02-§8.5`–`8.7` | Leverans av bilder | `byggd` | `picture`-shortcoden i djurkortet, djurslagsrutan och djur- och artsidan, `credit` i `source/pages/djur.njk` och `arter.njk`; `tests/build/data-pages.test.ts` kontrollerar `srcset`, `width`, `height`, `loading`, `fetchpriority`, `alt`, platshållaren och fototexten på Rosas och Bockens sidor |
-| `02-§8.8` | Bildposten med `alt` och `credit` | `saknas` | `source/data/images/<bild-id>.yaml`, se [ADR 0015](../adr/0015-bilden-som-egen-post.md) |
-| `02-§8.9` | Bild-id ur innehållets SHA-256 | `saknas` | `img-` och tolv hex; formen valideras, inte hashen (`04-§9.10`) |
-| `02-§8.10`–`8.11` | Referenser och huvudbild | `saknas` | `photos` som lista av id:n hos djur och plats, `photo` hos art; den första är huvudbilden |
-| `02-§8.12` | Bilder i Markdown | `saknas` | `![](img-…)` med alt ur bildposten |
-| `02-§8.13` | Varning för oanvänd bildpost och oanvänd bildfil | `saknas` | Oanvänt utrymme ligger kvar i historiken (ADR 0008) |
+| `02-§8.8` | Bildposten med `alt` och `credit` | `byggd` | `validateImagePosts` i `source/ts/domain/validate.ts`, `Image` i `types.ts`, `images/` i `load.ts`; `tests/domain/validate.test.ts` och `tests/domain/qa-data.test.ts`. Se [ADR 0015](../adr/0015-bilden-som-egen-post.md) |
+| `02-§8.9` | Bild-id ur innehållets SHA-256 | `byggd` | `source/ts/domain/image-id.ts`; `tests/domain/image-id.test.ts` prövar formen, att hashen är stabil och att prefixet hindrar YAML från att läsa ett id med bara siffror som heltal |
+| `02-§8.10`–`8.11` | Referenser och huvudbild | `byggd` | `Fields.photos` och `Fields.imageReference` löser upp id:n till `Image`, `portraitOf` i `source/ts/build/pages.ts` tar den första; `tests/domain/validate.test.ts` prövar delning mellan poster och dubbelreferens, `tests/build/data-pages.test.ts` att en delad bild ger en fil och en alt-text på båda sidorna |
+| `02-§8.12` | Bilder i Markdown | `byggd` | Bildregeln i `source/ts/build/markdown.ts` och upplösaren i `images-plugin.ts`; `tests/build/markdown.test.ts` och en markdown-bild i en QA-platsbeskrivning som `tests/build/data-pages.test.ts` följer genom bygget |
+| `02-§8.13` | Varning för oanvänd bildpost och oanvänd bildfil | `byggd` | `collectWarnings` och `warnAboutStrayImageFiles` i `validate.ts`; bild-id i Markdown räknas som användning, annars vore varningen falsk. `tests/domain/validate.test.ts` |
 | `02-§9.1` | Eleventy och esbuild | `byggd` | `eleventy.config.js` med esbuild i `eleventy.before`; `erasableSyntaxOnly` i `tsconfig.json` fäller `enum` och `namespace`; byggtesterna kör Eleventy som barnprocess |
 | `02-§9.2` | Node 22.18 i `.nvmrc` och `engines` | `påbörjad` | Båda finns, och `eleventy.config.js` importerar `.ts` direkt; inget test |
 | `02-§9.3` | `npm run lint` | `påbörjad` | Kör html-validate, stylelint med `declaration-strict-value`, eslint, markdownlint och yamllint; inget test som bevakar att alla fem ingår |
@@ -163,7 +164,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§7.7`–`7.8` | Fokusmarkering, rörelse | `påbörjad` | I `base.css`; inget test |
 | `05-§7.10` | Filstruktur för CSS | `påbörjad` | Fyra filer, laddade i ordning av `source/layouts/base.njk`; `utilities.css` skapas vid behov; inget test |
 | `05-§8.1`–`8.4`, `8.8`–`8.10` | Fotoregler, personer, upphovsrätt | `dokumenterad` | Vägledning för den som fotograferar; `credit` visas intill varje bild (`02-§8.7`) |
-| `05-§8.5`–`8.7` | Tekniska bildregler | `byggd` | `generateImageSizes` och `renderPicture`, använda av sidorna; `srcset`, `width`, `height` och `loading` bevakas av `tests/build/data-pages.test.ts` |
+| `05-§8.5`–`8.7` | Tekniska bildregler | `byggd` | `generateImageSizes` och `renderPicture`, använda av sidorna; `srcset`, `width`, `height` och `loading` bevakas av `tests/build/data-pages.test.ts`. En bild i brödtext delar utseende med en bild i en figure i `source/assets/css/components.css` |
 | `05-§9` | Tillgänglighet | `dokumenterad` | Delvis testbar med html-validate |
 | `05-§10` | Vad man inte gör | `dokumenterad` | Delvis kontrollerbar med lint |
 
@@ -171,7 +172,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `04-§1`–`04-§9` | Modell för djur, arter, raser, bestånd, platser och bilder | `påbörjad` | Domänlagret läser och validerar modellen, inklusive räknade bestånd; bildfilerna saknas ännu |
+| `04-§1`–`04-§9` | Modell för djur, arter, raser, bestånd, platser och bilder | `påbörjad` | Domänlagret läser och validerar modellen, inklusive räknade bestånd och bildposter; gårdens egna bildfiler saknas ännu |
 | `04-§4.2` | Djur har inget `location`-fält | `byggd` | Valideraren fäller (`tests/domain/validate.test.ts`) och `tests/domain/no-location.test.ts` bevakar datat |
 | `04-§8` | Härledda vyer | `byggd` | `source/ts/domain/derive.ts` matar vymodellerna i `source/ts/build/pages.ts`; `tests/domain/derive.test.ts` och `tests/build/pages.test.ts`. Djursidan påstår aldrig var individen står (`04-§8.2`): `tests/build/data-pages.test.ts` kräver att ordet `location` inte finns på någon sida |
 | `04-§10` | Validering | `byggd` | `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts`. Bildkontrollen (`04-§10.7`) prövas med handbyggda WebP-filer i `tests/domain/webp.test.ts` tills `source/images-qa/` finns |
@@ -206,9 +207,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§7` | Redigering | `dokumenterad` | Process |
 | `03-§6.4` | Artens bild i rutor och på artsidan | `byggd` | `species-tile.njk` och `source/pages/arter.njk`; platshållaren med artnamnet bevakas av `tests/build/data-pages.test.ts` |
 | `03-§6.1` | Bygget genererar bara mindre storlekar | `byggd` | `generateImageSizes` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
-| `03-§6.2` | Upplösare från filnamn till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` |
-| `03-§6.5` | Bild-id löses upp när datasetet normaliseras | `saknas` | Vymodellerna får ett färdigt bildobjekt |
-| `03-§6.6` | Bilder i Markdown genom samma kedja | `saknas` | `renderMarkdown` tar en upplösare |
+| `03-§6.2` | Upplösare från bild-id till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` kontrollerar också att ingen sökväg har en underkatalog per posttyp |
+| `03-§6.5` | Bild-id löses upp när datasetet normaliseras | `byggd` | `Fields.imageReference` i `validate.ts` ger `Animal.photos`, `Location.photos` och `Species.photo` färdiga `Image`-objekt; `tests/domain/validate.test.ts` |
+| `03-§6.6` | Bilder i Markdown genom samma kedja | `byggd` | `renderMarkdown(text, { renderImage })` och `markdownImages` från `images-plugin.ts`; `tests/build/markdown.test.ts` |
 | `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `byggd` | `renderPicture` med `eager` för sidans första bild; `tests/build/data-pages.test.ts` kräver `fetchpriority="high"` på porträttet och `loading="lazy"` på nästa bild |
 | `03-§8.1` | `npm run build` | `byggd` | `eleventy` med `eleventy.config.js`; byggtesterna kör samma bygge till en tillfällig katalog |
 | `03-§8.2`–`8.4` | Test, lint och CI | `påbörjad` | `npm test`, `npm run lint` och CI kör dem (`02-§9.7`); valideringen körs av bygget först när datat kopplas in |
@@ -238,10 +239,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 9 |
+| `saknas` | 1 |
 | `dokumenterad` | 14 |
 | `påbörjad` | 17 |
-| `byggd` | 84 |
+| `byggd` | 92 |
 | `manuell` | 38 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
