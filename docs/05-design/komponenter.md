@@ -170,6 +170,11 @@ samma streck som sidhuvudets ikoner (6.11). En `djurplats` är fylld — botten
 `--color-surface`, symbolen `--color-green-deep`. Så syns det redan på håll, före
 symbolens form, vilka markörer som är djur. <!-- 05-§6.39 -->
 
+Symbolerna delar streck med sidhuvudets ikoner (6.11) och följer, där ett svenskt
+vägmärke finns för platsen, det märkets motiv (`02-§5.36`). Nya symboler ritas inte fritt:
+finns ett känt märke är det förlagan, och saknas det följer motivet vanlig svensk
+skyltning.
+
 I listan under kartan står samma symbol framför platsens namn, 20 px i
 `--color-green-deep`, utan bricka. Listan är därmed också symbolernas
 teckenförklaring (`02-§5.37`). <!-- 05-§6.40 -->

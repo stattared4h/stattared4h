@@ -146,9 +146,11 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   vyn i mobilläget (`05-§5.1`) — och räknar deterministiskt: samma platsdata ger samma
   placering. <!-- 02-§5.33 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
-  var sin symbol: hage, mat, grill, toalett, parkering, lek och boende. Symbolen är ritad
-  i sidan, hämtas inte utifrån (`02-§5.26`) och är dold för skärmläsaren — markörens
-  tillgängliga namn är platsens namn, som förut. <!-- 02-§5.36 -->
+  var sin symbol: hage, mat, grill, toalett, parkering, lek och boende. Finns ett svenskt
+  vägmärke för det platsen är följer symbolen det märkets motiv, så att markören visar
+  samma sak som skylten: H5 servering, H14 toalett, H8 vandrarhem och E19 parkering.
+  Symbolen är ritad i sidan, hämtas inte utifrån (`02-§5.26`) och är dold för
+  skärmläsaren — markörens tillgängliga namn är platsens namn, som förut. <!-- 02-§5.36 -->
 - Samma symbol står framför platsens namn i listan under kartan. Den som möter en symbol
   på ritningen hittar därmed dess betydelse i text på samma sida, utan egen
   teckenförklaring (`02-§5.24`). <!-- 02-§5.37 -->

@@ -45,6 +45,21 @@ Fältet är fortfarande obligatoriskt, har fortfarande inget standardvärde, och
 fortfarande aldrig ur `species` — en hage vars djur tillfälligt flyttats är fortfarande
 en hage. Den delen av ADR 0018 står kvar oförändrad.
 
+### Symbolerna ritas inte fritt
+
+Var symbol som har ett svenskt vägmärke följer det märkets motiv: H5 servering (kopp på
+fat) för `mat`, H14 toalett (utedasset med hjärtat) för `toalett`, H8 vandrarhem (hus med
+gran) för `boende`, E19 för `parkering`. Besökaren har mött dem vid infarten och på
+skylten, och en egen tolkning av samma sak vore sämre av precis det skälet.
+
+`djurplats`, `grill` och `lek` har inget vägmärke. Djurplatsen är gårdens egen, och grillen
+och gungorna följer motivet på vanlig svensk friluftsskyltning.
+
+Banorna ritas ändå här, i sajtens streck. Vägmärkena är svarta fyllda figurer på blå
+platta, gjorda för en skylt i meterstorlek: i de 16 px en markör har blir de klumpar, och
+den blå plattan hör inte hemma i en grön sajt (`05-§6.33`). Det är motivet som är hämtat,
+inte banorna. `docs/09-kallor/index.md` bär märkena, hämtdatum och kontrollsummor.
+
 ## Övervägda alternativ
 
 **Behålla två värden och lägga symbolen i ett eget fält,** exempelvis
@@ -62,6 +77,15 @@ gäller även åt det här hållet — ett värde utan beroende är bara en etik
 **Härleda symbolen ur namnet.** "Parkeringen vid infarten" börjar med "Parkering". Ett
 namn är inget kontrakt: det byter gården när den vill, och "Trekanten" avslöjar
 ingenting.
+
+**Bädda in vägmärkesfilerna som de är.** De är public domain och hade varit trogna
+standarden in i minsta bana. Avvisat: de är oläsliga i markörens storlek, och de hade
+lagt blå skyltplattor mitt i en grön sajt. Att följa motivet ger besökaren igenkänningen
+utan att offra läsbarheten.
+
+**Följa SS-ISO 7001,** den standard som faktiskt täcker alla sju sorterna, lekplatsen
+inräknad. Avvisat: standarden säljs av SIS och symbolerna är upphovsrättsskyddade. Repot
+är publikt (`CL-§2.17`), och att lägga in dem utan licens vore inte vårt att göra.
 
 ## Konsekvenser
 

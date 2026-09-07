@@ -44,6 +44,47 @@ QA-datasetet. Importkommandot lägger in märkningen "AI-bild · QA", skalar, ko
 och tar bort metadata enligt ADR 0017. Bildposterna anger samma ursprung med
 `credit: AI-genererad med OpenAI ImageGen`.
 
+### Vägmärken som förlaga till kartans symboler
+
+| | |
+| --- | --- |
+| Utgivare | Vägmärkesförordningen (2007:90); filerna via Wikimedia Commons |
+| Adress | `https://commons.wikimedia.org/wiki/Special:FilePath/Sweden_road_sign_<märke>.svg` |
+| Hämtad | 2026-09-07 |
+| I repot | Ingenting — se nedan |
+
+Fyra av kartans sju symboler (`02-§5.36`) följer motivet på ett svenskt vägmärke, så att
+markören i telefonen visar samma sak som skylten vid grinden:
+
+| Sort | Märke | Motiv |
+| --- | --- | --- |
+| `mat` | H5 servering | kopp på fat |
+| `toalett` | H14 toalett | utedass med hjärta på dörren |
+| `boende` | H8 vandrarhem | hus med gran bredvid |
+| `parkering` | E19 parkering | bokstaven P |
+
+`djurplats`, `grill` och `lek` har inget vägmärke. Djurplatsen är gårdens egen, och grillen
+och gungorna följer motivet på vanlig svensk friluftsskyltning.
+
+Märkenas utformning är fastställd i författning och är därmed ett officiellt verk enligt
+9 § upphovsrättslagen. Commons-filerna bär mallen `PD-Transportstyrelsen`.
+
+SHA-256 för de hämtade filerna:
+
+```text
+e5e6c2d68c17e80fe153a8aeb192f28e720ccec627e98a5a0cd7b2e549c675ac  E19.svg
+0007fb574027d63e4b99952966c6b75af8df41d71abea4808d6b838772abaca8  H5.svg
+4344e2cb74ded9ab26da2a14f276dabb050e5bebbc6f229086daeeabaa621405  H8.svg
+678f6b0fc5413c315e194217692246c99a1fa1ad7f422f9f18417c0655bb3c1a  H14.svg
+```
+
+Filerna ligger inte i repot. Regeln i `09-§1.2` gäller den direkta källan till något vi
+levererar, och det är de inte: ingen banadata följer med. Märkena är svarta fyllda figurer
+på blå platta, ritade för en skylt i meterstorlek, och i de 16 px en markör har blir de
+klumpar som dessutom bär in en blå platta i en grön sajt (`05-§6.33`). Det som är hämtat är
+motivet; strecket är sajtens eget, i `source/ts/build/symbols.ts`. Kontrollsummorna finns
+för att en läsare ska kunna hämta samma filer och se förlagan.
+
 ### 4H-logotypen
 
 | | |
