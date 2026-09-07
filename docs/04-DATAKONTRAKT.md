@@ -172,7 +172,7 @@ kind: enum                   # vad platsen är, se regeln nedan
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
 description: string | null   # markdown
-lat: number | null           # WGS84 i decimalgrader, t.ex. 57.412300
+lat: number | null           # WGS84 i decimalgrader; ytans mitt, se regeln nedan
 lon: number | null
 accessible: boolean          # nåbar med rullstol eller barnvagn
 active: boolean              # false för platser som inte används just nu
@@ -204,6 +204,12 @@ Regler:
   tillfälligt flyttats är fortfarande en hage. Bara en `djurplats` får ha djurslag; på
   någon av de sex andra sorterna fäller `species` valideringen. Se
   [ADR 0019](adr/0019-platsens-sort-styr-symbolen.md). <!-- 04-§5.7 -->
+- `lat` och `lon` pekar på **den punkt besökaren ska gå till**. För ett hus är det huset.
+  För en yta — en hage, en betesmark — är det ytans mitt, inte ett hörn och inte den punkt
+  någon råkade läsa av. Skälet syns på kartan: markörens etikett hänger under markören
+  (`02-§5.33`), så en punkt vid kanten skjuter namnet mot staketet och in i grannhagen,
+  medan en punkt i mitten håller det inne i den hage det hör till. På en hage om två hektar
+  är skillnaden tiotals meter. <!-- 04-§5.8 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död

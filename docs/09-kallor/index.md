@@ -199,6 +199,16 @@ Att indelningen stämmer går att pröva: de fyra numrerade hagarnas koordinater
 ur ett ortofoto innan staketen fanns, hamnar i var sitt fält och i ordning från nordost
 till sydväst. Två oberoende avläsningar som pekar åt samma håll.
 
+De koordinaterna räckte för att hamna i rätt band, men inte för att hamna mitt i det — de
+låg 29 till 78 meter från bandens tyngdpunkter, och mest fel i den största hagen. Sedan
+`04-§5.8` säger att koordinaten är ytans mitt är de fyra ersatta med bandens tyngdpunkter,
+uträknade genom att klippa betesmarkens form med de tre staketlinjerna i `background.svg`
+och ta tyngdpunkten av varje del. Banden blev 1,7 till 2,7 hektar, vilket är rimliga
+hagstorlekar. Härledningen ärver staketens osäkerhet: de är gårdens egna markeringar,
+avlästa ur ritningen och inte uppmätta på marken. Platsfilerna säger det i en kommentar,
+så att den som en dag mäter på plats vet att siffrorna får ersättas utan att något går
+förlorat.
+
 Resten följer OSM:s taggar. Formerna följer taggarna:
 `landuse=meadow` och `grass` blir betesmark, `landuse=farmyard` gårdsplanen,
 `amenity=parking` parkeringarna, `barrier=wall` en streckad gräns, `highway=unclassified`
