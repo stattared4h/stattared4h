@@ -214,6 +214,10 @@
 /* ── Button states (05-§6.9–6.12) ──────────────────────────────────────── */
 
 /* .button sets display, so hidden needs restating (the share button, 02-§10.30). */
+/* --- Pages --- */
+
+/* The share button starts hidden and is shown by its module (02-§10.30); .button sets
+   display, so the hidden attribute needs restating, as for .icon-button. */
 .button[hidden] {
   display: none;
 }
@@ -333,6 +337,142 @@
   font-size: var(--font-size-small);
 }
 
+.share-button {
+  margin-bottom: var(--space-md);
+}
+
+/* ── Species tile (05-§6.24) ───────────────────────────────────────────── */
+
+/* A card that is one big link: picture on top, plural name under it. */
+.species-tile {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-green-deep);
+  text-decoration: none;
+}
+
+.species-tile__image,
+.animal-card__image {
+  display: block;
+  aspect-ratio: 4 / 3;
+}
+
+.species-tile__image img,
+.animal-card__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The placeholder plate fills the same box as a photo (05-§6.20). */
+.species-tile__image .image-placeholder,
+.animal-card__image .image-placeholder {
+  height: 100%;
+  border-radius: 0;
+}
+
+.species-tile__name {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+}
+
+.species-tile:hover .species-tile__name,
+.species-tile:focus-visible .species-tile__name {
+  text-decoration: underline;
+}
+
+/* ── Animal card (05-§6.13–6.20) ───────────────────────────────────────── */
+
+/* The picture is flush with the card's edges; the body keeps the card padding (05-§6.14). */
+.animal-card {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.animal-card__body {
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+
+.animal-card__title {
+  margin-bottom: var(--space-xs);
+}
+
+/* The heading link carries the text; its ::after covers the card, so the whole card
+   is clickable without an empty link (05-§6.16). */
+.card__link {
+  text-decoration: none;
+}
+
+.card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.card__link:hover,
+.card__link:focus-visible {
+  text-decoration: underline;
+}
+
+/* Labels: pale green plate, deep green text (05-§6.19). */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--color-green-pale);
+  color: var(--color-green-deep);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+}
+
+/* ── Location page (05-§6.25) ──────────────────────────────────────────── */
+
+.place-note {
+  color: var(--color-ink-soft);
+}
+
+/* ── Photos with credit (02-§8.7) ──────────────────────────────────────── */
+
+.photo {
+  margin: 0 0 var(--space-md);
+}
+
+.photo--wide {
+  max-width: var(--container-narrow);
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.photo__credit {
+  margin-top: var(--space-xs);
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-small);
+}
+
 .dialog__actions {
   display: flex;
   justify-content: flex-end;
@@ -358,4 +498,58 @@
 
 .status-bar__text {
   font-weight: 600;
+}
+
+.animal__born {
+  font-weight: 600;
+}
+
+/* ── Map markers (02-§5.27) ────────────────────────────────────────────── */
+
+/* The pin box is the tap target; the visible dot inside it is smaller. */
+.map__pin {
+  display: grid;
+  place-items: center;
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+}
+
+.map__pin::before {
+  content: "";
+  width: var(--space-md);
+  height: var(--space-md);
+  border: var(--border-width) solid var(--color-surface);
+  border-radius: var(--radius-full);
+  background: var(--color-green);
+  box-shadow: var(--shadow-raised);
+}
+
+.map__label {
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-green-deep);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.map__marker:hover .map__label,
+.map__marker:focus-visible .map__label {
+  text-decoration: underline;
+}
+
+/* Places close together overlap; the one under the finger or with focus comes to the front. */
+.map__marker:hover,
+.map__marker:focus-visible {
+  z-index: 1;
+}
+
+.map__ground {
+  fill: var(--color-green-pale);
+}
+
+.place-list__species {
+  color: var(--color-ink-soft);
 }

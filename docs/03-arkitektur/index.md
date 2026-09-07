@@ -86,6 +86,32 @@ aldrig bytas när djuren flyttar, eftersom det är platsfilen som ändras. <!-- 
 En plats utan djurslag visar det rakt ut och pekar vidare, i stället för en tom
 sida. <!-- 03-§4.2 -->
 
+Bygget läser datasetet i `eleventy.config.js` genom `loadValidDataset` innan något
+skrivs — händelsehanterarna körs i ordning, så valideringen går före bildgenereringen —
+och räknar en färdig vymodell per sida i `source/ts/build/pages.ts`: namn, listor,
+länkar, rubriker och meningar. Mallarna i `source/pages/` paginerar över `views` och
+skriver bara ut vad modellen säger; all ordval och allt urval testas därför i Node.
+Adresserna i modellen är sajtrelativa och får bas-sökvägen av `url`-filtret i mallen;
+kartan, som renderas färdig i byggmodulen, får den som argument. <!-- 03-§4.3 -->
+
+Djurslagens bestämda form i rubriker och frågor — "Getterna på gården", "Var finns
+fåren?" — härleds ur `plural` i `source/ts/domain/swedish.ts`: plural på -ar, -er och
+-or får -na, på -en får -a, och övriga får -en. Regeln täcker gårdens djurslag utan ett
+andra fält i vokabulären som kunde glida isär från det första. <!-- 03-§4.4 -->
+
+Djurkortet och djurslagsrutan är Nunjucks-makron i `source/layouts/animal-card.njk` och
+`species-tile.njk`, så att start-, plats- och artsidan delar markup. Markdown i
+`description` och i `source/content/arter/` renderas av filtret `markdown`, en
+markdown-it utan HTML-genomsläpp; valideringen har redan avvisat HTML i
+datat. <!-- 03-§4.5 -->
+
+QR-koderna för skyltarna skrivs av `scripts/qr.mjs` (`02-§5.29`) med paketet `qrcode`,
+som räknar modulmatrisen; själva skylten — koden, platsens namn och adressen som
+`<title>` — ritas av `source/ts/build/qr.ts`. Paketet är granskat enligt
+`07-SAKERHET.md` §6: ett väletablerat bibliotek med lång släpphistorik och få egna
+beroenden, låst till exakt version, som bara körs lokalt av den som skriver ut skyltar
+och aldrig når bygget eller besökaren. <!-- 03-§4.6 -->
+
 ---
 
 ## 5. Offline och service worker
@@ -184,16 +210,22 @@ bas-sökvägens hjälpfunktion, och att inget djur har fått ett `location`-fäl
 
 ## 9. Kartan
 
-Kartan är en SVG som bygget genererar ur platsernas `lat`/`lon` (`02-§5.23`).
-Projektionen är linjär: den omslutande rektangeln kring alla aktiva platser med
-koordinater, med marginal, mappas på SVG:ns `viewBox`. Vid gårdens storlek är jordens
-krökning försumbar. Varje markör är ett `<a>`-element med platsens id, namn och
-länk. <!-- 03-§9.1 -->
+Kartan är en SVG som bygget genererar ur platsernas `lat`/`lon` (`02-§5.23`), i
+`source/ts/build/map.ts`. Projektionen är linjär: den omslutande rektangeln kring alla
+aktiva platser med koordinater, med marginal, mappas på SVG:ns `viewBox`, vars proportion
+följer markens inom gränser. Vid gårdens storlek är jordens krökning försumbar. Varje
+markör är ett `<a>`-element med platsens id, namn och länk, lagt som HTML ovanpå
+SVG:n och placerat i procent av ritningen — så behåller markören sin storlek och
+läsbara etikett i varje skärmbredd medan ritningen skalar med sidan. <!-- 03-§9.1 -->
 
 En ritad bakgrund — byggnader, vägar, hagarnas former — kan läggas under markörerna
-(issue #19). Ritningen anger då vilka koordinater dess hörn motsvarar, så att bygget kan
-placera markörerna rätt i den. Platsernas geometri bor ändå i YAML, aldrig i
-ritningen. <!-- 03-§9.2 -->
+(issue #19): `source/map/background.svg` med `source/map/background.yaml`, som anger
+vilka latituder och longituder ritningens över-, under-, vänster- och högerkant motsvarar.
+Bygget bäddar in ritningens innehåll i sidan, utan externa resurser, och projicerar
+markörerna in i ritningens `viewBox`; en plats utanför ritningen utelämnas med en
+varning i loggen. Ritningen får inte innehålla skript, stilmallar, bilder eller länkar
+utåt — bygget vägrar då. Konventionen i detalj står i `source/map/README.md`.
+Platsernas geometri bor ändå i YAML, aldrig i ritningen. <!-- 03-§9.2 -->
 
 ---
 

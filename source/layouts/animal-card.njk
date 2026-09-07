@@ -1,0 +1,37 @@
+{#
+  Animal card macro (02-§5.28, 05-§6.13–6.20). Takes an AnimalCardView from
+  source/ts/build/pages.ts. The heading link carries the name and, through CSS, makes
+  the whole card clickable (05-§6.16). `eager` marks the page's first image (03-§6.3).
+
+    {% import "animal-card.njk" as cards %}
+    {{ cards.animalCard(card, loop.first) }}
+#}
+{% macro animalCard(card, eager = false) %}
+<article class="card animal-card">
+  <div class="animal-card__image">
+    {%- picture card.photo, "animals", "(min-width: 960px) 33vw, (min-width: 600px) 50vw, 100vw", eager, card.speciesName %}
+  </div>
+  <div class="animal-card__body">
+    <h3 class="animal-card__title"><a class="card__link" href="{{ card.url | url }}">{{ card.name }}</a></h3>
+    {%- if card.tags.length > 0 %}
+    <ul class="tags">
+      {%- for tag in card.tags %}
+      <li class="tag">{{ tag }}</li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+  </div>
+</article>
+{% endmacro %}
+
+{#
+  A grid of animal cards. The first card's image on a page is eager only when `first`
+  is true, i.e. when no image comes before the grid.
+#}
+{% macro animalGrid(cards, first = false) %}
+<ul class="card-grid">
+  {%- for card in cards %}
+  <li>{{ animalCard(card, first and loop.first) }}</li>
+  {%- endfor %}
+</ul>
+{% endmacro %}

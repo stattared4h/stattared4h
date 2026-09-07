@@ -18,11 +18,13 @@ export interface BuildOptions {
   env?: Record<string, string>;
   /** Alternative input directory, for builds that must fail. */
   input?: string;
+  /** Output directory; a fresh temporary one by default. */
+  output?: string;
 }
 
 /** Runs Eleventy and returns the output directory. Throws with Eleventy's stderr when the build fails. */
 export async function buildSite(options: BuildOptions = {}): Promise<string> {
-  const output = await mkdtemp(path.join(os.tmpdir(), "stattared4h-build-"));
+  const output = options.output ?? (await mkdtemp(path.join(os.tmpdir(), "stattared4h-build-")));
   const args = [ELEVENTY, `--output=${output}`, "--quiet"];
   if (options.input) args.push(`--input=${options.input}`);
   try {

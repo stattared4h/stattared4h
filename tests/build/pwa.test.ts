@@ -239,11 +239,15 @@ describe("ikoner (02-§10.31–10.32)", () => {
     assert.doesNotMatch(svg, /4h-logo/i, "ikonen bygger inte på 4H-loggan (ADR 0007)");
   });
 
-  test("varje inline-SVG i markupen har aria-hidden", async () => {
+  test("varje inline-SVG i markupen har aria-hidden, utom kartan som är en bild med beskrivning", async () => {
     for (const { file, html } of await htmlFiles(qa)) {
       const svgs = html.match(/<svg[^>]*>/g) ?? [];
       assert.ok(svgs.length >= 5, `${file}: sidhuvudets och dialogens ikoner`);
-      for (const svg of svgs) assert.match(svg, /aria-hidden="true"/, `${file}: ${svg}`);
+      for (const svg of svgs) {
+        // 02-§10.32 covers icons; the map (02-§5.27) is content and carries role="img" and a label.
+        const isDescribedImage = /role="img"/.test(svg) && /aria-label="[^"]+"/.test(svg);
+        assert.ok(isDescribedImage || /aria-hidden="true"/.test(svg), `${file}: ${svg}`);
+      }
     }
   });
 });

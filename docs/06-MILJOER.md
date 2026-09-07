@@ -46,11 +46,9 @@ DATA_DIR=source/data npm run build     # produktion
 DATA_DIR=source/data-qa npm run build  # QA
 ```
 
-`DATA_DIR` avgör redan i dag om bygget är ett QA-bygge — varje sida får `noindex` när
-katalogen slutar på `data-qa` (`06-§1.3`) — och skickas vidare som `build.dataDir` till
-de datadrivna sidorna. Bygget renderar i dag startsidan, 404-sidan och offline-sidan; de
-datadrivna sidorna tillkommer med domänskiktet. Se spårbarhetsmatrisen för vad som finns
-och vad som saknas.
+`DATA_DIR` avgör också om bygget är ett QA-bygge — varje sida får `noindex` när
+katalogen slutar på `data-qa` (`06-§1.3`). Ett tomt dataset bygger: startsidan säger då
+att djuren inte är inlagda ännu, och kartan att inga platser finns.
 
 Bildkatalogen följer datasetet (`04-§9.4`): `source/data-qa` läser bilder från
 `source/images-qa/`, som `npm run qa:images` genererar och git ignorerar (`02-§8.4`).

@@ -7,37 +7,34 @@ description: >-
   varandra, och vilka djur som finns i varje hage. Ett komplement till gårdens
   huvudsida på 4h.se/stattared.
 ---
-<div class="container container--narrow">
+{#- The home page (02-§5.7–5.8): what the site is, the species on the farm, and the map. #}
+{% import "species-tile.njk" as tiles %}
+<div class="container">
   <h1>Lär känna djuren på gården</h1>
 
   <p class="lead">
-    Den här sidan handlar bara om djuren. Allt annat om Stättareds 4H-gård —
-    öppettider, boende, bokningar och nyheter — finns på gårdens huvudsida.
+    Den här sidan handlar bara om djuren på Stättareds 4H-gård. Öppettider, boende,
+    bokningar och nyheter finns på <a href="{{ site.mainSite }}">gårdens huvudsida</a>.
   </p>
 
-  <p>
-    <a class="button" href="{{ site.mainSite }}">
-      Till Stättareds 4H-gård
-    </a>
-  </p>
+  {%- if views.home.species.length > 0 %}
+  <section class="page-section">
+    <h2>Djuren på gården</h2>
+    {{- tiles.speciesGrid(views.home.species, true) }}
+  </section>
 
-  <div class="card">
-    <h2>Det här kommer att finnas här</h2>
+  <section class="page-section">
+    <h2>Var går de?</h2>
+    <p>Kartan visar gårdens hagar och vilka djurslag som går i varje hage.</p>
+    <p><a class="button" href="{{ '/karta/' | url }}">Karta över gården</a></p>
+  </section>
+  {%- else %}
+  <div class="note page-section">
+    <h2>Djuren är inte inlagda ännu</h2>
     <p>
-      Snart kan du läsa om varje djur — vad det heter, vilken art och ras, och vilka
-      som är släkt med varandra.
-    </p>
-    <p>
-      Vid varje hage kommer det sitta en QR-kod. Skannar du den ser du direkt vilka
-      djurslag som går just där.
-    </p>
-  </div>
-
-  <div class="note">
-    <h2>Sidan byggs just nu</h2>
-    <p>
-      Djuren är ännu inte inlagda. Under tiden hittar du allt om gården på
+      Snart kan du läsa om varje djur här. Under tiden hittar du allt om gården på
       <a href="{{ site.mainSite }}">4h.se/stattared</a>.
     </p>
   </div>
+  {%- endif %}
 </div>
