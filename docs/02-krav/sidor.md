@@ -32,6 +32,11 @@ läsa sig fram namn för namn. Issue #51 bad om en symbol per sorts plats, som p
 skyltar. Symbolerna är det bygget som först beror på vad en plats är, och därför bär
 `kind` sedan dess åtta värden i stället för två (ADR 0019).
 
+Samma issue bad också om att kunna zooma. Åtta av gårdens platser ligger i en klunga kring
+gårdsplanen, inom några tiotal meter från varandra, och i överblick får deras namn inte
+plats. Zoomen är sajtens första riktiga klientkod, och vad den får kosta i en sajt som
+håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
+
 ### Sidtyper och adresser
 
 - Sajten har fyra sidtyper: startsidan `/`, platssidan `/plats/<id>/`, djursidan
@@ -158,6 +163,26 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
 - Startsidan länkar vidare till gårdens egen sida om vandring och fiske och till
   Naturkartan för Kungsbacka, under rubriken "Fler kartor i området". Länkarna är vanliga
   länkar; sidan bäddar inte in något från dem (`02-§5.26`). <!-- 02-§5.34 -->
+- Kartan går att zooma och panorera. På pekskärm zoomar besökaren med ett nyp och drar
+  kartan med ett finger; på dator zoomar `Ctrl`- eller `Cmd`-hjul, medan vanligt hjul
+  rullar sidan som på varje annan sida. <!-- 02-§5.40 -->
+- Kartan har tre knappar: zooma in, zooma ut och "Visa hela kartan". De går att nå med
+  tangentbord, och genom dem finns zoomen även för den som inte nyper eller har
+  mus. <!-- 02-§5.41 -->
+- Vid 1× tar kartan bara nyp, inte drag: en besökare som rullar förbi startsidan med
+  fingret på kartan rullar sidan. Först när kartan är inzoomad tar den också drag, och då
+  går den att panorera. <!-- 02-§5.42 -->
+- Markören behåller sin storlek och sin träffyta om minst 44 × 44 px (`02-§5.27`) vid
+  varje zoomnivå, och sitter kvar på sin koordinat när kartan flyttas eller zoomas — som
+  en nål på en karta, inte som en del av bilden. <!-- 02-§5.43 -->
+- Zoomad tillräckligt långt in visar kartan alla platsnamn, också de etiketter som döljs
+  i överblick när markörerna ligger för tätt (`02-§5.33`). Klungan kring gårdsplanen går
+  därmed att särskilja: varje plats syns med namn. Att kartan bara är inzoomad räcker inte
+  — åtta platser inom några tiotal meter staplar sina etiketter även vid dubbel förstoring,
+  och staplade namn är sämre än inga. <!-- 02-§5.44 -->
+- Utan JavaScript visas kartan som en stillbild i sitt utgångsläge, knapparna syns inte,
+  och listan under kartan är fortfarande en fullvärdig väg till informationen
+  (`02-§5.24`). Zoomen hämtar ingenting utifrån (`02-§5.26`). <!-- 02-§5.45 -->
 
 ### Djurkortet
 

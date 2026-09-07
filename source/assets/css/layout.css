@@ -228,7 +228,28 @@
    and keep their size, so a marker is always at least the tap target (02-§5.27). */
 .map {
   position: relative;
+  overflow: hidden;
   margin-bottom: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+/* The layer the zoom moves (ADR 0020): the drawing and the markers together, so a marker
+   follows its place. `--map-scale` lets the markers undo the scaling and keep their size
+   and their tap target (02-§5.43). */
+.map__canvas {
+  transform-origin: 0 0;
+  /* At 1x the map takes a pinch but not a drag, so a visitor scrolling past the home page
+     with a finger on the map scrolls the page (02-§5.42). */
+  touch-action: pan-y;
+}
+
+.map--zoomed .map__canvas {
+  touch-action: none;
+  cursor: grab;
+}
+
+.map--dragging .map__canvas {
+  cursor: grabbing;
 }
 
 .map__drawing {
@@ -244,8 +265,23 @@
   position: absolute;
   width: var(--tap-target-min);
   height: var(--tap-target-min);
-  transform: translate(-50%, -50%);
+  /* The counter-scale keeps the pin its own size inside a scaled canvas (02-§5.43). */
+  transform: translate(-50%, -50%) scale(calc(1 / var(--map-scale, 1)));
   text-decoration: none;
+}
+
+/* The controls sit outside the canvas, so the zoom never moves them (05-§6.41). */
+.map__controls {
+  position: absolute;
+  right: var(--space-sm);
+  bottom: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.map__controls[hidden] {
+  display: none;
 }
 
 /* Default: under the pin. The three modifiers below move it, and nothing else changes. */
@@ -292,6 +328,19 @@
   width: auto;
   height: auto;
   padding: 0 var(--space-xs);
+}
+
+/* Far enough in there is room for every name, including the ones the build had to hide
+   when the markers crowded each other in the overview (02-§5.44, 02-§5.33). Merely being
+   zoomed is not enough: eight places within a few tens of metres still stack their labels
+   at 2x, and stacked names are worse than none. */
+.map--names .map__marker--label-hidden .map__label,
+.map--names .map__marker--wide-hidden .map__label {
+  width: auto;
+  height: auto;
+  padding: 0 var(--space-xs);
+  overflow: visible;
+  clip-path: none;
 }
 
 /* From the tablet width up the map is wider, and labels that crowd each other on a
