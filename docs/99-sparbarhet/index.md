@@ -55,6 +55,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.23`–`5.26` | Kartan | `byggd` | `source/ts/build/map.ts` och `source/pages/karta.njk`; projektion, markörer och lista i `tests/build/map.test.ts`, `pages.test.ts` och `data-pages.test.ts`, som också kräver att inget anrop går utanför sajten |
 | `02-§5.27` | Markörer minst 44 px; textbeskrivning | `manuell` | Beskrivningen bevakas av `tests/build/map.test.ts`. Öppna `/karta/` i 360 px och bekräfta att varje markör är minst 44 px hög och bred (mätt till 68 px hög i Chromium) |
 | `02-§5.28` | Djurkortet | `byggd` | Makrot i `source/layouts/animal-card.njk` med `animalCard` i `pages.ts`; etiketter och platshållare i `tests/build/pages.test.ts` och `data-pages.test.ts` |
+| `02-§5.31` | Platssidan visar platsens bilder | `saknas` | Platsen får `photos` i datakontraktet (`04-§5.6`) |
 | `02-§5.29` | `npm run qr` | `byggd` | `scripts/qr.mjs` och `source/ts/build/qr.ts`; `tests/build/qr.test.ts` kör skriptet mot QA-datat och kontrollerar en fil per plats med adressen som `<title>` |
 | `02-§5.30` | Ritad kartbakgrund | `byggd` | `parseMapBackground` och `loadMapBackground` i `source/ts/build/map.ts`, konventionen i `source/map/README.md`; `tests/build/map.test.ts` bäddar in en liten SVG och prövar varningen för en plats utanför |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
@@ -84,6 +85,11 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` och `optimiseImage` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `02-§8.4` | `npm run qa:images` | `byggd` | `scripts/qa-images.mjs` skriver till `source/images-qa/`; `tests/build/images.test.ts` |
 | `02-§8.5`–`8.7` | Leverans av bilder | `byggd` | `picture`-shortcoden i djurkortet, djurslagsrutan och djur- och artsidan, `credit` i `source/pages/djur.njk` och `arter.njk`; `tests/build/data-pages.test.ts` kontrollerar `srcset`, `width`, `height`, `loading`, `fetchpriority`, `alt`, platshållaren och fototexten på Rosas och Bockens sidor |
+| `02-§8.8` | Bildposten med `alt` och `credit` | `saknas` | `source/data/images/<bild-id>.yaml`, se [ADR 0015](../adr/0015-bilden-som-egen-post.md) |
+| `02-§8.9` | Bild-id ur innehållets SHA-256 | `saknas` | `img-` och tolv hex; formen valideras, inte hashen (`04-§9.10`) |
+| `02-§8.10`–`8.11` | Referenser och huvudbild | `saknas` | `photos` som lista av id:n hos djur och plats, `photo` hos art; den första är huvudbilden |
+| `02-§8.12` | Bilder i Markdown | `saknas` | `![](img-…)` med alt ur bildposten |
+| `02-§8.13` | Varning för oanvänd bildpost och oanvänd bildfil | `saknas` | Oanvänt utrymme ligger kvar i historiken (ADR 0008) |
 | `02-§9.1` | Eleventy och esbuild | `byggd` | `eleventy.config.js` med esbuild i `eleventy.before`; `erasableSyntaxOnly` i `tsconfig.json` fäller `enum` och `namespace`; byggtesterna kör Eleventy som barnprocess |
 | `02-§9.2` | Node 22.18 i `.nvmrc` och `engines` | `påbörjad` | Båda finns, och `eleventy.config.js` importerar `.ts` direkt; inget test |
 | `02-§9.3` | `npm run lint` | `påbörjad` | Kör html-validate, stylelint med `declaration-strict-value`, eslint, markdownlint och yamllint; inget test som bevakar att alla fem ingår |
@@ -201,6 +207,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§6.4` | Artens bild i rutor och på artsidan | `byggd` | `species-tile.njk` och `source/pages/arter.njk`; platshållaren med artnamnet bevakas av `tests/build/data-pages.test.ts` |
 | `03-§6.1` | Bygget genererar bara mindre storlekar | `byggd` | `generateImageSizes` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `03-§6.2` | Upplösare från filnamn till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` |
+| `03-§6.5` | Bild-id löses upp när datasetet normaliseras | `saknas` | Vymodellerna får ett färdigt bildobjekt |
+| `03-§6.6` | Bilder i Markdown genom samma kedja | `saknas` | `renderMarkdown` tar en upplösare |
 | `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `byggd` | `renderPicture` med `eager` för sidans första bild; `tests/build/data-pages.test.ts` kräver `fetchpriority="high"` på porträttet och `loading="lazy"` på nästa bild |
 | `03-§8.1` | `npm run build` | `byggd` | `eleventy` med `eleventy.config.js`; byggtesterna kör samma bygge till en tillfällig katalog |
 | `03-§8.2`–`8.4` | Test, lint och CI | `påbörjad` | `npm test`, `npm run lint` och CI kör dem (`02-§9.7`); valideringen körs av bygget först när datat kopplas in |
@@ -230,7 +238,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 9 |
 | `dokumenterad` | 14 |
 | `påbörjad` | 17 |
 | `byggd` | 84 |

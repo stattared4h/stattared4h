@@ -38,7 +38,8 @@ source/data/
 ├── breeds.yaml               # vokabulär: raserna
 ├── populations.yaml          # djur som redovisas som antal per ras
 ├── animals/<djur-id>.yaml    # en fil per djur
-└── locations/<plats-id>.yaml # en fil per hage eller plats
+├── locations/<plats-id>.yaml # en fil per hage eller plats
+└── images/<bild-id>.yaml     # en fil per bild
 ```
 
 Regeln bakom uppdelningen: **egen fil för det som har en egen publik sida. En
@@ -47,6 +48,10 @@ gemensam fil för kontrollerad vokabulär.** <!-- 04-§2.1 -->
 Djur och platser har egna sidor, växer i innehåll och redigeras var för sig — därför
 egna filer, som aldrig kolliderar när flera redigerar samtidigt. Arter och raser är ett
 femtontal poster som ändras några gånger om året och läses bäst som en lista. <!-- 04-§2.2 -->
+
+Bilderna har ingen egen sida men egna filer ändå: de blir tusentals, de läggs till en i
+taget, och en delad fil skulle kollidera vid varje uppladdning. Se
+[ADR 0015](adr/0015-bilden-som-egen-post.md). <!-- 04-§2.5 -->
 
 Vissa djurslag, exempelvis höns, presenteras inte som namngivna individer. De lagras i
 `populations.yaml` som ett antal per ras. En art får finnas antingen i `animals/` eller
@@ -68,6 +73,9 @@ inuti filen — det skulle vara samma faktum på två ställen. <!-- 04-§3.1 --
   tillägg. <!-- 04-§3.4 -->
 - **Ändras aldrig.** Länkar, bokmärken och QR-koder pekar på id:t. Ett djur som byter
   namn behåller sitt id. <!-- 04-§3.3 -->
+- Bilder är undantaget: deras id väljs inte av en människa utan räknas ur filens
+  innehåll, eftersom ett namn som beskriver motivet kan bli fel. Formen står i
+  §9. <!-- 04-§3.5 -->
 
 ---
 
@@ -83,11 +91,7 @@ mother: string | null        # djur-id, om mamman finns i registret
 father: string | null        # djur-id, om pappan finns i registret
 status: here | gone          # finns på gården, eller har lämnat den
 description: string | null   # markdown, presentationstexten
-photos:
-  - file: string             # filnamn i source/images/animals/
-    alt: string              # alternativtext på svenska, obligatorisk
-    credit: string           # fotograf eller rättighetshavare
-    portrait: boolean        # true på bilden som används som porträtt
+photos: [string]             # bild-id:n, se §9; den första är porträttet
 ```
 
 Obligatoriskt: `name`, `species`, `sex` och `status`. Övrigt får utelämnas. <!-- 04-§4.1 -->
@@ -155,6 +159,7 @@ lat: number | null           # WGS84 i decimalgrader, t.ex. 57.412300
 lon: number | null
 accessible: boolean          # nåbar med rullstol eller barnvagn
 active: boolean              # false för platser som inte används just nu
+photos: [string]             # bild-id:n, se §9; den första visas överst
 ```
 
 Obligatoriskt: `name`, `species`, `accessible` och `active`. `species` får vara en tom
@@ -181,10 +186,7 @@ species:
   - id: string               # t.ex. "get"
     name: string             # singular, "Get"
     plural: string           # "Getter"
-    photo:                   # frivillig: bilden i djurslagsrutorna och på artsidan
-      file: string           # filnamn i source/images/species/
-      alt: string
-      credit: string
+    photo: string            # frivillig: bild-id, se §9
 ```
 
 Arten anges en gång här, så att "get" och "getter" stavas likadant överallt. <!-- 04-§6.1 -->
@@ -234,12 +236,56 @@ länkar till artsidan som visar var arten finns. <!-- 04-§8.2 -->
 
 ## 9. Bilder
 
-Bilder ligger i `source/images/animals/`, `source/images/species/`,
-`source/images/places/` och `source/images/content/`, platt inom varje mapp, med filnamn
-som inleds med postens id. <!-- 04-§9.1 -->
+Bilden är en **egen post**, inte ett fält inuti djuret. Ett foto kan visa två djur, och
+ett filnamn som bär ett djurnamn blir osant så snart bilden hamnar under fel post. Se
+[ADR 0015](adr/0015-bilden-som-egen-post.md). <!-- 04-§9.5 -->
 
-YAML refererar **bara filnamnet**, aldrig en sökväg. Bygget avgör var filen bor, så att
-lagringen kan bytas utan att datat rörs. <!-- 04-§9.2 -->
+```yaml
+# source/data/images/img-a3f2c1d8b901.yaml
+alt: Rosa och Stjärna står tillsammans i Björkhagen.
+credit: Anna Karlsson
+```
+
+Båda fälten är obligatoriska. `alt` beskriver vad som är viktigt i bilden, på svenska.
+`credit` är fotografen eller rättighetshavaren, och visas intill bilden
+(`02-§8.7`). <!-- 04-§9.6 -->
+
+### Bild-id
+
+Ett bild-id är `img-` följt av **tolv hexadecimala tecken**: `img-a3f2c1d8b901`.
+
+- Tecknen är de första av SHA-256 över den färdiga WebP-filen. `npm run image` räknar ut
+  dem; ingen skriver ett bild-id för hand. <!-- 04-§9.7 -->
+- Ingen räknare behövs, så två pull requests kan lägga till varsin bild utan att
+  kollidera, och samma foto får alltid samma id i stället för en andra kopia. <!-- 04-§9.8 -->
+- Prefixet finns för att YAML annars skulle läsa ett id med bara siffror som ett
+  heltal. <!-- 04-§9.9 -->
+- Valideringen kontrollerar id:ts **form**, inte att det motsvarar filens innehåll:
+  QA-platshållarna genereras om och skulle annars börja fela vid en versionshöjning av
+  bildbiblioteket. <!-- 04-§9.10 -->
+
+### Referenser
+
+Poster refererar bild-id, aldrig ett filnamn och aldrig en sökväg. Bygget avgör var
+filen bor, så att lagringen kan bytas utan att datat rörs. <!-- 04-§9.2 -->
+
+| Post | Fält | Form |
+| --- | --- | --- |
+| Djur | `photos` | lista av bild-id:n; den första är porträttet |
+| Plats | `photos` | lista av bild-id:n; den första visas överst |
+| Art | `photo` | ett bild-id |
+
+Samma bild-id får stå i flera poster. Filen finns en gång, alt-texten skrivs en gång, och
+upphovsuppgiften är sann överallt där bilden visas. <!-- 04-§9.11 -->
+
+En innehållssida i Markdown infogar en bild med bildsyntax där adressen är bild-id:t och
+alt-texten är tom: `![](img-a3f2c1d8b901)`. Alt-texten hämtas ur bildposten. <!-- 04-§9.12 -->
+
+### Filerna
+
+Bildfilerna ligger **platt** i `source/images/`, en fil per bildpost med bild-id:t som
+filnamn: `source/images/img-a3f2c1d8b901.webp`. Det finns inga undermappar per posttyp —
+en bild på en get i en hage tillhör både djuret och platsen. <!-- 04-§9.1 -->
 
 Bara webbanpassade bilder läggs i repot — WebP, högst 1600 px och 250 KB. Original bevaras
 i gårdens eget arkiv. Se [ADR 0008](adr/0008-bilder-i-repot.md). <!-- 04-§9.3 -->
@@ -262,8 +308,12 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 - Att räknade bestånd har positiva heltalsantal, giltig art–ras-kombination och inte
   blandas med individuella poster för samma art. <!-- 04-§10.12 -->
 - Att ingen stamtavla går i cirkel, och att ingen är sin egen förälder. <!-- 04-§10.6 -->
-- Att varje refererad bildfil finns, har alternativtext och upphovsuppgift, och håller sig
+- Att varje bild-id en post refererar har en bildpost, och att bildposten har `alt` och
+  `credit`. <!-- 04-§10.13 -->
+- Att varje bildpost har en bildfil som finns, är WebP, saknar metadata och håller sig
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->
+- Att varje bild-id följer formen i §9, och att ingen post refererar samma bild två
+  gånger. <!-- 04-§10.14 -->
 - Att inget djur har ett `location`-fält. <!-- 04-§10.8 -->
 - Att inget fält innehåller HTML. Innehåll är markdown eller ren text. <!-- 04-§10.9 -->
 - Att inget fält finns som kontraktet inte känner till, så att ett felstavat fältnamn
@@ -271,4 +321,5 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 
 Valideringen ger dessutom **varningar** som inte fäller bygget, för sådant som är tillåtet
 men troligen ett förbiseende: ett djur utan foto, en aktiv plats utan djurslag, en plats
-utan koordinater. <!-- 04-§10.10 -->
+utan koordinater, en bildpost som ingen refererar och en bildfil som ingen bildpost hör
+till. <!-- 04-§10.10 -->

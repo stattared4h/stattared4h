@@ -144,7 +144,7 @@ manifest-`id`, så att QA och produktion aldrig delar cache (`02-§7.9`). <!-- 0
 Källbilderna är redan webbanpassade ([ADR 0008](../adr/0008-bilder-i-repot.md)). Bygget
 genererar bara mindre storlekar för `srcset`. <!-- 03-§6.1 -->
 
-Sökvägen till en bild byggs av en upplösare utifrån filnamnet i YAML. Datat känner aldrig
+Sökvägen till en bild byggs av en upplösare utifrån bild-id:t i YAML. Datat känner aldrig
 till var filerna ligger. <!-- 03-§6.2 -->
 
 Varje bild får `width`, `height` och `loading="lazy"` — utom den första bilden på sidan, som
@@ -155,9 +155,20 @@ Mekanismen bor i `source/ts/build/images.ts` — storlekar, `renderPicture` och
 `renderPlaceholder` — och i `images-plugin.ts`, som registrerar Nunjucks-shortcoden
 `picture` i Eleventy. Bildkatalogen härleds ur datasetet (`04-§9.4`).
 
-En art kan ha en bild (`04-§6.3`) i `source/images/species/`. Den används i
-djurslagsrutorna på start- och platssidan och på artsidan. Saknas den visas artens namn
-på en ljusgrön platta (`05-§6.20`). <!-- 03-§6.4 -->
+En art kan ha en bild (`04-§6.3`). Den används i djurslagsrutorna på start- och
+platssidan och på artsidan. Saknas den visas artens namn på en ljusgrön platta
+(`05-§6.20`). <!-- 03-§6.4 -->
+
+Bilden är en egen post ([ADR 0015](../adr/0015-bilden-som-egen-post.md)). Valideringen
+löser upp varje bild-id till `{ id, alt, credit }` när datasetet normaliseras, så
+vymodellerna i `pages.ts` och mallarna arbetar med ett färdigt bildobjekt och behöver
+aldrig slå upp något själva. Härledningen går åt ett håll, som alla andra i
+`04-§8`. <!-- 03-§6.5 -->
+
+Bilder i Markdown renderas av samma kedja: `renderMarkdown` tar en upplösare som
+översätter `![](img-…)` till samma markup som shortcoden ger, med alt-texten ur
+bildposten. Utan upplösare — i ett enhetstest, eller för en text utan bilder — blir
+resultatet oförändrat. <!-- 03-§6.6 -->
 
 ---
 

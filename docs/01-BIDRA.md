@@ -103,17 +103,48 @@ bär annars med sig GPS-positionen där bilden togs
 ([ADR 0008](adr/0008-bilder-i-repot.md)). Kommandot `npm run image` gör allt det:
 
 ```bash
-npm run image -- ~/Bilder/IMG_1234.jpg --to animals --name rosa-1
+npm run image -- ~/Bilder/IMG_1234.jpg \
+  --alt "Rosa och Stjärna står tillsammans i Björkhagen." \
+  --credit "Anna Karlsson"
 ```
 
-Det skriver `source/images/animals/rosa-1.webp`: nedskalat, konverterat och rensat på
-metadata. Originalet rörs inte. `--to` är `animals`, `species`, `places` eller
-`content`, och `--name` ska börja med postens id — `rosa-1`, `rosa-2`. Finns filen redan
-vägrar kommandot skriva över den; lägg till `--force` om det är meningen.
+Det skriver två filer och skriver ut bildens id:
 
-Referera sedan bara filnamnet från djurets `photos`: `file: rosa-1.webp`. Varje bild
-behöver `alt` som beskriver vad man ser, och `credit` med den som tagit den. Publicera
-aldrig en bild på en identifierbar person utan samtycke.
+```text
+source/images/img-a3f2c1d8b901.webp          bilden, nedskalad och rensad på metadata
+source/data/images/img-a3f2c1d8b901.yaml     alt-texten och fotografen
+```
+
+Originalet rörs inte. Id:t räknas ut ur bildens innehåll
+([ADR 0015](adr/0015-bilden-som-egen-post.md)), så du väljer inget namn och behöver inte
+veta vilket nummer som var sist. Laddar du upp samma foto igen får det samma id, och
+kommandot säger att bilden redan finns i stället för att göra en kopia.
+
+`--alt` beskriver vad som är viktigt i bilden och `--credit` vem som tagit den. Båda
+krävs: en bild utan alt-text kommer ändå inte förbi valideringen. Publicera aldrig en
+bild på en identifierbar person utan samtycke.
+
+Referera sedan id:t från djuret eller platsen:
+
+```yaml
+photos:
+  - img-a3f2c1d8b901
+  - img-7be014aa39c2
+```
+
+Den **första bilden i listan är huvudbilden**: djurets porträtt, platsens toppbild. Vill
+du byta porträtt flyttar du raden överst. En art har i stället ett enda id:
+`photo: img-a3f2c1d8b901`.
+
+Samma id får stå hos flera poster. Ett foto med två djur på läggs in en gång och
+refereras från båda — filen finns en gång och alt-texten skrivs en gång.
+
+I en innehållstext i Markdown infogas bilden med tom alt-text, eftersom texten redan står
+i bildposten:
+
+```markdown
+![](img-a3f2c1d8b901)
+```
 
 ### Vad som händer sedan
 
@@ -146,7 +177,7 @@ Andra kommandon:
 | Kommando | Gör |
 | --- | --- |
 | `npm run build` | Bygger sajten till `public/` med Eleventy; klientkoden buntas med esbuild |
-| `npm run image -- <fil>` | Webbanpassar ett foto och lägger det i `source/images/` (§2) |
+| `npm run image -- <fil> --alt <text> --credit <namn>` | Webbanpassar ett foto, skriver bildfilen och bildposten (§2) |
 | `npm run icons` | Genererar `favicon.ico`, `apple-touch-icon.png` och manifestikonerna ur `source/assets/img/favicon.svg`; kör efter en ändring av SVG:n och committa resultatet |
 | `npm run qa:images` | Genererar platshållarbilderna som QA-datat refererar, i `source/images-qa/` |
 | `npm run qr` | Skriver en utskrivbar QR-kod per plats till `qr/`, med adressen ur `SITE_URL` (`02-§5.29`) |
@@ -171,6 +202,10 @@ med `pip install yamllint`.
 `npm run validate` kontrollerar också bildfilerna när bildkatalogen finns:
 `source/images-qa` för `DATA_DIR=source/data-qa`, annars `source/images`. Saknas katalogen
 hoppas filkontrollen över och det står i utskriften.
+
+Två varningar är värda att städa bort när de dyker upp: en bildpost som ingen refererar,
+och en bildfil som ingen bildpost hör till. Ingen av dem når besökaren, men båda ligger
+kvar i git-historiken för alltid.
 
 ---
 

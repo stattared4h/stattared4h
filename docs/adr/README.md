@@ -33,3 +33,4 @@ Mall: `NNNN-kort-titel.md` med rubrikerna **Status** (Antagen/Ersatt + datum),
 | 0012 | [Platsen bär djurslagen; enskilda djur spåras inte](0012-ingen-individuell-platssparning.md) |
 | 0013 | [Två faser: en administratör nu, skriv-API sedan](0013-faser-admin-nu-skriv-api-sedan.md) |
 | 0014 | [Rollerna upprätthålls av GitHub, inte av vår kod](0014-roller-via-github.md) |
+| 0015 | [Bilden är en egen post med ett id ur innehållet](0015-bilden-som-egen-post.md) |
