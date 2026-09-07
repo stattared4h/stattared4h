@@ -330,10 +330,12 @@
   padding: 0 var(--space-xs);
 }
 
-/* Zoomed in there is room for every name, including the ones the build had to hide when
-   the markers crowded each other in the overview (02-§5.44, 02-§5.33). */
-.map--zoomed .map__marker--label-hidden .map__label,
-.map--zoomed .map__marker--wide-hidden .map__label {
+/* Far enough in there is room for every name, including the ones the build had to hide
+   when the markers crowded each other in the overview (02-§5.44, 02-§5.33). Merely being
+   zoomed is not enough: eight places within a few tens of metres still stack their labels
+   at 2x, and stacked names are worse than none. */
+.map--names .map__marker--label-hidden .map__label,
+.map--names .map__marker--wide-hidden .map__label {
   width: auto;
   height: auto;
   padding: 0 var(--space-xs);

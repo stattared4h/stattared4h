@@ -291,7 +291,9 @@ kopplingen: pekar- och tangentbordshändelser in, vyn ut, satt som `transform` p
 de behåller sin storlek och sin träffyta medan ritningen växer (`02-§5.43`). Vid 1× har
 omslaget `touch-action: pan-y` och tar bara nyp; inzoomad byter det till `none` och tar
 också drag, så startsidan går att rulla förbi (`02-§5.42`). Knapparna är dolda tills
-modulen kör, som installknappen (`03-§10.2`). <!-- 03-§9.6 -->
+modulen kör, som installknappen (`03-§10.2`). Vid tillräcklig förstoring sätts också
+`map--names`, som upphäver döljandet av de etiketter bygget inte fick plats med
+(`02-§5.44`); tröskeln är mätt i Chromium mot klungan vid gårdsplanen. <!-- 03-§9.6 -->
 
 Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
 är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting

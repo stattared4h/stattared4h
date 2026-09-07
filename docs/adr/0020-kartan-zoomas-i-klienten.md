@@ -45,9 +45,10 @@ rullar förbi startsidan med fingret på kartan rullar sidan (`02-§5.42`). För
 är inzoomad tar den drag. På dator zoomar `Ctrl`- eller `Cmd`-hjul; vanligt hjul rullar
 sidan (`02-§5.40`). Kartan blir aldrig en fälla besökaren inte bett om.
 
-**Inzoomad visas alla etiketter** (`02-§5.44`), också de bygget döljer i överblick. Det är
-hela poängen med zoomen: trängseln som gjorde att de doldes finns inte längre när ritningen
-är större.
+**Tillräckligt långt in visas alla etiketter** (`02-§5.44`), också de bygget döljer i
+överblick. Det är hela poängen med zoomen: trängseln som gjorde att de doldes finns inte
+längre när ritningen är större. Gränsen är mätt, inte gissad — vid dubbel förstoring
+staplar klungans etiketter fortfarande på varandra, vid fyra gånger står de isär.
 
 Utan JavaScript är kartan exakt vad den är i dag — en stillbild — och listan under den bär
 informationen (`02-§5.45`). Ingenting hämtas utifrån.

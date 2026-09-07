@@ -19,6 +19,11 @@ const BUTTON_STEP = 1.6;
 const KEY_PAN = 0.15;
 /** How much a wheel notch zooms. Small, because a wheel sends many. */
 const WHEEL_STEP = 0.0015;
+/**
+ * The scale at which every name is shown, hidden ones included (02-§5.44). Measured on the
+ * yard cluster in Chromium: at 2x its labels still stack, at 4x they stand apart.
+ */
+const NAMES_AT_SCALE = 4;
 /** A press that moves further than this is a drag, and must not follow the marker's link. */
 const DRAG_SLOP_PX = 6;
 
@@ -51,6 +56,7 @@ export function init(): void {
     canvas.style.transform = `translate(${view.x * 100}%, ${view.y * 100}%) scale(${view.scale})`;
     map.style.setProperty("--map-scale", String(view.scale));
     map.classList.toggle("map--zoomed", !isHome(view));
+    map.classList.toggle("map--names", view.scale >= NAMES_AT_SCALE);
     const home = buttons.get("home");
     if (home) home.hidden = isHome(view);
     const zoomIn = buttons.get("in");

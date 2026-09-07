@@ -175,9 +175,11 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
 - Markören behåller sin storlek och sin träffyta om minst 44 × 44 px (`02-§5.27`) vid
   varje zoomnivå, och sitter kvar på sin koordinat när kartan flyttas eller zoomas — som
   en nål på en karta, inte som en del av bilden. <!-- 02-§5.43 -->
-- Inzoomad visar kartan alla platsnamn, också de etiketter som döljs i överblick när
-  markörerna ligger för tätt (`02-§5.33`). Klungan kring gårdsplanen går därmed att
-  särskilja: varje plats syns med namn. <!-- 02-§5.44 -->
+- Zoomad tillräckligt långt in visar kartan alla platsnamn, också de etiketter som döljs
+  i överblick när markörerna ligger för tätt (`02-§5.33`). Klungan kring gårdsplanen går
+  därmed att särskilja: varje plats syns med namn. Att kartan bara är inzoomad räcker inte
+  — åtta platser inom några tiotal meter staplar sina etiketter även vid dubbel förstoring,
+  och staplade namn är sämre än inga. <!-- 02-§5.44 -->
 - Utan JavaScript visas kartan som en stillbild i sitt utgångsläge, knapparna syns inte,
   och listan under kartan är fortfarande en fullvärdig väg till informationen
   (`02-§5.24`). Zoomen hämtar ingenting utifrån (`02-§5.26`). <!-- 02-§5.45 -->
