@@ -284,7 +284,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 17 |
 | `påbörjad` | 14 |
-| `byggd` | 122 |
+| `byggd` | 123 |
 | `manuell` | 41 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
