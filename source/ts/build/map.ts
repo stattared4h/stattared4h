@@ -184,8 +184,10 @@ export const LABEL_METRICS = {
   fontSize: 15,
   /** `--space-xs`: the label's padding, at each end. */
   padding: 8,
-  /** The width the placement is calculated for: the narrowest map (02-§5.33). */
+  /** The narrowest the map gets, in the mobile layout (05-§5.1). */
   referenceWidth: 360,
+  /** The widest it gets: `--container-narrow` less the container's padding (05-§5.2). */
+  wideWidth: 648,
 } as const;
 
 /**
@@ -270,9 +272,10 @@ export function placeLabels(
   markers: readonly LabelMarker[],
   drawingWidth: number,
   drawingHeight: number,
+  referenceWidth: number = LABEL_METRICS.referenceWidth,
 ): Map<string, LabelSide> {
-  const scale = LABEL_METRICS.referenceWidth / drawingWidth;
-  const edge: Box = { left: 0, right: LABEL_METRICS.referenceWidth, top: 0, bottom: drawingHeight * scale };
+  const scale = referenceWidth / drawingWidth;
+  const edge: Box = { left: 0, right: referenceWidth, top: 0, bottom: drawingHeight * scale };
   const height = LABEL_METRICS.fontSize * LINE_HEIGHT_RATIO;
   const half = LABEL_METRICS.tapTarget / 2;
 
@@ -351,18 +354,26 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   }
 
   // Only the markers that are actually drawn take part: a place outside the drawing
-  // cannot crowd a label (02-§5.33).
-  const sides = placeLabels(
-    drawn.map(({ location, position }) => ({ id: location.id, name: location.name, ...position })),
-    frame.width,
-    frame.height,
-  );
+  // cannot crowd a label (02-§5.33). The placement is worked out twice, because what
+  // crowds a 360 px map has room on a 648 px one, and the visitor sees one or the other.
+  const points = drawn.map(({ location, position }) => ({
+    id: location.id,
+    name: location.name,
+    ...position,
+  }));
+  const sides = placeLabels(points, frame.width, frame.height);
+  const wideSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.wideWidth);
 
   const markers: string[] = [];
   for (const { location, position } of drawn) {
     const side = sides.get(location.id) ?? "below";
-    // `below` is the plain case and needs no modifier, so most markers keep bare markup.
-    const className = side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`;
+    const wide = wideSides.get(location.id) ?? "below";
+    // `below` is the plain case and needs no modifier in the narrow layout, so most
+    // markers keep bare markup there. The wide class is always written: from 600 px the
+    // stylesheet starts from the default and follows it (05-§5.2).
+    const className =
+      (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
+      ` map__marker--wide-${wide}`;
     const style = `left: ${percent(position.x, frame.width)}; top: ${percent(position.y, frame.height)}`;
     markers.push(
       `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}">` +

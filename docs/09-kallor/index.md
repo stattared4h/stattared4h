@@ -144,7 +144,16 @@ Uttaget innehåller Stättaredsvägen, gårdsplanen, fyra byggnader, tre parkeri
 betesmarken sydost om vägen. Det användes för att kontrollera att gårdens koordinater
 ligger rätt, och är underlaget när den ritade bakgrunden (`02-§5.30`) en gång ritas.
 
-`source/map/background.svg` är ritad ur det här uttaget. Formerna följer OSM:s taggar:
+`source/map/background.svg` är ritad ur det här uttaget, med två tillägg som gården själv
+märkt ut på ritningen och som inte finns i OSM: den nya toalettbyggnaden och de tre
+staketen som delar betesmarken i 1:an, 2:an, 3:an och 4:an. De är gårdens egna uppgifter,
+avlästa ur ritningen, och håller på någon meter — inte uppmätta.
+
+Att indelningen stämmer går att pröva: de fyra numrerade hagarnas koordinater, som lästes
+ur ett ortofoto innan staketen fanns, hamnar i var sitt fält och i ordning från nordost
+till sydväst. Två oberoende avläsningar som pekar åt samma håll.
+
+Resten följer OSM:s taggar. Formerna följer taggarna:
 `landuse=meadow` och `grass` blir betesmark, `landuse=farmyard` gårdsplanen,
 `amenity=parking` parkeringarna, `barrier=wall` en streckad gräns, `highway=unclassified`
 och `service` vägarna, `highway=path` stigarna, och `building` husen. Inget är påhittat:

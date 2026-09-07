@@ -90,7 +90,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map"><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))?" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))? map__marker--wide-\w+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Gethagen", "Stora hagen", "Övre hagen"]);
@@ -124,7 +124,7 @@ describe("drawn background (02-§5.30, 03-§9.2)", () => {
     assert.deepEqual(warnings, []);
     assert.match(html, /viewBox="0 0 400 300"/);
     const backgroundAt = html.indexOf('<g class="map__background">');
-    assert.ok(backgroundAt > -1 && backgroundAt < html.indexOf('<a class="map__marker"'), "background before markers");
+    assert.ok(backgroundAt > -1 && backgroundAt < html.indexOf('<a class="map__marker'), "background before markers");
     assert.match(html, /map-barn/);
 
     // Gethagen: lon 12.2134 of 12.2100–12.2180 → 42.5 %; lat 57.4123 of 57.4150–57.4100 → 54 %.
@@ -286,8 +286,8 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
       { id: "tvaan", name: "2:an", lat: 57.4125, lon: 12.2142 },
     ];
     const { html } = renderMap(crowded, { base: "/", background });
-    assert.match(html, /<a class="map__marker" href="\/plats\/ettan\//, "the first keeps the plain class");
-    assert.match(html, /<a class="map__marker map__marker--label-\w+" href="\/plats\/tvaan\//);
+    assert.match(html, /<a class="map__marker map__marker--wide-\w+" href="\/plats\/ettan\//, "the first keeps the plain narrow class");
+    assert.match(html, /<a class="map__marker map__marker--label-\w+ map__marker--wide-\w+" href="\/plats\/tvaan\//);
   });
 
   test("the estimate uses the measurements in tokens.css", async () => {
