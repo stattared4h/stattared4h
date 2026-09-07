@@ -1,4 +1,5 @@
 name: Smådjurshuset
+kind: djurplats
 species:
   - kanin
 note: Gå in tyst, kaninerna blir lätt skrämda.

@@ -22,7 +22,9 @@ description: Karta över Stättareds 4H-gård med hagarna och vilka djurslag som
       {%- for place in views.map.list %}
       <li class="place-list__item">
         <a class="place-list__link" href="{{ place.url | url }}">{{ place.name }}</a>
+        {%- if place.species %}
         <span class="place-list__species">{{ place.species }}</span>
+        {%- endif %}
       </li>
       {%- endfor %}
     </ul>

@@ -1,4 +1,5 @@
 name: Grishagen
+kind: djurplats
 species:
   - gris
 description: En rymlig utehage för gårdens grisar.

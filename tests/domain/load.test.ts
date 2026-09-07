@@ -14,7 +14,7 @@ test("reads vocabulary, populations, animals and locations from the QA dataset",
   assert.equal(raw.breeds?.file, "breeds.yaml");
   assert.equal(raw.populations?.file, "populations.yaml");
   assert.equal(raw.animals.length, 100);
-  assert.equal(raw.locations.length, 9);
+  assert.equal(raw.locations.length, 10);
   assert.deepEqual(
     raw.animals.map((a) => a.id).slice(0, 3),
     ["bagaren", "bocken", "bomull"],

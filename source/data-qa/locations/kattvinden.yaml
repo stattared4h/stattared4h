@@ -1,4 +1,5 @@
 name: Kattvinden
+kind: djurplats
 species:
   - katt
 description: En lugn plats för gårdens katter.

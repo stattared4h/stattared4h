@@ -212,7 +212,7 @@ describe("the map page (02-§5.23–5.25)", () => {
   test("a marker per active place with coordinates; the list has every active place", async () => {
     const { views } = await qaViews();
     const markers = [...views.map.html.matchAll(/data-place="([^"]+)"/g)].map((m) => m[1]);
-    assert.deepEqual(markers, ["bjorkhagen", "gethagen", "grishagen", "honshuset", "kattvinden", "smadjurshuset", "stora-hagen", "ovre-hagen"]);
+    assert.deepEqual(markers, ["bjorkhagen", "gethagen", "grishagen", "honshuset", "kaffestugan", "kattvinden", "smadjurshuset", "stora-hagen", "ovre-hagen"]);
     assert.deepEqual(
       views.map.list.map((item) => [item.name, item.species]),
       [
@@ -220,6 +220,7 @@ describe("the map page (02-§5.23–5.25)", () => {
         ["Gethagen", "Getter"],
         ["Grishagen", "Grisar"],
         ["Hönshuset", "Höns"],
+        ["Kaffestugan", ""],
         ["Kattvinden", "Katter"],
         ["Smådjurshuset", "Kaniner"],
         ["Stora hagen", "Får och kor"],

@@ -1,4 +1,5 @@
 name: Björkhagen
+kind: djurplats
 species:
   - get
 note: Även här går getter — de flyttas mellan hagarna under säsongen.

@@ -32,12 +32,12 @@ function main(html: string): string {
 }
 
 describe("every page exists (02-§5.1–5.2)", () => {
-  test("a location page for all nine places, an animal page for all 100, a species page for all eight", async () => {
+  test("a location page for all ten places, an animal page for all 100, a species page for all eight", async () => {
     const files = await listFiles(site);
     const locations = files.filter((f) => /^plats\/[^/]+\/index\.html$/.test(f));
     const animals = files.filter((f) => /^djur\/[^/]+\/index\.html$/.test(f));
     const species = files.filter((f) => /^arter\/[^/]+\/index\.html$/.test(f));
-    assert.equal(locations.length, 9);
+    assert.equal(locations.length, 10);
     assert.ok(locations.includes(path.join("plats", "gamla-stallet", "index.html")), "the inactive place keeps its page");
     assert.equal(animals.length, 100);
     assert.equal(species.length, 8);
@@ -274,7 +274,7 @@ describe("the map (02-§5.23–5.27)", () => {
     assert.match(html, /<h1>Karta över gården<\/h1>/);
     assert.match(html, /<svg class="map__drawing" [^>]*role="img" aria-label="Karta över Stättared med gårdens hagar">/);
     const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))?" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
-    assert.equal(markers.length, 8, "nine places minus the inactive one without coordinates");
+    assert.equal(markers.length, 9, "ten places minus the inactive one without coordinates");
     assert.ok(!markers.includes("gamla-stallet"));
     const list = html.slice(html.indexOf('<ul class="place-list">'));
     assert.match(list, /href="\/plats\/stora-hagen\/">Stora hagen<\/a>\s*<span class="place-list__species">Får och kor<\/span>/);
@@ -288,6 +288,23 @@ describe("the map (02-§5.23–5.27)", () => {
       ["https://www.4h.se/stattared/vandring-fiske/", "https://www.naturkartan.se/sv/kungsbacka"],
       "only the two maps in 02-§5.34 lead out of the site",
     );
+  });
+});
+
+describe("a besoksmal never mentions animals (02-§5.35, ADR 0017)", () => {
+  test("the café page shows its text and accessibility, and no animal sentence", async () => {
+    const html = main(await page("plats/kaffestugan"));
+    assert.match(html, /<h1>Kaffestugan<\/h1>/);
+    assert.match(html, /Öppet när flaggan är uppe/, "the note is shown");
+    assert.match(html, /Hit når man med rullstol och barnvagn/);
+    assert.doesNotMatch(html, /Just nu går inga djur här/, "that sentence belongs to a djurplats");
+    assert.doesNotMatch(html, /species-tile/, "no species boxes");
+    assert.doesNotMatch(html, /animal-card/, "no animals");
+  });
+
+  test("a djurplats without animals still says so", async () => {
+    const html = main(await page("plats/kattvinden"));
+    assert.match(html, /<h1>Kattvinden<\/h1>/);
   });
 });
 

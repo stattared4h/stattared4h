@@ -1,4 +1,5 @@
 name: Gethagen
+kind: djurplats
 species:
   - get
 note: Här går getterna på dagarna.

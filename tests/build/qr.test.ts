@@ -44,9 +44,9 @@ describe("npm run qr", () => {
         cwd: ROOT,
         env: { ...process.env, DATA_DIR: QA_DIR, SITE_URL: "https://example.com/djur/" },
       });
-      assert.match(stdout, /Skrev 9 QR-koder/);
+      assert.match(stdout, /Skrev 10 QR-koder/);
       const files = (await readdir(out)).sort();
-      assert.equal(files.length, 9);
+      assert.equal(files.length, 10);
       assert.ok(files.includes("gethagen.svg"));
       assert.ok(files.includes("gamla-stallet.svg"), "the inactive place gets a code too");
       const gethagen = await readFile(path.join(out, "gethagen.svg"), "utf8");

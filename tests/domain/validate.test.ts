@@ -79,6 +79,45 @@ test("a missing required field on a location fails, including accessible and act
   }
 });
 
+test("kind is required on a location and only accepts the contract's values (04-§5.7)", async () => {
+  const missing = await rawQa();
+  editLocation(missing, "gethagen", (l) => delete l.kind);
+  assert.equal(errorsFor(await validate(missing), "locations/gethagen.yaml", "kind").length, 1);
+
+  const wrong = await rawQa();
+  editLocation(wrong, "gethagen", (l) => (l.kind = "hage"));
+  const result = await validate(wrong);
+  assert.match(
+    errorsFor(result, "locations/gethagen.yaml", "kind")[0].message,
+    /djurplats eller besoksmal/,
+    "the message names both values",
+  );
+});
+
+test("a besoksmal with species is an error, not a warning (ADR 0017)", async () => {
+  // The likely slip is copying a paddock file when adding a café.
+  const raw = await rawQa();
+  editLocation(raw, "gethagen", (l) => (l.kind = "besoksmal"));
+  const result = await validate(raw);
+  assert.equal(result.dataset, null, "the build stops");
+  assert.match(
+    errorsFor(result, "locations/gethagen.yaml", "species")[0].message,
+    /besöksmål/,
+    "the message says a besoksmal has no animals",
+  );
+});
+
+test("a besoksmal without species is valid and keeps its kind", async () => {
+  const raw = await rawQa();
+  editLocation(raw, "gethagen", (l) => {
+    l.kind = "besoksmal";
+    l.species = [];
+  });
+  const result = await validate(raw);
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.dataset?.locations.find((l) => l.id === "gethagen")?.kind, "besoksmal");
+});
+
 test("accessible and active must be booleans, not text", async () => {
   const raw = await rawQa();
   editLocation(raw, "gethagen", (l) => {
