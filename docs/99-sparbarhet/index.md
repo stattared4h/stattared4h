@@ -61,9 +61,10 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.31` | Platssidan visar platsens bilder | `byggd` | `photos` på platsen i `04-§5.6`, `view.photos` i `source/pages/plats.njk` efter faktarutan; `tests/build/data-pages.test.ts` kontrollerar bilderna, fototexten, att djurslagsrutorna står före dem och att en plats utan bilder inte visar någon platshållare |
 | `02-§5.29` | `npm run qr` | `byggd` | `scripts/qr.mjs` och `source/ts/build/qr.ts`; `tests/build/qr.test.ts` kör skriptet mot QA-datat och kontrollerar en fil per plats med adressen som `<title>` |
 | `02-§5.30` | Ritad kartbakgrund | `byggd` | `parseMapBackground` och `loadMapBackground` i `source/ts/build/map.ts`, konventionen i `source/map/README.md`; `tests/build/map.test.ts` bäddar in en liten SVG och prövar varningen för en plats utanför |
-| `02-§5.32` | Kartan visar bara platsnamn | `saknas` | |
-| `02-§5.33` | Etiketter som annars överlappar | `saknas` | |
-| `02-§5.34` | Fler kartor i området | `saknas` | |
+| `02-§5.32` | Kartan visar bara platsnamn | `byggd` | Markören bär pin och namn och inget annat; `tests/build/map.test.ts` läser varje markörs innehåll, djurslagen står bara i listan under kartan |
+| `02-§5.33` | Etiketter som annars överlappar | `byggd` | `placeLabels` i `source/ts/build/map.ts` med modifierarna i `layout.css`; `tests/build/map.test.ts` prövar krock, kant, ordningsoberoende och att etiketter utöver fyra döljs. Konstanterna jämförs med `tokens.css` i samma fil |
+| `02-§5.34` | Fler kartor i området | `byggd` | `site.areaMaps` i `eleventy.config.js` och avsnittet i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver rubriken och exakt de två länkmålen, och att inget hämtas utifrån |
+| `02-§5.33` (dold etikett) | Etiketten kommer fram vid fokus | `manuell` | Bygg med `DATA_DIR=source/data-qa`, öppna `/karta/` i 360 px bredd och tabba till en markör i klungan i mitten: namnet ska komma fram, och markören ska ligga överst |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
 | `02-§6.2` | Valideringen körs först i bygget | `byggd` | `eleventy.config.js` anropar `loadValidDataset` i `eleventy.before`, i sekventiellt händelseläge före bildpluginen; `tests/build/data-pages.test.ts` bygger ett ogiltigt dataset och kräver en tom utkatalog |
 | `02-§6.3` | Fäller vid allt i `04-§10` och vid okända fält | `byggd` | `source/ts/domain/validate.ts`; varje regel prövas i `tests/domain/validate.test.ts` |
@@ -240,7 +241,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§8.7` | Node 22.18; Eleventy importerar TypeScript direkt | `påbörjad` | `eleventy.config.js` importerar `source/ts/domain/version.ts`; `erasableSyntaxOnly` bevakas av typkontrollen, inte av ett test |
 | `03-§8.8`–`8.9` | Två deploy-flöden med ett återanvändbart; dubbelbygge | `manuell` | Kontrollpunkterna för `02-§9.11`–`9.12` och `02-§10.35` |
 | `03-§9` | Kartan | `byggd` | `source/ts/build/map.ts` med `mapFrame`, `projectPoint`, `renderMap` och bakgrunden; `tests/build/map.test.ts` |
-| `03-§9.3`–`9.4` | Etikettplacering och länkar vidare | `saknas` | |
+| `03-§9.3`–`9.4` | Etikettplacering och länkar vidare | `byggd` | `placeLabels` och kartsidans avsnitt; `tests/build/map.test.ts` och `data-pages.test.ts` |
 | `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
 
@@ -270,11 +271,11 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 5 |
+| `saknas` | 1 |
 | `dokumenterad` | 17 |
 | `påbörjad` | 14 |
-| `byggd` | 111 |
-| `manuell` | 39 |
+| `byggd` | 115 |
+| `manuell` | 40 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->

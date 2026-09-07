@@ -169,7 +169,7 @@ function assertBasePath(base: string): void {
  * Which side of the marker its label sits on (02-§5.33). `below` is the plain case and
  * the fallback; the others are written on the marker as a modifier and placed by CSS.
  */
-export type LabelSide = "below" | "above" | "right" | "left";
+export type LabelSide = "below" | "above" | "right" | "left" | "hidden";
 
 /**
  * Measurements the estimate needs, in pixels, mirrored from `tokens.css`. There is no
@@ -188,10 +188,16 @@ export const LABEL_METRICS = {
   referenceWidth: 360,
 } as const;
 
-/** Width of an average character at `--font-size-small`, as a fraction of the type size. */
-const CHAR_WIDTH_RATIO = 0.55;
-/** The label is one line; its box is the line height. */
-const LINE_HEIGHT_RATIO = 1.4;
+/**
+ * Width of an average character at `--font-size-small`, as a fraction of the type size.
+ * Measured in Chromium over the QA place names, where the ratio ran between 0.62 and
+ * 0.68; this value sits above the worst of them on purpose. Overestimating moves labels
+ * apart that would have fitted; underestimating leaves them on top of each other — and
+ * only the second is visible to a visitor.
+ */
+const CHAR_WIDTH_RATIO = 0.7;
+/** The label is one line. Measured at 24 px against a 15 px type size. */
+const LINE_HEIGHT_RATIO = 1.6;
 /** Tried in this order, so the plain case wins whenever it is free. */
 const LABEL_SIDES: readonly LabelSide[] = ["below", "above", "right", "left"];
 
@@ -215,6 +221,16 @@ function overlaps(a: Box, b: Box): boolean {
   return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 }
 
+/** True when `inner` lies wholly inside `outer`. */
+function contains(outer: Box, inner: Box): boolean {
+  return (
+    inner.left >= outer.left &&
+    inner.right <= outer.right &&
+    inner.top >= outer.top &&
+    inner.bottom <= outer.bottom
+  );
+}
+
 /** The label's box on one side of a marker standing at `x`, `y` in pixels. */
 function labelBox(x: number, y: number, width: number, height: number, side: LabelSide): Box {
   const half = LABEL_METRICS.tapTarget / 2;
@@ -227,6 +243,9 @@ function labelBox(x: number, y: number, width: number, height: number, side: Lab
       return { left: x + half, right: x + half + width, top: y - height / 2, bottom: y + height / 2 };
     case "left":
       return { left: x - half - width, right: x - half, top: y - height / 2, bottom: y + height / 2 };
+    case "hidden":
+      // Never asked for while choosing; a hidden label occupies nothing.
+      return { left: x, right: x, top: y, bottom: y };
   }
 }
 
@@ -236,9 +255,13 @@ function labelBox(x: number, y: number, width: number, height: number, side: Lab
  *
  * The boxes are worked out in pixels for a `referenceWidth` drawing — the narrowest the
  * map gets — because that is where the labels crowd. Places are taken from north to
- * south, and each label gets the first free side. When all four are taken the label
- * stays below its own marker: a label that sits still is honest, one flung across the
- * map points at nothing.
+ * south, and each label gets the first free side. A side that would push the label off
+ * the drawing is not free either, so a place at the edge turns its label inwards.
+ *
+ * There are four sides, so a fifth marker on the same spot has nowhere to go. Its label
+ * is then `hidden`: the pin stays, and CSS keeps the name out of sight until the marker
+ * is pointed at or focused. Stacked unreadable text would be worse than none, and the
+ * place is never lost — it stands in the list under the map (02-§5.24).
  *
  * The estimate is an estimate. It tells a crowded map from an airy one; it does not
  * promise pixels.
@@ -246,8 +269,10 @@ function labelBox(x: number, y: number, width: number, height: number, side: Lab
 export function placeLabels(
   markers: readonly LabelMarker[],
   drawingWidth: number,
+  drawingHeight: number,
 ): Map<string, LabelSide> {
   const scale = LABEL_METRICS.referenceWidth / drawingWidth;
+  const edge: Box = { left: 0, right: LABEL_METRICS.referenceWidth, top: 0, bottom: drawingHeight * scale };
   const height = LABEL_METRICS.fontSize * LINE_HEIGHT_RATIO;
   const half = LABEL_METRICS.tapTarget / 2;
 
@@ -273,11 +298,16 @@ export function placeLabels(
   for (const point of order) {
     const free = LABEL_SIDES.find((side) => {
       const box = labelBox(point.x, point.y, point.width, height, side);
-      return !taken.some((other) => overlaps(box, other)) && !pins.some((pin) => overlaps(box, pin));
+      return (
+        contains(edge, box) &&
+        !taken.some((other) => overlaps(box, other)) &&
+        !pins.some((pin) => overlaps(box, pin))
+      );
     });
-    const side = free ?? "below";
+    const side = free ?? "hidden";
     sides.set(point.id, side);
-    taken.push(labelBox(point.x, point.y, point.width, height, side));
+    // A hidden label takes no room, so it must not push the next one aside.
+    if (side !== "hidden") taken.push(labelBox(point.x, point.y, point.width, height, side));
   }
   return sides;
 }
@@ -322,6 +352,7 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   const sides = placeLabels(
     drawn.map(({ location, position }) => ({ id: location.id, name: location.name, ...position })),
     frame.width,
+    frame.height,
   );
 
   const markers: string[] = [];

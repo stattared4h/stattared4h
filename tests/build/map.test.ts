@@ -90,7 +90,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map"><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-(?:above|right|left|hidden))?" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)">.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Gethagen", "Stora hagen", "Övre hagen"]);
@@ -200,12 +200,28 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
   test("places far apart keep their label under the marker", () => {
     const sides = placeLabels(
       [
-        { id: "a", name: "Ettan", x: 100, y: 100 },
-        { id: "b", name: "Tvåan", x: 600, y: 500 },
+        { id: "a", name: "Ettan", x: 300, y: 150 },
+        { id: "b", name: "Tvåan", x: 500, y: 350 },
       ],
       800,
+      600,
     );
     assert.deepEqual([...sides.values()], ["below", "below"]);
+  });
+
+  test("a place at the edge turns its label inwards", () => {
+    // The drawing is 360 × 270 px at the reference width. A marker just above the
+    // bottom edge has no room under it, and one at the right edge none beside it.
+    const sides = placeLabels(
+      [
+        { id: "botten", name: "Fyran", x: 400, y: 580 },
+        { id: "hoger", name: "Lygnslätt 2", x: 780, y: 300 },
+      ],
+      800,
+      600,
+    );
+    assert.equal(sides.get("botten"), "above", "no room below the bottom edge");
+    assert.equal(sides.get("hoger"), "left", "no room to the right of the right edge");
   });
 
   test("two markers a finger apart get their labels on different sides", () => {
@@ -217,6 +233,7 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
         { id: "b", name: "Tvåan", x: 400 + 30 * UNITS_PER_PX, y: 300 },
       ],
       800,
+      600,
     );
     assert.equal(sides.get("a"), "below");
     assert.notEqual(sides.get("b"), "below", "the second label moves out of the way");
@@ -229,26 +246,37 @@ describe("label placement (02-§5.33, 03-§9.3)", () => {
       { id: "c", name: "Trean", x: 440, y: 295 },
       { id: "d", name: "Fyran", x: 405, y: 340 },
     ];
-    const forwards = placeLabels(markers, 800);
-    const backwards = placeLabels([...markers].reverse(), 800);
+    const forwards = placeLabels(markers, 800, 600);
+    const backwards = placeLabels([...markers].reverse(), 800, 600);
     assert.deepEqual([...forwards].sort(), [...backwards].sort());
   });
 
-  test("when every side is taken the label stays under its own marker", () => {
-    // Six places on the same spot: there are four sides, so two must give up. A label
-    // that stays put is honest; one flung across the map would point at nothing.
+  test("when every side is taken the extra labels are hidden, not stacked", () => {
+    // Six places on the same spot: there are four sides, so two labels must give up.
+    // Hidden beats stacked — unreadable text helps nobody, and the place is still in
+    // the list under the map (02-§5.24).
     const markers = Array.from({ length: 6 }, (_, i) => ({
       id: `p${i}`,
       name: "Hagen",
       x: 400,
       y: 300,
     }));
-    const sides = placeLabels(markers, 800);
+    const sides = placeLabels(markers, 800, 600);
     assert.equal(sides.size, 6);
     assert.equal(sides.get("p0"), "below");
-    for (const side of sides.values()) {
-      assert.ok(["below", "above", "right", "left"].includes(side), side);
-    }
+    assert.deepEqual(
+      [...sides.values()].filter((side) => side === "hidden").length,
+      2,
+      "four sides are used, the last two are hidden",
+    );
+  });
+
+  test("a hidden label leaves room for the next one", () => {
+    // Otherwise a label nobody can see would push aside one that fits.
+    const crowd = Array.from({ length: 5 }, (_, i) => ({ id: `c${i}`, name: "Hagen", x: 400, y: 300 }));
+    const sides = placeLabels([...crowd, { id: "granne", name: "Hagen", x: 400, y: 480 }], 800, 600);
+    assert.equal(sides.get("c4"), "hidden");
+    assert.equal(sides.get("granne"), "below", "the neighbour is placed as if the hidden one were not there");
   });
 
   test("renderMap marks the side on the marker, and only when it is not the default", () => {

@@ -124,9 +124,13 @@ namngivet djur står i hagen.
   kartan, aldrig i markörerna, så att ritningen förblir läsbar när hagarna ligger
   tätt. <!-- 02-§5.32 -->
 - Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
-  var sin sida om markören, så att båda går att läsa. Bygget räknar placeringen för en
-  karta som är 360 px bred — den trängsta vyn i mobilläget (`05-§5.1`) — och räknar
-  deterministiskt: samma platsdata ger samma placering. <!-- 02-§5.33 -->
+  var sin sida om markören, så att båda går att läsa, och en etikett hålls innanför
+  ritningens kant. Ligger fler markörer på samma fläck än det finns sidor visas de
+  etiketter som blir över inte på kartan: namnet är kvar som markörens tillgängliga namn, syns
+  när markören pekas på eller får fokus, och står alltid i listan under kartan
+  (`02-§5.24`). Bygget räknar placeringen för en karta som är 360 px bred — den trängsta
+  vyn i mobilläget (`05-§5.1`) — och räknar deterministiskt: samma platsdata ger samma
+  placering. <!-- 02-§5.33 -->
 - Kartsidan länkar vidare till gårdens egen sida om vandring och fiske och till
   Naturkartan för Kungsbacka, under rubriken "Fler kartor i området". Länkarna är vanliga
   länkar; kartsidan bäddar inte in något från dem (`02-§5.26`). <!-- 02-§5.34 -->

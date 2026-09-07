@@ -260,8 +260,13 @@ ruta ur namnets längd och de mått som gäller i `tokens.css`: teckenstorlek, i
 träffytans minsta mått. Rutorna räknas i pixlar för en 360 px bred karta, den trängsta
 vyn, och prövas mot varandra i en bestämd ordning: platserna tas norrifrån och söderut,
 och varje etikett får den första av sidorna under, över, höger, vänster som är ledig.
-Krockar alla fyra behåller etiketten sin plats under markören — då räcker inte kartan
-till, och det syns hellre än att en etikett flyttar långt bort från sin markör. Sidan
+En sida som skulle skjuta etiketten utanför ritningen räknas också som upptagen, så en
+plats vid kanten vänder etiketten inåt. Räcker ingen av de fyra döljs etiketten visuellt
+i stället för att staplas oläslig ovanpå en annan; namnet finns kvar för skärmläsaren och
+kommer fram vid fokus. Konstanterna för teckenbredd och radhöjd är uppmätta i Chromium
+och satta strax över det värsta uppmätta fallet: att gissa för brett flyttar en etikett i
+onödan, att gissa för smalt lägger två ovanpå varandra, och bara det senare syns för
+besökaren. Sidan
 skrivs som en modifierare på markören, och CSS lägger etiketten där. Uppskattningen är
 just en uppskattning: den skiljer bra fall från dåliga, den garanterar inga
 pixlar. <!-- 03-§9.3 -->
