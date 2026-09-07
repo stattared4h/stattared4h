@@ -331,7 +331,8 @@ describe("an empty dataset (02-§5.7)", () => {
     assert.deepEqual(views.locations, []);
     assert.deepEqual(views.animals, []);
     assert.deepEqual(views.species, []);
-    assert.deepEqual(views.map, { html: "", list: [], warnings: [] });
+    // No place at all means no group either: an empty heading is not an answer (02-§5.51).
+    assert.deepEqual(views.map, { html: "", list: [], groups: [], warnings: [] });
   });
 });
 
