@@ -1,0 +1,20 @@
+---
+layout: base.njk
+permalink: /om/
+title: Om sajten
+description: >-
+  Vad sajten om djuren på Stättareds 4H-gård är, att den fungerar offline, hur den
+  läggs på hemskärmen, och att den inte samlar in uppgifter om dig.
+---
+{#-
+  The about page (02-§10.27). The text, heading included, is source/content/om.md
+  (CL-§2.2); the two things an editor should not have to keep in step with the code —
+  the repository's address and the version — come from the build.
+-#}
+<div class="container container--narrow">
+  {{ texts.om | markdown | safe }}
+  <p><a href="{{ site.repo }}">Källkoden finns på GitHub</a>, öppen för alla.</p>
+  {%- if build.version %}
+  <p class="meta" data-version-row>Version {{ build.version }}</p>
+  {%- endif %}
+</div>
