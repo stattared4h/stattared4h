@@ -1,5 +1,5 @@
 {#
-  Site header (02-§10.1–10.10, 02-§10.38–10.39, 05-§6.1). Markup only: the menu behaviour is in
+  Site header (02-§10.1–10.10, 02-§10.38–10.42, 05-§6.1). Markup only: the menu behaviour is in
   source/ts/ui/menu.ts; install, "to top" and feedback get theirs from their own modules,
   which find the buttons by their data attributes. Both layouts share one set of
   buttons and links; CSS decides what shows at which width (05-§5.4).
@@ -11,11 +11,23 @@
 ] %}
 <a class="skip-link" href="#main">Hoppa till innehållet</a>
 <header class="site-header">
-  <div class="container site-header__inner">
+  <div class="container site-header__inner{% if page.url == '/' %} site-header__inner--home{% endif %}">
     <a class="site-header__brand" href="{{ '/' | url }}">
       <img class="site-header__logo" src="{{ '/assets/img/4h-logo.svg' | url }}" alt="4H" width="64" height="44">
       <span class="site-header__name">{{ site.name }}</span>
     </a>
+
+    {#- The way back (02-§10.40). A plain link to the start page, so it works without
+        script and on a page opened straight from a QR code; source/ts/ui/back.ts swaps
+        it for the history entry when the visitor came from a page of this site. The
+        start page has none: there is nothing above it. #}
+    {%- if page.url != "/" %}
+    <a class="icon-button icon-button--mobile-only site-header__back" href="{{ '/' | url }}" aria-label="Tillbaka" data-back-button>
+      <svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+        <path d="M20 12H4m0 0 6-6m-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    {%- endif %}
 
     {#- Both states live in the markup; `aria-expanded` decides which one shows, so the
         open/closed state is written in one place only (05-§6.42, 02-§10.4). #}

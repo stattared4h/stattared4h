@@ -36,6 +36,14 @@ att kortet läses som ett eget lager, och det ger en yta som uppenbart går att 
 att stänga. Krysset i `02-§10.4` finns för att målgruppen är ett barn med en telefon
 (`02-§2.3`), utan Escape-tangent och utan vana att gissa att man trycker bredvid.
 
+Sidhuvudet saknade länge varje väg bakåt på mobil (issue #60). Djursidan hade en enda
+länk ut — till artsidan — så den som följt en QR-kod till hagen och tryckt på ett djur
+inte kunde ta sig tillbaka till hagen. 4H-loggan, som annars är den vägen, visas först
+från desktopbrytpunkten. Och manifestet säger `display: standalone` (`02-§7.1`):
+installerad som app har sajten ingen webbläsarram och därmed ingen bakåtknapp alls.
+Därför är "Tillbaka" i `02-§10.40` sajtens egen, längst till vänster där varje telefon
+har sin.
+
 ### Sidhuvudet
 
 - Varje sida har samma sidhuvud överst, klistrat i fönstrets topp så att det syns vid
@@ -44,9 +52,10 @@ att stänga. Krysset i `02-§10.4` finns för att målgruppen är ett barn med e
 - Första fokuserbara elementet på varje sida är länken "Hoppa till innehållet", som
   leder till `<main>` och syns när den har fokus. <!-- 02-§10.2 -->
 - Under desktopbrytpunkten (`05-§5.3`) är sidhuvudet en rad ikonknappar (`05-§6.33`),
-  minst `--tap-target-min`: menyknappen längst till vänster, installknappen direkt till
-  höger om den, "till toppen" i mitten och feedbackknappen längst till
-  höger. <!-- 02-§10.3 -->
+  minst `--tap-target-min`: "Tillbaka" längst till vänster, menyknappen direkt till höger
+  om den, installknappen därefter, "till toppen" i mitten och feedbackknappen längst till
+  höger. På startsidan finns ingen "Tillbaka", och raden börjar med
+  menyknappen. <!-- 02-§10.3 -->
 - Menyknappen visar tre streck och ordet "Meny", har `aria-expanded` och
   `aria-controls`, och öppnar menyn. Medan menyn är öppen visar samma knapp ett kryss och
   ordet "Stäng", och ett tryck stänger menyn. <!-- 02-§10.4 -->
@@ -73,6 +82,19 @@ att stänga. Krysset i `02-§10.4` finns för att målgruppen är ett barn med e
   med något ovanpå sig, och alltid med frizonen i `05-§6.38` omkring sig. <!-- 02-§10.37 -->
 - Sidhuvudet innehåller ingen länk till huvudsidan; den finns i sidfoten
   (`02-§1.9`). <!-- 02-§10.10 -->
+
+### Tillbaka
+
+- Varje sida utom startsidan har knappen "Tillbaka" under desktopbrytpunkten, med en
+  vänsterpil och `aria-label` "Tillbaka". Kom besökaren från en annan sida på sajten går
+  den dit. Kom hen utifrån — en QR-kod, en delad länk eller appens startpunkt — går den
+  till startsidan med kartan. <!-- 02-§10.40 -->
+- Knappen är en länk till startsidan i markupen och fungerar därför utan JavaScript.
+  Klientkoden byter den mot historiken först när den vet att föregående sida är sajtens
+  egen. QA och produktionen delar värd men har var sin bas-sökväg (ADR 0005), och en sida
+  under den andra bas-sökvägen räknas som en annan sajt. <!-- 02-§10.41 -->
+- Från desktopbrytpunkten finns knappen inte: där bär sidhuvudet 4H-loggan och sajtens
+  namn som väg till startsidan (`02-§10.7`). <!-- 02-§10.42 -->
 
 ### Installknappen
 

@@ -12,8 +12,9 @@ Inga literaler.
 ### 6.1 Sidhuvud
 
 Sidhuvudet är vitt, klistrat i toppen, med en tunn kantlinje undertill. Under
-desktopbrytpunkten är det en rad ikonknappar (6.11): meny och installation till vänster,
-"till toppen" i mitten, feedback till höger. Från desktopbrytpunkten innehåller det
+desktopbrytpunkten är det en rad ikonknappar (6.11): "Tillbaka", meny och installation
+till vänster, "till toppen" i mitten, feedback till höger. Startsidan har ingen
+"Tillbaka", och raden börjar där med menyknappen. Från desktopbrytpunkten innehåller det
 4H-logotypen och sajtens namn till vänster, länkarna i raden, och installation och
 feedback som ikoner utan botten till höger (`02-§10.3`, `02-§10.7`). <!-- 05-§6.1 -->
 

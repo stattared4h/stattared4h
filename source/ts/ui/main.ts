@@ -7,6 +7,7 @@
  * bar (status-bar.ts) has no init: the modules that show a status import it directly.
  */
 
+import { init as initBack } from "./back.ts";
 import { init as initMenu } from "./menu.ts";
 import { init as initInstall } from "./install.ts";
 import { init as initToTop } from "./to-top.ts";
@@ -17,6 +18,6 @@ import { init as initOffline } from "./offline.ts";
 import { init as initServiceWorker } from "./sw-register.ts";
 import { init as initAnimalIdSearch } from "./animal-id-search.ts";
 
-for (const init of [initMenu, initInstall, initToTop, initFeedback, initShare, initMapZoom, initOffline, initAnimalIdSearch, initServiceWorker]) {
+for (const init of [initBack, initMenu, initInstall, initToTop, initFeedback, initShare, initMapZoom, initOffline, initAnimalIdSearch, initServiceWorker]) {
   init();
 }
