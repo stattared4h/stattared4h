@@ -120,6 +120,16 @@ namngivet djur står i hagen.
   ritningens koordinatsystem enligt de kanter `background.yaml` anger (`03-§9.2`).
   Bygget varnar om en plats hamnar utanför ritningen. Saknas filerna visas markörerna på
   en tom platta. <!-- 02-§5.30 -->
+- Kartan visar bara platsernas namn. Vilka djurslag som går var står i listan under
+  kartan, aldrig i markörerna, så att ritningen förblir läsbar när hagarna ligger
+  tätt. <!-- 02-§5.32 -->
+- Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
+  var sin sida om markören, så att båda går att läsa. Bygget räknar placeringen för en
+  karta som är 360 px bred — den trängsta vyn i mobilläget (`05-§5.1`) — och räknar
+  deterministiskt: samma platsdata ger samma placering. <!-- 02-§5.33 -->
+- Kartsidan länkar vidare till gårdens egen sida om vandring och fiske och till
+  Naturkartan för Kungsbacka, under rubriken "Fler kartor i området". Länkarna är vanliga
+  länkar; kartsidan bäddar inte in något från dem (`02-§5.26`). <!-- 02-§5.34 -->
 
 ### Djurkortet
 
