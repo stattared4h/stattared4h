@@ -119,8 +119,10 @@ inte byggas in i egna märken (ADR 0007).
   bygger bygget själv en lokal version ur senaste taggen, eller `X.Y.0`, och klockslaget
   i Europe/Stockholm; saknas den i CI sätts ingen version. Versionslogiken är en egen
   modul som enhetstestas. <!-- 02-§10.25 -->
-- Service workerns cachenamn är versionssträngen, så att versionen i sidfoten och cachen
-  aldrig pekar på olika byggen (`02-§7.6`). <!-- 02-§10.26 -->
+- Service workerns cachenamn är bas-sökvägen följd av versionssträngen, så att versionen
+  i sidfoten och cachen aldrig pekar på olika byggen, och så att QA och produktion —
+  som delar värd och efter en produktionsdeploy även version (`02-§10.34`) — aldrig
+  raderar varandras cache (`02-§7.6`). <!-- 02-§10.26 -->
 - QA deployas automatiskt vid varje merge till `main`. QA:s version är versionen i
   senaste taggen `vX.Y.*` för `X.Y` i `VERSION`, eller `X.Y.0` när ingen sådan tagg
   finns, följd av " – QA PR<n>" där `n` är numret på den mergade pull requesten; kan

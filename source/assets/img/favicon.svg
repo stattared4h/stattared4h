@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!--
+    The site's own icon (02-§10.31): a cloven hoof print — goats, sheep, cows and pigs all
+    leave one — in white on 4H green. Two shapes only, so it still reads at 16 px. Not
+    the 4H clover: the logo is the association's and is never built into our own marks
+    (ADR 0007). The colours are the tokens "color-green" and "color-surface" from
+    tokens.css; an SVG file cannot reference CSS variables, so the values are repeated
+    here on purpose.
+    PNG and ICO sizes are generated from this file by `npm run icons`.
+  -->
+  <rect width="64" height="64" rx="14" fill="#00863f"/>
+  <g id="hoof" fill="#ffffff">
+    <path d="M28 14c4 3 6 14 4 27-1 5-5 9-10 8s-8-6-7-12c1-9 5-19 13-23z"/>
+    <path d="M36 14c-4 3-6 14-4 27 1 5 5 9 10 8s8-6 7-12c-1-9-5-19-13-23z"/>
+  </g>
+</svg>

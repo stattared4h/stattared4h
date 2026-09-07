@@ -104,7 +104,7 @@ describe("sidorna (02-§5.2, 02-§5.3, 02-§5.6, 02-§7.7)", () => {
   test("varje sida har en h1, lang=sv, titel och beskrivning", async () => {
     for (const { file, html } of await htmlFiles(prod)) {
       assert.match(html, /^<!DOCTYPE html>/, `${file}: doctype`);
-      assert.match(html, /<html lang="sv">/, `${file}: lang`);
+      assert.match(html, /<html lang="sv"[ >]/, `${file}: lang`);
       assert.equal(html.match(/<h1[\s>]/g)?.length, 1, `${file}: exakt en h1`);
       const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
       assert.match(title, /^\S.* – Stättareds 4H-gård$/, `${file}: titeln "${title}" ska börja med sidnamnet och sluta med gårdens namn`);

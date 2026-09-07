@@ -27,8 +27,8 @@ färdig den än ser ut — det är testet som gör att den förblir färdig. <!-
 ## Läget nu
 
 Repot innehåller ramverket — process, beslut, datakontrakt, design och krav för fas 1 —
-samt Eleventy-bygget med grundlayout, sidhuvud, sidfot och versionsmodul. Ingen
-datadriven sida, ingen validering och ingen service worker finns. Statusen nedan
+samt Eleventy-bygget med grundlayout, sidhuvud, sidfot och versionsmodul, manifest,
+service worker, feedbackdialog och om-sida. Ingen datadriven sida finns. Statusen nedan
 speglar det.
 
 ### Krav (`02-§`)
@@ -67,8 +67,15 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§6.11` | Test: inget `location`-fält | `byggd` | `tests/domain/no-location.test.ts` läser både `source/data` och `source/data-qa` |
 | `02-§6.12` | QA har minst 100 individer och täcker vokabulären | `byggd` | `tests/domain/qa-data.test.ts`; `source/data-qa/` har 100 individer |
 | `02-§6.13` | Räknade bestånd för djur utan individsidor | `byggd` | `source/ts/domain/load.ts`, `validate.ts`, `derive.ts`; `tests/domain/qa-data.test.ts` |
-| `02-§7.1`–`7.9` | Manifest och service worker | `saknas` | |
-| `02-§7.10` | Installation på iOS och Android | `saknas` | Blir `manuell` med steget i kravet när service workern finns |
+| `02-§7.1`–`7.2` | Manifest: namn, färger ur tokens, ikoner; `start_url`, `scope` och `id` ur bas-sökvägen | `byggd` | `source/pages/manifest.njk` med färgerna från `readThemeColours` i `source/ts/build/pwa.ts`; `tests/build/pwa.test.ts` jämför med `tokens.css` och bygger under `/prov/qa/` |
+| `02-§7.3` | Registrering på `<bas>sw.js` med scope lika med bas-sökvägen | `manuell` | `source/ts/ui/sw-register.ts` läser `data-base`, som `tests/build/pwa.test.ts` bevakar. Öppna startsidan i Chromium, DevTools → Application → Service Workers: `sw.js` är registrerad med scope lika med bas-sökvägen, och under `/qa/` finns en egen med scope `…/qa/` |
+| `02-§7.4` | Förcachen | `byggd` | `source/pages/sw.njk` listar `collections.all`, offline- och 404-sidan, manifestet, `main.js` och allt under `source/assets/`; `tests/build/pwa.test.ts` jämför med filerna i utdatan |
+| `02-§7.5` | Cache först för förcachen, nätverk först för foton | `manuell` | Strategivalet i `source/ts/domain/offline.ts` testas i `tests/domain/offline.test.ts`; utförandet är `source/ts/sw.ts`. Ladda startsidan, stäng av nätet (DevTools → Network → Offline) och ladda om: sidan och CSS kommer ur cachen, och ett foto som visats en gång visas igen |
+| `02-§7.6` | Cachenamn ur bas-sökväg och version; äldre cacher raderas | `byggd` | `CACHE_NAME` i `source/pages/sw.njk`, bevakat av `tests/build/pwa.test.ts`; raderingen i `source/ts/sw.ts` är verifierad i Chromium: efter Ladda om finns bara den nya cachen |
+| `02-§7.7` | Sidor i förcachen svarar offline; okänd adress ger offline-sidan | `manuell` | Efter en första laddning: stoppa servern eller sätt flygplansläge, öppna `/om/` och en påhittad adress — den första visas, den andra ger "Du är offline" med länkar till startsidan och kartan |
+| `02-§7.8` | Inga anrop till andra värdar | `byggd` | `tests/build/pwa.test.ts` fäller `http(s)://` i `sw.js` och `main.js`; workern rör aldrig ett annat origin (`tests/domain/offline.test.ts`) |
+| `02-§7.9` | QA har egen service worker och eget manifest-`id` | `byggd` | Scope, `id` och cachenamn följer bas-sökvägen; `tests/build/pwa.test.ts` bygger under `/prov/qa/` och jämför med `/` |
+| `02-§7.10` | Installation på iOS och Android | `manuell` | Öppna sajten i Safari på en iPhone, lägg den på hemskärmen, sätt flygplansläge och öppna en platssida och en djursida från appen; gör samma sak i Chrome på Android via installknappen |
 | `02-§8.1` | Bara webbanpassade bilder i repot | `påbörjad` | `npm run image` skriver filer som håller gränserna; `source/images/` har ännu inga bilder. Efterlevnaden bevakas av `02-§8.2` |
 | `02-§8.2` | Validering av bildfiler | `saknas` | Valideraren (`04-§10.7`) |
 | `02-§8.3` | `npm run image` | `byggd` | `scripts/image.mjs` och `optimiseImage` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
@@ -88,24 +95,29 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§10.1`–`10.8` | Sidhuvud, hopp-länk, ikonrad, meny, desktopvariant, aktuell sida | `manuell` | `source/layouts/header.njk`, `source/ts/ui/menu.ts`, `layout.css`, `components.css`. Öppna startsidan i 360 px: raden visar Meny och feedback, menyn öppnas med knappen och stängs med Escape, klick utanför och länkval, och sidhuvudet ligger kvar vid rullning. I 1280 px: logga, namn och länkarna Hem, Karta och Om sajten syns, Hem är understruken. Tab från adressfältet landar på "Hoppa till innehållet" |
 | `02-§10.9` | 4H-loggan | `påbörjad` | `source/assets/img/4h-logo.svg` är en märkt platshållare; förbundets sajt publicerar loggan bara som PNG. Byts mot förbundets SVG |
 | `02-§10.10` | Ingen huvudsidelänk i sidhuvudet | `byggd` | `tests/build/site.test.ts` |
-| `02-§10.11`–`10.13` | Installknapp | `saknas` | Kräver manifest och service worker (`02-§7`) |
-| `02-§10.14` | Till toppen | `saknas` | |
-| `02-§10.15`–`10.20` | Feedback via förifylld GitHub-issue | `saknas` | Issue-mallen `.github/ISSUE_TEMPLATE/feedback.md` finns inte |
+| `02-§10.11`–`10.13` | Installknapp | `manuell` | `source/ts/ui/install.ts`; läget avgörs av `installButtonState` i `source/ts/domain/install.ts`, testad i `tests/domain/install.test.ts`, och `aria-label` bevakas av `tests/build/pwa.test.ts`. Öppna sajten i Chrome på Android: knappen syns när installationserbjudandet kommer, ett tryck visar dialogen, och knappen försvinner efter installation; i Safari på iPhone syns den alltid och ett tryck växlar texten om Dela under sidhuvudet |
+| `02-§10.14` | Till toppen | `manuell` | `source/ts/ui/to-top.ts`. Öppna startsidan i 360 px och rulla 300 px: knappen syns; ett tryck rullar mjukt till toppen och knappen försvinner |
+| `02-§10.15` | Feedbackdialogens innehåll | `byggd` | `source/layouts/feedback-dialog.njk`; rubrik, mening, kategorier, fält, etiketter och längdgränser bevakas på varje sida av `tests/build/pwa.test.ts` |
+| `02-§10.16` | Skicka först när fälten är ifyllda; issue-adressen | `byggd` | `buildFeedbackUrl` och `isFeedbackComplete` i `source/ts/domain/feedback.ts`, testade i `tests/domain/feedback.test.ts`; `source/ts/ui/feedback.ts` öppnar adressen i ny flik med `noopener` |
+| `02-§10.17` | Fokus, Escape, klick utanför, kryss, fälten kvar | `manuell` | `<dialog>.showModal()` i `source/ts/ui/feedback.ts`. Öppna dialogen och tabba runt: fokus stannar i den; Escape, klick utanför och krysset stänger, och fokus återgår till feedbackknappen; skriv i fälten, stäng och öppna igen: texten är kvar |
+| `02-§10.18` | Offline: text och inaktiv Skicka | `manuell` | Sätt DevTools → Network → Offline och öppna dialogen: "Du är offline. Feedback kräver uppkoppling." och Skicka går inte att trycka; sätt online igen: Skicka aktiveras |
+| `02-§10.19` | Issue-mallen med etiketten `feedback` | `byggd` | `.github/ISSUE_TEMPLATE/feedback.md`; front matter bevakas av `tests/build/pwa.test.ts` |
+| `02-§10.20` | Sajten skickar inget själv | `byggd` | Bara `window.open` på adressen; `tests/build/pwa.test.ts` fäller `http(s)://` i `main.js` |
 | `02-§10.21` | Sidfot | `byggd` | `source/layouts/footer.njk`; huvudsidelänk, integritetsmening och versionsrad bevakas av `tests/build/site.test.ts`. Loggan är platshållaren i `02-§10.9` |
 | `02-§10.22` | Versionsradens lydelser | `byggd` | `tests/domain/version.test.ts` prövar varje fall; att raden skrivs, och utelämnas utan version, bevakas av `tests/build/site.test.ts` |
 | `02-§10.23` | `VERSION` med `X.Y` | `påbörjad` | `VERSION` finns med `0.0` och deploy-flödena läser den; `package.json` bär fortfarande ett eget `version`-fält; inget test |
 | `02-§10.24` | Produktionsdeploy med godkännande, tagg och Release | `manuell` | Kör *Deploy till produktion* från Actions-fliken, godkänn i miljön `production`, och bekräfta att taggen `v0.0.0` och Releasen `v0.0.0` finns och att sidfoten visar `Version 0.0.0` |
 | `02-§10.25` | `BUILD_VERSION`, lokal version, ingen i CI | `byggd` | `source/ts/domain/version.ts`, testad i `tests/domain/version.test.ts` |
-| `02-§10.26` | Cachenamnet är versionssträngen | `saknas` | Ingen service worker |
+| `02-§10.26` | Cachenamnet är bas-sökvägen och versionssträngen | `byggd` | `CACHE_NAME` i `source/pages/sw.njk`; `tests/build/pwa.test.ts` |
 | `02-§10.33` | QA-versionen får " – QA PR<n>" | `manuell` | Merga en pull request och öppna körningen av *Deploy till QA*: jobbet *Compute versions* skriver `0.0.0 – QA PR<n>` med numret på pull requesten, och sidfoten under `/qa/` visar samma sträng |
 | `02-§10.34` | QA visar släppet utan suffix efter produktionsdeploy | `manuell` | Efter *Deploy till produktion*: körningens sammanfattning visar samma version för QA som för produktionen |
 | `02-§10.35` | Innehållsmerge bygger om produktionen med taggens kod | `manuell` | När en tagg finns: merga en ändring i `source/data/` och bekräfta i körningen av *Deploy till QA* att produktionen byggs från taggen och att loggen säger `Copied source/data from main` |
 | `02-§10.36` | Releaseguide | `dokumenterad` | `docs/08-SLAPP.md` |
-| `02-§10.27` | Om-sidan | `saknas` | |
-| `02-§10.28`–`10.29` | Statusrad för ny version och offline | `saknas` | |
-| `02-§10.30` | Dela | `saknas` | Kräver de datadrivna sidorna |
-| `02-§10.31` | Egen appikon | `saknas` | Ikonen är inte ritad; favicon svarar 404 i dag |
-| `02-§10.32` | Inline-SVG-ikoner med `aria-hidden` | `påbörjad` | Sidhuvudets fyra ikoner i `source/layouts/header.njk`; inget test |
+| `02-§10.27` | Om-sidan | `byggd` | `source/pages/om.njk` renderar `source/content/om.md`; `tests/build/pwa.test.ts` kontrollerar texten, källkodslänken och versionen sist |
+| `02-§10.28`–`10.29` | Statusrad för ny version och offline | `manuell` | `source/ts/ui/sw-register.ts` och `source/ts/ui/offline.ts` via `source/ts/ui/status-bar.ts`. Bygg om lokalt med en annan `BUILD_VERSION` medan en sida är öppen: "Ny version finns." med Ladda om visas, och efter tryck visar sidfoten den nya versionen och bara den nya cachen finns kvar. Sätt DevTools → Network → Offline: "Du är offline. Du ser den sparade versionen." visas och försvinner när nätet är tillbaka |
+| `02-§10.30` | Dela | `manuell` | `source/ts/ui/share.ts` visar `[data-share-button]` när JS kör; valet mellan delning och kopiering testas i `tests/ui/share.test.ts`. Öppna en platssida på en mobil: Dela öppnar delningsarket; på ett skrivbord utan delningsfunktion visar knappen "Länken är kopierad" och urklippet har adressen |
+| `02-§10.31` | Egen appikon | `byggd` | `source/assets/img/favicon.svg` och storlekarna från `npm run icons` (`scripts/icons.mjs`); `tests/build/pwa.test.ts` kontrollerar filerna, måtten och länkarna i `<head>` |
+| `02-§10.32` | Inline-SVG-ikoner med `aria-hidden` | `byggd` | Sidhuvudets och dialogens ikoner; `tests/build/pwa.test.ts` kräver `aria-hidden` på varje `<svg>` i varje sida |
 
 ### Designspecifikation (`05-§`)
 
@@ -120,14 +132,15 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§4.1`–`4.10` | Behållare och spacing | `påbörjad` | Tokens bevakas av testet; `layout.css` använder dem i behållare, sidhuvud och sidfot utan test |
 | `05-§4.11`–`4.15` | Rutnät och träffytor | `dokumenterad` | Rutnätet skrivs med djurkorten |
 | `05-§5` | Brytpunkter | `dokumenterad` | Tillämpas när layouten skrivs |
-| `05-§6.3` | Knappar | `påbörjad` | `.button` på startsidan, 47 px hög |
+| `05-§6.9`–`6.12` | Knappar | `manuell` | `.button`, `.button--secondary` och `.button:disabled` i `components.css`. Öppna feedbackdialogen: Skicka är grön med vit text och halvgenomskinlig med en förklarande mening tills fälten är ifyllda; statusradens Ladda om är sekundär med djupgrön kant |
 | `05-§6.1`–`6.4` | Sidhuvud | `manuell` | `layout.css`. Öppna startsidan i 360 px och 1280 px: vitt sidhuvud med kantlinje som ligger kvar vid rullning, ikonknappar på mobil, logga och länkar på desktop, aktuell sida understruken |
 | `05-§6.15` | Kortets bild i 4:3 | `dokumenterad` | Kortets CSS skrivs med djurkorten; platshållaren (`05-§6.20`) håller redan 4:3 |
 | `05-§6.17` | `width` och `height` på varje bild | `påbörjad` | `renderPicture` sätter dem, bevakat av `tests/build/images.test.ts`; ingen sida använder den ännu |
 | `05-§6.20` | Platshållare för saknat foto | `påbörjad` | `renderPlaceholder` och `.image-placeholder` i `components.css`; markupen är testad, utseendet kontrolleras när en sida visar den |
+| `05-§6.28`–`6.29`, `6.32` | Formulärfält | `manuell` | `.field` i `components.css`. Öppna feedbackdialogen: etiketterna Rubrik och Beskrivning står ovanför fälten, som är vita med ram, rundade hörn och minst 44 px höga. Felmeddelanden (`05-§6.29`) har ingen markup ännu: dialogen förebygger fel genom att Skicka är inaktiv tills fälten är ifyllda |
 | `05-§6.30` | Sidfot | `manuell` | `source/layouts/footer.njk`, `layout.css`. Öppna en sida och bekräfta djupgrön botten, vit text, och ordningen logga, huvudsidelänk, repolänk, integritetsmening, version |
 | `05-§6.33`–`6.34`, `6.37` | Ikonknapp, meny, sidhuvudets höjd | `manuell` | `components.css`, `layout.css`. I 360 px: knapparna är 44 px, menykortet är grönt med vita länkar och glider in under sidhuvudet; sidhuvudets höjd är densamma före och efter rullning och i 1280 px |
-| `05-§6.35`–`6.36` | Dialog, statusrad | `saknas` | |
+| `05-§6.35`–`6.36` | Dialog, statusrad | `manuell` | `.dialog` och `.status-bar` i `components.css`. Öppna feedbackdialogen i 360 px och 1280 px: mörkt bakgrundsskikt, vit yta med rundade hörn och kryssknapp uppe till höger, som mest 680 px bred, intonad på under 200 ms; sätt DevTools → Network → Offline: ljusgrön rad med djupgrön text direkt under sidhuvudet |
 | `05-§6` övrigt | Komponenter | `saknas` | Skrivs när markupen finns, enligt `05-§7.2` |
 | `05-§7.1`, `7.5` | Inga hårdkodade värden | `byggd` | stylelint-regeln `declaration-strict-value` fäller literaler utanför `tokens.css` |
 | `05-§7.4` | Designtokens | `byggd` | `tokens.css`, bevakad av `tests/design/tokens.test.ts` |
@@ -151,7 +164,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | --- | --- | --- | --- |
 | `06-§1.1`–`1.2` | QA och produktion ur samma kod i samma utgåva | `manuell` | Efter *Deploy till produktion*: sidfoten i `https://stattared4h.github.io/stattared4h/` och `.../qa/` visar samma version |
 | `06-§1.3` | QA-sidor bär `noindex` | `byggd` | `source/layouts/base.njk` när `DATA_DIR` slutar på `data-qa`; `tests/build/site.test.ts` bygger QA och produktion och jämför |
-| `06-§1.4` | QA har egen service worker och eget manifest-`id` | `saknas` | Ingen service worker |
+| `06-§1.4` | QA har egen service worker och eget manifest-`id` | `byggd` | Scope, `start_url`, `id` och cachenamn följer bas-sökvägen; `tests/build/pwa.test.ts` bygger under `/prov/qa/` |
 | `06-§1.5` | QA-versionen får tillägget " – QA" | `manuell` | Kontrollpunkten för `02-§10.33` |
 | `06-§2.1` | `DATA_DIR` väljer dataset | `påbörjad` | `defaultDataDir()` i `source/ts/domain/index.ts` och `npm run validate` läser `DATA_DIR` (`tests/domain/validate-script.test.ts`); bygget läser ännu inget dataset |
 | `06-§2.2` | Tester körs mot QA-data | `byggd` | `tests/domain/helpers.ts` pekar på `source/data-qa/`; ingen domäntest läser `source/data` utom `02-§6.11` |
@@ -168,7 +181,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 
 | ID | Ämne | Status | Anteckning |
 | --- | --- | --- | --- |
-| `03-§1`–`03-§7` | Byggkedja, skikt, härledda vyer, sidor, offline, bilder, redigering | `dokumenterad` | Mekanismerna bakom `02-§5`–`02-§8` |
+| `03-§1`–`03-§4`, `03-§6`–`03-§7` | Byggkedja, skikt, härledda vyer, sidor, bilder, redigering | `dokumenterad` | Mekanismerna bakom `02-§5`–`02-§8` |
+| `03-§5` | Offline och service worker | `byggd` | `source/ts/sw.ts`, `source/pages/sw.njk`, `source/ts/build/pwa.ts`, `source/ts/ui/sw-register.ts`; strategin i `tests/domain/offline.test.ts`, bygget i `tests/build/pwa.test.ts` |
 | `03-§6.1` | Bygget genererar bara mindre storlekar | `byggd` | `generateImageSizes` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `03-§6.2` | Upplösare från filnamn till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` |
 | `03-§6.3` | `width`, `height`, `loading`, `fetchpriority` | `påbörjad` | `renderPicture` är testad; sidorna använder den inte ännu |
@@ -179,7 +193,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§8.7` | Node 22.18; Eleventy importerar TypeScript direkt | `påbörjad` | `eleventy.config.js` importerar `source/ts/domain/version.ts`; `erasableSyntaxOnly` bevakas av typkontrollen, inte av ett test |
 | `03-§8.8`–`8.9` | Två deploy-flöden med ett återanvändbart; dubbelbygge | `manuell` | Kontrollpunkterna för `02-§9.11`–`9.12` och `02-§10.35` |
 | `03-§9` | Kartan | `dokumenterad` | |
-| `03-§10` | Sidhuvud, sidfot, version och feedback | `dokumenterad` | Mekanismen bakom `02-§10` |
+| `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
+| `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
 
 ---
 
@@ -199,11 +214,11 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 20 |
+| `saknas` | 8 |
 | `dokumenterad` | 15 |
-| `påbörjad` | 28 |
-| `byggd` | 42 |
-| `manuell` | 18 |
+| `påbörjad` | 26 |
+| `byggd` | 58 |
+| `manuell` | 31 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
