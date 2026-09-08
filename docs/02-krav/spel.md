@@ -22,6 +22,11 @@ spelet till en kontroll av barnet, och gården har bett om ett spel. Och brickan
 på en telefonskärm utan att rullas: den som står i hagen med ena handen på staketet ska
 se hela brickan på en gång.
 
+En tredje sak avgjordes när spelet väl gick att spela: bara den vågräta raden ger konfetti
+på vägen. Räknades kolumner och diagonaler med avslutade nästan varje bock mot slutet av
+brickan någon linje, ofta två på samma tryck, och konfettin slutade betyda något långt
+innan bingot. Raden ensam räcker, och den är den linje ett barn ser utan att leta.
+
 ### Sidan
 
 - Djurbingo har sidan `/bingo/`, ett kort på startsidans nav (`02-§5.63`) med rubriken
@@ -66,9 +71,11 @@ se hela brickan på en gång.
 ### Vinsten
 
 - Under brickan står hur många rutor som är avbockade av hur många. När ett tryck gör en
-  rad, kolumn eller diagonal komplett faller lite konfetti. <!-- 02-§12.10 -->
-- När alla rutor är avbockade är det bingo: mycket konfetti, en fanfar och en ruta under
-  brickan som säger det och erbjuder "Spela igen". Konfettin ritas av sajtens egen kod på
-  en canvas i sajtens färger; fanfaren syntetiseras i webbläsaren. Ingen ljudfil och inget
-  bibliotek når besökaren (`02-§9.5`). Med `prefers-reduced-motion: reduce` visas
-  rutan utan konfetti. <!-- 02-§12.11 -->
+  vågrät rad komplett faller lite konfetti. Kolumner och diagonaler är inga linjer i
+  spelet och firas inte. <!-- 02-§12.10 -->
+- När alla rutor är avbockade är det bingo: mycket konfetti, en fem sekunder lång fanfar
+  och en ruta under brickan som säger det och erbjuder "Spela igen". Fanfaren är en kort
+  slinga som spelas om tills de fem sekunderna är fyllda, och slutackordet klingar ut på
+  sekunden. Konfettin ritas av sajtens egen kod på en canvas i sajtens färger; fanfaren
+  syntetiseras i webbläsaren. Ingen ljudfil och inget bibliotek når besökaren (`02-§9.5`).
+  Med `prefers-reduced-motion: reduce` visas rutan utan konfetti. <!-- 02-§12.11 -->
