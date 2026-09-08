@@ -91,14 +91,14 @@ export function toggleSquare(board: Board, index: number): Board {
   return { ...board, squares };
 }
 
-/** Every line that counts: rows, columns and the two diagonals, as lists of square indices. */
+/**
+ * Every line that counts, as lists of square indices: the across rows, and nothing else
+ * (02-§12.10). Columns and diagonals are deliberately left out — counted too, a board
+ * near full finished a line on nearly every press, often two at once, and the confetti
+ * stopped meaning anything before the bingo did.
+ */
 export function lines(size: BoardSize): number[][] {
-  const result: number[][] = [];
-  for (let r = 0; r < size; r++) result.push(Array.from({ length: size }, (_, c) => r * size + c));
-  for (let c = 0; c < size; c++) result.push(Array.from({ length: size }, (_, r) => r * size + c));
-  result.push(Array.from({ length: size }, (_, i) => i * size + i));
-  result.push(Array.from({ length: size }, (_, i) => i * size + (size - 1 - i)));
-  return result;
+  return Array.from({ length: size }, (_, r) => Array.from({ length: size }, (_, c) => r * size + c));
 }
 
 /** The lines whose every square is found, as lists of square indices. */
@@ -106,7 +106,11 @@ export function completedLines(board: Board): number[][] {
   return lines(board.size).filter((line) => line.every((index) => board.squares[index].found));
 }
 
-/** Lines that are complete in `after` but were not in `before`: what a single toggle just finished (02-§12.10). */
+/**
+ * Lines that are complete in `after` but were not in `before`: what a single toggle just
+ * finished (02-§12.10). With rows as the only lines a square sits in exactly one of them,
+ * so a single toggle finishes at most one.
+ */
 export function newlyCompletedLines(before: Board, after: Board): number[][] {
   const wasComplete = new Set(completedLines(before).map((line) => line.join(",")));
   return completedLines(after).filter((line) => !wasComplete.has(line.join(",")));
