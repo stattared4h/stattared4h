@@ -1,6 +1,7 @@
 name: Grillplatsen vid ställplatsen
 kind: grill
 species: []
+label: hoger
 lat: 57.338173
 lon: 12.341523
 accessible: true
