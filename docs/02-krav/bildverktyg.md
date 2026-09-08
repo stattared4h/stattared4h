@@ -53,9 +53,12 @@ bara sista steget ut.
 
 ### Bereda bilder
 
-- Sidan tar emot en eller flera bildfiler i JPEG, PNG eller WebP, från filväljaren eller
-  direkt från kameran. Flera bilder i samma vända är ett krav: den första inmatningen av
-  gårdens djur är fas 1:s tyngsta arbete. <!-- 02-§11.7 -->
+- Sidan tar emot en eller flera bildfiler från filväljaren eller direkt från kameran, i
+  varje format webbläsaren kan öppna. Det inkluderar iPhonens HEIC där webbläsaren läser
+  det, eftersom ingenting av originalformatet når repot: allt sidan lämnar ifrån sig är
+  WebP. En fil webbläsaren inte kan öppna rapporteras som ett fel på just den bilden.
+  Flera bilder i samma vända är ett krav: den första inmatningen av gårdens djur är fas
+  1:s tyngsta arbete. <!-- 02-§11.7 -->
 - Varje bild rätas upp efter sin EXIF-orientering, skalas till högst `MAX_IMAGE_EDGE` på
   längsta sidan och kodas om till WebP under `MAX_IMAGE_BYTES` — samma gränser som
   `02-§8.1`. En bild som redan är mindre förstoras inte. <!-- 02-§11.8 -->

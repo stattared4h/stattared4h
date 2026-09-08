@@ -30,10 +30,14 @@ export interface PreparedImage {
   sourceName: string;
 }
 
-/** What the file picker offers, and what `optimiseImage` takes on the other side. */
-export const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-/** Decodes the file, upright, as an element whose intrinsic size is the corrected one. */
+/**
+ * Decodes the file, upright, as an element whose intrinsic size is the corrected one.
+ *
+ * Which formats are allowed is the browser's answer, not a list of ours: everything that
+ * comes out of here is WebP from a canvas, so the format going in never reaches the
+ * repository. That matters on an iPhone, where the camera roll holds HEIC and Safari is
+ * the one browser that can read it.
+ */
 async function decode(file: File): Promise<HTMLImageElement> {
   const url = URL.createObjectURL(file);
   const image = new Image();
@@ -42,7 +46,10 @@ async function decode(file: File): Promise<HTMLImageElement> {
     await image.decode();
     return image;
   } catch {
-    throw new Error("Filen går inte att öppna som en bild. Är den hel?");
+    throw new Error(
+      "Filen går inte att öppna som en bild. Webbläsaren känner kanske inte formatet — " +
+        "spara den som JPEG och försök igen.",
+    );
   } finally {
     // The decoded picture is kept by the element; the address is not needed any more.
     URL.revokeObjectURL(url);
@@ -69,10 +76,6 @@ async function toWebp(canvas: HTMLCanvasElement, quality: number): Promise<Uint8
  * meant for the editor: the caller shows it beside the picture that caused it.
  */
 export async function prepareImage(file: File): Promise<PreparedImage> {
-  if (!ACCEPTED_TYPES.includes(file.type)) {
-    throw new Error("Bilden måste vara JPEG, PNG eller WebP.");
-  }
-
   const image = await decode(file);
   const size = fitWithin({ width: image.naturalWidth, height: image.naturalHeight }, MAX_IMAGE_EDGE);
 
