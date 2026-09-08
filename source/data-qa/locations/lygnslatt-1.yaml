@@ -1,11 +1,11 @@
-name: Stora hagen
+name: Lygnslätt 1
 kind: djurplats
 species:
   - far
   - ko
 description: Gårdens största betesmark. Här går fåren och Majros tillsammans.
-lat: 57.335800
-lon: 12.338500
+lat: 57.337344
+lon: 12.345002
 accessible: false
 active: true
 photos:

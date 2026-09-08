@@ -85,7 +85,7 @@ describe("parseTable", () => {
 });
 
 describe("planImport", () => {
-  const valid = `${HEADER}\nIMG_0001.jpg,rosa,"Rosa, en brun get, tittar in i kameran.",Anna Karlsson\nIMG_0002.jpg,rosa,Rosa på en stubbe.,Anna Karlsson\nIMG_0003.jpg,gethagen,Gethagen en sommarmorgon.,Erik Eriksson\n`;
+  const valid = `${HEADER}\nIMG_0001.jpg,rosa,"Rosa, en brun get, tittar in i kameran.",Anna Karlsson\nIMG_0002.jpg,rosa,Rosa på en stubbe.,Anna Karlsson\nIMG_0003.jpg,brackebur,Bräckebur en sommarmorgon.,Erik Eriksson\n`;
 
   test("a filled-in table plans one row per photo, in file order", () => {
     const plan = planImport(valid);
@@ -95,7 +95,7 @@ describe("planImport", () => {
       [
         ["IMG_0001.jpg", "rosa", "Anna Karlsson"],
         ["IMG_0002.jpg", "rosa", "Anna Karlsson"],
-        ["IMG_0003.jpg", "gethagen", "Erik Eriksson"],
+        ["IMG_0003.jpg", "brackebur", "Erik Eriksson"],
       ],
     );
     assert.equal(plan.rows[0].alt, "Rosa, en brun get, tittar in i kameran.");
@@ -170,10 +170,10 @@ describe("formatIdsByPost", () => {
   test("grouped by post, in the form photos takes in YAML (02-§8.17)", () => {
     const text = formatIdsByPost([
       { post: "rosa", id: "img-000000000001" },
-      { post: "gethagen", id: "img-000000000003" },
+      { post: "brackebur", id: "img-000000000003" },
       { post: "rosa", id: "img-000000000002" },
     ]);
-    assert.equal(text, "rosa:\n  - img-000000000001\n  - img-000000000002\n\ngethagen:\n  - img-000000000003\n");
+    assert.equal(text, "rosa:\n  - img-000000000001\n  - img-000000000002\n\nbrackebur:\n  - img-000000000003\n");
   });
 });
 
@@ -216,7 +216,7 @@ describe("npm run image:import", () => {
       tablePath,
       `${HEADER}\nIMG_0001.jpg,rosa,"Rosa, en brun get, tittar in i kameran.",Anna Karlsson\n` +
         `IMG_0002.jpg,rosa,Rosa på en stubbe.,Anna Karlsson\n` +
-        `IMG_0003.jpg,gethagen,Gethagen en sommarmorgon.,Erik Eriksson\n`,
+        `IMG_0003.jpg,brackebur,Bräckebur en sommarmorgon.,Erik Eriksson\n`,
     );
     const result = await runScript([tablePath, "--photos", photoDir, "--data-dir", dataDir]);
     assert.equal(result.code, 0, result.stderr);
@@ -234,7 +234,7 @@ describe("npm run image:import", () => {
 
     // The printed ids are grouped and ready to paste into photos:.
     assert.match(result.stdout, /rosa:\n {2}- img-[0-9a-f]{12}\n {2}- img-[0-9a-f]{12}/);
-    assert.match(result.stdout, /gethagen:\n {2}- img-[0-9a-f]{12}/);
+    assert.match(result.stdout, /brackebur:\n {2}- img-[0-9a-f]{12}/);
   });
 
   test("it never touches the animals, locations or species files (02-§8.15)", async () => {

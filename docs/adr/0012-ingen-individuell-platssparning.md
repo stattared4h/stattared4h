@@ -19,8 +19,8 @@ Platsen äger uppgiften om vilka **djurslag** som finns där. Ett djur har inget
 `location`-fält, och får aldrig få ett. Ingen placeringshistorik registreras.
 
 ```yaml
-# locations/gethagen.yaml
-name: Gethagen
+# locations/brackebur.yaml
+name: Bräckebur
 species: [get, far]
 note: Här går bockarna.
 ```
@@ -38,7 +38,7 @@ av en välmenande framtida ändring.
   den skulle vara **osann**. Flyttas djur individuellt och ofta är en individuell
   platsuppgift inaktuell inom dagar. Ett register som ljuger är sämre än inget register, och
   en besökare som letar efter Rosa i fel hage får en sämre upplevelse än en som får veta att
-  getter finns i Gethagen och Bockhagen.
+  getter finns i Bräckebur och Tåmossen.
 - **Namngivna grupper med en plats var** — avvisad: det krävde att någon hittade på
   identifierare för "bockarna" och "årets killingar" och höll dem stabila över tid. Det är
   jargong förklädd till schema, och det löser inget som artlistan på platsen inte redan löser.

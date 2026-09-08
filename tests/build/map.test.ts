@@ -28,9 +28,9 @@ const ROOT = path.resolve(import.meta.dirname, "..", "..");
 const FACTS = { note: null, accessibility: "Hit når man med rullstol och barnvagn", species: "Getter" };
 
 const PLACES: MapLocation[] = [
-  { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.4123, lon: 12.2134, ...FACTS },
-  { id: "stora-hagen", name: "Stora hagen", kind: "djurplats", lat: 57.411, lon: 12.212, ...FACTS },
-  { id: "ovre-hagen", name: "Övre hagen", kind: "djurplats", lat: 57.414, lon: 12.2168, ...FACTS },
+  { id: "brackebur", name: "Bräckebur", kind: "djurplats", lat: 57.4123, lon: 12.2134, ...FACTS },
+  { id: "lygnslatt-1", name: "Lygnslätt 1", kind: "djurplats", lat: 57.411, lon: 12.212, ...FACTS },
+  { id: "stora-grishagen", name: "Stora grishagen", kind: "djurplats", lat: 57.414, lon: 12.2168, ...FACTS },
 ];
 
 /** A small drawing, the way an SVG editor saves one. */
@@ -96,8 +96,8 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
     const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
-    assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/gethagen/", "/prov/plats/stora-hagen/", "/prov/plats/ovre-hagen/"]);
-    assert.deepEqual(markers.map((m) => m[5]), ["Gethagen", "Stora hagen", "Övre hagen"]);
+    assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/brackebur/", "/prov/plats/lygnslatt-1/", "/prov/plats/stora-grishagen/"]);
+    assert.deepEqual(markers.map((m) => m[5]), ["Bräckebur", "Lygnslätt 1", "Stora grishagen"]);
     for (const marker of markers) {
       assert.ok(Number(marker[2]) >= 0 && Number(marker[2]) <= 100);
       assert.ok(Number(marker[3]) >= 0 && Number(marker[3]) <= 100);
@@ -136,7 +136,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
   test("every marker carries the symbol for its kind (02-§5.38)", () => {
     const mixed: MapLocation[] = [
       { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.4123, lon: 12.2134, ...FACTS, species: "" },
-      { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.411, lon: 12.212, ...FACTS },
+      { id: "brackebur", name: "Bräckebur", kind: "djurplats", lat: 57.411, lon: 12.212, ...FACTS },
     ];
     const { html } = renderMap(mixed, { base: "/" });
     assert.match(html, /<span class="map__pin map__pin--mat" aria-hidden="true"><svg class="map__symbol"/);
@@ -152,14 +152,14 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
 describe("the popup on a marker (02-§5.46–5.49, 03-§9.7)", () => {
   test("each marker carries what the popup shows, and the empty popup rides in the canvas", () => {
     const places: MapLocation[] = [
-      { id: "gethagen", name: "Gethagen", kind: "djurplats", lat: 57.4123, lon: 12.2134,
+      { id: "brackebur", name: "Bräckebur", kind: "djurplats", lat: 57.4123, lon: 12.2134,
         note: "Här går bockarna.", accessibility: "Hit når man med rullstol och barnvagn", species: "Getter" },
       { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.411, lon: 12.212,
         note: null, accessibility: "Hit når man inte med rullstol eller barnvagn", species: "" },
     ];
     const { html } = renderMap(places, { base: "/" });
 
-    const paddock = /<a class="map__marker[^"]*"[^>]*data-place="gethagen"[^>]*>/.exec(html)?.[0] ?? "";
+    const paddock = /<a class="map__marker[^"]*"[^>]*data-place="brackebur"[^>]*>/.exec(html)?.[0] ?? "";
     assert.match(paddock, /data-kind="djurplats"/);
     assert.match(paddock, /data-species="Getter"/);
     assert.match(paddock, /data-note="Här går bockarna\."/);
@@ -209,17 +209,17 @@ describe("drawn background (02-§5.30, 03-§9.2)", () => {
     assert.ok(backgroundAt > -1 && backgroundAt < html.indexOf('<a class="map__marker'), "background before markers");
     assert.match(html, /map-barn/);
 
-    // Gethagen: lon 12.2134 of 12.2100–12.2180 → 42.5 %; lat 57.4123 of 57.4150–57.4100 → 54 %.
-    assert.match(html, /href="\/plats\/gethagen\/" style="left: 42\.5%; top: 54%"/);
+    // Bräckebur: lon 12.2134 of 12.2100–12.2180 → 42.5 %; lat 57.4123 of 57.4150–57.4100 → 54 %.
+    assert.match(html, /href="\/plats\/brackebur\/" style="left: 42\.5%; top: 54%"/);
   });
 
   test("a place outside the drawing is left out with a warning", () => {
     const background = parseMapBackground(DRAWING, "north: 57.4130\nsouth: 57.4100\nwest: 12.2100\neast: 12.2180\n");
     const { html, warnings } = renderMap(PLACES, { base: "/", background });
-    assert.doesNotMatch(html, /ovre-hagen/);
-    assert.match(html, /gethagen/);
+    assert.doesNotMatch(html, /stora-grishagen/);
+    assert.match(html, /brackebur/);
     assert.equal(warnings.length, 1);
-    assert.match(warnings[0], /background\.yaml: platsen ovre-hagen .* utanför ritningen/);
+    assert.match(warnings[0], /background\.yaml: platsen stora-grishagen .* utanför ritningen/);
   });
 
   test("a viewBox with an offset is translated away; width/height in px are accepted", () => {

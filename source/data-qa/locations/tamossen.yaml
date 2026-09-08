@@ -1,14 +1,14 @@
-name: Björkhagen
+name: Tåmossen
 kind: djurplats
 species:
   - get
 note: Även här går getter — de flyttas mellan hagarna under säsongen.
 description: |
-  Skuggig hage med björkar, används mest under varma sommardagar.
+  Skuggig hage, används mest under varma sommardagar.
 
   ![](img-aa2c37af9e5e)
-lat: 57.337900
-lon: 12.341700
+lat: 57.337830
+lon: 12.336398
 accessible: true
 active: true
 photos:

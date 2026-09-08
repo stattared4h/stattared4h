@@ -134,7 +134,7 @@ Har du miljön i §3 gör `npm run image` samma sak från terminalen:
 
 ```bash
 npm run image -- ~/Bilder/IMG_1234.jpg \
-  --alt "Rosa och Stjärna står tillsammans i Björkhagen." \
+  --alt "Rosa och Stjärna står tillsammans i Tåmossen." \
   --credit "Anna Karlsson"
 ```
 
@@ -203,7 +203,7 @@ IMG_0002.jpg,,,
 
 | Kolumn | Vad du skriver |
 | --- | --- |
-| `post` | Id:t på djuret, platsen eller arten bilden hör till, alltså filnamnet utan `.yaml` — `rosa`, `gethagen` |
+| `post` | Id:t på djuret, platsen eller arten bilden hör till, alltså filnamnet utan `.yaml` — `rosa`, `brackebur` |
 | `alt` | Vad som är viktigt i bilden, på svenska. Skriv en mening, inte ett ord |
 | `fotograf` | Den som tagit bilden |
 
@@ -227,7 +227,7 @@ rosa:
   - img-983a851829da
   - img-88c164764c6d
 
-gethagen:
+brackebur:
   - img-e28ead3d09f0
 ```
 

@@ -1,10 +1,10 @@
-name: Grishagen
+name: Lygnslätt 2
 kind: djurplats
 species:
   - gris
 description: En rymlig utehage för gårdens grisar.
-lat: 57.337400
-lon: 12.339400
+lat: 57.337052
+lon: 12.345002
 accessible: true
 active: true
 photos:

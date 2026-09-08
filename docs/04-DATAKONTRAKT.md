@@ -67,7 +67,7 @@ inuti filen — det skulle vara samma faktum på två ställen. <!-- 04-§3.1 --
 - Små bokstäver `a–z`, siffror och bindestreck. Inga åäö, inga mellanslag, inga
   versaler. `Lilla Gumman` blir `lilla-gumman`. <!-- 04-§3.2 -->
 - Svenska tecken skrivs om: `å` och `ä` blir `a`, `ö` blir `o`. `Snöbollen` blir
-  `snobollen`, `Björkhagen` blir `bjorkhagen`. Regeln kan ge id:n som liknar varandra —
+  `snobollen`, `Tåmossen` blir `tamossen`. Regeln kan ge id:n som liknar varandra —
   `får` blir `far` — vilket är acceptabelt eftersom id:t aldrig visas för besökaren.
   Skulle två poster få samma id fälls valideringen och den ena får ett förtydligande
   tillägg. <!-- 04-§3.4 -->
@@ -167,7 +167,7 @@ Platsen är sajtens nav: QR-koden på hagen pekar hit, och härifrån väljer be
 djuren som finns där. <!-- 04-§5.1 -->
 
 ```yaml
-name: string                 # platsens namn, t.ex. "Gethagen"
+name: string                 # platsens namn, t.ex. "Bräckebur"
 kind: enum                   # vad platsen är, se regeln nedan
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
@@ -292,7 +292,7 @@ ett filnamn som bär ett djurnamn blir osant så snart bilden hamnar under fel p
 
 ```yaml
 # source/data/images/img-a3f2c1d8b901.yaml
-alt: Rosa och Stjärna står tillsammans i Björkhagen.
+alt: Rosa och Stjärna står tillsammans i Tåmossen.
 credit: Anna Karlsson
 ```
 

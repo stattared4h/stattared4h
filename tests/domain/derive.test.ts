@@ -40,7 +40,7 @@ function location(dataset: Dataset, id: string): Location {
 
 test("animalsAtLocation: present animals of the location's species, grouped in species.yaml order", async () => {
   const dataset = await qaDataset();
-  const groups = animalsAtLocation(dataset, location(dataset, "stora-hagen"));
+  const groups = animalsAtLocation(dataset, location(dataset, "lygnslatt-1"));
   assert.deepEqual(
     groups.map((g) => g.species.id),
     ["far", "ko"],
@@ -50,15 +50,15 @@ test("animalsAtLocation: present animals of the location's species, grouped in s
   assert.ok(ids(groups[0].animals).includes("bagaren"));
   assert.ok(ids(groups[1].animals).includes("majros"));
 
-  const goats = animalsAtLocation(dataset, location(dataset, "gethagen"));
+  const goats = animalsAtLocation(dataset, location(dataset, "brackebur"));
   assert.equal(goats[0].animals.length, 19, "bocken is gone");
   assert.ok(ids(goats[0].animals).includes("rosa"));
-  assert.deepEqual(animalsAtLocation(dataset, location(dataset, "ovre-hagen")), []);
+  assert.deepEqual(animalsAtLocation(dataset, location(dataset, "a")), []);
 });
 
 test("animalsAtLocation groups every matching present individual", async () => {
   const dataset = await qaDataset();
-  const emptyKaninHus = { ...location(dataset, "smadjurshuset"), species: ["hast", "kanin"] };
+  const emptyKaninHus = { ...location(dataset, "b"), species: ["hast", "kanin"] };
   const groups = animalsAtLocation(dataset, emptyKaninHus);
   assert.deepEqual(groups.map((g) => g.species.id), ["hast", "kanin"]);
   assert.equal(groups[0].animals.length, 10);
@@ -76,14 +76,14 @@ test("animalsAtLocation groups every matching present individual", async () => {
 
 test("locationsForSpecies: the same species on several places, and only active places", async () => {
   const dataset = await qaDataset();
-  assert.deepEqual(ids(locationsForSpecies(dataset, "get")), ["bjorkhagen", "gethagen", "gethuset", "trekanten"]);
-  assert.deepEqual(ids(locationsForSpecies(dataset, "ko")), ["tvaan", "trean", "dalen", "stora-hagen"]);
+  assert.deepEqual(ids(locationsForSpecies(dataset, "get")), ["brackebur", "gethuset", "trekanten", "tamossen"]);
+  assert.deepEqual(ids(locationsForSpecies(dataset, "ko")), ["tvaan", "trean", "dalen", "lygnslatt-1"]);
   assert.deepEqual(ids(locationsForSpecies(dataset, "hast")), [], "hast is deliberately on no place");
   const inactive = {
     ...dataset,
-    locations: dataset.locations.map((l) => (l.id === "gethagen" ? { ...l, active: false } : l)),
+    locations: dataset.locations.map((l) => (l.id === "brackebur" ? { ...l, active: false } : l)),
   };
-  assert.deepEqual(ids(locationsForSpecies(inactive, "get")), ["bjorkhagen", "gethuset", "trekanten"]);
+  assert.deepEqual(ids(locationsForSpecies(inactive, "get")), ["gethuset", "trekanten", "tamossen"]);
 });
 
 test("offspring: children of a gone parent, and of a mother of two", async () => {

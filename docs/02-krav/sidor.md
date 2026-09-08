@@ -46,7 +46,7 @@ plus listan är orienteringsverktyget för den som står i hagen. Orienteringen 
 som inte hörde hemma mitt på sidan.
 
 Djurkorten låg först i en kolumn på mobil: `auto-fit` med ett minimum på 280 px ger
-aldrig två kolumner i en telefons 312 px innehållsbredd. Platssidan för Gethagen blev
+aldrig två kolumner i en telefons 312 px innehållsbredd. Platssidan för Bräckebur blev
 8 249 px lång för nitton getter — tio skärmars rullning — och barnet som ska känna igen
 geten framför sig fick hålla nitton foton i minnet i stället för att jämföra dem på
 skärmen (issue #61). `02-§5.50` sätter antalet per bredd i stället.

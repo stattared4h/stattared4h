@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { shareOrCopy } from "../../source/ts/ui/share.ts";
 
-const PAGE = "https://example.test/stattared4h/plats/stora-hagen/";
+const PAGE = "https://example.test/stattared4h/plats/lygnslatt-1/";
 
 function abort(): Error {
   const error = new Error("cancelled");
@@ -16,19 +16,19 @@ function abort(): Error {
 describe("dela eller kopiera", () => {
   test("delningsfunktionen används när den finns, med titel och adress", async () => {
     const calls: Array<{ title: string; url: string }> = [];
-    const outcome = await shareOrCopy("Stora hagen", PAGE, {
+    const outcome = await shareOrCopy("Lygnslätt 1", PAGE, {
       share: async (data) => {
         calls.push(data);
       },
       writeText: async () => assert.fail("ska inte kopiera när delning finns"),
     });
     assert.equal(outcome, "shared");
-    assert.deepEqual(calls, [{ title: "Stora hagen", url: PAGE }]);
+    assert.deepEqual(calls, [{ title: "Lygnslätt 1", url: PAGE }]);
   });
 
   test("utan delningsfunktion kopieras adressen", async () => {
     const copied: string[] = [];
-    const outcome = await shareOrCopy("Stora hagen", PAGE, { writeText: async (text) => void copied.push(text) });
+    const outcome = await shareOrCopy("Lygnslätt 1", PAGE, { writeText: async (text) => void copied.push(text) });
     assert.equal(outcome, "copied");
     assert.deepEqual(copied, [PAGE]);
   });
