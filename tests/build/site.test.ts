@@ -161,14 +161,16 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
       assert.ok(rows.includes("Startsidan"), `${file}: raden Startsidan`);
       assert.ok(rows.includes("Kartan"), `${file}: raden Kartan`);
       assert.ok(rows.includes("Djurbingo"), `${file}: raden Djurbingo (02-§12.2)`);
+      assert.ok(rows.includes("Spana!"), `${file}: raden Spana! (02-§13.1)`);
       assert.ok(rows.includes("Om sajten"), `${file}: raden Om sajten`);
       assert.deepEqual(summary, ["Djuren"], `${file}: Djuren är den enda fällbara raden (02-§10.45)`);
       assert.ok(
         card.indexOf(">Startsidan<") < card.indexOf(">Kartan<") &&
           card.indexOf(">Kartan<") < card.indexOf("site-menu__summary") &&
           card.indexOf("site-menu__summary") < card.indexOf(">Djurbingo<") &&
-          card.indexOf(">Djurbingo<") < card.indexOf(">Om sajten<"),
-        `${file}: ordningen Startsidan, Kartan, Djuren, Djurbingo, Om sajten`,
+          card.indexOf(">Djurbingo<") < card.indexOf(">Spana!<") &&
+          card.indexOf(">Spana!<") < card.indexOf(">Om sajten<"),
+        `${file}: ordningen Startsidan, Kartan, Djuren, Djurbingo, Spana!, Om sajten`,
       );
     }
   });
@@ -295,5 +297,25 @@ describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/images"/);
     assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/data\/images"/);
+    assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/data\/clues"/, "ledtrådens katalog (02-§11.28)");
+    // Both YAML files carry the picture's id and are told apart only by their folder, so
+    // a phone's flat downloads folder renames the second one (02-§11.30).
+    assert.match(main, /heter <strong>samma sak<\/strong>/, "varningen om filnamnen på telefonen");
+  });
+
+  test("platsväljaren är inbakad i sidan, inte hämtad i körtid (02-§11.26)", async () => {
+    // The production dataset is the one the editor actually works against, so it is the
+    // one the picker is checked against: its places, by name, in the site's own order.
+    const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
+    const template = html.slice(html.indexOf("<template data-image-tool-places>"), html.indexOf("</template>"));
+    assert.ok(template.length > 0, "sidan bär ingen platsmall");
+    const options = [...template.matchAll(/<option value="([^"]*)">([^<]+)<\/option>/g)];
+    assert.equal(options[0][1], "", "första valet är tomt, så inget väljs av misstag");
+    const places = options.slice(1);
+    assert.ok(places.length >= 30, `bara ${places.length} platser i väljaren`);
+    assert.ok(places.every(([, id]) => id !== ""), "varje plats har ett id");
+    const names = places.map((option) => option[2]);
+    assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, "sv")), "platserna står i bokstavsordning");
+    assert.equal(html.includes("fetch("), false, "sidan hämtar ingenting i körtid (ADR 0021)");
   });
 });

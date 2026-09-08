@@ -43,3 +43,4 @@ Mall: `NNNN-kort-titel.md` med rubrikerna **Status** (Antagen/Ersatt + datum),
 | 0022 | [Verktygssidor ligger utanför navigationen, inte bakom ett lås](0022-verktygssidor-utanfor-navigationen.md) |
 | 0023 | [Startsidan är ett nav, inte sajtens innehåll](0023-startsidan-ar-ett-nav.md) |
 | 0024 | [Djurbingo bygger på ärlighet; firandet är sajtens eget](0024-djurbingo-pa-arlighet.md) |
+| 0025 | [Spelets ledtrådar är egna poster, inte fält på platsen](0025-spelets-ledtradar-ar-egna-poster.md) |

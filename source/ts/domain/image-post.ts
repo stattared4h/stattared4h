@@ -4,15 +4,15 @@
  *
  * `npm run image` and the image tool in the browser both write the post through
  * `formatImagePost`, so the same picture gives the same file whichever way it came in.
- * The tool cannot use the `yaml` package for it — no dependency reaches the visitor
- * (02-§9.5) — so the two fields are written here by hand, quoted whenever a plain scalar
- * would be read as something other than the text that was typed.
+ * The quoting is in `yaml-scalar.ts`, shared with the clue the tool can deliver beside
+ * the picture (04-§11).
  *
  * `imagePostProblems` is the validator's rules for an image post, phrased for the editor
  * standing in a paddock rather than for a pull request: the same fields must be there,
  * carry no markup, and not claim a generated picture is the farm's own (02-§8.21).
  */
 import { containsHtml } from "./plain-text.ts";
+import { yamlScalar } from "./yaml-scalar.ts";
 
 export interface ImagePostFields {
   alt: string;
@@ -30,46 +30,9 @@ export interface ImagePostProblem {
 /** The prefix that marks a generated picture; refused outside the QA dataset (02-§8.21). */
 const AI_CREDIT_PREFIX = "AI-genererad";
 
-/**
- * A plain scalar is safe when it starts with a letter and carries no colon, no number
- * sign and no control character. That rules out every indicator YAML reads specially at
- * the start of a value, and both `key: value` and `value # comment` inside one.
- */
-const PLAIN_SAFE = /^\p{L}[^\p{C}:#]*$/u;
-
-/** Plain words YAML reads as a boolean or as nothing at all. */
-const RESERVED_WORDS = /^(?:y|n|yes|no|true|false|on|off|null)$/i;
-
-/** The last character before the printable range, and the one just after it. */
-const FIRST_PRINTABLE = 0x20;
-const DELETE_CHARACTER = 0x7f;
-
-function isPlainSafe(value: string): boolean {
-  return value === value.trim() && PLAIN_SAFE.test(value) && !RESERVED_WORDS.test(value);
-}
-
-/** A double-quoted YAML scalar, with the escapes the format defines. */
-function quoteScalar(value: string): string {
-  let out = '"';
-  for (const character of value) {
-    const code = character.codePointAt(0) ?? 0;
-    if (character === '"' || character === "\\") out += `\\${character}`;
-    else if (character === "\n") out += "\\n";
-    else if (character === "\r") out += "\\r";
-    else if (character === "\t") out += "\\t";
-    else if (code < FIRST_PRINTABLE || code === DELETE_CHARACTER) out += `\\x${code.toString(16).padStart(2, "0")}`;
-    else out += character;
-  }
-  return `${out}"`;
-}
-
-function scalar(value: string): string {
-  return isPlainSafe(value) ? value : quoteScalar(value);
-}
-
 /** The file `source/data/images/<bild-id>.yaml`: `alt` and `credit`, one line each. */
 export function formatImagePost(fields: ImagePostFields): string {
-  return `alt: ${scalar(fields.alt)}\ncredit: ${scalar(fields.credit)}\n`;
+  return `alt: ${yamlScalar(fields.alt)}\ncredit: ${yamlScalar(fields.credit)}\n`;
 }
 
 /**

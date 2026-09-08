@@ -176,6 +176,35 @@ i bildposten:
 ![](img-a3f2c1d8b901)
 ```
 
+### Lägga till en ledtråd till Spana!
+
+Spelet Spana! (`02-§13`) visar en närbild på något besökaren ska leta upp — en gunga, en
+grind, en käpphäst — och avslöjar platsen först när spelaren tryckt *Hittat!*. Ledtråden
+är en egen liten fil bredvid bilden ([ADR 0025](adr/0025-spelets-ledtradar-ar-egna-poster.md)).
+
+Enklast går det i bildverktyget: kryssa i **Det här är en ledtråd till Spana!** under
+bilden, välj platsen där detaljen sitter och skriv en kort ledtråd om du vill. Verktyget
+lämnar då en fil till, som ska ligga i `source/data/clues/`.
+
+Vill du skriva den för hand heter filen samma sak som bilden:
+
+```yaml
+# source/data/clues/img-a3f2c1d8b901.yaml
+location: brackebur            # plats-id — svaret spelaren får
+text: Den öppnas varje morgon. # frivillig, högst 120 tecken
+```
+
+Tre saker att tänka på när du fotograferar och skriver:
+
+- **Fotografera detaljen på nära håll.** En översiktsbild av hela hagen besvarar sin egen
+  fråga.
+- **Skriv inte platsen i alt-texten.** Den läses upp för den som inte ser bilden, och
+  skulle då avslöja svaret innan spelaren letat. "Närbild på en gunga" duger.
+- **En bild kan vara ledtråd en gång.** Ska samma motiv bli två ledtrådar är det två foton.
+
+Flera ledtrådar får peka på samma plats, och en plats behöver ingen alls. Formen står i
+[datakontraktet](04-DATAKONTRAKT.md) §11.
+
 ### Många bilder på en gång
 
 Ska du lägga in en hög med foton — den första omgången är runt hundra — är `npm run

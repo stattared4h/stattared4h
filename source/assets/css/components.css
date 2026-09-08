@@ -1010,6 +1010,145 @@
   height: auto;
 }
 
+/* ── Spana! (02-§13, 05-§6.48) ─────────────────────────────────────────── */
+
+/* One column, not a grid: a round is four or eight stops to walk past with a thumb, and
+   the clue's picture is the whole question, so it gets the column's full width. */
+.spana-list {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spana-progress {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-ink-soft);
+  font-weight: 600;
+  text-align: center;
+}
+
+.spana-stop {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: var(--space-xs);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-green-deep);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.spana-stop:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* The picture is capped by height and never cropped: the detail is the whole question,
+   and a crop can cut away the very thing the player is meant to look for. A portrait
+   photo is therefore narrower than the card rather than taller than the screen
+   (05-§6.48) — the same rule the tool's own cards follow (05-§6.15). */
+.spana-stop__image {
+  position: relative;
+  display: block;
+  border-radius: var(--radius-sm);
+}
+
+.spana-stop__image img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 240px;
+  margin-inline: auto;
+  border-radius: var(--radius-sm);
+}
+
+.spana-stop__number {
+  display: block;
+  padding-top: var(--space-xs);
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+}
+
+/* Found: the same sun tones and the same tick as the bingo square, so the two games are
+   recognisably a pair (05-§6.47). */
+.spana-stop--found {
+  border-color: var(--color-sun);
+  background: var(--color-sun);
+  color: var(--color-sun-ink);
+}
+
+.spana-stop--found .spana-stop__image {
+  opacity: 0.55;
+}
+
+.spana-stop--found .spana-stop__number {
+  color: var(--color-sun-ink);
+}
+
+.spana-stop--found .spana-stop__image::after {
+  content: "";
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  width: 12%;
+  height: 34%;
+  border-right: 6px solid var(--color-sun-ink);
+  border-bottom: 6px solid var(--color-sun-ink);
+  transform: translate(-50%, 0) rotate(45deg);
+  pointer-events: none;
+}
+
+.spana-win {
+  margin: var(--space-md) 0 0;
+  text-align: center;
+}
+
+.spana-win__title {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-sun-ink);
+  font-size: var(--font-size-h1);
+}
+
+.spana-restart {
+  margin: var(--space-md) 0 0;
+  text-align: center;
+}
+
+.spana-dialog__image {
+  margin: 0 0 var(--space-sm);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+/* Tall enough to see the detail, short enough that the answer and the button are still
+   on the screen under it on a phone (05-§6.48). */
+.spana-dialog__image img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 45dvh;
+  margin-inline: auto;
+}
+
+/* The answer is a message, not a fault: the status bar's pale green, never the danger
+   colour (05-§6.48). */
+.spana-answer {
+  margin: 0 0 var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-green-pale);
+  color: var(--color-green-deep);
+  font-weight: 600;
+}
+
 /* The confetti canvas lies over everything and lets every touch through; the script
    removes it when the last piece has fallen (02-§12.10). */
 .confetti {

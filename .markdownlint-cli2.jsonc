@@ -2,6 +2,11 @@
   "config": {
     "default": true,
     "MD013": false,
+    // A heading may end in "!": the game is called "Spana!", and the mark is part of the
+    // name, not punctuation to tidy away. Full stop, comma, colon and semicolon still fail.
+    "MD026": {
+      "punctuation": ".,;:"
+    },
     "MD024": {
       "siblings_only": true
     },

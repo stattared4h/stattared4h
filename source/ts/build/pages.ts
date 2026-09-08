@@ -24,6 +24,7 @@ import {
   sortLocations,
   speciesOnFarm,
   type Animal,
+  type Clue,
   type Dataset,
   type Image,
   type Location,
@@ -31,6 +32,7 @@ import {
   type Population,
   type Species,
 } from "../domain/index.ts";
+import { HUNT_SIZES, type HuntSize } from "../domain/spana.ts";
 import { definitePlural, joinSwedish, lowerFirst } from "../domain/swedish.ts";
 import { renderMap, type MapBackground, type MapLocation } from "./map.ts";
 import { HOME_CARD_SYMBOLS, symbolSvg, type HomeCardId } from "./symbols.ts";
@@ -102,6 +104,48 @@ export interface BingoView {
   species: BingoCandidateView[];
   /** Every animal that is here and has a portrait. */
   animals: BingoCandidateView[];
+}
+
+/** One stop Spana! can ask for (02-§13.5): the picture, the words, and the place that answers it. */
+export interface SpanaClueView {
+  /** The clue's id, which is its picture's id: what the round stores between visits (02-§13.14). */
+  key: string;
+  photo: Image;
+  /** The clue's own line, or null when the picture is the whole clue (04-§11.4). */
+  text: string | null;
+  /** The place's name, as the visitor reads it after "Hittat!" (02-§13.13). */
+  location: string;
+}
+
+/** One round length the start screen offers (02-§13.7, 02-§13.8). */
+export interface SpanaRoundView {
+  /** What the form submits, and what the round is measured against when it is restored. */
+  size: HuntSize;
+  /** How many stops it actually gives with this catalogue: never more than it holds. */
+  stops: number;
+  /** "Kort runda, 4 stopp" — the number the player will really get. */
+  label: string;
+}
+
+/** The Spana! page (02-§13): the catalogue; the round itself is drawn in the browser (ADR 0009). */
+export interface SpanaView {
+  clues: SpanaClueView[];
+  /** The lengths worth offering, shortest first; empty when there are no clues. */
+  rounds: SpanaRoundView[];
+}
+
+/** One place the image tool offers as a clue's answer (02-§11.26). */
+export interface ToolPlaceView {
+  id: string;
+  name: string;
+}
+
+/**
+ * What the editors' image tool needs from the dataset (02-§11.26). The page is built with
+ * the list inside it, so the tool asks no one for it at run time (ADR 0021).
+ */
+export interface ImageToolView {
+  places: ToolPlaceView[];
 }
 
 /** The animal overview page: the ear tag search and the species on the farm (02-§5.66). */
@@ -202,8 +246,10 @@ export interface MapPageView {
 
 export interface SiteViews {
   home: HomeView;
+  imageTool: ImageToolView;
   animalsOverview: AnimalsOverviewView;
   bingo: BingoView;
+  spana: SpanaView;
   locations: LocationPageView[];
   animals: AnimalPageView[];
   species: SpeciesPageView[];
@@ -314,7 +360,7 @@ export function homeView(): HomeView {
       {
         id: "djuren",
         title: "Djuren",
-        text: "Se djurslagen, eller sök på ett öronmärke.",
+        text: "Läs om djuren, eller slå upp numret i örat på den du ser.",
         url: "/djuren/",
         symbol: HOME_CARD_SYMBOLS.djuren,
       },
@@ -324,6 +370,13 @@ export function homeView(): HomeView {
         text: "Hitta djuren på gården och bocka av dem.",
         url: bingoUrl(),
         symbol: HOME_CARD_SYMBOLS.bingo,
+      },
+      {
+        id: "spana",
+        title: "Spana!",
+        text: "Hitta detaljen på bilden, någonstans på gården.",
+        url: spanaUrl(),
+        symbol: HOME_CARD_SYMBOLS.spana,
       },
     ],
   };
@@ -355,6 +408,67 @@ export function bingoView(dataset: Dataset): BingoView {
     if (animal.status === "here" && portrait !== null) animals.push({ key: animal.id, name: animal.name, photo: portrait });
   }
   return { species, animals };
+}
+
+/**
+ * The places the image tool can hand a clue (02-§11.26). Active places only, by name: a
+ * clue that answers with a paddock nobody keeps would send the player nowhere, and the
+ * validator warns about exactly that (04-§10.10). The sort is the site's own, so the
+ * picker reads like the list under the map.
+ */
+export function imageToolView(dataset: Dataset): ImageToolView {
+  return {
+    places: sortLocations(dataset.locations)
+      .filter((location) => location.active)
+      .map((location) => ({ id: location.id, name: location.name })),
+  };
+}
+
+export function spanaUrl(): string {
+  return "/spana/";
+}
+
+/**
+ * The clue catalogue as the page shows it (02-§13.5, 02-§13.6). Every clue is listed, in
+ * the dataset's own order (04-§11.8), so two builds of the same data give the same page.
+ *
+ * The place is resolved to its name here and nowhere else: the data holds an id
+ * (ADR 0025), the visitor reads a name, and the template should not have to look
+ * anything up (03-§6.5). A clue whose place is missing cannot reach this far — the
+ * validator refuses it (04-§10.17) — but the fallback to the id keeps a broken build
+ * showing something rather than "undefined".
+ */
+/** The name each length goes by on the start screen. Swedish, like everything the visitor reads. */
+const ROUND_NAMES: Record<HuntSize, string> = { 4: "Kort runda", 8: "Lång runda" };
+
+/**
+ * The round lengths to offer for a catalogue of `count` clues (02-§13.7, 02-§13.8).
+ *
+ * A round never repeats a clue, so a length can only give as many stops as the catalogue
+ * holds — and a length that would give no more stops than a shorter one is not offered at
+ * all: "Lång runda" beside "Kort runda" when both give four stops is a choice that is not
+ * a choice. The label carries the number the player actually gets, because a button that
+ * promises eight and hands over five has told them something untrue.
+ */
+export function spanaRounds(count: number): SpanaRoundView[] {
+  const rounds: SpanaRoundView[] = [];
+  for (const size of HUNT_SIZES) {
+    const stops = Math.min(size, count);
+    if (stops === 0 || rounds.some((round) => round.stops >= stops)) continue;
+    rounds.push({ size, stops, label: `${ROUND_NAMES[size]}, ${stops} stopp` });
+  }
+  return rounds;
+}
+
+export function spanaView(dataset: Dataset): SpanaView {
+  const names = new Map(dataset.locations.map((location) => [location.id, location.name]));
+  const clue = (one: Clue): SpanaClueView => ({
+    key: one.id,
+    photo: one.image,
+    text: one.text,
+    location: names.get(one.location) ?? one.location,
+  });
+  return { clues: dataset.clues.map(clue), rounds: spanaRounds(dataset.clues.length) };
 }
 
 export function locationView(dataset: Dataset, location: Location, farm: string): LocationPageView {
@@ -509,8 +623,10 @@ export function buildViews(dataset: Dataset, options: BuildViewsOptions): SiteVi
   const content = options.speciesContent ?? {};
   return {
     home: homeView(),
+    imageTool: imageToolView(dataset),
     animalsOverview: animalsOverviewView(dataset),
     bingo: bingoView(dataset),
+    spana: spanaView(dataset),
     locations: dataset.locations.map((location) => locationView(dataset, location, options.farm)),
     animals: dataset.animals.map((animal) => animalView(dataset, animal, options.farm)),
     species: dataset.species.map((species) => speciesView(dataset, species, options.farm, content[species.id] ?? null)),

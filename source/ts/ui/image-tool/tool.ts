@@ -11,13 +11,14 @@
  * The DOM is built with `createElement` and `textContent`, never `innerHTML` (CL-§2.13).
  * Everything worth testing lives in the domain layer; this file is the wiring.
  */
-import { imageFileName, imagePostFile } from "../../domain/image-id.ts";
 import {
-  formatImagePost,
-  imagePostProblems,
-  type ImagePostFields,
-  type ImagePostProblem,
-} from "../../domain/image-post.ts";
+  cluePostFile,
+  cluePostProblems,
+  formatCluePost,
+  type CluePostFields,
+} from "../../domain/clue-post.ts";
+import { imageFileName, imagePostFile } from "../../domain/image-id.ts";
+import { formatImagePost, imagePostProblems, type ImagePostFields } from "../../domain/image-post.ts";
 import { createZip, type ZipEntry } from "../../domain/zip.ts";
 import { prepareImage, type PreparedImage } from "./prepare.ts";
 
@@ -29,7 +30,21 @@ interface Card {
   prepared: PreparedImage;
   alt: HTMLTextAreaElement;
   credit: HTMLInputElement;
+  /** Ticked when the picture is a clue for Spana! (02-§11.25). */
+  isClue: HTMLInputElement;
+  /** The place that is the answer; empty until the editor picks one (02-§11.27). */
+  place: HTMLSelectElement | null;
+  clueText: HTMLInputElement;
+  /** Shown only while the picture is a clue. */
+  clueFields: HTMLElement;
+  clueDownload: HTMLButtonElement;
   error: HTMLParagraphElement;
+}
+
+/** One thing to fix, and the control to send the editor to. */
+interface Problem {
+  message: string;
+  control: HTMLElement;
 }
 
 const cards: Card[] = [];
@@ -38,18 +53,42 @@ function fieldsOf(card: Card): ImagePostFields {
   return { alt: card.alt.value, credit: card.credit.value };
 }
 
-/** Shows what is missing on one card, and hands the problems back to the caller. */
-function showProblems(card: Card): ImagePostProblem[] {
-  const problems = imagePostProblems(fieldsOf(card));
-  card.error.textContent = problems.map((problem) => problem.message).join(" ");
-  card.error.hidden = problems.length === 0;
-  card.alt.setAttribute("aria-invalid", String(problems.some((problem) => problem.field === "alt")));
-  card.credit.setAttribute("aria-invalid", String(problems.some((problem) => problem.field === "credit")));
+function clueFieldsOf(card: Card): CluePostFields {
+  return { location: card.place?.value ?? "", text: card.clueText.value };
+}
+
+/** True when this picture is being delivered as a clue as well (02-§11.25). */
+function isClue(card: Card): boolean {
+  return card.isClue.checked && card.place !== null;
+}
+
+/** Everything wrong with one card: the picture's own fields, and the clue's when it is one. */
+function problemsOf(card: Card): Problem[] {
+  const problems: Problem[] = imagePostProblems(fieldsOf(card)).map((problem) => ({
+    message: problem.message,
+    control: problem.field === "alt" ? card.alt : card.credit,
+  }));
+  if (isClue(card)) {
+    for (const problem of cluePostProblems(clueFieldsOf(card))) {
+      problems.push({
+        message: problem.message,
+        control: problem.field === "location" ? (card.place as HTMLSelectElement) : card.clueText,
+      });
+    }
+  }
   return problems;
 }
 
-function controlFor(card: Card, problem: ImagePostProblem): HTMLElement {
-  return problem.field === "alt" ? card.alt : card.credit;
+/** Shows what is missing on one card, and hands the problems back to the caller. */
+function showProblems(card: Card): Problem[] {
+  const problems = problemsOf(card);
+  card.error.textContent = problems.map((problem) => problem.message).join(" ");
+  card.error.hidden = problems.length === 0;
+  const failing = new Set(problems.map((problem) => problem.control));
+  for (const control of [card.alt, card.credit, card.clueText, ...(card.place === null ? [] : [card.place])]) {
+    control.setAttribute("aria-invalid", String(failing.has(control)));
+  }
+  return problems;
 }
 
 /** Hands the browser a file to save. A user gesture is what got us here, so it is allowed. */
@@ -81,6 +120,19 @@ function element<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
+/** A checkbox with its label beside it, the one place a label follows its control. */
+function checkbox(label: string, input: HTMLInputElement, id: string): HTMLElement {
+  const wrapper = element("div", "field");
+  const labelNode = element("label", "choice");
+  input.type = "checkbox";
+  input.className = "choice__input";
+  input.id = id;
+  labelNode.htmlFor = id;
+  labelNode.append(input, document.createTextNode(` ${label}`));
+  wrapper.append(labelNode);
+  return wrapper;
+}
+
 /** One labelled field, with the label above the control (05-§6.32). */
 function field(label: string, control: HTMLElement, id: string, describedBy: string): HTMLElement {
   const wrapper = element("div", "field");
@@ -92,8 +144,13 @@ function field(label: string, control: HTMLElement, id: string, describedBy: str
   return wrapper;
 }
 
-/** The card for one prepared picture: what it became, what to write about it, and the two files. */
-function buildCard(prepared: PreparedImage): { node: HTMLLIElement; card: Card } {
+/**
+ * The card for one prepared picture: what it became, what to write about it, and the
+ * files it turns into. `places` is the select the build wrote into the page, or null when
+ * the dataset has no places at all — then the picture cannot be a clue and the tick box
+ * says why (02-§11.26).
+ */
+function buildCard(prepared: PreparedImage, places: HTMLTemplateElement | null): { node: HTMLLIElement; card: Card } {
   const node = element("li", "image-tool__item");
   const errorId = `fel-${prepared.id}`;
 
@@ -121,7 +178,39 @@ function buildCard(prepared: PreparedImage): { node: HTMLLIElement; card: Card }
   error.hidden = true;
   error.setAttribute("role", "alert");
 
-  const card: Card = { prepared, alt, credit, error };
+  const isClueBox = element("input", "");
+  const place = places === null ? null : (places.content.cloneNode(true) as DocumentFragment).querySelector("select");
+  const clueText = element("input", "field__input");
+  clueText.type = "text";
+  const clueFields = element("div", "image-tool__clue");
+  clueFields.hidden = true;
+
+  const clueDownload = element("button", "button button--secondary", "Ladda ner ledtråden");
+  clueDownload.type = "button";
+  clueDownload.hidden = true;
+
+  const card: Card = { prepared, alt, credit, isClue: isClueBox, place, clueText, clueFields, clueDownload, error };
+
+  if (place === null) {
+    // Nothing to answer with: the dataset has no places, so a clue could not be finished
+    // even if it were ticked. Saying so beats a tick box that silently does nothing.
+    isClueBox.disabled = true;
+    clueFields.append(element("p", "meta", "Gården har inga platser i datat ännu, så en bild kan inte bli en ledtråd."));
+    clueFields.hidden = false;
+  } else {
+    clueFields.append(
+      field("Var finns detaljen? Platsen är svaret spelaren får.", place, `plats-${prepared.id}`, errorId),
+      field("Ledtråd (frivillig)", clueText, `ledtrad-${prepared.id}`, errorId),
+    );
+  }
+
+  const showClueFields = (): void => {
+    if (place === null) return;
+    clueFields.hidden = !isClueBox.checked;
+    clueDownload.hidden = !isClueBox.checked;
+    if (!card.error.hidden || isClueBox.checked) showProblems(card);
+  };
+  isClueBox.addEventListener("change", showClueFields);
 
   const downloads = element("div", "image-tool__downloads");
   const imageButton = element("button", "button button--secondary", "Ladda ner bilden");
@@ -135,9 +224,13 @@ function buildCard(prepared: PreparedImage): { node: HTMLLIElement; card: Card }
     if (showProblems(card).length > 0) return;
     download(`${prepared.id}.yaml`, new TextEncoder().encode(formatImagePost(fieldsOf(card))), "text/yaml");
   });
-  downloads.append(imageButton, postButton);
+  clueDownload.addEventListener("click", () => {
+    if (showProblems(card).length > 0) return;
+    download(`${prepared.id}.yaml`, new TextEncoder().encode(formatCluePost(clueFieldsOf(card))), "text/yaml");
+  });
+  downloads.append(imageButton, postButton, clueDownload);
 
-  for (const control of [alt, credit]) {
+  for (const control of [alt, credit, clueText, ...(place === null ? [] : [place])]) {
     control.addEventListener("change", () => showProblems(card));
     // While a message is up, every keystroke may be the one that clears it.
     control.addEventListener("input", () => {
@@ -150,21 +243,29 @@ function buildCard(prepared: PreparedImage): { node: HTMLLIElement; card: Card }
     facts,
     field("Alt-text — vad är viktigt i bilden?", alt, `alt-${prepared.id}`, errorId),
     field("Fotograf", credit, `credit-${prepared.id}`, errorId),
+    checkbox("Det här är en ledtråd till Spana!", isClueBox, `ledtrad-kryss-${prepared.id}`),
+    clueFields,
     error,
     downloads,
   );
   return { node, card };
 }
 
-/** The two files one picture becomes, laid out as they lie in the repository. */
+/**
+ * The files one picture becomes, laid out as they lie in the repository: the picture, its
+ * post, and — when it is a clue — the clue under the picture's own id, so the pair cannot
+ * be separated on the way in (02-§11.28, 04-§11.2).
+ */
 function entriesFor(card: Card): ZipEntry[] {
-  return [
+  const encoder = new TextEncoder();
+  const entries: ZipEntry[] = [
     { name: `${IMAGES_DIR}/${imageFileName(card.prepared.id)}`, data: card.prepared.data },
-    {
-      name: `${DATA_DIR}/${imagePostFile(card.prepared.id)}`,
-      data: new TextEncoder().encode(formatImagePost(fieldsOf(card))),
-    },
+    { name: `${DATA_DIR}/${imagePostFile(card.prepared.id)}`, data: encoder.encode(formatImagePost(fieldsOf(card))) },
   ];
+  if (isClue(card)) {
+    entries.push({ name: `${DATA_DIR}/${cluePostFile(card.prepared.id)}`, data: encoder.encode(formatCluePost(clueFieldsOf(card))) });
+  }
+  return entries;
 }
 
 export function init(): void {
@@ -176,6 +277,7 @@ export function init(): void {
   const actions = root.querySelector<HTMLElement>("[data-image-tool-actions]");
   const zipButton = root.querySelector<HTMLButtonElement>("[data-image-tool-zip]");
   const blocked = root.querySelector<HTMLElement>("[data-image-tool-blocked]");
+  const places = root.querySelector<HTMLTemplateElement>("[data-image-tool-places]");
   if (input === null || list === null || status === null || actions === null || zipButton === null || blocked === null) return;
 
   const say = (message: string): void => {
@@ -206,7 +308,7 @@ export function init(): void {
             skipped.push(file.name);
             continue;
           }
-          const built = buildCard(prepared);
+          const built = buildCard(prepared, places);
           list.append(built.node);
           cards.push(built.card);
         } catch (error) {
@@ -231,9 +333,9 @@ export function init(): void {
     const incomplete = checked.filter((row) => row.problems.length > 0);
     if (incomplete.length > 0) {
       const names = incomplete.map((row) => row.card.prepared.sourceName).join(", ");
-      blocked.textContent = `Fyll i alt-text och fotograf först. Det saknas för: ${names}.`;
+      blocked.textContent = `Fyll i alt-text, fotograf och plats först. Det saknas för: ${names}.`;
       blocked.hidden = false;
-      controlFor(incomplete[0].card, incomplete[0].problems[0]).focus();
+      incomplete[0].problems[0].control.focus();
       return;
     }
     blocked.hidden = true;

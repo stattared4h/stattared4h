@@ -6,15 +6,16 @@
  * photo, on the animal level every animal that is here and has a portrait (02-§12.4).
  * The build lists those candidates on the page; this module only draws from the list.
  *
- * Randomness is injected as a `() => number` in [0, 1), so the tests can hand in a fixed
- * sequence and the browser hands in `Math.random` (ADR 0009). The draw takes every
- * candidate once before any is repeated, so a small demo dataset gives duplicates and a
- * real one does not (02-§12.5).
+ * The draw lives in draw.ts, which Spana! reads too (03-§12.3): it takes every candidate
+ * once before any is repeated, so a small demo dataset gives duplicates and a real one
+ * does not (02-§12.5). Randomness is injected as a `() => number` in [0, 1), so the tests
+ * can hand in a fixed sequence and the browser hands in `Math.random` (ADR 0009).
  *
  * The board is never mutated: `toggleSquare` returns a new board. That keeps "found"
  * and "not found after all" the same operation, which is what makes undoing as easy as
  * marking (02-§12.8).
  */
+import { drawCandidates, type Random } from "./draw.ts";
 
 export type BoardSize = 3 | 4;
 export type Level = "species" | "animal";
@@ -49,35 +50,6 @@ export interface StoredBoard {
 }
 
 export const STORAGE_KEY = "s4h-bingo";
-
-export type Random = () => number;
-
-/** Fisher–Yates with the injected random, so a fixed sequence gives a fixed order. */
-export function shuffle<T>(items: readonly T[], random: Random): T[] {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-/**
- * Draws `count` candidates: a shuffled pass through all of them, then another pass and
- * so on until the count is reached (02-§12.5). With enough candidates there are no
- * duplicates; with fewer, every candidate appears about equally often.
- */
-export function drawCandidates(candidates: readonly Candidate[], count: number, random: Random): Candidate[] {
-  if (candidates.length === 0) throw new Error("Cannot draw from an empty candidate list");
-  const drawn: Candidate[] = [];
-  while (drawn.length < count) {
-    for (const candidate of shuffle(candidates, random)) {
-      if (drawn.length === count) break;
-      drawn.push(candidate);
-    }
-  }
-  return drawn;
-}
 
 export function buildBoard(candidates: readonly Candidate[], size: BoardSize, level: Level, random: Random): Board {
   const squares = drawCandidates(candidates, size * size, random).map((candidate) => ({ ...candidate, found: false }));

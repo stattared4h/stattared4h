@@ -78,20 +78,25 @@ describe("every page exists (02-§5.1–5.2)", () => {
 });
 
 describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
-  test("is a nav of cards: the map first, the animals second, the bingo third, and nothing else", async () => {
+  test("is a nav of cards: the map first, the animals second, then a card per game, and nothing else", async () => {
     const html = main(await page(""));
     const cards = [...html.matchAll(/<a class="home-card" href="\/([^"]*)">/g)].map((m) => `/${m[1]}`);
-    assert.deepEqual(cards, ["/karta/", "/djuren/", "/bingo/"], "ett kort per ärende, kartan först (02-§5.7, 02-§12.2)");
+    assert.deepEqual(
+      cards,
+      ["/karta/", "/djuren/", "/bingo/", "/spana/"],
+      "ett kort per ärende, kartan först (02-§5.7, 02-§12.2, 02-§13.1)",
+    );
     assert.match(html, /<h2 class="home-card__title">Kartan<\/h2>/);
     assert.match(html, /<h2 class="home-card__title">Djuren<\/h2>/);
     assert.match(html, /<h2 class="home-card__title">Djurbingo<\/h2>/);
+    assert.match(html, /<h2 class="home-card__title">Spana!<\/h2>/);
     assert.match(html, /<ul class="card-grid">/, "korten ligger i djurkortens rutnät (02-§5.64)");
     assert.match(html, /href="https:\/\/www\.4h\.se\/stattared\/"/, "meningen om vad sajten är (02-§5.8)");
   });
 
   test("carries none of the content the cards lead to (02-§5.7)", async () => {
     const html = main(await page(""));
-    for (const marker of ["map__drawing", "place-list__link", "species-tile", "data-animal-id-search", "Fler kartor i området", "data-bingo-board"]) {
+    for (const marker of ["map__drawing", "place-list__link", "species-tile", "data-animal-id-search", "Fler kartor i området", "data-bingo-board", "data-spana-list"]) {
       assert.ok(!html.includes(marker), `startsidan bär inte ${marker}`);
     }
   });
@@ -99,7 +104,7 @@ describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
   test("every card's symbol is decorative; the heading carries the text (05-§6.45)", async () => {
     const html = main(await page(""));
     const symbols = [...html.matchAll(/<svg class="home-card__symbol"([^>]*)>/g)].map((m) => m[1]);
-    assert.equal(symbols.length, 3);
+    assert.equal(symbols.length, 4);
     for (const attributes of symbols) assert.match(attributes, /aria-hidden="true"/);
   });
 });
@@ -390,6 +395,75 @@ describe("the bingo page (02-§12.2–12.4, 02-§12.7, 02-§12.13)", () => {
   });
 });
 
+describe("the Spana! page (02-§13.1, 02-§13.4, 02-§13.7, 02-§13.10, 02-§13.11)", () => {
+  test("has the start screen, the round, one template per clue and the dialog", async () => {
+    const html = main(await page("spana"));
+    const dataset = await qaDataset();
+    assert.match(html, /<h1>Spana!<\/h1>/);
+    assert.match(html, /data-spana-start/, "startskärmen");
+    assert.match(html, /name="size" value="4" checked> Kort runda, 4 stopp/);
+    assert.match(html, /name="size" value="8"> Lång runda, 8 stopp/, "tolv ledtrådar räcker till den långa rundan (02-§13.8)");
+    assert.match(html, /name="level" value="easy" checked/);
+    assert.match(html, /name="level" value="hard"/);
+    assert.match(html, /data-spana-game hidden/, "spelet väntar på skriptet");
+    assert.match(html, /data-spana-dialog/, "dialogen");
+    assert.match(html, /<noscript>/, "utan JavaScript säger sidan det (02-§13.4)");
+    const templates = html.match(/<template data-clue=/g) ?? [];
+    assert.equal(templates.length, dataset.clues.length);
+    assert.match(
+      html,
+      /<template data-clue="img-[0-9a-f]{12}" data-place="[^"]+"[^>]*><img [^>]*srcset=/,
+      "malldelen bär sidans egen bildmarkup och platsens namn",
+    );
+    assert.doesNotMatch(html, /<template[^>]*><img [^>]*fetchpriority/, "en malldel är aldrig sidans ivriga bild");
+  });
+
+  test("a clue with a text carries it, and one without carries none", async () => {
+    const html = main(await page("spana"));
+    const dataset = await qaDataset();
+    // A plain text, so this test is about the attribute being there and not about the
+    // escaping — that has a test of its own below.
+    const withText = dataset.clues.find((clue) => clue.text !== null && !/["&<>]/.test(clue.text));
+    const without = dataset.clues.find((clue) => clue.text === null);
+    assert.ok(withText && without, "QA har båda sorterna");
+    assert.ok(
+      html.includes(`data-clue="${withText.id}" data-place="`) && html.includes(`data-text="${withText.text}"`),
+      "ledtrådstexten står på malldelen",
+    );
+    const bare = html.slice(html.indexOf(`data-clue="${without.id}"`));
+    assert.doesNotMatch(bare.slice(0, bare.indexOf(">")), /data-text=/, "en ledtråd utan text får inget tomt attribut");
+  });
+
+  test("a clue text with quotes and an ampersand survives the attribute it rides in", async () => {
+    // The text is written by an editor and lands in an HTML attribute (02-§13.5). A
+    // stray quote there would end the attribute and swallow the rest of the template,
+    // and the QA data carries such a text on purpose.
+    const html = main(await page("spana"));
+    const dataset = await qaDataset();
+    const tricky = dataset.clues.find((clue) => clue.text?.includes('"'));
+    assert.ok(tricky, "QA-datat saknar en ledtråd med citattecken");
+    assert.match(html, /data-text="Leta efter det &quot;enkla&quot; trästaketet &amp; grinden\."/);
+    assert.doesNotMatch(html, /data-text="[^"]*"[^>]*"enkla"/, "citattecknet får inte bryta attributet");
+  });
+
+  test("the answer is never written into the page as plain text (02-§13.13)", async () => {
+    // The place is the answer, and it belongs in the dialog after "Hittat!", not in the
+    // list the player reads before looking. It reaches the page only as an attribute on
+    // the inert template.
+    const html = main(await page("spana"));
+    const list = html.slice(0, html.indexOf("data-spana-pool"));
+    assert.doesNotMatch(list, /Bräckebur/);
+  });
+
+  test("the home page and the menu lead to it (02-§13.1)", async () => {
+    const home = main(await page(""));
+    assert.match(home, /href="\/spana\/"[\s\S]*?<h2 class="home-card__title">Spana!<\/h2>/);
+    assert.match(home, /Hitta detaljen på bilden, någonstans på gården\./);
+    const other = await page("karta");
+    assert.match(other, /href="\/spana\/"/);
+  });
+});
+
 describe("the dataset in the build (02-§6.2, 06-§2.1)", () => {
   test("an empty dataset builds: the home page says so and the map is empty", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "s4h-empty-"));
@@ -411,6 +485,10 @@ describe("the dataset in the build (02-§6.2, 06-§2.1)", () => {
     const bingo = main(await readFile(path.join(out, "bingo", "index.html"), "utf8"));
     assert.match(bingo, /Djuren är inte inlagda ännu/, "no candidates, no board (02-§12.12)");
     assert.doesNotMatch(bingo, /data-bingo-start/);
+    const spana = main(await readFile(path.join(out, "spana", "index.html"), "utf8"));
+    assert.match(spana, /Ledtrådarna är inte inlagda ännu/, "no clues, no round (02-§13.3)");
+    assert.match(spana, /href="https:\/\/www\.4h\.se\/stattared\/"/, "and a way on to the main site");
+    assert.doesNotMatch(spana, /data-spana-start/);
     await assert.rejects(access(path.join(out, "plats")), "no location pages");
   });
 
