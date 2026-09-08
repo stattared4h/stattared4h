@@ -69,9 +69,9 @@ i praktiken via kartan eller en QR-kod.
   `aria-controls`, och öppnar menyn. Medan menyn är öppen visar samma knapp ett kryss och
   ordet "Stäng", och ett tryck stänger menyn. <!-- 02-§10.4 -->
 - Menyn fälls ut under raden som ett kort (`05-§6.34`) med 4H-loggan överst, följd av
-  raderna "Startsidan", "Kartan", "Djuren" och "Om sajten", i den ordningen. "Kartan" och
-  "Startsidan" är vanliga länkar; "Djuren" är en fällbar rad
-  (`02-§10.43`). <!-- 02-§10.5 -->
+  raderna "Startsidan", "Kartan", "Djuren", en rad per spel i navets ordning — "Djurbingo"
+  och "Spana!" — och sist "Om sajten". "Startsidan", "Kartan" och spelens rader är vanliga
+  länkar; "Djuren" är en fällbar rad (`02-§10.43`). <!-- 02-§10.5 -->
 - Raden "Djuren" är hopfälld när menyn öppnas. Ett tryck fäller ut den och visar först
   "Alla djuren", länken till djurinfosidan, och därefter en rad per djurslag på gården
   (`02-§5.66`), länkad till artsidan. Ett tryck till fäller ihop den. Raden visar en

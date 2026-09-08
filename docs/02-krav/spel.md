@@ -1,14 +1,15 @@
 # Krav — Spel
 
-Del av [kravindexet](./index.md). Den här filen äger `02-§12`.
+Del av [kravindexet](./index.md). Den här filen äger `02-§12` och `02-§13`.
 
 Beslut: [ADR 0009](../adr/0009-datadrivna-spel.md),
 [ADR 0010](../adr/0010-ingen-sparning-av-besokare.md),
-[ADR 0024](../adr/0024-djurbingo-pa-arlighet.md).
+[ADR 0024](../adr/0024-djurbingo-pa-arlighet.md),
+[ADR 0025](../adr/0025-spelets-ledtradar-ar-egna-poster.md).
 
 ---
 
-## 12. Spel
+## 12. Djurbingo
 
 ### Bakgrund
 
@@ -79,3 +80,82 @@ innan bingot. Raden ensam räcker, och den är den linje ett barn ser utan att l
   sekunden. Konfettin ritas av sajtens egen kod på en canvas i sajtens färger; fanfaren
   syntetiseras i webbläsaren. Ingen ljudfil och inget bibliotek når besökaren (`02-§9.5`).
   Med `prefers-reduced-motion: reduce` visas rutan utan konfetti. <!-- 02-§12.11 -->
+
+---
+
+## 13. Spana!
+
+### Bakgrund
+
+Djurbingo (`02-§12`) ber besökaren hitta djur. Spana! ber hen hitta gården: en närbild på
+en detalj — en gunga, en käpphäst, en gärsgård — och frågan var på gården den sitter.
+Spelen är syskon och delar allt utom vad rutan visar, så dragningen bor i en modul båda
+läser (`03-§12.3`).
+
+Ärlighetsprincipen i [ADR 0024](../adr/0024-djurbingo-pa-arlighet.md) gäller oförändrad.
+Spelaren bockar av själv. Ingen QR-kod och ingen platskontroll avgör om detaljen
+verkligen hittades — det vore att göra spelet till ett prov, och platsen som avslöjas när
+spelaren tryckt "Hittat!" är ett svar, inte ett facit att bli underkänd mot.
+
+Ledtrådarna är egna poster i stället för fält på platsen
+([ADR 0025](../adr/0025-spelets-ledtradar-ar-egna-poster.md)). En plats kan bära flera
+ledtrådar eller ingen alls, och en detalj är ett fotografi som byts ut oftare än hagen den
+sitter i.
+
+### Sidan
+
+- Spana! har sidan `/spana/`, ett kort på startsidans nav (`02-§5.63`) med rubriken
+  "Spana!" och raden "Hitta detaljen på bilden, någonstans på gården.", och en rad i menyn
+  (`02-§10.5`) efter Djurbingo. Kortets symbol är ett ritat förstoringsglas i samma streck
+  som de andra korten (`05-§6.45`). <!-- 02-§13.1 -->
+- Sidan ingår i service workerns förcache som varje annan sida (`02-§7.4`), och spelet
+  fungerar offline när sidan väl har öppnats. <!-- 02-§13.2 -->
+- Finns ingen ledtråd i katalogen säger sidan att ledtrådarna inte är inlagda ännu och
+  pekar på huvudsidan, i stället för en tom lista. <!-- 02-§13.3 -->
+- Utan JavaScript säger sidan att spelet behöver det. <!-- 02-§13.4 -->
+
+### Ledtrådarna
+
+- Stoppen kommer ur ledtrådskatalogen (`04-§11`): en bild som visar en detalj på nära håll,
+  en frivillig kort ledtrådstext och den plats som är svaret. Platsernas egna filer bär
+  ingen speldata. <!-- 02-§13.5 -->
+- Sidan listar varje ledtråd i katalogen i datasetets egen ordning, med bilden, texten när
+  den finns och namnet på platsen den hör till, så att två bygg av samma data ger samma
+  sida. <!-- 02-§13.6 -->
+
+### Rundan
+
+- Innan spelet börjar väljer spelaren på en startskärm hur lång rundan är — "Kort runda"
+  om fyra stopp eller "Lång runda" om åtta — och nivå: "Lätt" visar ledtrådens bild och
+  dess text när den finns, "Svårt" visar bara bilden. Valen görs bara där: under spelet
+  finns inga inställningar. <!-- 02-§13.7 -->
+- En runda har så många stopp som valet säger, men aldrig fler än katalogen har
+  ledtrådar, och samma ledtråd förekommer aldrig två gånger i samma runda. "Lång runda"
+  erbjuds bara när katalogen har fler ledtrådar än den korta rundan. Stoppen slumpas i
+  webbläsaren varje gång en runda börjar. <!-- 02-§13.8 -->
+- Nivån avgör vad spelaren ser, inte vilka ledtrådar som dras: samma katalog och samma
+  slump ger samma runda på båda nivåerna. <!-- 02-§13.9 -->
+- Rundans stopp står som en lista av knappar, en per stopp, med ledtrådens bild och samma
+  avbockade läge som bingots ruta (`05-§6.48`). <!-- 02-§13.10 -->
+- Ett tryck på ett stopp öppnar en dialog (`05-§6.35`) med bilden i större format,
+  ledtrådstexten när nivån är "Lätt" och ledtråden har en, och en knapp. För ett stopp som
+  inte är avbockat heter knappen "Hittat!"; för ett avbockat heter den "Inte hittat
+  ändå". <!-- 02-§13.11 -->
+- Att bocka av och att ta bort en bock är samma handling. Spelet kontrollerar inte att
+  detaljen verkligen hittats, och ber inte om bekräftelse åt något håll
+  (ADR 0024). <!-- 02-§13.12 -->
+- När "Hittat!" trycks stannar dialogen öppen och visar platsens namn: svaret på var
+  detaljen sitter. Det är ett avslöjande, inte en fråga — spelaren har inte svarat på
+  något och kan varken ha rätt eller fel. Namnet står kvar så länge stoppet är avbockat
+  och försvinner när bocken tas bort. <!-- 02-§13.13 -->
+- Rundan, med sina bockar, sparas i `localStorage` i besökarens egen webbläsare
+  (ADR 0010) under en egen nyckel, skild från bingots, och visas igen när sidan öppnas
+  nästa gång. En sparad runda som nämner en ledtråd katalogen inte längre har förkastas i
+  sin helhet, och startskärmen visas. Knappen "Ny runda" rensar det sparade och visar
+  startskärmen. Inget annat sparas. <!-- 02-§13.14 -->
+- Ovanför listan står hur många stopp som är avbockade av hur många. Varje avbockning ger
+  lite konfetti. <!-- 02-§13.15 -->
+- När alla stopp är avbockade är rundan klar: mycket konfetti, en fanfar och en ruta under
+  listan som säger det och erbjuder "Ny runda". Konfettin och fanfaren är sajtens egna
+  (`02-§12.11`), och med `prefers-reduced-motion: reduce` visas rutan utan
+  konfetti. <!-- 02-§13.16 -->
