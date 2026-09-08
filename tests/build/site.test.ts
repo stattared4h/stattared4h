@@ -122,7 +122,7 @@ describe("sidorna (02-§5.2, 02-§5.3, 02-§5.6, 02-§7.7)", () => {
     for (const html of [notFound, offline]) {
       const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
       assert.match(main, /href="\/"/, "länk till startsidan");
-      assert.match(main, /<a href="\/">Karta över gården<\/a>/, "länk till startsidan med kartan");
+      assert.match(main, /<a href="\/karta\/">Karta över gården<\/a>/, "länk till kartsidan");
     }
   });
 });
@@ -151,6 +151,46 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
       assert.match(button, /icon-button__icon--closed/, `${file}: ikonen för stängt läge`);
       assert.match(button, /icon-button__icon--open/, `${file}: ikonen för öppet läge`);
     }
+  });
+
+  test("menyn har en rad per ärende, i ordning (02-§10.5)", async () => {
+    for (const { file, html } of await htmlFiles(prod)) {
+      const card = html.slice(html.indexOf('id="site-menu"'), html.indexOf("</nav>", html.indexOf('id="site-menu"')));
+      const rows = [...card.matchAll(/class="site-menu__link[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1]);
+      const summary = [...card.matchAll(/class="site-menu__summary"[^>]*>\s*<span[^>]*>([^<]+)</g)].map((m) => m[1]);
+      assert.ok(rows.includes("Startsidan"), `${file}: raden Startsidan`);
+      assert.ok(rows.includes("Kartan"), `${file}: raden Kartan`);
+      assert.ok(rows.includes("Om sajten"), `${file}: raden Om sajten`);
+      assert.deepEqual(summary, ["Djuren"], `${file}: Djuren är den enda fällbara raden (02-§10.45)`);
+      assert.ok(
+        card.indexOf(">Startsidan<") < card.indexOf(">Kartan<") &&
+          card.indexOf(">Kartan<") < card.indexOf("site-menu__summary") &&
+          card.indexOf("site-menu__summary") < card.indexOf(">Om sajten<"),
+        `${file}: ordningen Startsidan, Kartan, Djuren, Om sajten`,
+      );
+    }
+  });
+
+  test("Djuren fäller ut arterna, hopfällt och utan JavaScript (02-§10.43–10.44)", async () => {
+    const html = await readFile(path.join(prod, "index.html"), "utf8");
+    const card = html.slice(html.indexOf('id="site-menu"'), html.indexOf("</nav>", html.indexOf('id="site-menu"')));
+    const details = card.slice(card.indexOf("<details"), card.indexOf("</details>"));
+    assert.ok(details.length > 0, "fällan är ett details-element");
+    assert.doesNotMatch(details.slice(0, details.indexOf(">")), /\bopen\b/, "fällan är hopfälld när menyn öppnas");
+    assert.match(details, /<summary class="site-menu__summary"/);
+    const rows = [...details.matchAll(/<a class="site-menu__link site-menu__link--child" href="([^"]+)"[^>]*>([^<]+)</g)];
+    assert.ok(rows.length > 0, "fällan har underrader");
+    assert.deepEqual([rows[0][1], rows[0][2]], ["/djuren/", "Alla djuren"], "första underraden är vägen till sidan");
+    assert.deepEqual(
+      rows.slice(1).map((m) => m[1]),
+      ["/arter/get/", "/arter/far/", "/arter/ko/", "/arter/hast/", "/arter/kanin/", "/arter/gris/", "/arter/hons/", "/arter/katt/"],
+      "ett djurslag per rad, i arternas ordning",
+    );
+  });
+
+  test("menyns utfällning kräver ingen klientkod (02-§10.44)", async () => {
+    const menu = await readFile(path.join(ROOT, "source", "ts", "ui", "menu.ts"), "utf8");
+    assert.doesNotMatch(menu, /details|summary/i, "menu.ts rör bara kortet, inte fällan");
   });
 
   test("överlägget ligger före menykortet och under sidhuvudets rad (02-§10.38)", async () => {

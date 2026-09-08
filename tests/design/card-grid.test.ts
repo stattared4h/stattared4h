@@ -57,6 +57,16 @@ describe("djurkortens rutnät (02-§5.50, 05-§4.12)", () => {
     assert.deepEqual(sizes, [[`(min-width: ${DESKTOP_BREAKPOINT}px)`, "33vw"], ["", "50vw"]]);
   });
 
+  test("navkorten ligger i samma rutnät (02-§5.64)", async () => {
+    const html = await read("source/layouts/home-card.njk");
+    assert.match(html, /class="card-grid home-cards"/, "navet återanvänder djurkortens rutnät");
+    const css = await read("source/assets/css/components.css");
+    const rule = /\.home-card__symbol-plate\s*\{([^}]*)\}/.exec(css);
+    assert.ok(rule, ".home-card__symbol-plate saknas");
+    assert.match(rule[1], /aspect-ratio:\s*4\s*\/\s*3/, "plattan har fotots bildförhållande (05-§6.45)");
+    assert.match(rule[1], /background:\s*var\(--color-green-pale\)/, "plattan är ljusgrön (05-§6.45)");
+  });
+
   test("djurslagsrutorna växer fritt med bredden (05-§4.14)", async () => {
     const css = await read("source/assets/css/layout.css");
     const rule = /\.species-grid\s*\{([^}]*)\}/.exec(css);
