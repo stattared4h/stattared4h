@@ -116,6 +116,7 @@ Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett inter
 | [`bygge.md`](./bygge.md) | Verktygskedja, kontroller, deploy | §9 |
 | [`sidhuvud-sidfot.md`](./sidhuvud-sidfot.md) | Sidhuvud, meny, installation, feedback, sidfot, version | §10 |
 | [`bildverktyg.md`](./bildverktyg.md) | Bildverktyget i webbläsaren: adress, beredning, leverans | §11 |
+| [`spel.md`](./spel.md) | Spelen: Djurbingo — bricka, nivåer, avbockning, vinst | §12 |
 
-Filerna ovan täcker fas 1 enligt epic #3. Nya kravområden — spel enligt ADR 0009,
-redaktörsgränssnittet i fas 2 — får egna filer och nästa lediga avsnittsnummer.
+Filerna ovan täcker fas 1 enligt epic #3 samt det första spelet. Nya kravområden — fler
+spel, redaktörsgränssnittet i fas 2 — får egna filer och nästa lediga avsnittsnummer.
