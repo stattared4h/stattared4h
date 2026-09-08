@@ -447,9 +447,12 @@ ruta, så hundra djur kostar sidan ingenting att visa, och bildkedjan (`03-§6`)
 enda som skriver bildmarkup. <!-- 03-§12.1 -->
 
 Reglerna bor i `source/ts/domain/bingo.ts`: dragningen, som tar varje kandidat en gång
-innan någon upprepas, brickan, avbockningen, raderna och vinsten, och den form som sparas
-och läses tillbaka. Slumpen är en injicerad funktion, så testerna i
+innan någon upprepas, brickan, avbockningen, raderna — de vågräta, de enda som ger
+konfetti (`02-§12.10`) — och vinsten, och den form som sparas och läses tillbaka. Slumpen är en injicerad funktion, så testerna i
 `tests/domain/bingo.test.ts` ger den ett fast frö. `source/ts/ui/bingo.ts` läser
 kandidaterna ur sidan, bygger rutorna med `createElement`, öppnar dialogen och skriver
 brickan till `localStorage` efter varje ändring; `confetti.ts` och `fanfare.ts` bredvid
-den är firandet, utan beroenden och utan filer ([ADR 0024](../adr/0024-djurbingo-pa-arlighet.md)). <!-- 03-§12.2 -->
+den är firandet, utan beroenden och utan filer ([ADR 0024](../adr/0024-djurbingo-pa-arlighet.md)).
+Fanfaren lägger ut sina toner som ren data — `fanfareNotes` ger frekvens, starttid och
+längd — och bara den korta funktion som spelar upp dem rör Web Audio, så att längden
+(`02-§12.11`) går att pröva i Node. <!-- 03-§12.2 -->
