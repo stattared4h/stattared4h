@@ -70,6 +70,18 @@ några tiotal meter: åtta av dem blir utan namn. Därför får en plats ange si
 allmänhet — men en regel som gäller alla lika kan inte veta vilken av två grannar som är
 viktigast att namnge, och gården kan. Fältet är frivilligt; utan det gäller automatiken.
 
+Startsidan bar länge tre ärenden i en enda rulle: kartan med platslistan, djurslagen och
+öronmärkessökningen. Den var 5 000 px lång på en telefon, och varje ärende låg i vägen för
+de andra. `02-§5.51` och `02-§5.52` sorterade rullen; de gjorde den inte kortare.
+
+Kartan hade dessutom ingen egen adress, vilket var ett medvetet val: besökaren står på
+gården och behöver kartan först, och ett nav mellan hen och kartan kostar ett tryck. Det
+valet är omprövat. Skälet håller för en sajt med två ärenden och faller med det tredje:
+spelen i ADR 0009 har ingen plats i en rulle som redan är för lång, och en startsida som
+växer med ett avsnitt per funktion blir obrukbar långt före det femte. `02-§5.7` gör
+startsidan till ett nav av kort i stället, och kartan och djuren får var sin sida. ADR 0023
+bär avvägningen — det extra trycket mot en sida per ärende.
+
 Samma issue bad också om att kunna zooma. Åtta av gårdens platser ligger i en klunga kring
 gårdsplanen, inom några tiotal meter från varandra, och i överblick får deras namn inte
 plats. Zoomen är sajtens första riktiga klientkod, och vad den får kosta i en sajt som
@@ -77,9 +89,9 @@ håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
 
 ### Sidtyper och adresser
 
-- Sajten har fyra sidtyper: startsidan `/`, platssidan `/plats/<id>/`, djursidan
-  `/djur/<id>/` och artsidan `/arter/<id>/`. Adressen byggs av postens id och ändras
-  aldrig. Kartan har ingen egen adress: den bor på startsidan. <!-- 02-§5.1 -->
+- Sajten har sex sidtyper: startsidan `/`, kartsidan `/karta/`, djurinfosidan `/djuren/`,
+  platssidan `/plats/<id>/`, djursidan `/djur/<id>/` och artsidan `/arter/<id>/`. En
+  adress som bär ett id byggs av postens id och ändras aldrig. <!-- 02-§5.1 -->
 - Varje sidadress slutar med snedstreck och skrivs som `index.html` i en katalog, så att
   GitHub Pages och den lokala servern svarar likadant. <!-- 02-§5.2 -->
 - En adress som inte finns visar sajtens egen 404-sida, med sidhuvud och sidfot, texten
@@ -94,17 +106,37 @@ håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
 
 ### Startsidan
 
-- Startsidan visar först kartan över gården, sedan platslistan (`02-§5.51`), och därunder
-  djurslagen som finns på gården — arter med minst ett djur med `status: here` eller ett
-  räknat bestånd (`04-§4.7`) — som tryckytor med artens bild och namn i plural, länkade
-  till artsidan. Besökaren står på gården med telefonen: kartan är det första hen behöver,
-  djuren det andra. Är inget djurslag inlagt säger startsidan det och pekar på
-  huvudsidan. <!-- 02-§5.7 -->
-- Öronmärkessökningen (`02-§5.36`) är startsidans sista avsnitt före "Fler kartor i
-  området". Den kräver att besökaren står intill djuret med numret läsbart och är därmed
-  det ovanligaste av startsidans ärenden. <!-- 02-§5.52 -->
+- Startsidan är sajtens nav. Den säger i en mening vad sajten är (`02-§5.8`) och visar
+  därunder ett kort per ärende sajten bär: "Karta över gården", som leder till kartsidan,
+  och "Djuren på gården", som leder till djurinfosidan. Kartan står först — besökaren står
+  på gården med telefonen, och frågan om vilken hage hen ska gå till är den vanligaste.
+  Startsidan visar ingen karta, ingen platslista, inga djurslag och ingen
+  öronmärkessökning; de bor på sidorna korten leder till. <!-- 02-§5.7 -->
+- Varje kort är en tryckyta med en symbol, en rubrik och en rad som säger vad besökaren
+  hittar på sidan. Hela kortet är länken (`05-§6.45`). <!-- 02-§5.63 -->
+- Korten ligger två i bredd under desktopbrytpunkten (`05-§5.3`) och tre från den, i samma
+  rutnät som djurkorten (`02-§5.50`). Ett barn ska se båda korten utan att rulla, och
+  rutnätet ska rymma fler kort utan att byta form när spelen kommer
+  (ADR 0009). <!-- 02-§5.64 -->
 - Startsidan säger i en mening vad sajten är och pekar på huvudsidan
   (`02-§1.9`). <!-- 02-§5.8 -->
+
+### Kartsidan
+
+- Kartsidan `/karta/` visar kartan över gården (`02-§5.23`) överst, därunder platslistan i
+  sina två grupper (`02-§5.51`) och sist "Fler kartor i området"
+  (`02-§5.34`). <!-- 02-§5.65 -->
+
+### Djurinfosidan
+
+- Djurinfosidan `/djuren/` visar öronmärkessökningen (`02-§5.36`) överst och därunder
+  djurslagen som finns på gården — arter med minst ett djur med `status: here` eller ett
+  räknat bestånd (`04-§4.7`) — som tryckytor med artens bild och namn i plural, länkade
+  till artsidan (`05-§6.24`). Är inget djurslag inlagt säger sidan det och pekar på
+  huvudsidan. <!-- 02-§5.66 -->
+- Öronmärkessökningen är djurinfosidans första avsnitt. Den som står intill djuret med
+  numret läsbart har den skarpaste av sidans frågor — *vilket* djur är det här — och ska
+  inte rulla förbi åtta djurslag för att ställa den. <!-- 02-§5.52 -->
 
 ### Platssidan
 
@@ -119,13 +151,13 @@ håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
   14 orusthöns." Sidan påstår inte att en namngiven individ står på platsen
   (ADR 0012). <!-- 02-§5.11 -->
 - En aktiv plats med `kind: djurplats` utan djurslag visar "Just nu går inga djur här"
-  och en länk till startsidan med kartan. <!-- 02-§5.12 -->
+  och en länk till kartsidan. <!-- 02-§5.12 -->
 - En plats vars `kind` inte är `djurplats` nämner inte djur: ingen djurlista, ingen rubrik per
   djurslag och ingen mening om att inga djur går där. Sidan visar namnet, texten,
   tillgängligheten och bilderna. I kartans lista står platsen med namn och länk,
   utan text om djurslag. <!-- 02-§5.35 -->
 - En plats med `active: false` behåller sin adress, visar "Den här platsen används inte
-  just nu" och en länk till startsidan med kartan, och finns varken på kartan eller i
+  just nu" och en länk till kartsidan, och finns varken på kartan eller i
   kartans lista. <!-- 02-§5.13 -->
 - Platssidan visar platsens bilder med `alt` och fotografens namn, efter faktarutan och
   före djurlistan, så att djurslagen överst inte trängs undan (`05-§6.24`). En plats utan
@@ -158,15 +190,15 @@ håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
   `status: gone` under rubriken "Har lämnat gården". En art med räknade bestånd visar i
   stället meningen "På gården finns 18 svarta dvärghöns och 14 orusthöns." <!-- 02-§5.20 -->
 - Finns arten på ingen aktiv plats säger artsidan "Just nu vet vi inte var getterna går"
-  och länkar till startsidan med kartan. <!-- 02-§5.21 -->
+  och länkar till kartsidan. <!-- 02-§5.21 -->
 - Finns `source/content/arter/<id>.md` renderas dess Markdown som artens redaktionella
   text. Saknas filen visas ingen text och ingen tom rubrik. <!-- 02-§5.22 -->
 
 ### Kartan
 
-Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-§5.7`).
+Kartan har en egen sida, `/karta/`, och är det första på den (`02-§5.1`, `02-§5.65`).
 
-- Startsidan visar en karta över gården: en SVG som bygget genererar, där varje aktiv
+- Kartsidan visar en karta över gården: en SVG som bygget genererar, där varje aktiv
   plats med koordinater är en markör med platsens namn, länkad till platssidan. Länken är
   markörens grund: utan JavaScript går ett tryck dit, med JavaScript öppnas en ruta med
   mer om platsen (`02-§5.46`). <!-- 02-§5.23 -->
@@ -286,7 +318,7 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
 - Samma symbol står framför platsens namn i listan under kartan. Den som möter en symbol
   på ritningen hittar därmed dess betydelse i text på samma sida, utan egen
   teckenförklaring (`02-§5.24`). <!-- 02-§5.39 -->
-- Startsidan länkar vidare till gårdens egen sida om vandring och fiske och till
+- Kartsidan länkar vidare till gårdens egen sida om vandring och fiske och till
   Naturkartan för Kungsbacka, under rubriken "Fler kartor i området". Länkarna är vanliga
   länkar; sidan bäddar inte in något från dem (`02-§5.26`). <!-- 02-§5.34 -->
 - Kartan går att zooma och panorera. På pekskärm zoomar besökaren med ett nyp och drar
