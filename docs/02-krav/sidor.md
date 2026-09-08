@@ -182,12 +182,13 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   bett om texten: ritningen bär bara det som måste synas hela tiden. <!-- 02-§5.32 -->
 - Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
   var sin sida om markören, så att båda går att läsa, och en etikett hålls innanför
-  ritningens kant. Ligger fler markörer på samma fläck än det finns sidor visas de
-  etiketter som blir över inte på kartan: namnet är kvar som markörens tillgängliga namn, syns
-  när markören pekas på eller får fokus, och står alltid i listan under kartan
-  (`02-§5.24`). Bygget räknar placeringen för kartans egen bredd, inte fönstrets: på en
-  360 px telefon är kartan 312 px bred, resten är behållarens innerkant. Räkningen är
-  deterministisk: samma platsdata ger samma placering. <!-- 02-§5.33 -->
+  ritningens kant. Ligger fler markörer på samma fläck än det finns lediga lägen får de
+  som blir över det läge som skaver minst (`02-§5.54`); först när inget av de åtta lägena
+  ryms innanför kanten visas etiketten inte på kartan. Namnet är då kvar som markörens
+  tillgängliga namn, syns när markören pekas på eller får fokus, och står alltid i listan
+  under kartan (`02-§5.24`). Bygget räknar placeringen för kartans egen bredd, inte
+  fönstrets: på en 360 px telefon är kartan 312 px bred, resten är behållarens innerkant.
+  Räkningen är deterministisk: samma platsdata ger samma placering. <!-- 02-§5.33 -->
 - Etiketten har åtta möjliga lägen kring markören: fyra sneda och fyra raka. De sneda
   prövas först — ett snett läge lämnar stråket rakt under och rakt bredvid markören fritt
   åt grannen. Betesmarkens band löper nordväst–sydost, så av de sneda prövas de två som
@@ -197,6 +198,21 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   raka: under, över, höger, vänster. Ordningen är fast, så placeringen är
   deterministisk. Hörnet där zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så
   ingen etikett hamnar bakom en knapp. <!-- 02-§5.53 -->
+- **Ingen etikett hamnar utanför ritningens kant.** Det är den regel som väger tyngst;
+  en etikett som sticker ut klipps av kartan och blir obegriplig. Finns inget helt ledigt
+  läge innanför kanten väljs det läge som skaver minst mot det som redan står där, hellre
+  än att namnet inte visas alls. Att skava mot en annan etikett väger lättare än att täcka
+  en annan markörs prick, eftersom pricken är det besökaren trycker på; texten går att läsa
+  förbi, en dold prick går inte att hitta. Zoomknapparnas hörn (`02-§5.41`) är fortsatt
+  helt förbjudet. En etikett som ligger delvis över en annan hör fortfarande ihop med sin
+  prick, eftersom strecket i `02-§5.55` visar vilken. <!-- 02-§5.54 -->
+- Varje synlig etikett är förbunden med sin markör med ett tunt streck från etikettens
+  närmaste kant in mot prickens mitt. Utan strecket är kopplingen en gissning: etiketten
+  hänger några pixlar från pricken, och på en karta med trettio platser ligger det ofta en
+  annan prick lika nära — särskilt i ytterkanten, där platserna utanför ritningen står på
+  rad (`04-§5.9`). Strecket ritas i sidan, hämtar inget utifrån (`02-§5.26`), följer
+  etiketten till vart och ett av de åtta lägena i `02-§5.53`, och är dekoration som inte
+  läses upp för skärmläsaren. <!-- 02-§5.55 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är
