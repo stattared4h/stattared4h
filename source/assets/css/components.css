@@ -873,8 +873,9 @@
 /* The board is a square, as wide as the column allows but never taller than what is
    left of the viewport under the header and the progress line, so a whole 4 × 4 board
    fits a phone in portrait without scrolling (02-§12.6). `dvh` follows the browser's
-   own bars; `vh` would hide the bottom row behind the address bar. The reserved height
-   is header, heading and progress line together, measured on a 360 px phone. */
+   own bars; `vh` would hide the bottom row behind the address bar. The reserved height is
+   a first estimate for header, heading and progress line together — check it against a
+   real phone (02-§12.6) and adjust the number here if a row gets clipped. */
 .bingo-board {
   --bingo-size: 3;
   --bingo-reserved: 230px;
