@@ -332,7 +332,7 @@ export function homeView(): HomeView {
       {
         id: "djuren",
         title: "Djuren",
-        text: "Se djurslagen, eller sök på ett öronmärke.",
+        text: "Läs om djuren, eller slå upp numret i örat på den du ser.",
         url: "/djuren/",
         symbol: HOME_CARD_SYMBOLS.djuren,
       },
