@@ -3,5 +3,5 @@ kind: grill
 species: []
 lat: 57.337718
 lon: 12.339993
-accessible: false
+accessible: true
 active: true

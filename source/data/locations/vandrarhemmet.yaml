@@ -3,5 +3,5 @@ kind: boende
 species: []
 lat: 57.337843
 lon: 12.340552
-accessible: false
+accessible: true
 active: true

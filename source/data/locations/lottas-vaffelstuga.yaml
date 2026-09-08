@@ -3,5 +3,5 @@ kind: mat
 species: []
 lat: 57.337784
 lon: 12.339588
-accessible: false
+accessible: true
 active: true

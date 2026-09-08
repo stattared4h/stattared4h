@@ -5,5 +5,5 @@ species: []
 # gårdens staket i source/map/background.svg. Inte uppmätt på marken.
 lat: 57.337875
 lon: 12.343587
-accessible: false
+accessible: true
 active: true

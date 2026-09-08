@@ -3,5 +3,5 @@ kind: parkering
 species: []
 lat: 57.337386
 lon: 12.339786
-accessible: false
+accessible: true
 active: true

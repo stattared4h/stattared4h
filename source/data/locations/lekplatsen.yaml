@@ -3,5 +3,5 @@ kind: lek
 species: []
 lat: 57.338509
 lon: 12.342127
-accessible: false
+accessible: true
 active: true
