@@ -10,7 +10,7 @@ const BASE = "/stattared4h/";
 
 describe("vägen tillbaka", () => {
   test("en sida på samma sajt är historiken", () => {
-    assert.equal(returnsToSitePage(`${ORIGIN}${BASE}plats/gethagen/`, ORIGIN, BASE), true);
+    assert.equal(returnsToSitePage(`${ORIGIN}${BASE}plats/brackebur/`, ORIGIN, BASE), true);
     assert.equal(returnsToSitePage(`${ORIGIN}${BASE}`, ORIGIN, BASE), true);
   });
 
@@ -24,8 +24,8 @@ describe("vägen tillbaka", () => {
   });
 
   test("QA och produktion är olika appar och delar inte historik (ADR 0005)", () => {
-    assert.equal(returnsToSitePage(`${ORIGIN}/qa/plats/gethagen/`, ORIGIN, BASE), false);
-    assert.equal(returnsToSitePage(`${ORIGIN}${BASE}plats/gethagen/`, ORIGIN, "/qa/"), false);
+    assert.equal(returnsToSitePage(`${ORIGIN}/qa/plats/brackebur/`, ORIGIN, BASE), false);
+    assert.equal(returnsToSitePage(`${ORIGIN}${BASE}plats/brackebur/`, ORIGIN, "/qa/"), false);
   });
 
   test("en adress som inte går att tolka går till startsidan", () => {
@@ -33,6 +33,6 @@ describe("vägen tillbaka", () => {
   });
 
   test("bas-sökvägen / tar emot varje sida på samma ursprung", () => {
-    assert.equal(returnsToSitePage("http://localhost:8080/plats/gethagen/", "http://localhost:8080", "/"), true);
+    assert.equal(returnsToSitePage("http://localhost:8080/plats/brackebur/", "http://localhost:8080", "/"), true);
   });
 });

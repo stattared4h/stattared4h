@@ -11,7 +11,7 @@
  * has none (03-§10.2). Without it the map is the still picture the build wrote.
  */
 
-import { clampView, HOME, isHome, MAX_SCALE, MIN_SCALE, panBy, zoomBy, type MapView, type Point } from "../domain/map-view.ts";
+import { clampView, HOME, isHome, MAX_SCALE, MIN_SCALE, NAMES_AT_SCALE, panBy, zoomBy, type MapView, type Point } from "../domain/map-view.ts";
 
 /** One press of + or −. Chosen so four presses cross the whole range. */
 const BUTTON_STEP = 1.6;
@@ -19,11 +19,6 @@ const BUTTON_STEP = 1.6;
 const KEY_PAN = 0.15;
 /** How much a wheel notch zooms. Small, because a wheel sends many. */
 const WHEEL_STEP = 0.0015;
-/**
- * The scale at which every name is shown, hidden ones included (02-§5.44). Measured on the
- * yard cluster in Chromium: at 2x its labels still stack, at 4x they stand apart.
- */
-const NAMES_AT_SCALE = 4;
 /** A press that moves further than this is a drag, and must not follow the marker's link. */
 const DRAG_SLOP_PX = 6;
 

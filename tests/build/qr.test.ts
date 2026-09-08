@@ -19,20 +19,20 @@ describe("renderQrSvg", () => {
   test("draws the dark modules, the name and the address as title, at a printable size", () => {
     const svg = renderQrSvg({
       modules: { size: 2, data: [1, 0, 0, 1] },
-      name: "Gethagen <vid> ån",
-      url: "https://example.com/plats/gethagen/",
+      name: "Bräckebur <vid> ån",
+      url: "https://example.com/plats/brackebur/",
       widthMm: 100,
     });
     assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="0 0 10 16" width="100mm" height="160mm"/);
-    assert.match(svg, /<title>https:\/\/example\.com\/plats\/gethagen\/<\/title>/);
+    assert.match(svg, /<title>https:\/\/example\.com\/plats\/brackebur\/<\/title>/);
     // Modules (0,0) and (1,1) inside a quiet zone of 4.
     assert.match(svg, /<path fill="#000000" d="M4 4h1v1h-1zM5 5h1v1h-1z"\/>/);
-    assert.match(svg, />Gethagen &lt;vid&gt; ån<\/text>/);
+    assert.match(svg, />Bräckebur &lt;vid&gt; ån<\/text>/);
   });
 
   test("locationAddress joins the site address and the page path", () => {
-    assert.equal(locationAddress("https://example.com/djur", "gethagen"), "https://example.com/djur/plats/gethagen/");
-    assert.equal(locationAddress(DEFAULT_SITE_URL, "gamla-stallet"), "https://stattared4h.github.io/stattared4h/plats/gamla-stallet/");
+    assert.equal(locationAddress("https://example.com/djur", "brackebur"), "https://example.com/djur/plats/brackebur/");
+    assert.equal(locationAddress(DEFAULT_SITE_URL, "d"), "https://stattared4h.github.io/stattared4h/plats/d/");
   });
 });
 
@@ -44,15 +44,15 @@ describe("npm run qr", () => {
         cwd: ROOT,
         env: { ...process.env, DATA_DIR: QA_DIR, SITE_URL: "https://example.com/djur/" },
       });
-      assert.match(stdout, /Skrev 33 QR-koder/);
+      assert.match(stdout, /Skrev 32 QR-koder/);
       const files = (await readdir(out)).sort();
-      assert.equal(files.length, 33);
-      assert.ok(files.includes("gethagen.svg"));
-      assert.ok(files.includes("gamla-stallet.svg"), "the inactive place gets a code too");
-      const gethagen = await readFile(path.join(out, "gethagen.svg"), "utf8");
-      assert.match(gethagen, /<title>https:\/\/example\.com\/djur\/plats\/gethagen\/<\/title>/);
-      assert.match(gethagen, />Gethagen<\/text>/);
-      assert.match(gethagen, /<path fill="#000000" d="M/);
+      assert.equal(files.length, 32);
+      assert.ok(files.includes("brackebur.svg"));
+      assert.ok(files.includes("d.svg"), "the inactive place gets a code too");
+      const brackebur = await readFile(path.join(out, "brackebur.svg"), "utf8");
+      assert.match(brackebur, /<title>https:\/\/example\.com\/djur\/plats\/brackebur\/<\/title>/);
+      assert.match(brackebur, />Bräckebur<\/text>/);
+      assert.match(brackebur, /<path fill="#000000" d="M/);
     } finally {
       await rm(out, { recursive: true, force: true });
     }

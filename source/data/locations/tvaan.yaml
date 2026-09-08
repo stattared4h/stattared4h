@@ -1,9 +1,10 @@
 name: "2:an"
 kind: djurplats
 species: []
+label: over
 # Koordinaten är hagens mitt (04-§5.8), härledd ur betesmarken och
 # gårdens staket i source/map/background.svg. Inte uppmätt på marken.
 lat: 57.337151
 lon: 12.342169
-accessible: false
+accessible: true
 active: true

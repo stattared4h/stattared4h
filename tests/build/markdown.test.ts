@@ -10,11 +10,11 @@ import { test } from "node:test";
 import { renderMarkdown } from "../../source/ts/build/markdown.ts";
 
 const renderImage = (id: string): string | null =>
-  id === "img-a3f2c1d8b901" ? `<img src="/images/${id}-800.webp" alt="En get i Gethagen.">` : null;
+  id === "img-a3f2c1d8b901" ? `<img src="/images/${id}-800.webp" alt="En get i Bräckebur.">` : null;
 
 test("an image id becomes the markup the resolver returns", () => {
   const html = renderMarkdown("Text.\n\n![](img-a3f2c1d8b901)\n", { renderImage });
-  assert.match(html, /<img src="\/images\/img-a3f2c1d8b901-800\.webp" alt="En get i Gethagen\.">/);
+  assert.match(html, /<img src="\/images\/img-a3f2c1d8b901-800\.webp" alt="En get i Bräckebur\.">/);
   assert.doesNotMatch(html, /src="img-/);
 });
 

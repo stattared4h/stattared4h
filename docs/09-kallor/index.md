@@ -209,6 +209,16 @@ avlästa ur ritningen och inte uppmätta på marken. Platsfilerna säger det i e
 så att den som en dag mäter på plats vet att siffrorna får ersättas utan att något går
 förlorat.
 
+De elva platser som saknade koordinater — Bräckebur, Dalen, Dammen, Ekbacken, gethuset,
+Lilla och Stora grishagen, Lygnslätt 1 och 2, Tåmossen och Trekanten — ligger till största
+delen utanför ritningens kanter, och OSM-uttaget täcker dem inte. Gården pekade i stället
+ut dem på ritningen 2026-09-08, en punkt per plats vid den kant platsen ligger åt, och
+Bräckebur och Tåmossen längs vandringsleden öster om 1:an. Punkterna är omräknade till
+`lat`/`lon` med kanterna i `background.yaml` och skrivna som ungefärliga lägen enligt
+`04-§5.9`. Det är gårdens egen anvisning på en ritning, inte en mätning: de säger åt vilket
+håll platsen ligger, inte var den ligger. Platsfilerna säger det i en kommentar, och en
+inmätt koordinat ersätter den ungefärliga så snart gården har en.
+
 Resten följer OSM:s taggar. Formerna följer taggarna:
 `landuse=meadow` och `grass` blir betesmark, `landuse=farmyard` gårdsplanen,
 `amenity=parking` parkeringarna, `barrier=wall` en streckad gräns, `highway=unclassified`
@@ -229,10 +239,15 @@ ingen hämtad fil utan en skylt på gården, fotograferad 2026-09-07. Reglerna o
 *var kom det ifrån* är precis lika viktig för hagarnas namn som för en logotyp.
 
 Namnen i `source/data/locations/` är skyltens: Tåmossen, Bräckebur, Dammen, Lilla och
-Stora grishagen, Ekbacken, Trekanten, 1:an–4:an, Dalen, Lygnslätt 1 och 2, gethuset och
-kanin- och hönshuset. Gården har godkänt att uppgifterna används.
+Stora grishagen, Ekbacken, Trekanten, 1:an–4:an, A–D, Dalen, Lygnslätt 1 och 2, gethuset
+och kanin- och hönshuset. Gården har godkänt att uppgifterna används.
 
 Skylten är också enda kända källan till vilken hage som är vilken. Gården har två skyltar
-med **olika** bokstavssystem — pappersskylten märker husen A–D, den målade tavlan märker
+med **olika** bokstavssystem — pappersskylten märker A–D, den målade tavlan märker
 platserna A–Q och husen 1–5 — och de går inte att lägga ihop. Sajten följer
 pappersskylten.
+
+Pappersskyltens A–D är fyra mindre hagar bakom stallet och hönshuset, enligt gården
+2026-09-08. Den här texten sa tidigare att A–D var *husen*, vilket var en felläsning av
+skylten. Hagarnas lägen är utpekade av gården på ritningen på samma sätt som de elva
+ovan, och är riktmärken snarare än mätningar.

@@ -1,6 +1,8 @@
 name: Lottas våffelstuga
+shortName: Våffelstugan
 kind: mat
 species: []
+label: vanster
 lat: 57.337784
 lon: 12.339588
 accessible: true

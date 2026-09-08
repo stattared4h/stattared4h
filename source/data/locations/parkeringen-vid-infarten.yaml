@@ -1,7 +1,8 @@
 name: Parkeringen vid infarten
+shortName: Parkering
 kind: parkering
 species: []
 lat: 57.338960
 lon: 12.344100
-accessible: false
+accessible: true
 active: true

@@ -9,7 +9,7 @@ const BASE = "/stattared4h/";
 const PRECACHE = new Set([
   `${BASE}`,
   `${BASE}karta/`,
-  `${BASE}plats/stora-hagen/`,
+  `${BASE}plats/lygnslatt-1/`,
   `${BASE}offline/`,
   `${BASE}404.html`,
   `${BASE}assets/main.js`,

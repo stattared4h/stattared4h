@@ -1,9 +1,14 @@
 # QA-data
 
-Påhittade djur och platser. **Ingen post här motsvarar ett verkligt djur på Stättared.**
+Påhittade djur. **Ingen individ här motsvarar ett verkligt djur på Stättared.**
 
 Datasetet finns av två skäl: testerna ska köras mot data som aldrig ändras när gården
 säljer en get, och ett QA-bygge ska kunna visa sajten utan att röra riktigt innehåll.
+
+**Platserna bär däremot gårdens riktiga namn.** Djuren byts ut stup i kvarten, men
+hagarna och husen ligger kvar; att hitta på platsnamn gjorde bara QA-kartan obegriplig
+att jämföra med gårdens egen. Vilka djur som står på vilken plats är fortfarande
+påhittat.
 
 Strukturen är identisk med `source/data/` och följer
 [datakontraktet](../../docs/04-DATAKONTRAKT.md). Ändras kontraktet ändras det här
@@ -40,19 +45,19 @@ prövar större listor, svensk sortering och att samtliga arter och raser använ
 
 | Plats | Fall som prövas |
 | --- | --- |
-| `gethagen` | Normalfallet: ett djurslag, koordinater, `note`; **plats med bilder**, varav en delas med Rosa och Lilla Gumman |
-| `bjorkhagen` | **Samma djurslag på två platser** — kärnfallet i ADR 0012; `description` med en **markdown-bild**, så bygget prövar `02-§8.12` |
-| `stora-hagen` | **Flera djurslag i samma hage**; `accessible: false` |
-| `smadjurshuset` | Inomhusplats med eget djurslag |
-| `ovre-hagen` | Aktiv plats utan djurslag → tom platssida, och en varning i valideringen |
-| `gamla-stallet` | Inaktiv plats utan koordinater → QR-koden får inte leda till en död sida |
-| `grishagen` | Nytt djurslag med många individer |
+| `brackebur` | Normalfallet: ett djurslag, koordinater, `note`; **plats med bilder**, varav en delas med Rosa och Lilla Gumman |
+| `tamossen` | **Samma djurslag på två platser** — kärnfallet i ADR 0012; `description` med en **markdown-bild**, så bygget prövar `02-§8.12` |
+| `lygnslatt-1` | **Flera djurslag i samma hage**; `accessible: false` |
+| `b` | Plats vars djurslag delas med `kaninhagen` |
+| `a` | Aktiv plats utan djurslag → tom platssida, och en varning i valideringen |
+| `d` | Inaktiv plats utan koordinater → QR-koden får inte leda till en död sida |
+| `lygnslatt-2` | Nytt djurslag med många individer |
 | `honshuset` | Ett djurslag som representeras av räknade bestånd i stället för individer |
-| `kattvinden` | Ett litet bestånd med bara två individer |
-| `grillplatsen` | Finns för att QA-datat ska innehålla **varje sort i `kind`** (`04-§5.7`), så att kartans åtta symboler alla byggs; `tests/domain/qa-data.test.ts` kräver det |
+| `c` | Ett litet bestånd med bara två individer |
+| `grillplatsen-vid-gardsplanen` | Finns för att QA-datat ska innehålla **varje sort i `kind`** (`04-§5.7`), så att kartans åtta symboler alla byggs; `tests/domain/qa-data.test.ts` kräver det |
 
-Varje värde i `kind` finns representerat: `djurplats` i hagarna, `mat` i `cafeet`,
-`kaffestugan` och `lottas-vaffelstuga`, `grill` i `grillplatsen`, `toalett` i
+Varje värde i `kind` finns representerat: `djurplats` i hagarna, `mat` i `cafeet` och
+`lottas-vaffelstuga`, `grill` i `grillplatsen-vid-gardsplanen`, `toalett` i
 `toaletterna`, `parkering` i de två parkeringarna, `lek` i `lekplatsen` och
 `kapphastbanan`, `boende` i `vandrarhemmet` och `husbil` i `stallplatsen`.
 

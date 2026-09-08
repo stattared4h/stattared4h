@@ -1,0 +1,9 @@
+name: A
+kind: djurplats
+species: []
+label: over
+# Läget är utpekat av gården på ritningen, inte uppmätt på marken.
+lat: 57.338131
+lon: 12.338765
+accessible: false
+active: true

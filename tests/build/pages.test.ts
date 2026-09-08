@@ -70,7 +70,7 @@ describe("the home page (02-§5.7)", () => {
 describe("the location page (02-§5.9–5.13)", () => {
   test("the same species on two places: both show the goats, in the species' order", async () => {
     const { views } = await qaViews();
-    for (const id of ["bjorkhagen", "gethagen"]) {
+    for (const id of ["tamossen", "brackebur"]) {
       const view = location(views, id);
       assert.equal(view.active, true);
       assert.deepEqual(view.species.map((s) => s.id), ["get"]);
@@ -79,30 +79,30 @@ describe("the location page (02-§5.9–5.13)", () => {
       assert.ok(!view.groups[0].cards.some((card) => card.id === "bocken"), `${id} does not show the gone Bocken`);
       assert.equal(view.groups[0].populationSentence, null);
     }
-    assert.equal(location(views, "gethagen").note, "Här går getterna på dagarna.");
-    assert.equal(location(views, "gethagen").accessibility, ACCESSIBLE_TEXT);
-    assert.equal(location(views, "gethagen").url, "/plats/gethagen/");
+    assert.equal(location(views, "brackebur").note, "Här går getterna på dagarna.");
+    assert.equal(location(views, "brackebur").accessibility, ACCESSIBLE_TEXT);
+    assert.equal(location(views, "brackebur").url, "/plats/brackebur/");
   });
 
   test("two species in one paddock get one group each", async () => {
     const { views } = await qaViews();
-    const view = location(views, "stora-hagen");
+    const view = location(views, "lygnslatt-1");
     assert.deepEqual(view.groups.map((g) => g.heading), ["Fåren på gården", "Korna på gården"]);
     assert.equal(view.groups[0].cards.length, 20);
     assert.equal(view.groups[1].cards.length, 10);
     assert.equal(view.accessibility, NOT_ACCESSIBLE_TEXT);
-    assert.match(view.description, /Stora hagen på Stättareds 4H-gård/);
+    assert.match(view.description, /Lygnslätt 1 på Stättareds 4H-gård/);
   });
 
   test("an active place without species has no groups; an inactive one is marked", async () => {
     const { views } = await qaViews();
-    const empty = location(views, "ovre-hagen");
+    const empty = location(views, "a");
     assert.equal(empty.active, true);
     assert.deepEqual(empty.species, []);
     assert.deepEqual(empty.groups, []);
-    const inactive = location(views, "gamla-stallet");
+    const inactive = location(views, "d");
     assert.equal(inactive.active, false);
-    assert.equal(inactive.url, "/plats/gamla-stallet/");
+    assert.equal(inactive.url, "/plats/d/");
     assert.match(inactive.description, /används inte just nu/);
   });
 
@@ -186,10 +186,10 @@ describe("the species page (02-§5.19–5.22)", () => {
     assert.equal(get.url, "/arter/get/");
     assert.equal(get.whereHeading, "Var finns getterna?");
     assert.deepEqual(get.locations, [
-      { name: "Björkhagen", url: "/plats/bjorkhagen/" },
-      { name: "Gethagen", url: "/plats/gethagen/" },
+      { name: "Bräckebur", url: "/plats/brackebur/" },
       { name: "Gethuset", url: "/plats/gethuset/" },
       { name: "Trekanten", url: "/plats/trekanten/" },
+      { name: "Tåmossen", url: "/plats/tamossen/" },
     ]);
     assert.equal(get.unknownWhere, null);
     assert.equal(get.hereHeading, "Getterna på gården");
@@ -217,7 +217,7 @@ describe("the map page (02-§5.23–5.25)", () => {
   test("a marker per active place with coordinates; the list has every active place", async () => {
     const { views } = await qaViews();
     const markers = [...views.map.html.matchAll(/data-place="([^"]+)"/g)].map((m) => m[1]);
-    assert.deepEqual(markers, ["ettan", "tvaan", "trean", "fyran", "bjorkhagen", "cafeet", "dalen", "dammen", "ekbacken", "gethagen", "gethuset", "grillplatsen", "grishagen", "honshuset", "kaffestugan", "kaninhagen", "kattvinden", "kapphastbanan", "lekplatsen", "lilla-grishagen", "lottas-vaffelstuga", "parkeringen-vid-infarten", "parkeringen-vid-toaletterna", "smadjurshuset", "stallet", "stora-grishagen", "stora-hagen", "stallplatsen", "toaletterna", "trekanten", "vandrarhemmet", "ovre-hagen"]);
+    assert.deepEqual(markers, ["ettan", "tvaan", "trean", "fyran", "a", "b", "brackebur", "c", "cafeet", "dalen", "dammen", "ekbacken", "gethuset", "grillplatsen-vid-gardsplanen", "honshuset", "kaninhagen", "kapphastbanan", "lekplatsen", "lilla-grishagen", "lottas-vaffelstuga", "lygnslatt-1", "lygnslatt-2", "parkeringen-vid-infarten", "parkeringen-vid-toaletterna", "stallet", "stora-grishagen", "stallplatsen", "toaletterna", "trekanten", "tamossen", "vandrarhemmet"]);
     assert.deepEqual(
       views.map.list.map((item) => [item.name, item.species]),
       [
@@ -225,37 +225,36 @@ describe("the map page (02-§5.23–5.25)", () => {
         ["2:an", "Kor"],
         ["3:an", "Får och kor"],
         ["4:an", "Får"],
-        ["Björkhagen", "Getter"],
+        ["A", NO_SPECIES_AT_LOCATION_TEXT],
+        ["B", "Kaniner"],
+        ["Bräckebur", "Getter"],
+        ["C", "Katter"],
         ["Caféet", ""],
         ["Dalen", "Kor"],
         ["Dammen", NO_SPECIES_AT_LOCATION_TEXT],
         ["Ekbacken", "Får"],
-        ["Gethagen", "Getter"],
         ["Gethuset", "Getter"],
-        ["Grillplatsen", ""],
-        ["Grishagen", "Grisar"],
+        ["Grillplatsen vid gårdsplanen", ""],
         ["Hönshuset", "Höns"],
-        ["Kaffestugan", ""],
         ["Kaninhagen", "Kaniner"],
-        ["Kattvinden", "Katter"],
         ["Käpphästbanan", ""],
         ["Lekplatsen", ""],
         ["Lilla grishagen", "Grisar"],
         ["Lottas våffelstuga", ""],
+        ["Lygnslätt 1", "Får och kor"],
+        ["Lygnslätt 2", "Grisar"],
         ["Parkeringen vid infarten", ""],
         ["Parkeringen vid toaletterna", ""],
-        ["Smådjurshuset", "Kaniner"],
         ["Stallet", "Katter"],
         ["Stora grishagen", "Grisar"],
-        ["Stora hagen", "Får och kor"],
         ["Ställplatsen", ""],
         ["Toaletterna", ""],
         ["Trekanten", "Getter"],
+        ["Tåmossen", "Getter"],
         ["Vandrarhemmet", ""],
-        ["Övre hagen", NO_SPECIES_AT_LOCATION_TEXT],
       ],
     );
-    assert.ok(!views.map.list.some((item) => item.url === "/plats/gamla-stallet/"), "inactive places are not listed");
+    assert.ok(!views.map.list.some((item) => item.url === "/plats/d/"), "inactive places are not listed");
     assert.deepEqual(views.map.warnings, []);
   });
 
@@ -315,11 +314,11 @@ describe("the map page (02-§5.23–5.25)", () => {
     const { dataset } = await qaViews();
     const altered: Dataset = {
       ...dataset,
-      locations: dataset.locations.map((l) => (l.id === "gethagen" ? { ...l, lat: null, lon: null } : l)),
+      locations: dataset.locations.map((l) => (l.id === "brackebur" ? { ...l, lat: null, lon: null } : l)),
     };
     const views = buildViews(altered, { base: "/", farm: FARM });
-    assert.doesNotMatch(views.map.html, /data-place="gethagen"/);
-    assert.ok(views.map.list.some((item) => item.url === "/plats/gethagen/"));
+    assert.doesNotMatch(views.map.html, /data-place="brackebur"/);
+    assert.ok(views.map.list.some((item) => item.url === "/plats/brackebur/"));
   });
 });
 

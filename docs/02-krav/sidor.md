@@ -46,18 +46,29 @@ plus listan är orienteringsverktyget för den som står i hagen. Orienteringen 
 som inte hörde hemma mitt på sidan.
 
 Djurkorten låg först i en kolumn på mobil: `auto-fit` med ett minimum på 280 px ger
-aldrig två kolumner i en telefons 312 px innehållsbredd. Platssidan för Gethagen blev
+aldrig två kolumner i en telefons 312 px innehållsbredd. Platssidan för Bräckebur blev
 8 249 px lång för nitton getter — tio skärmars rullning — och barnet som ska känna igen
 geten framför sig fick hålla nitton foton i minnet i stället för att jämföra dem på
 skärmen (issue #61). `02-§5.50` sätter antalet per bredd i stället.
 
 Etiketterna hade först fyra lägen — under, över, höger, vänster — och tog det första
 lediga. "Under" är ledig för de fyra numrerade hagarna, så den vann varje gång. Betesmarken
-är indelad i band som löper nordväst–sydost, och en etikett rakt under markören glider
-därför på tvärs mot bandet, mot staketet och in i grannhagen (issue #50). `02-§5.53` ger
-placeringen fyra sneda lägen till och prövar dem först. Alternativet — att låta varje plats
-välja sida i sin YAML — avvisades: utseende hör inte hemma i datat, och en regel som gäller
-alla platser lika är värd mer än handpåläggning per plats.
+är indelad i band som löper nordväst–sydost, och en etikett rakt under markören gled därför
+på tvärs mot bandet, in i grannhagen (issue #50). Svaret blev fyra sneda lägen till, prövade
+först, och alternativet — att låta varje plats välja sida i sin YAML — avvisades då som
+handpåläggning.
+
+Båda de besluten är omprövade. Den egentliga orsaken till #50 var inte att lägena var för
+få utan att hagarnas koordinater låg vid kanten i stället för i mitten; `04-§5.8` rättade
+det, och därmed föll skälet till de sneda lägena bort. Kvar av dem blev nackdelen: ett
+snett läge möter markören hörn mot hörn, och på en karta med trettiofyra platser pekar ett
+hörn lika gärna på grannen som på den egna pricken. `02-§5.53` har därför åter fyra lägen.
+
+Med fyra lägen räcker inte automatiken för gårdsplanen, där ett tiotal platser ligger inom
+några tiotal meter: åtta av dem blir utan namn. Därför får en plats ange sin sida själv
+(`02-§5.60`). Invändningen att utseende inte hör hemma i datat står kvar och är riktig i
+allmänhet — men en regel som gäller alla lika kan inte veta vilken av två grannar som är
+viktigast att namnge, och gården kan. Fältet är frivilligt; utan det gäller automatiken.
 
 Samma issue bad också om att kunna zooma. Åtta av gårdens platser ligger i en klunga kring
 gårdsplanen, inom några tiotal meter från varandra, och i överblick får deras namn inte
@@ -182,21 +193,89 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   bett om texten: ritningen bär bara det som måste synas hela tiden. <!-- 02-§5.32 -->
 - Två markörer vars etiketter annars skulle överlappa får sina etiketter placerade på
   var sin sida om markören, så att båda går att läsa, och en etikett hålls innanför
-  ritningens kant. Ligger fler markörer på samma fläck än det finns sidor visas de
-  etiketter som blir över inte på kartan: namnet är kvar som markörens tillgängliga namn, syns
-  när markören pekas på eller får fokus, och står alltid i listan under kartan
-  (`02-§5.24`). Bygget räknar placeringen för kartans egen bredd, inte fönstrets: på en
-  360 px telefon är kartan 312 px bred, resten är behållarens innerkant. Räkningen är
-  deterministisk: samma platsdata ger samma placering. <!-- 02-§5.33 -->
-- Etiketten har åtta möjliga lägen kring markören: fyra sneda och fyra raka. De sneda
-  prövas först — ett snett läge lämnar stråket rakt under och rakt bredvid markören fritt
-  åt grannen. Betesmarkens band löper nordväst–sydost, så av de sneda prövas de två som
-  följer den riktningen först: snett upp till vänster och snett ned till höger. En etikett
-  på den andra diagonalen går på tvärs över staketet in i grannhagen. Ordningen är därmed
-  snett upp vänster, snett ned höger, snett upp höger, snett ned vänster, och därefter de
-  raka: under, över, höger, vänster. Ordningen är fast, så placeringen är
-  deterministisk. Hörnet där zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så
-  ingen etikett hamnar bakom en knapp. <!-- 02-§5.53 -->
+  ritningens kant. Ligger fler markörer på samma fläck än det finns lediga lägen får de
+  som blir över det läge som skaver minst (`02-§5.54`); först när inget av de åtta lägena
+  ryms innanför kanten visas etiketten inte på kartan. Namnet är då kvar som markörens
+  tillgängliga namn, syns när markören pekas på eller får fokus, och står alltid i listan
+  under kartan (`02-§5.24`). Bygget räknar placeringen för kartans egen bredd, inte
+  fönstrets: på en 360 px telefon är kartan 312 px bred, resten är behållarens innerkant.
+  Räkningen är deterministisk: samma platsdata ger samma placering. <!-- 02-§5.33 -->
+- Etiketten har fyra möjliga lägen kring markören: under, över, höger och vänster, prövade
+  i den ordningen. Alla fyra ligger mitt för markören — rakt under, rakt över, rakt bredvid
+  — så etiketten pekar ut sin egen prick och ingen annan. Sneda lägen, som möter markören
+  hörn mot hörn, finns inte. Ordningen är fast, så placeringen är deterministisk. Hörnet där
+  zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så ingen etikett hamnar bakom en
+  knapp. <!-- 02-§5.53 -->
+- **Ingen etikett hamnar utanför ritningens kant, och ingen döljs för att det är trångt.**
+  Kanten är det som aldrig böjs: en etikett som sticker ut klipps av kartan och blir
+  obegriplig, och zoomknapparnas hörn (`02-§5.41`) är förbjudet av samma skäl. Finns inget
+  helt ledigt läge innanför kanten väljs i stället det som skaver minst mot det som redan
+  står där. Ett namn som delvis ligger över ett annat är fortfarande ett namn; ett namn som
+  inte visas alls finns bara i listan under kartan, och den som står i hagen med telefonen
+  läser inte listan. Att skava mot en annan etikett väger lättare än att täcka en annan
+  markörs prick, eftersom pricken är det besökaren trycker på. Först när inget av de fyra
+  lägena ryms innanför kanten visas etiketten inte (`02-§5.33`). <!-- 02-§5.54 -->
+- **Under 600 px visas inga namn förrän kartan är inzoomad så långt att alla får plats**
+  (`02-§5.44`). Kartan är där 312 px bred, och gårdens trettiofyra platser får inte plats
+  med namn bredvid varandra hur de än placeras. Det gäller inte bara överblicken: vid ett
+  eller två zoomtryck är kartan fortfarande för trång, och namn som tänds då blir en vägg
+  av text i stället för en karta. Markörerna med sina symboler (`02-§5.38`) räcker för att
+  se var platserna ligger, namnen står i listan under kartan (`02-§5.24`), och ett enskilt
+  namn kommer fram om besökaren pekar på sin markör. Från 600 px finns utrymmet, och då
+  syns namnen direkt. <!-- 02-§5.55 -->
+- **Den inzoomade kartan har en egen etikettplacering.** Bygget räknar ut tre placeringar:
+  en för den smala kartan, en för den breda, och en för den skala där alla namn tänds
+  (`02-§5.44`). Utan den tredje har en etikett som överblicken tvingats dölja inget eget
+  läge, och alla sådana faller tillbaka på samma plats rakt under sin markör — så just de
+  namn zoomen finns till för att visa hamnar i en hög. Referensen är den smalaste kartan
+  vid den skalan; ryms namnen där ryms de vid varje bredare fönster, och att zooma vidare
+  ger bara mer plats. Tröskelskalan är samma tal i bygget som i klientkoden, hämtat ur en källa, så de inte kan
+  glida isär. <!-- 02-§5.57 -->
+- **Bygget räknar fyra placeringar, en per bredd kartan faktiskt visas i:** den smala
+  (312 px), surfplattans (552 px), desktopens (912 px) och den inzoomade. Skälet är att en
+  placering räknad för den smalaste skärmen styr alla bredare: `Grillplatsen vid
+  ställplatsen` behöver 333 px åt höger, har 226 vid ett 600 px-fönster och 373 vid ett på
+  960 — utan en egen desktopplacering hamnar namnet på fel sida på varje skärm, för att en
+  surfplatta i porträtt inte rymde det. Brytpunkten är 960 px, samma som resten av
+  designen använder (`05-§5.3`). Varje placering räknas mot sin egen bredd, så ingen
+  etikett hamnar utanför ritningen i något fönster (`02-§5.54`). <!-- 02-§5.61 -->
+- **En plats får ha ett kort namn som bara kartan använder** (`04-§5.11`). Markörens
+  etikett visar då det korta namnet; platssidan, listan under kartan och rutan man öppnar
+  visar det fullständiga. Skälet är gårdsplanen: *Grillplatsen vid ställplatsen* är 310 px
+  bred, och tre grillplatser och två parkeringar med sådana namn ligger inom ett par hundra
+  pixlar av varandra. Ingen placering löser det — namnen är för långa för ytan, inte fel
+  placerade. Markörens **tillgängliga namn förblir det fullständiga**, så den som lyssnar
+  hör "Grillplatsen vid gårdsplanen" och inte "Grillplats" tre gånger. Kortnamnet är
+  frivilligt; utan det står det fullständiga namnet på kartan som
+  förut. <!-- 02-§5.62 -->
+- **Det en etikett måste hålla sig undan är den ritade pricken, inte tryckytan runt den.**
+  Markören är 44 × 44 px för att gå att träffa med ett finger (`05-§4.15`), men själva
+  pricken är 24 px; resten är osynlig luft. Räknades hela tryckytan som upptagen sköts
+  etiketter undan från lägen där ingenting syntes — och de fem platserna längs kanten
+  förlorade sitt raka läge till en granne de aldrig hade rört. Med prickens mått som gräns
+  får de sitt raka läge, och ingen etikett hamnar någonsin ovanpå en synlig prick. Etiketten
+  ligger **kloss an mot pricken** — dess kant vid prickens kant — eftersom luft mellan dem
+  är luft ögat måste överbrygga, och ett namn som vilar mot sin prick hör synligt ihop med
+  den. En etikett kan då nudda ytterkanten av en grannes tryckyta, men det kostar
+  ingenting: **etiketten tar inte emot tryck**, så markören under svarar på varje tryck i
+  sin tryckyta, också där ett namn ligger över. Namnet är kvar som markörens tillgängliga
+  namn och som länk i listan under kartan (`02-§5.24`). <!-- 02-§5.58 -->
+- **En markör i ritningens ytterkant får sitt namn rakt åt sidan**, inte snett: står
+  markören i vänsterkanten hamnar namnet rakt till höger, i högerkanten rakt till vänster.
+  Ett rakt läge ligger mitt för pricken och pekar ut den entydigt; ett snett sätter
+  etikettens hörn mot markörens, och längs kanten — där platserna utanför ritningen står på
+  rad (`04-§5.9`) — pekar ett hörn lika gärna på grannen. Innanför ytterkanten gäller
+  ordningen i `02-§5.53`, eftersom betesmarkens band då avgör. Regeln biter först sedan
+  `02-§5.58` slutade räkna grannens osynliga tryckyta som upptagen: dessförinnan var det
+  raka läget alltid blockerat, och placeringen föll till ett snett ändå. <!-- 02-§5.59 -->
+- **En plats får ange sin egen etikettsida** med fältet `label` (`04-§5.10`). Anges det
+  läggs namnet där, före all automatik, och de platser som placeras automatiskt viker undan
+  för det. Anges det inte gäller `02-§5.53` som förut. Skälet är att fyra lägen inte räcker
+  åt gårdsplanen: ett tiotal platser ligger där inom några tiotal meter, och automatiken —
+  som tar platserna i tur och ordning från norr — kan inte veta att Stallet är viktigare att
+  namnge än grillplatsen intill. Gården vet. Ett angivet läge som skulle hamna utanför
+  ritningen eller bakom en zoomknapp följs inte; där väger `02-§5.54` tyngre, och platsen
+  placeras automatiskt i stället. <!-- 02-§5.60 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är

@@ -1,6 +1,7 @@
 name: Stallet
 kind: djurplats
 species: []
+label: over
 lat: 57.337951
 lon: 12.339839
 accessible: false

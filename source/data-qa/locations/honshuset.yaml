@@ -3,6 +3,7 @@ kind: djurplats
 species:
   - hons
 description: Här hålls hönsen som räknade bestånd per ras.
+label: vanster
 lat: 57.338384
 lon: 12.340552
 accessible: true

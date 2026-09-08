@@ -24,7 +24,7 @@ function animal(id: string, name: string): Animal {
 }
 
 function location(id: string, name: string): Location {
-  return { id, name, kind: "djurplats" as const, species: [], note: null, description: null, lat: null, lon: null, accessible: true, active: true, photos: [] };
+  return { id, name, shortName: null, kind: "djurplats" as const, species: [], note: null, description: null, lat: null, lon: null, accessible: true, active: true, label: null, photos: [] };
 }
 
 test("Å, Ä and Ö sort after Z, not among A and O", () => {
@@ -52,10 +52,11 @@ test("sorting is case-insensitive and returns a copy", () => {
 });
 
 test("locations sort the same way", () => {
-  const sorted = sortLocations([location("o", "Övre hagen"), location("g", "Gethagen"), location("b", "Björkhagen")]);
+  // Å sorterar efter Z i svenskan, så Tåmossen hamnar sist trots att T kommer före Ä.
+  const sorted = sortLocations([location("t", "Tåmossen"), location("e", "Ekbacken"), location("b", "Bräckebur")]);
   assert.deepEqual(
     sorted.map((l) => l.id),
-    ["b", "g", "o"],
+    ["b", "e", "t"],
   );
   assert.ok(compareByName(location("x", "Ö"), location("y", "Z")) > 0);
 });
@@ -75,35 +76,34 @@ test("the validated QA dataset is already sorted", async () => {
       "tvaan",
       "trean",
       "fyran",
-      "bjorkhagen",
+      "a",
+      "b",
+      "brackebur",
+      "c",
       "cafeet",
+      "d",
       "dalen",
       "dammen",
       "ekbacken",
-      "gamla-stallet",
-      "gethagen",
       "gethuset",
-      "grillplatsen",
-      "grishagen",
+      "grillplatsen-vid-gardsplanen",
       "honshuset",
-      "kaffestugan",
       "kaninhagen",
-      "kattvinden",
       "kapphastbanan",
       "lekplatsen",
       "lilla-grishagen",
       "lottas-vaffelstuga",
+      "lygnslatt-1",
+      "lygnslatt-2",
       "parkeringen-vid-infarten",
       "parkeringen-vid-toaletterna",
-      "smadjurshuset",
       "stallet",
       "stora-grishagen",
-      "stora-hagen",
       "stallplatsen",
       "toaletterna",
       "trekanten",
+      "tamossen",
       "vandrarhemmet",
-      "ovre-hagen",
     ],
   );
   assert.deepEqual(

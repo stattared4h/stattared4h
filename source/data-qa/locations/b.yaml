@@ -1,11 +1,12 @@
-name: Smådjurshuset
+name: B
 kind: djurplats
 species:
   - kanin
 note: Gå in tyst, kaninerna blir lätt skrämda.
-description: Litet hus vid gårdsplanen där kaninerna bor.
-lat: 57.337600
-lon: 12.340600
+description: Liten hage bakom stallet där kaninerna får springa.
+label: over
+lat: 57.338457
+lon: 12.339422
 accessible: true
 active: true
 photos:

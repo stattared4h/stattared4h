@@ -26,7 +26,8 @@ import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import { escapeAttribute, escapeText } from "./images.ts";
 import { symbolSvg } from "./symbols.ts";
-import type { LocationKind } from "../domain/types.ts";
+import { NAMES_AT_SCALE } from "../domain/map-view.ts";
+import type { LabelPlacement, LocationKind } from "../domain/types.ts";
 
 export const MAP_DESCRIPTION = "Karta över Stättared med gårdens hagar";
 
@@ -43,6 +44,8 @@ export interface MapPoint {
 export interface MapLocation extends MapPoint {
   id: string;
   name: string;
+  /** What the marker's label says, when the full name is too long for the map. */
+  shortName: string | null;
   /** Decides the marker's symbol (02-§5.38, 04-§5.7). */
   kind: LocationKind;
   /** The place's short human note, or null (02-§5.46). */
@@ -51,6 +54,8 @@ export interface MapLocation extends MapPoint {
   accessibility: string;
   /** "Får och kor" or "Inga djur just nu" for a djurplats; empty for the rest. */
   species: string;
+  /** The side the place asks its name to stand on, or null for the build to choose. */
+  label: LabelPlacement | null;
 }
 
 /**
@@ -185,16 +190,15 @@ function assertBasePath(base: string): void {
  * slanted and four straight. `below` is the stylesheet's base case and the fallback;
  * every other position is written on the marker as a modifier and placed by CSS.
  */
-export type LabelSide =
-  | "above-left"
-  | "above-right"
-  | "below-left"
-  | "below-right"
-  | "below"
-  | "above"
-  | "right"
-  | "left"
-  | "hidden";
+export type LabelSide = "below" | "above" | "right" | "left" | "hidden";
+
+/** The data's word for a side (04-§5.10) turned into the one the placement uses. */
+const SIDE_FOR_PLACEMENT: Readonly<Record<LabelPlacement, LabelSide>> = {
+  under: "below",
+  over: "above",
+  hoger: "right",
+  vanster: "left",
+};
 
 /**
  * Measurements the estimate needs, in pixels, mirrored from `tokens.css`. There is no
@@ -205,6 +209,17 @@ export type LabelSide =
 export const LABEL_METRICS = {
   /** `--tap-target-min`: the pin's box, centred on the place. */
   tapTarget: 44,
+  /**
+   * `--space-md`: the drawn dot inside that box. The rest of the tap target is invisible
+   * air, and it is the dot a label has to keep clear of, not the air (02-§5.58).
+   */
+  dot: 24,
+  /**
+   * How far from the place the label's nearest edge sits: exactly the drawn dot's radius,
+   * so the two touch. Air between them is air the eye has to bridge, and the name belongs
+   * to the dot it is resting against.
+   */
+  labelOffset: 24 / 2,
   /** `--font-size-small`: the label's type size. */
   fontSize: 15,
   /** `--space-xs`: the label's padding, at each end. */
@@ -212,14 +227,23 @@ export const LABEL_METRICS = {
   /** `--space-md`: the container's padding, which the map does not get to use. */
   containerPadding: 24,
   /**
-   * The map's own width, not the window's: the canvas is the viewport less the
-   * container's padding at each side. A 360 px phone — the narrowest width the design
-   * targets (05-§5.1) — leaves the map 312 px, and estimating against 360 would let a
-   * label hang over the edge.
+   * The map's own width on the narrowest phone the design targets (05-§5.1): the canvas
+   * is the viewport less the container's padding at each side, so 360 px leaves 312.
+   *
+   * No placement is worked out against it any more — under 600 px no name is shown until
+   * the map is zoomed (02-§5.55), and by then the zoomed placement has taken over. It is
+   * the basis for that one: the zoomed map is this width times the scale at which the
+   * names appear (02-§5.57).
    */
   referenceWidth: 360 - 2 * 24,
   /** The same at 600 px, where the wide placement takes over (05-§5.2). */
   wideWidth: 600 - 2 * 24,
+  /**
+   * And at 960 px, the design's desktop breakpoint (05-§5.3). Without a placement of its
+   * own, the narrowest tablet in portrait would decide where the names sit on every wider
+   * screen too (02-§5.61).
+   */
+  desktopWidth: 960 - 2 * 24,
   /** `--space-sm`: how far the zoom controls sit in from the map's bottom-right corner. */
   controlInset: 16,
   /** `--space-xs`: the gap between the control buttons. */
@@ -237,26 +261,37 @@ const CHAR_WIDTH_RATIO = 0.7;
 /** The label is one line. Measured at 24 px against a 15 px type size. */
 const LINE_HEIGHT_RATIO = 1.6;
 /**
- * Tried in this order (02-§5.53). The four slanted positions come first, because a
- * slanted label leaves both the lane straight below the marker and the lane straight
- * beside it free for a neighbour.
- *
- * Among the slanted four, the pasture decides the order. Its bands run north-west to
- * south-east, so a label up-and-left or down-and-right follows the paddock it belongs to,
- * while one on the other diagonal drifts across the fence into the next paddock. The two
- * along that axis are therefore tried before the two across it. The straight four come
- * last, in the order they have always had.
+ * Tried in this order (02-§5.53). All four sit square on the marker — straight below,
+ * straight above, straight beside — so a label points at its own pin and no other. The
+ * slanted positions that once came first are gone: they met the marker corner to corner,
+ * and on a map of thirty-four places a corner points at the neighbour as readily as at the
+ * place it belongs to. They were introduced to stop a paddock's name drifting across the
+ * fence (issue #50), but the cause of that was a coordinate at the paddock's edge rather
+ * than its middle, which `04-§5.8` has since fixed.
  */
-const LABEL_SIDES: readonly LabelSide[] = [
-  "above-left",
-  "below-right",
-  "above-right",
-  "below-left",
-  "below",
-  "above",
-  "right",
-  "left",
-];
+const LABEL_SIDES: readonly LabelSide[] = ["below", "above", "right", "left"];
+
+/**
+ * The order to try for a marker standing at `x` in a drawing `width` px wide, both in the
+ * reference pixels the placement is worked out in (02-§5.59).
+ *
+ * A marker whose own pin reaches the drawing's left or right edge is *in the margin*, and
+ * there the straight side pointing inwards comes first. A straight label sits level with
+ * the pin, so the name plainly belongs to it; a slanted one meets the pin corner to
+ * corner. Corner to corner is fine out in the pasture, where the markers are spread out —
+ * but the places that lie outside the drawing are parked along these very edges
+ * (04-§5.9), one under the other, and there a corner points at two pins as readily as one.
+ *
+ * Half a tap target is the threshold rather than a chosen fraction: it is exactly when the
+ * marker stops being a dot in the drawing and becomes a dot on its edge. It also scales
+ * with the layout, so the same markers count as edge markers at 312 px and at 552 px.
+ */
+function sidesFor(x: number, width: number): readonly LabelSide[] {
+  const half = LABEL_METRICS.tapTarget / 2;
+  const inwards: LabelSide | null = x < half ? "right" : x > width - half ? "left" : null;
+  if (inwards === null) return LABEL_SIDES;
+  return [inwards, ...LABEL_SIDES.filter((side) => side !== inwards)];
+}
 
 /** A marker to place a label for, positioned in drawing units. */
 export interface LabelMarker {
@@ -264,6 +299,8 @@ export interface LabelMarker {
   name: string;
   x: number;
   y: number;
+  /** The side the place asked for (02-§5.60), or null to let the order decide. */
+  side?: LabelSide | null;
 }
 
 interface Box {
@@ -278,6 +315,20 @@ function overlaps(a: Box, b: Box): boolean {
   return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 }
 
+/** How much area the two boxes share, in square pixels; zero when they only touch. */
+function overlapArea(a: Box, b: Box): number {
+  const wide = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const tall = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return wide > 0 && tall > 0 ? wide * tall : 0;
+}
+
+/**
+ * How much worse it is to cover a pin than another label (02-§5.54). A covered name can
+ * still be read past; a covered pin is a place the visitor cannot find or tap, so the
+ * placement pays several times over for hiding one.
+ */
+const PIN_PENALTY = 8;
+
 /** True when `inner` lies wholly inside `outer`. */
 function contains(outer: Box, inner: Box): boolean {
   return (
@@ -288,28 +339,23 @@ function contains(outer: Box, inner: Box): boolean {
   );
 }
 
-/** The label's box on one side of a marker standing at `x`, `y` in pixels. */
+/**
+ * The label's box on one side of a marker standing at `x`, `y` in pixels. It hangs
+ * `labelOffset` from the place rather than clearing the whole tap target: what the eye
+ * has to connect is the name and the drawn dot, and every pixel between them is a pixel
+ * the reader has to bridge.
+ */
 function labelBox(x: number, y: number, width: number, height: number, side: LabelSide): Box {
-  const half = LABEL_METRICS.tapTarget / 2;
+  const off = LABEL_METRICS.labelOffset;
   switch (side) {
     case "below":
-      return { left: x - width / 2, right: x + width / 2, top: y + half, bottom: y + half + height };
+      return { left: x - width / 2, right: x + width / 2, top: y + off, bottom: y + off + height };
     case "above":
-      return { left: x - width / 2, right: x + width / 2, top: y - half - height, bottom: y - half };
+      return { left: x - width / 2, right: x + width / 2, top: y - off - height, bottom: y - off };
     case "right":
-      return { left: x + half, right: x + half + width, top: y - height / 2, bottom: y + height / 2 };
+      return { left: x + off, right: x + off + width, top: y - height / 2, bottom: y + height / 2 };
     case "left":
-      return { left: x - half - width, right: x - half, top: y - height / 2, bottom: y + height / 2 };
-    // The slanted positions sit corner to corner with the pin's box, so they clear both
-    // the lane under the marker and the lane beside it (02-§5.53).
-    case "above-left":
-      return { left: x - half - width, right: x - half, top: y - half - height, bottom: y - half };
-    case "above-right":
-      return { left: x + half, right: x + half + width, top: y - half - height, bottom: y - half };
-    case "below-left":
-      return { left: x - half - width, right: x - half, top: y + half, bottom: y + half + height };
-    case "below-right":
-      return { left: x + half, right: x + half + width, top: y + half, bottom: y + half + height };
+      return { left: x - off - width, right: x - off, top: y - height / 2, bottom: y + height / 2 };
     case "hidden":
       // Never asked for while choosing; a hidden label occupies nothing.
       return { left: x, right: x, top: y, bottom: y };
@@ -343,7 +389,6 @@ export function placeLabels(
   const scale = referenceWidth / drawingWidth;
   const edge: Box = { left: 0, right: referenceWidth, top: 0, bottom: drawingHeight * scale };
   const height = LABEL_METRICS.fontSize * LINE_HEIGHT_RATIO;
-  const half = LABEL_METRICS.tapTarget / 2;
 
   // The zoom controls sit over the bottom-right corner (02-§5.41), so a label placed
   // there would end up behind a button. Only the two buttons that are always on screen
@@ -358,15 +403,23 @@ export function placeLabels(
 
   const points = markers.map((marker) => ({
     id: marker.id,
+    side: marker.side ?? null,
     x: marker.x * scale,
     y: marker.y * scale,
     width: marker.name.length * LABEL_METRICS.fontSize * CHAR_WIDTH_RATIO + 2 * LABEL_METRICS.padding,
   }));
+  // What a label must not cover is the drawn dot, not the tap target around it (02-§5.58).
+  // The tap target is 44 px so a finger can hit it; the dot is --space-md, and the rest is
+  // air nobody can see. Guarding the whole target pushed labels out of positions where
+  // nothing was in the way — the places along the edge lost their straight position to a
+  // neighbour they never touched. A label may end up over that air; it takes no pointer
+  // events (05-§6.44), so the neighbour's target still answers every tap.
+  const dot = LABEL_METRICS.dot / 2;
   const pins: Box[] = points.map((p) => ({
-    left: p.x - half,
-    right: p.x + half,
-    top: p.y - half,
-    bottom: p.y + half,
+    left: p.x - dot,
+    right: p.x + dot,
+    top: p.y - dot,
+    bottom: p.y + dot,
   }));
 
   // North to south, then west to east, then by id: the same places always place in the
@@ -375,8 +428,22 @@ export function placeLabels(
 
   const taken: Box[] = [];
   const sides = new Map<string, LabelSide>();
+
+  // A place that asks for a side gets it, before anything is placed automatically
+  // (02-§5.60). It still may not leave the drawing or hide behind a zoom button; there
+  // 02-§5.54 weighs more, and the place falls through to the automatic pass instead.
   for (const point of order) {
-    const free = LABEL_SIDES.find((side) => {
+    const asked = point.side;
+    if (!asked || asked === "hidden") continue;
+    const box = labelBox(point.x, point.y, point.width, height, asked);
+    if (!contains(edge, box) || overlaps(box, controls)) continue;
+    sides.set(point.id, asked);
+    taken.push(box);
+  }
+
+  for (const point of order) {
+    if (sides.has(point.id)) continue;
+    const free = sidesFor(point.x, referenceWidth).find((side) => {
       const box = labelBox(point.x, point.y, point.width, height, side);
       return (
         contains(edge, box) &&
@@ -385,7 +452,26 @@ export function placeLabels(
         !pins.some((pin) => overlaps(box, pin))
       );
     });
-    const side = free ?? "hidden";
+    // Nothing free: take the position that grazes least rather than drop the name
+    // (02-§5.54). A name partly over another is still a name; a name nobody can see is
+    // not, and the place it belongs to then exists only in the list under the map. The
+    // drawing's edge and the zoom controls do not bend — a label outside the drawing is
+    // clipped into nonsense, and one behind a button cannot be read at all.
+    const side =
+      free ??
+      (LABEL_SIDES.map((candidate) => {
+        const box = labelBox(point.x, point.y, point.width, height, candidate);
+        if (!contains(edge, box) || overlaps(box, controls)) return null;
+        const cost =
+          taken.reduce((sum, other) => sum + overlapArea(box, other), 0) +
+          PIN_PENALTY * pins.reduce((sum, pin) => sum + overlapArea(box, pin), 0);
+        return { side: candidate, cost };
+      })
+        // A tie keeps the order of LABEL_SIDES, so the placement stays deterministic.
+        .reduce<{ side: LabelSide; cost: number } | null>(
+          (best, next) => (next !== null && (best === null || next.cost < best.cost) ? next : best),
+          null,
+        )?.side ?? "hidden");
     sides.set(point.id, side);
     // A hidden label takes no room, so it must not push the next one aside.
     if (side !== "hidden") taken.push(labelBox(point.x, point.y, point.width, height, side));
@@ -482,22 +568,39 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   // crowds a 360 px map has room on a 648 px one, and the visitor sees one or the other.
   const points = drawn.map(({ location, position }) => ({
     id: location.id,
-    name: location.name,
+    // The placement measures what is actually drawn, so a short name takes less room.
+    name: location.shortName ?? location.name,
+    side: location.label === null ? null : SIDE_FOR_PLACEMENT[location.label],
     ...position,
   }));
-  const sides = placeLabels(points, frame.width, frame.height);
+  // No narrow placement: under 600 px no name is shown until the map is zoomed far enough
+  // for the zoomed placement to take over (02-§5.55), so one worked out for a 312 px map
+  // would never be seen.
   const wideSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.wideWidth);
+  const desktopSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.desktopWidth);
+  // A third placement for the zoomed map (02-§5.57). Zooming shows every name (02-§5.44),
+  // and a name the overview had to hide has no side of its own — so they all fell back to
+  // the same spot under their pin and stacked. The reference is the narrowest map at the
+  // scale where the names appear: what fits there fits at every wider viewport, and
+  // zooming further only adds room.
+  const zoomSides = placeLabels(
+    points,
+    frame.width,
+    frame.height,
+    LABEL_METRICS.referenceWidth * NAMES_AT_SCALE,
+  );
 
   const markers: string[] = [];
   for (const { location, position } of drawn) {
-    const side = sides.get(location.id) ?? "below";
     const wide = wideSides.get(location.id) ?? "below";
-    // `below` is the stylesheet's base case and needs no modifier in the narrow layout.
-    // The wide class is always written: from 600 px the stylesheet starts from the
-    // default and follows it (05-§5.2).
+    const desktop = desktopSides.get(location.id) ?? "below";
+    const zoom = zoomSides.get(location.id) ?? "below";
     const className =
-      (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
-      ` map__marker--wide-${wide}`;
+      `map__marker map__marker--wide-${wide}` +
+      ` map__marker--desktop-${desktop}` +
+      // Nothing to say when the zoomed placement has no room either: the marker then keeps
+      // the default position, and the line to its pin still says which one it belongs to.
+      (zoom === "hidden" ? "" : ` map__marker--zoom-${zoom}`);
     const style = `left: ${percent(position.x, frame.width)}; top: ${percent(position.y, frame.height)}`;
     // What the popup shows, carried on the marker so the client needs no second source
     // (03-§9.7). Only a djurplats reports animals (02-§5.47), and a place without a note
@@ -507,10 +610,18 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
       ` data-access="${escapeAttribute(location.accessibility)}"` +
       (location.note === null ? "" : ` data-note="${escapeAttribute(location.note)}"`) +
       (location.kind === "djurplats" ? ` data-species="${escapeAttribute(location.species)}"` : "");
+    // A short name shortens the label, never the place (02-§5.62). The link keeps the full
+    // name as its accessible name, so a screen reader does not hear "Grillplats" three
+    // times, and `data-name` hands the same full name to the popup.
+    const short = location.shortName;
+    const full =
+      short === null
+        ? ""
+        : ` aria-label="${escapeAttribute(location.name)}" data-name="${escapeAttribute(location.name)}"`;
     markers.push(
-      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}"${facts}>` +
+      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}"${full}${facts}>` +
         `<span class="map__pin map__pin--${location.kind}" aria-hidden="true">${symbolSvg(location.kind, "map__symbol")}</span>` +
-        `<span class="map__label">${escapeText(location.name)}</span>` +
+        `<span class="map__label">${escapeText(short ?? location.name)}</span>` +
         `</a>`,
     );
   }

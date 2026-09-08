@@ -74,22 +74,22 @@ test("a missing required field on an animal fails", async () => {
 test("a missing required field on a location fails, including accessible and active", async () => {
   for (const field of ["name", "species", "accessible", "active"]) {
     const raw = await rawQa();
-    editLocation(raw, "gethagen", (l) => delete l[field]);
+    editLocation(raw, "brackebur", (l) => delete l[field]);
     const result = await validate(raw);
-    assert.equal(errorsFor(result, "locations/gethagen.yaml", field).length, 1, field);
+    assert.equal(errorsFor(result, "locations/brackebur.yaml", field).length, 1, field);
   }
 });
 
 test("kind is required on a location and only accepts the contract's values (04-§5.7)", async () => {
   const missing = await rawQa();
-  editLocation(missing, "gethagen", (l) => delete l.kind);
-  assert.equal(errorsFor(await validate(missing), "locations/gethagen.yaml", "kind").length, 1);
+  editLocation(missing, "brackebur", (l) => delete l.kind);
+  assert.equal(errorsFor(await validate(missing), "locations/brackebur.yaml", "kind").length, 1);
 
   const wrong = await rawQa();
-  editLocation(wrong, "gethagen", (l) => (l.kind = "hage"));
+  editLocation(wrong, "brackebur", (l) => (l.kind = "hage"));
   const result = await validate(wrong);
   assert.match(
-    errorsFor(result, "locations/gethagen.yaml", "kind")[0].message,
+    errorsFor(result, "locations/brackebur.yaml", "kind")[0].message,
     /djurplats, mat, grill, toalett, parkering, lek, boende eller husbil/,
     "the message names every value",
   );
@@ -98,31 +98,31 @@ test("kind is required on a location and only accepts the contract's values (04-
   // ADR 0019 each of the six has its own value, and the old one is a mistake worth
   // pointing out rather than translating into a guess about what the place is.
   const outdated = await rawQa();
-  editLocation(outdated, "gethagen", (l) => (l.kind = "besoksmal"));
-  assert.equal(errorsFor(await validate(outdated), "locations/gethagen.yaml", "kind").length, 1);
+  editLocation(outdated, "brackebur", (l) => (l.kind = "besoksmal"));
+  assert.equal(errorsFor(await validate(outdated), "locations/brackebur.yaml", "kind").length, 1);
 });
 
 test("every one of the eight kinds is accepted (04-§5.7, ADR 0019)", async () => {
   for (const kind of ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende", "husbil"]) {
     const raw = await rawQa();
-    editLocation(raw, "gethagen", (l) => {
+    editLocation(raw, "brackebur", (l) => {
       l.kind = kind;
       if (kind !== "djurplats") l.species = [];
     });
     const result = await validate(raw);
     assert.deepEqual(result.errors, [], `kind: ${kind} is valid`);
-    assert.equal(result.dataset?.locations.find((l) => l.id === "gethagen")?.kind, kind);
+    assert.equal(result.dataset?.locations.find((l) => l.id === "brackebur")?.kind, kind);
   }
 });
 
 test("djurslag on a place that is not a djurplats is an error, not a warning (ADR 0019)", async () => {
   // The likely slip is copying a paddock file when adding a café.
   const raw = await rawQa();
-  editLocation(raw, "gethagen", (l) => (l.kind = "mat"));
+  editLocation(raw, "brackebur", (l) => (l.kind = "mat"));
   const result = await validate(raw);
   assert.equal(result.dataset, null, "the build stops");
   assert.match(
-    errorsFor(result, "locations/gethagen.yaml", "species")[0].message,
+    errorsFor(result, "locations/brackebur.yaml", "species")[0].message,
     /bara en djurplats har djurslag/,
     "the message says which kind may have animals",
   );
@@ -130,13 +130,13 @@ test("djurslag on a place that is not a djurplats is an error, not a warning (AD
 
 test("accessible and active must be booleans, not text", async () => {
   const raw = await rawQa();
-  editLocation(raw, "gethagen", (l) => {
+  editLocation(raw, "brackebur", (l) => {
     l.accessible = "yes";
     l.active = 1;
   });
   const result = await validate(raw);
-  assert.match(errorsFor(result, "locations/gethagen.yaml", "accessible")[0].message, /true eller false/);
-  assert.match(errorsFor(result, "locations/gethagen.yaml", "active")[0].message, /true eller false/);
+  assert.match(errorsFor(result, "locations/brackebur.yaml", "accessible")[0].message, /true eller false/);
+  assert.match(errorsFor(result, "locations/brackebur.yaml", "active")[0].message, /true eller false/);
 });
 
 test("sex and status only accept the contract's values", async () => {
@@ -251,13 +251,13 @@ test("a breed whose species does not exist fails", async () => {
 
 test("a location species that does not exist, or is listed twice, fails", async () => {
   const raw = await rawQa();
-  editLocation(raw, "gethagen", (l) => (l.species = ["get", "lama"]));
-  editLocation(raw, "bjorkhagen", (l) => (l.species = ["get", "get"]));
-  editLocation(raw, "stora-hagen", (l) => (l.species = "far"));
+  editLocation(raw, "brackebur", (l) => (l.species = ["get", "lama"]));
+  editLocation(raw, "tamossen", (l) => (l.species = ["get", "get"]));
+  editLocation(raw, "lygnslatt-1", (l) => (l.species = "far"));
   const result = await validate(raw);
-  assert.match(errorsFor(result, "locations/gethagen.yaml", "species")[0].message, /arten "lama" finns inte/);
-  assert.match(errorsFor(result, "locations/bjorkhagen.yaml", "species")[0].message, /två gånger/);
-  assert.match(errorsFor(result, "locations/stora-hagen.yaml", "species")[0].message, /måste vara en lista/);
+  assert.match(errorsFor(result, "locations/brackebur.yaml", "species")[0].message, /arten "lama" finns inte/);
+  assert.match(errorsFor(result, "locations/tamossen.yaml", "species")[0].message, /två gånger/);
+  assert.match(errorsFor(result, "locations/lygnslatt-1.yaml", "species")[0].message, /måste vara en lista/);
 });
 
 test("an invalid field does not hide the reference errors in the same file", async () => {
@@ -295,7 +295,7 @@ test("a pedigree that loops fails, reported once", async () => {
 
 test("a location field on an animal fails with a pointer to ADR 0012", async () => {
   const raw = await rawQa();
-  editAnimal(raw, "rosa", (a) => (a.location = "gethagen"));
+  editAnimal(raw, "rosa", (a) => (a.location = "brackebur"));
   const result = await validate(raw);
   const errors = errorsFor(result, "animals/rosa.yaml", "location");
   assert.equal(errors.length, 1, "one message, not also an unknown-field message");
@@ -308,13 +308,13 @@ test("HTML in any field fails, markdown and comparisons pass", async () => {
   const raw = await rawQa();
   editAnimal(raw, "rosa", (a) => (a.description = "Rosa är <b>framfusig</b>."));
   editImage(raw, await photoId("stjarna"), (image) => (image.alt = "<img src=x>"));
-  editLocation(raw, "gethagen", (l) => (l.note = "<!-- dold -->"));
+  editLocation(raw, "brackebur", (l) => (l.note = "<!-- dold -->"));
   speciesList(raw)[0].name = "</Get>";
   editAnimal(raw, "tuva", (a) => (a.description = "Tuva är **liten** och väger < 5 kg, se [gården](https://4h.se)."));
   const result = await validate(raw);
   assert.match(errorsFor(result, "animals/rosa.yaml", "description")[0].message, /innehåller HTML/);
   assert.equal(errorsFor(result, `images/${await photoId("stjarna")}.yaml`, "alt").length, 1);
-  assert.equal(errorsFor(result, "locations/gethagen.yaml", "note").length, 1);
+  assert.equal(errorsFor(result, "locations/brackebur.yaml", "note").length, 1);
   assert.equal(errorsFor(result, "species.yaml", "species[get].name").length, 1);
   assert.deepEqual(errorsFor(result, "animals/tuva.yaml"), []);
 });
@@ -327,14 +327,14 @@ test("an unknown field anywhere fails, so a typo is never silently ignored", asy
     a.nmae = "Rosa";
   });
   editImage(raw, await photoId("rosa"), (image) => (image.taken = "2021-05-01"));
-  editLocation(raw, "gethagen", (l) => (l.notes = "x"));
+  editLocation(raw, "brackebur", (l) => (l.notes = "x"));
   speciesList(raw)[0].photos = [];
   breedList(raw)[0].origin = "x";
   (raw.species?.data as Record<string, unknown>).extra = 1;
   const result = await validate(raw);
   assert.match(errorsFor(result, "animals/rosa.yaml", "nmae")[0].message, /okänt fält/);
   assert.equal(errorsFor(result, `images/${await photoId("rosa")}.yaml`, "taken").length, 1);
-  assert.equal(errorsFor(result, "locations/gethagen.yaml", "notes").length, 1);
+  assert.equal(errorsFor(result, "locations/brackebur.yaml", "notes").length, 1);
   assert.equal(errorsFor(result, "species.yaml", "species[get].photos").length, 1);
   assert.equal(errorsFor(result, "species.yaml", "extra").length, 1);
   assert.equal(errorsFor(result, "breeds.yaml", "breeds[jamtget].origin").length, 1);
@@ -377,11 +377,11 @@ test("an image post file name must be a valid image id", async () => {
 test("a photo reference must name an image post that exists", async () => {
   const raw = await rawQa();
   editAnimal(raw, "rosa", (a) => ((a.photos as string[])[0] = "img-ffffffffffff"));
-  editLocation(raw, "gethagen", (l) => (l.photos = ["img-eeeeeeeeeeee"]));
+  editLocation(raw, "brackebur", (l) => (l.photos = ["img-eeeeeeeeeeee"]));
   speciesList(raw)[0].photo = "img-dddddddddddd";
   const result = await validate(raw);
   assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /finns inte i images\//);
-  assert.match(errorsFor(result, "locations/gethagen.yaml", "photos[0]")[0].message, /finns inte i images\//);
+  assert.match(errorsFor(result, "locations/brackebur.yaml", "photos[0]")[0].message, /finns inte i images\//);
   assert.match(errorsFor(result, "species.yaml", "species[get].photo")[0].message, /finns inte i images\//);
 });
 
@@ -411,13 +411,13 @@ test("two records may share the same image (ADR 0015)", async () => {
   const raw = await rawQa();
   const id = await photoId("rosa");
   editAnimal(raw, "tuva", (a) => (a.photos = [id]));
-  editLocation(raw, "gethagen", (l) => (l.photos = [id]));
+  editLocation(raw, "brackebur", (l) => (l.photos = [id]));
   speciesList(raw)[0].photo = id;
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
   const dataset = result.dataset;
   assert.equal(dataset?.animals.find((a) => a.id === "tuva")?.photos[0].id, id);
-  assert.equal(dataset?.locations.find((l) => l.id === "gethagen")?.photos[0].id, id);
+  assert.equal(dataset?.locations.find((l) => l.id === "brackebur")?.photos[0].id, id);
   assert.equal(dataset?.species.find((s) => s.id === "get")?.photo?.id, id);
 });
 
@@ -425,25 +425,25 @@ test("a reference is resolved to the post's alt and credit", async () => {
   const raw = await rawQa();
   const id = await photoId("rosa");
   editImage(raw, id, (image) => {
-    image.alt = "Rosa står i Gethagen.";
+    image.alt = "Rosa står i Bräckebur.";
     image.credit = "Anna Andersson";
   });
   const result = await validate(raw);
   const photo = result.dataset?.animals.find((a) => a.id === "rosa")?.photos[0];
-  assert.deepEqual(photo, { id, alt: "Rosa står i Gethagen.", credit: "Anna Andersson" });
+  assert.deepEqual(photo, { id, alt: "Rosa står i Bräckebur.", credit: "Anna Andersson" });
 });
 
 // --- Coordinates ------------------------------------------------------------------
 
 test("lat and lon come together and stay within WGS84 ranges", async () => {
   const raw = await rawQa();
-  editLocation(raw, "gethagen", (l) => (l.lon = null));
-  editLocation(raw, "bjorkhagen", (l) => (l.lat = 95));
-  editLocation(raw, "stora-hagen", (l) => (l.lon = "12,2"));
+  editLocation(raw, "brackebur", (l) => (l.lon = null));
+  editLocation(raw, "tamossen", (l) => (l.lat = 95));
+  editLocation(raw, "lygnslatt-1", (l) => (l.lon = "12,2"));
   const result = await validate(raw);
-  assert.match(errorsFor(result, "locations/gethagen.yaml", "lon")[0].message, /anges tillsammans/);
-  assert.match(errorsFor(result, "locations/bjorkhagen.yaml", "lat")[0].message, /utanför -90 till 90/);
-  assert.match(errorsFor(result, "locations/stora-hagen.yaml", "lon")[0].message, /måste vara ett tal/);
+  assert.match(errorsFor(result, "locations/brackebur.yaml", "lon")[0].message, /anges tillsammans/);
+  assert.match(errorsFor(result, "locations/tamossen.yaml", "lat")[0].message, /utanför -90 till 90/);
+  assert.match(errorsFor(result, "locations/lygnslatt-1.yaml", "lon")[0].message, /måste vara ett tal/);
 });
 
 // --- Warnings (02-§6.4, 04-§10.10) ------------------------------------------------
@@ -453,37 +453,37 @@ test("the QA dataset yields exactly the known warnings", async () => {
   assert.deepEqual(
     result.warnings.map((w) => `${w.file}:${w.field}`).sort(),
     [
+      "locations/a.yaml:species",
       "locations/dammen.yaml:species",
-      "locations/ovre-hagen.yaml:species",
       "species.yaml:species[hast]",
     ],
   );
   const hast = result.warnings.find((w) => w.field === "species[hast]");
   assert.match(hast?.message ?? "", /finns på ingen aktiv plats/);
   assert.ok(
-    !result.warnings.some((w) => w.file === "locations/gamla-stallet.yaml"),
+    !result.warnings.some((w) => w.file === "locations/d.yaml"),
     "an inactive location without coordinates is not a warning",
   );
 });
 
 test("an active location without coordinates warns", async () => {
   const raw = await rawQa();
-  editLocation(raw, "gamla-stallet", (l) => (l.active = true));
+  editLocation(raw, "d", (l) => (l.active = true));
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
-  const warning = result.warnings.find((w) => w.file === "locations/gamla-stallet.yaml" && w.field === "lat");
+  const warning = result.warnings.find((w) => w.file === "locations/d.yaml" && w.field === "lat");
   assert.match(warning?.message ?? "", /saknar koordinater/);
-  assert.ok(result.warnings.some((w) => w.file === "locations/gamla-stallet.yaml" && w.field === "species"));
+  assert.ok(result.warnings.some((w) => w.file === "locations/d.yaml" && w.field === "species"));
 });
 
 test("a species with a photo and a place stops warning", async () => {
   const raw = await rawQa();
   speciesList(raw)[3].photo = await photoId("rosa");
-  editLocation(raw, "ovre-hagen", (l) => (l.species = ["hast"]));
+  editLocation(raw, "a", (l) => (l.species = ["hast"]));
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
   assert.ok(!result.warnings.some((w) => w.file === "species.yaml" && w.field?.startsWith("species[hast]")));
-  assert.ok(!result.warnings.some((w) => w.file === "locations/ovre-hagen.yaml"));
+  assert.ok(!result.warnings.some((w) => w.file === "locations/a.yaml"));
 });
 
 // --- Image files (04-§10.7, 02-§8.2) ----------------------------------------------

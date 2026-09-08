@@ -1,0 +1,12 @@
+name: C
+kind: djurplats
+species:
+  - katt
+description: En lugn hage för gårdens katter.
+label: over
+lat: 57.338758
+lon: 12.340142
+accessible: false
+active: true
+photos:
+  - img-806029d17a68

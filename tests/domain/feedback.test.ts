@@ -16,7 +16,7 @@ import {
 
 const META: FeedbackMeta = {
   version: "1.0.4 – QA PR212",
-  page: "https://example.test/stattared4h/plats/stora-hagen/",
+  page: "https://example.test/stattared4h/plats/lygnslatt-1/",
   viewport: { width: 390, height: 844 },
   time: new Date("2026-09-07T10:15:00Z"),
   userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) Safari/605.1.15",
@@ -44,7 +44,7 @@ describe("metadataraden (02-§10.16)", () => {
   test("version, sida, fönster, tidpunkt i ISO och webbläsare, i den ordningen", () => {
     assert.equal(
       formatMeta(META),
-      "Version 1.0.4 – QA PR212, sida https://example.test/stattared4h/plats/stora-hagen/, fönster 390×844, tidpunkt 2026-09-07T10:15:00.000Z, webbläsare Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) Safari/605.1.15",
+      "Version 1.0.4 – QA PR212, sida https://example.test/stattared4h/plats/lygnslatt-1/, fönster 390×844, tidpunkt 2026-09-07T10:15:00.000Z, webbläsare Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) Safari/605.1.15",
     );
   });
 

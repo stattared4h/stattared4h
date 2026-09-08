@@ -1,7 +1,9 @@
 name: Gethuset
 kind: djurplats
 species: []
-lat: null
-lon: null
+# Ungefärligt läge vid ritningens kant (04-§5.9): platsen ligger utanför kartan,
+# och punkten är utpekad av gården på ritningen — inte uppmätt på marken.
+lat: 57.338447
+lon: 12.341555
 accessible: false
 active: true

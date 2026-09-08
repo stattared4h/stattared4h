@@ -67,7 +67,7 @@ inuti filen — det skulle vara samma faktum på två ställen. <!-- 04-§3.1 --
 - Små bokstäver `a–z`, siffror och bindestreck. Inga åäö, inga mellanslag, inga
   versaler. `Lilla Gumman` blir `lilla-gumman`. <!-- 04-§3.2 -->
 - Svenska tecken skrivs om: `å` och `ä` blir `a`, `ö` blir `o`. `Snöbollen` blir
-  `snobollen`, `Björkhagen` blir `bjorkhagen`. Regeln kan ge id:n som liknar varandra —
+  `snobollen`, `Tåmossen` blir `tamossen`. Regeln kan ge id:n som liknar varandra —
   `får` blir `far` — vilket är acceptabelt eftersom id:t aldrig visas för besökaren.
   Skulle två poster få samma id fälls valideringen och den ena får ett förtydligande
   tillägg. <!-- 04-§3.4 -->
@@ -167,11 +167,13 @@ Platsen är sajtens nav: QR-koden på hagen pekar hit, och härifrån väljer be
 djuren som finns där. <!-- 04-§5.1 -->
 
 ```yaml
-name: string                 # platsens namn, t.ex. "Gethagen"
+name: string                 # platsens namn, t.ex. "Bräckebur"
+shortName: string | null     # kortare namn som bara kartan använder
 kind: enum                   # vad platsen är, se regeln nedan
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
 description: string | null   # markdown
+label: enum | null           # sidan namnet står på i kartan, se regeln nedan
 lat: number | null           # WGS84 i decimalgrader; ytans mitt, se regeln nedan
 lon: number | null
 accessible: boolean          # nåbar med rullstol eller barnvagn
@@ -210,6 +212,32 @@ Regler:
   (`02-§5.33`), så en punkt vid kanten skjuter namnet mot staketet och in i grannhagen,
   medan en punkt i mitten håller det inne i den hage det hör till. På en hage om två hektar
   är skillnaden tiotals meter. <!-- 04-§5.8 -->
+- En plats som ligger utanför den ritade kartans kanter (`02-§5.30`) bär ändå `lat` och
+  `lon`: ett **ungefärligt läge** vid ritningens kant, i den riktning platsen faktiskt
+  ligger sedd från gårdsplanen, på obebyggd mark och inte ovanpå en form som betyder något
+  annat. Läget är ett riktmärke, inte en mätning, och platsfilen säger det i en kommentar
+  ovanför `lat` — annars går det inte att skilja ett gissat läge från ett inmätt när någon
+  senare läser filen. Alternativet vore att låta platsen sakna koordinater, men då syns den
+  inte alls på kartan (`02-§5.25`), och en hage som pekas ut åt rätt håll hjälper besökaren
+  mer än en hage som inte finns. Ett ungefärligt läge ersätts av ett inmätt så snart gården
+  har ett. Läget läggs så långt in att **markörens prick ryms helt** i den smalaste kartan
+  — 360 px ger kartan 312 px, och en prick vars mitt ligger närmare kanten än prickens
+  radie blir avhuggen. Det är en knapp meter på marken vid den skalan, långt inom den
+  osäkerhet ett utpekat läge ändå har, och en hel prick är skillnaden mellan en plats
+  besökaren ser och en hen anar. <!-- 04-§5.9 -->
+- `label` säger vilken sida av markören platsens namn står på i kartan: `under`, `over`,
+  `hoger` eller `vanster`. Utelämnas fältet väljer bygget själv (`02-§5.53`). Det är det
+  enda fältet som handlar om utseende, och det finns för att fyra lägen inte räcker åt
+  gårdsplanens klunga: automatiken tar platserna norrifrån och kan inte veta vilken av två
+  grannar som är viktigast att namnge. Sätt det bara när automatikens val faktiskt är
+  fel — ett fält satt i onödan blir ett fält som är kvar när kartan ändrats runt
+  det. <!-- 04-§5.10 -->
+- `shortName` är ett kortare namn som **bara kartans markör** använder (`02-§5.62`).
+  Platssidan, listan och rutan man öppnar visar `name`. Sätt det bara när det fullständiga
+  namnet är för långt för kartan — *Grillplatsen vid gårdsplanen* blir `Grillplats`,
+  *Parkeringen vid infarten* blir `Parkering` — och låt det vara begripligt intill
+  markörens symbol, som ändå säger vad platsen är (`02-§5.38`). Utelämnat visas hela
+  namnet. <!-- 04-§5.11 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död
@@ -283,7 +311,7 @@ ett filnamn som bär ett djurnamn blir osant så snart bilden hamnar under fel p
 
 ```yaml
 # source/data/images/img-a3f2c1d8b901.yaml
-alt: Rosa och Stjärna står tillsammans i Björkhagen.
+alt: Rosa och Stjärna står tillsammans i Tåmossen.
 credit: Anna Karlsson
 ```
 

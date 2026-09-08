@@ -1,7 +1,8 @@
 name: Toaletterna
 kind: toalett
 species: []
+label: over
 lat: 57.337440
 lon: 12.339960
-accessible: false
+accessible: true
 active: true

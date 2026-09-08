@@ -4,7 +4,7 @@
  * The templates in source/pages/ are deliberately dumb: every list, label, heading and
  * sentence is computed here from the validated Dataset with the derivations in
  * source/ts/domain/derive.ts, so the wording and the selections can be tested in Node.
- * `url` fields are site-relative ("/plats/gethagen/"); the templates put the base path
+ * `url` fields are site-relative ("/plats/brackebur/"); the templates put the base path
  * in front with Eleventy's `url` filter (ADR 0005). The one exception is the map, whose
  * markup is rendered here in full and therefore takes the base path as an option.
  *
@@ -368,6 +368,8 @@ export function mapLocations(dataset: Dataset): MapLocation[] {
     .filter((location) => location.active && location.lat !== null && location.lon !== null)
     .map((location) => ({
       id: location.id,
+      shortName: location.shortName,
+      label: location.label,
       name: location.name,
       kind: location.kind,
       lat: location.lat as number,
