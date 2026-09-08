@@ -198,14 +198,18 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   raka: under, över, höger, vänster. Ordningen är fast, så placeringen är
   deterministisk. Hörnet där zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så
   ingen etikett hamnar bakom en knapp. <!-- 02-§5.53 -->
-- **Ingen etikett hamnar utanför ritningens kant.** Det är den regel som väger tyngst;
-  en etikett som sticker ut klipps av kartan och blir obegriplig. Finns inget helt ledigt
-  läge innanför kanten väljs det läge som skaver minst mot det som redan står där, hellre
-  än att namnet inte visas alls. Att skava mot en annan etikett väger lättare än att täcka
-  en annan markörs prick, eftersom pricken är det besökaren trycker på; texten går att läsa
-  förbi, en dold prick går inte att hitta. Zoomknapparnas hörn (`02-§5.41`) är fortsatt
-  helt förbjudet. En etikett som ligger delvis över en annan hör fortfarande ihop med sin
-  prick, eftersom strecket i `02-§5.55` visar vilken. <!-- 02-§5.54 -->
+- **Ingen etikett hamnar utanför ritningens kant, och ingen lägger sig över en annan** —
+  utom för en markör i ritningens ytterkant, där den som blir över hellre skaver än döljs.
+  Undantaget följer av var platserna står. De som ligger utanför ritningen är parkerade
+  längs kanterna (`04-§5.9`), en under den andra, och där är alternativet till att skava
+  att namnet aldrig syns. Inne på ritningen gäller det motsatta: gårdsplanens platser
+  ligger inom några tiotal meter, och en etikett ovanpå en annan där gör båda oläsbara utan
+  att någon vinner — de som blir över döljs som förut (`02-§5.33`). Att täcka en annan
+  markörs prick väger tyngre än att täcka en etikett, också i ytterkanten, eftersom pricken
+  är det besökaren trycker på. Zoomknapparnas hörn (`02-§5.41`) är förbjudet överallt.
+  En etikett som skaver hör ändå ihop med sin egen prick, eftersom strecket i `02-§5.56`
+  visar vilken. En markör räknas till ytterkanten när dess egen prick når ritningens kant,
+  alltså inom en halv markör från den. <!-- 02-§5.54 -->
 - **Under 600 px visar överblicken inga namn alls.** Kartan är då 312 px bred, och
   gårdens trettiofyra platser får inte plats med namn bredvid varandra hur de än placeras;
   `02-§5.54` skulle lägga dem i en vägg av text över ritningen. Markörerna med sina
@@ -213,6 +217,14 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   kartan (`02-§5.24`), och de kommer fram så snart besökaren zoomar (`02-§5.44`) eller
   pekar på en markör. Från 600 px finns utrymmet, och då gäller `02-§5.54` som skrivet:
   namnen syns direkt. <!-- 02-§5.55 -->
+- Varje synlig etikett är förbunden med sin markör med ett tunt streck från etikettens
+  närmaste kant in mot prickens mitt. Utan strecket är kopplingen en gissning: etiketten
+  hänger några pixlar från pricken, ett snett läge sätter dessutom hörn mot hörn, och på en
+  karta med trettiofyra platser ligger det ofta en annan prick lika nära. Det gäller också
+  inzoomad, där varje namn visas (`02-§5.44`) och grannarna därmed är fler. Strecket ritas i
+  sidan, hämtar inget utifrån (`02-§5.26`), följer etiketten till vart och ett av de åtta
+  lägena i `02-§5.53`, och är dekoration som inte läses upp för
+  skärmläsaren. <!-- 02-§5.56 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är
