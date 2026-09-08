@@ -78,6 +78,7 @@ identiska filer. <!-- 03-§3.3 -->
 | Djur | `/djur/<id>/` | Namn, art, ras, stamtavla, bilder. Aldrig var individen står |
 | Art | `/arter/<id>/` | Om djurslaget, vilka platser det finns på, och individerna |
 | Djurbingo | `/bingo/` | Startskärm och bricka; rutorna slumpas i webbläsaren ur kandidaterna bygget listar (`02-§12`) |
+| Spana! | `/spana/` | Startskärm och stopplista; ledtrådarna slumpas i webbläsaren ur katalogen bygget listar (`02-§13`) |
 | Om | `/om/` | Vad sajten är, installation, integritet, källkod, version (`02-§10.27`) |
 | 404 | `404.html` | Sajtens egen felsida; GitHub Pages serverar den för okända adresser |
 | Offline | `/offline/` | Visas av service workern vid navigering utanför cachen |
@@ -456,3 +457,20 @@ den är firandet, utan beroenden och utan filer ([ADR 0024](../adr/0024-djurbing
 Fanfaren lägger ut sina toner som ren data — `fanfareNotes` ger frekvens, starttid och
 längd — och bara den korta funktion som spelar upp dem rör Web Audio, så att längden
 (`02-§12.11`) går att pröva i Node. <!-- 03-§12.2 -->
+
+Dragningen är gemensam. `source/ts/domain/draw.ts` äger `shuffle` och `drawCandidates`:
+en blandad genomgång av alla kandidater, och en till om fler behövs, så att varje kandidat
+tas en gång innan någon upprepas (`02-§12.5`). Båda spelen bygger på den, och slumpen är
+en injicerad funktion hela vägen, så `tests/domain/draw.test.ts` prövar fördelningen på
+ett ställe i stället för en gång per spel. <!-- 03-§12.3 -->
+
+Spana! (`02-§13`) följer samma tre lager. Bygget listar katalogens ledtrådar — `spanaView`
+i `source/ts/build/pages.ts` läser `dataset.clues`, slår upp platsens namn och lämnar
+ordningen som datasetet har den — och `source/pages/spana.njk` skriver dem som ett
+`<template>` per ledtråd, med ledtrådens text och platsens namn på `data`-attribut bredvid
+bilden. Reglerna ligger i `source/ts/domain/spana.ts`: rundan, avbockningen, den sparade
+formen och hur många stopp en runda får när katalogen är mindre än rundan
+(`02-§13.8`). `source/ts/ui/spana.ts` bygger listan, öppnar dialogen och avslöjar platsen
+när "Hittat!" trycks. Ledtrådarna är egna poster i datat
+([ADR 0025](../adr/0025-spelets-ledtradar-ar-egna-poster.md)); spelet har fortfarande ingen
+egen kopia av gårdens platser, bara en referens till dem. <!-- 03-§12.4 -->

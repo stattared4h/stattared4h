@@ -84,3 +84,16 @@ kan då genereras och importeras på nytt utan att alla referenser byter id
 
 Kör kommandot innan ett QA-bygge och när en post får en ny bildreferens. En fil som
 redan finns lämnas orörd, så en omkörning är omedelbar.
+
+## Ledtrådar
+
+`clues/` har tolv ledtrådar till spelet Spana! (`02-§13`, `04-§11`): sex med ledtrådstext
+och sex utan, så att båda nivåerna och båda rundlängderna går att pröva. Två av dem pekar
+på samma plats (`brackebur`), och tre pekar på platser som inte är djurplatser —
+lekplatsen, grillplatsen och caféet — eftersom en detalj kan sitta var som helst på
+gården.
+
+Ledtrådarna **återbrukar datasetets befintliga bilder**, som föreställer djur och hagar
+och inte de närbilder på detaljer som `04-§11.5` beskriver. QA prövar formen — postens
+fält, urvalet, dragningen och sidan — inte motivvalet. Bilderna byts när riktiga
+ledtrådsfoton finns, utan att någon annan del av datasetet rörs.

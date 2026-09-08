@@ -253,6 +253,25 @@ bilden överst i `--radius-md`. Vinstrutan under brickan är faktarutan i 6.6 me
 `--color-sun`, `--color-green`, `--color-green-pale` och `--color-green-deep`, lästa ur
 tokens vid körning. <!-- 05-§6.47 -->
 
+### 6.18 Spanalistan
+
+Spana! (`02-§13`) är bingots syskon och lånar dess delar: lägesraden, den avbockade rutan,
+vinstrutan och konfettin är samma som i 6.17. Skillnaden är att stoppen står i **en spalt**
+och inte i ett rutnät. En runda är fyra eller åtta stopp och ska rullas igenom med tummen
+medan man går, inte överblickas på en gång som brickan — och ledtrådens bild är hela
+frågan, så den får all bredd spalten har.
+
+Ett stopp är en knapp i kortets yta (6.4) med bilden överst i `--radius-md`, som mest
+240 px hög så att åtta stopp inte blir åtta skärmar att rulla igenom, och ordningsnumret
+i `--color-ink-soft` under den. Ett avbockat stopp bär samma soltoner och samma bock som
+bingots ruta (`05-§6.47`), så att de två spelen känns igen som ett par.
+
+Dialogen är dialogen i 6.13 med bilden överst i `--radius-md`, ledtrådstexten under den i
+brödtext, och därunder — bara när stoppet är avbockat — svaret: platsens namn i
+halvfet på en ljusgrön platta `--color-green-pale`, samma par som statusraden i 6.14,
+eftersom det är ett besked och inte ett fel. Knappen ligger sist och byter etikett med
+tillståndet. <!-- 05-§6.48 -->
+
 ### 6.15 Bildverktygets kort
 
 Verktygssidan (`02-§11`) lånar sidans egna delar: fälten är formulärfält (6.8), knapparna

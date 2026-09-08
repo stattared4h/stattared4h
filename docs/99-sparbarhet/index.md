@@ -217,6 +217,22 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§12.11` | Full bricka: konfetti, fem sekunders fanfar, Spela igen; reducerad rörelse | `manuell` | `isFull` i domänen är testad, och `fanfareNotes` i `source/ts/ui/fanfare.ts` prövas av `tests/ui/fanfare.test.ts` mot de fem sekunderna; `burst("big")` och `playFanfare` i `source/ts/ui/`. Att det hörs går inte att testa i kod: bocka av alla rutor med ljudet på och ta tid — konfetti, en fanfar som ringer i fem sekunder och rutan Bingo! visas; slå på reducerad rörelse i systemet och gör om: rutan visas utan konfetti |
 | `02-§12.12` | Utan kandidater: texten om att djuren inte är inlagda | `byggd` | Grenen i `source/pages/bingo.njk`; `tests/build/data-pages.test.ts` bygger det tomma datasetet och kräver texten |
 | `02-§12.13` | Utan JavaScript säger sidan det | `byggd` | `<noscript>` i `source/pages/bingo.njk`; `tests/build/data-pages.test.ts` kräver det |
+| `02-§13.1` | Sidan `/spana/`, navkortet och menyraden | `saknas` | Skrivs i fas 5; sidan, kortet och menyraden byggs i fas 4 |
+| `02-§13.2` | Sidan i förcachen | `saknas` | Skrivs i fas 5; sidan följer med förcachen ur `collections.all` |
+| `02-§13.3` | Utan ledtrådar: texten om att de inte är inlagda | `saknas` | Skrivs i fas 5 |
+| `02-§13.4` | Utan JavaScript säger sidan det | `saknas` | Skrivs i fas 5 |
+| `02-§13.5` | Stoppen kommer ur ledtrådskatalogen; platsfilerna bär ingen speldata | `saknas` | Skrivs i fas 5; katalogen definieras i `04-§11` |
+| `02-§13.6` | Sidan listar katalogen i datasetets ordning | `saknas` | Skrivs i fas 5 |
+| `02-§13.7` | Startskärm med rundlängd och nivå; inga inställningar under spelet | `saknas` | Skrivs i fas 5 |
+| `02-§13.8` | Rundans längd, aldrig fler stopp än ledtrådar, ingen upprepning | `saknas` | Skrivs i fas 5 |
+| `02-§13.9` | Nivån styr vad som visas, inte vilka ledtrådar som dras | `saknas` | Skrivs i fas 5 |
+| `02-§13.10` | Stoppen som en lista av knappar med bild och bocktillstånd | `saknas` | Skrivs i fas 5 |
+| `02-§13.11` | Dialogen från ett stopp: bild, text enligt nivå, en knapp | `saknas` | Skrivs i fas 5 |
+| `02-§13.12` | Avbocka och ångra är samma handling, utan kontroll | `saknas` | Skrivs i fas 5 |
+| `02-§13.13` | Platsen avslöjas i dialogen när Hittat! trycks | `saknas` | Skrivs i fas 5 |
+| `02-§13.14` | Rundan i `localStorage` under egen nyckel; det inaktuella förkastas | `saknas` | Skrivs i fas 5 |
+| `02-§13.15` | Lägesrad och konfetti per avbockning | `saknas` | Skrivs i fas 5 |
+| `02-§13.16` | Klar runda: konfetti, fanfar, Ny runda; reducerad rörelse | `saknas` | Skrivs i fas 5 |
 
 ### Designspecifikation (`05-§`)
 
@@ -255,6 +271,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.45` | Navkortet | `manuell` | `.home-card*` i `components.css`; plattans färg och kortets sträckning bevakas av `tests/design/card-grid.test.ts`, men utseendet är CSS-layout och går inte att enhetstesta i Node (`CL-§8.6`). Öppna `/` i 360 px och bekräfta att de två korten är lika höga, att rubrikerna står på en rad och att båda syns utan att rulla; öppna i 1280 px och bekräfta att symbolplattan är ett band och inte en tom fjärdedel av kortet |
 | `05-§6.46` | Menyns fällbara rad och dess vinkel | `manuell` | `.site-menu__summary`, `.site-menu__chevron` och `.site-menu__sublist` i `components.css`; markupen bevakas av `tests/build/site.test.ts`. Öppna menyn i 360 px: raden Djuren har en vinkel som pekar nedåt, ett tryck fäller ut arterna och vänder vinkeln uppåt, underraderna är indragna och minst 44 px höga, och kortet rullar inuti sig självt i stället för att gå utanför skärmens nederkant |
 | `05-§6.47` | Bingobrickan | `manuell` | `.bingo-*` och `.confetti` i `components.css`; färgerna läses ur tokens i `source/ts/ui/confetti.ts`. Öppna `/bingo/` i 360 px och bekräfta att en avbockad ruta har gul ram och botten med bocken över en nedtonad bild, att namnen står på en rad, och att dialogens bild har rundade hörn; öppna i 1280 px och bekräfta att brickan inte växer förbi skärmens höjd |
+| `05-§6.48` | Spanalistan | `saknas` | Skrivs i fas 5 |
 | `05-§6.35`–`6.36` | Dialog, statusrad | `manuell` | `.dialog` och `.status-bar` i `components.css`. Öppna feedbackdialogen i 360 px och 1280 px: mörkt bakgrundsskikt, vit yta med rundade hörn och kryssknapp uppe till höger, som mest 680 px bred, intonad på under 200 ms; sätt DevTools → Network → Offline: ljusgrön rad med djupgrön text direkt under sidhuvudet |
 | `05-§6.38` | Frizon runt 4H-logotypen | `manuell` | Öppna `/` i 1280 px och mät i DevTools att avståndet från logotypen till sajtnamnet är minst 8 px och till sidhuvudets över- och underkant minst 4 respektive 8 px; öppna menyn i 360 px och sidfoten och bekräfta minst 8 px under logotypen |
 | `05-§6` övrigt | Hero | `saknas` | Skrivs när markupen finns, enligt `05-§7.2`; heron väntar på ett fotografi från gården |
@@ -281,6 +298,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `04-§10` | Validering | `byggd` | Den kompletta ingången är `source/ts/domain/index.ts`, som validerar `publicId` och delegerar övriga kontraktsregler till `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts` och `tests/domain/public-id-validation.test.ts` |
 | `04-§10.15` | AI-credit avvisas i produktion | `byggd` | `validateImagePosts` skiljer QA från produktion via datakatalogen; `tests/domain/validate.test.ts` prövar båda fallen |
 | `04-§10.16` | Publikt ID har giltig form och normaliserad unikhet | `byggd` | `readPublicIds` och `normalisePublicId`; `tests/domain/public-id.test.ts` och `tests/domain/public-id-validation.test.ts` |
+| `04-§11` | Ledtrådskatalogen: filnamnet är bild-id:t, `location` och frivillig `text` | `saknas` | Skrivs i fas 5; kontraktet är skrivet, valideringen byggs i fas 4 |
+| `04-§10.17` | Ledtrådens bildpost och plats finns | `saknas` | Skrivs i fas 5 |
 
 ### Miljöer (`06-§`)
 
@@ -336,6 +355,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§11.3`–`11.5` | Lagerdelningen: domänlogik i Node, canvas i `ui/`, id via `crypto.subtle` | `byggd` | `source/ts/domain/image-prepare.ts`, `zip.ts`, `image-post.ts` och `image-limits.ts` testas i Node; `source/ts/ui/image-tool/` håller sig till canvas och DOM. `imageIdFor` är samma funktion i bygget, kommandona och webbläsaren (`tests/domain/image-id.test.ts`) |
 | `03-§12.1` | Kandidaterna från bygget som `<template>` per post | `byggd` | `bingoView` i `source/ts/build/pages.ts` och poolen i `source/pages/bingo.njk`; `tests/build/data-pages.test.ts` räknar malldelarna och kräver bildkedjans markup i dem |
 | `03-§12.2` | Regler i domänen, DOM i vyn, firande utan beroenden | `byggd` | `source/ts/domain/bingo.ts` testad i `tests/domain/bingo.test.ts`; `source/ts/ui/bingo.ts`, `confetti.ts` och `fanfare.ts` håller sig till DOM, canvas och Web Audio, och `tests/build/pwa.test.ts` kräver att den buntade koden inte pekar på någon annan värd. Fanfarens tonlista är ren data i `fanfareNotes`, testad utan webbläsare i `tests/ui/fanfare.test.ts` |
+| `03-§12.3` | Dragningen som en modul båda spelen läser | `saknas` | Skrivs i fas 5 |
+| `03-§12.4` | Spana!: katalogen i bygget, reglerna i domänen, DOM i vyn | `saknas` | Skrivs i fas 5 |
 
 ### Källregister (`09-§`)
 
@@ -363,7 +384,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 22 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
 | `byggd` | 174 |

@@ -39,7 +39,8 @@ source/data/
 ├── populations.yaml          # djur som redovisas som antal per ras
 ├── animals/<djur-id>.yaml    # en fil per djur
 ├── locations/<plats-id>.yaml # en fil per hage eller plats
-└── images/<bild-id>.yaml     # en fil per bild
+├── images/<bild-id>.yaml     # en fil per bild
+└── clues/<bild-id>.yaml      # en fil per ledtråd till spelet Spana!
 ```
 
 Regeln bakom uppdelningen: **egen fil för det som har en egen publik sida. En
@@ -52,6 +53,10 @@ femtontal poster som ändras några gånger om året och läses bäst som en lis
 Bilderna har ingen egen sida men egna filer ändå: de blir tusentals, de läggs till en i
 taget, och en delad fil skulle kollidera vid varje uppladdning. Se
 [ADR 0015](adr/0015-bilden-som-egen-post.md). <!-- 04-§2.5 -->
+
+Ledtrådarna i `clues/` följer bilderna av samma skäl: de läggs till en i taget, de hör
+ihop med varsin bild, och en delad fil skulle kollidera vid varje tillägg. Se
+[ADR 0025](adr/0025-spelets-ledtradar-ar-egna-poster.md). <!-- 04-§2.6 -->
 
 Vissa djurslag, exempelvis höns, presenteras inte som namngivna individer. De lagras i
 `populations.yaml` som ett antal per ras. En art får finnas antingen i `animals/` eller
@@ -76,6 +81,8 @@ inuti filen — det skulle vara samma faktum på två ställen. <!-- 04-§3.1 --
 - Bilder är undantaget: deras id väljs inte av en människa utan räknas ur filens
   innehåll, eftersom ett namn som beskriver motivet kan bli fel. Formen står i
   §9. <!-- 04-§3.5 -->
+- Ledtrådar har inget eget id: filnamnet är bild-id:t för den bild ledtråden visar, så att
+  bilden och ledtråden aldrig kan hamna i otakt. Formen står i §11. <!-- 04-§3.7 -->
 
 Ett individuellt djur får dessutom ha `publicId`, ett identifierande nummer som finns
 synligt på djuret och visas för besökaren, till exempel ett öronmärke. Det är skilt från
@@ -394,8 +401,47 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 - Att inget fält innehåller HTML. Innehåll är markdown eller ren text. <!-- 04-§10.9 -->
 - Att inget fält finns som kontraktet inte känner till, så att ett felstavat fältnamn
   inte tyst ignoreras. <!-- 04-§10.11 -->
+- Att varje ledtråds filnamn är ett bild-id som har en bildpost, och att ledtrådens
+  `location` pekar på en plats som finns. <!-- 04-§10.17 -->
 
 Valideringen ger dessutom **varningar** som inte fäller bygget, för sådant som är tillåtet
 men troligen ett förbiseende: ett djur utan foto, en aktiv plats utan djurslag, en plats
-utan koordinater, en bildpost som ingen refererar och en bildfil som ingen bildpost hör
-till. <!-- 04-§10.10 -->
+utan koordinater, en bildpost som ingen refererar, en bildfil som ingen bildpost hör till
+och en ledtråd som pekar på en plats som inte används just nu. <!-- 04-§10.10 -->
+
+---
+
+## 11. Ledtrådar — `clues/<bild-id>.yaml`
+
+Spelet Spana! (`02-§13`) visar en närbild på en detalj och frågar var på gården den
+sitter. Ledtråden är posten som binder ihop bilden med svaret. Den är en egen post och
+inte ett fält på platsen — se
+[ADR 0025](adr/0025-spelets-ledtradar-ar-egna-poster.md). <!-- 04-§11.1 -->
+
+```yaml
+# source/data/clues/img-a3f2c1d8b901.yaml
+location: brackebur            # plats-id: svaret på var detaljen sitter
+text: Den sitter på grinden.   # frivillig, kort
+```
+
+- **Filnamnet är bild-id:t** (`§9`) för den bild ledtråden visar. Ledtråden har därför
+  ingen `image`-rad: bilden står i filnamnet, och samma faktum skrivs inte två gånger
+  (`§3.1`). De två filerna heter samma sak och kan inte hamna i otakt — det är också så
+  bildverktyget levererar dem (`02-§11`). <!-- 04-§11.2 -->
+- `location` är obligatorisk och ska vara id:t på en plats i `locations/`. Vilken sort
+  platsen är spelar ingen roll: en detalj kan sitta i en hage lika gärna som vid
+  grillplatsen. <!-- 04-§11.3 -->
+- `text` är frivillig och är en kort mening, högst 120 tecken, som hjälper den som kör
+  fast. Den visas på nivån "Lätt" och göms på "Svårt" (`02-§13.7`). Utelämnas fältet är
+  bilden hela ledtråden. <!-- 04-§11.4 -->
+- Bilden ska vara en **närbild på detaljen** — en gunga, en käpphäst, en gärsgård — och
+  inte platsens översiktsbild: en bild som visar hela hagen besvarar sin egen fråga. Det
+  är en redaktionell regel som ingen validering kan avgöra åt oss. <!-- 04-§11.5 -->
+- Flera ledtrådar får peka på samma plats, och en plats behöver ingen ledtråd alls. En
+  bild kan däremot vara ledtråd högst en gång, eftersom filnamnet är bild-id:t. Ska samma
+  motiv vara två ledtrådar är det två foton. <!-- 04-§11.6 -->
+- Byts bilden ut får den ett nytt id (ADR 0015), och ledtråden flyttar med till en fil med
+  det nya namnet. Den gamla tas bort i samma ändring, precis som den gamla
+  bildposten. <!-- 04-§11.7 -->
+- Ledtrådarna sorteras på id, som bilderna, så att bygget är deterministiskt
+  (`02-§6.9`). <!-- 04-§11.8 -->
