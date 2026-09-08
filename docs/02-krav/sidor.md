@@ -197,6 +197,13 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   raka: under, över, höger, vänster. Ordningen är fast, så placeringen är
   deterministisk. Hörnet där zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så
   ingen etikett hamnar bakom en knapp. <!-- 02-§5.53 -->
+- En markör i ritningens ytterkant får sitt namn **rakt åt sidan**, inte snett: står
+  markören i vänsterkanten hamnar namnet rakt till höger, och i högerkanten rakt till
+  vänster. Ett snett läge sätter etikettens hörn mot markörens, och vid kanten — där
+  platserna utanför ritningen står på rad (`04-§5.9`) — går det då inte att se vilket namn
+  som hör till vilken prick. Ett rakt läge ligger mitt för pricken och pekar ut den
+  entydigt. Innanför ytterkanten gäller ordningen i `02-§5.53` som förut, eftersom
+  betesmarkens band då avgör. <!-- 02-§5.54 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är
