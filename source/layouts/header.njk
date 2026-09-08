@@ -5,8 +5,13 @@
   buttons and links; CSS decides what shows at which width (05-§5.4).
   Icons are inline SVG with aria-hidden (02-§10.32).
 #}
+{#- One entry per errand the site carries (02-§10.5), read by both the desktop row and
+    the menu card. `children` makes the menu row a `<details>` (02-§10.43); an entry
+    without it is a plain link, which is why the map has none (02-§10.45). #}
 {% set navLinks = [
   { href: "/", row: "Hem", menu: "Startsidan" },
+  { href: "/karta/", row: "Kartan", menu: "Kartan" },
+  { href: "/djuren/", row: "Djuren", menu: "Djuren", children: views.animalsOverview.species },
   { href: "/om/", row: "Om sajten", menu: "Om sajten" }
 ] %}
 <a class="skip-link" href="#main">Hoppa till innehållet</a>
@@ -83,7 +88,30 @@
     <ul class="site-menu__list">
       {%- for link in navLinks %}
       <li>
+        {%- if link.children %}
+        {#- The fold is `<details>`: no client code, keyboard and screen reader for free
+            (02-§10.44). The chevron follows `[open]` in CSS (05-§6.46). #}
+        <details class="site-menu__details">
+          <summary class="site-menu__summary">
+            <span>{{ link.menu }}</span>
+            <svg class="site-menu__chevron" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </summary>
+          <ul class="site-menu__sublist">
+            <li>
+              <a class="site-menu__link site-menu__link--child" href="{{ link.href | url }}"{% if page.url == link.href %} aria-current="page"{% endif %}>Alla djuren</a>
+            </li>
+            {%- for child in link.children %}
+            <li>
+              <a class="site-menu__link site-menu__link--child" href="{{ child.url | url }}"{% if page.url == child.url %} aria-current="page"{% endif %}>{{ child.plural }}</a>
+            </li>
+            {%- endfor %}
+          </ul>
+        </details>
+        {%- else %}
         <a class="site-menu__link" href="{{ link.href | url }}"{% if page.url == link.href %} aria-current="page"{% endif %}>{{ link.menu }}</a>
+        {%- endif %}
       </li>
       {%- endfor %}
     </ul>

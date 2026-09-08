@@ -153,6 +153,11 @@
   border-radius: var(--radius-lg);
   background: var(--color-green);
   box-shadow: var(--shadow-raised);
+  /* The fold can make the card taller than the screen (02-§10.43); it scrolls inside
+     itself rather than running off the bottom edge. */
+  max-height: calc(100dvh - var(--space-xl) - var(--space-lg));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   visibility: hidden;
   opacity: 0;
   transform: translateY(calc(-1 * var(--space-xs)));
@@ -214,6 +219,56 @@
   outline-color: var(--color-surface);
 }
 
+/* ── The menu's fold (02-§10.43–10.44, 05-§6.46) ───────────────────────── */
+
+/* The row is a <summary>, so the open state is the browser's and needs no script. The
+   default triangle goes; the chevron on the right follows [open]. */
+.site-menu__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--tap-target-min);
+  padding-block: var(--space-xs);
+  color: var(--color-surface);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.site-menu__summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-menu__summary:hover {
+  text-decoration: underline;
+}
+
+.site-menu__summary:focus-visible {
+  outline-color: var(--color-surface);
+}
+
+.site-menu__chevron {
+  flex: none;
+  transition: transform 200ms ease;
+}
+
+.site-menu__details[open] .site-menu__chevron {
+  transform: rotate(180deg);
+}
+
+/* The children are indented and set smaller, but keep the full tap target (02-§10.39). */
+.site-menu__sublist {
+  margin: 0;
+  padding: 0 0 var(--space-xs) var(--space-md);
+  list-style: none;
+}
+
+.site-menu__link--child {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+}
+
 /* The layer between the page and the menu card (02-§10.38). It is what receives a press
    outside the menu, so the press that closes the menu never reaches a link underneath.
    The header row is lifted above it in layout.css, so the menu button stays visible and
@@ -230,7 +285,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-menu {
+  .site-menu,
+  .site-menu__chevron {
     transition: none;
   }
 }
@@ -378,6 +434,62 @@
 /* ── Species tile (05-§6.24) ───────────────────────────────────────────── */
 
 /* A card that is one big link: picture on top, plural name under it. */
+/* ── Nav card (02-§5.63, 05-§6.45) ─────────────────────────────────────── */
+
+/* The home page's cards. Same surface as .card, but the picture is a drawn symbol on a
+   pale plate, so the grid keeps its shape whether a card has a photo or not. */
+.home-card {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-green-deep);
+  text-decoration: none;
+}
+
+/* A band, not a picture box: the symbol says what the errand is, and a card whose plate
+   grew with the card would be mostly empty green on a desktop (05-§6.45). */
+.home-card__symbol-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: var(--color-green-pale);
+}
+
+.home-card__symbol {
+  width: 48px;
+  height: 48px;
+  color: var(--color-green-deep);
+}
+
+.home-card__title {
+  margin: 0;
+  padding: var(--space-sm) var(--space-sm) 0;
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+}
+
+.home-card__text {
+  margin: 0;
+  padding: 0 var(--space-sm) var(--space-sm);
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-small);
+}
+
+.home-card:hover .home-card__title,
+.home-card:focus-visible .home-card__title {
+  text-decoration: underline;
+}
+
+@media (min-width: 960px) {
+  .home-card__symbol {
+    width: 64px;
+    height: 64px;
+  }
+}
+
 .species-tile {
   display: block;
   overflow: hidden;

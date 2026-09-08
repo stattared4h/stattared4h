@@ -83,11 +83,11 @@ describe("the animal overview page (02-§5.66)", () => {
   test("lists the species with present animals or counted populations, linked to their pages", async () => {
     const { views } = await qaViews();
     assert.deepEqual(
-      views.animals.species.map((s) => s.id),
+      views.animalsOverview.species.map((s) => s.id),
       ["get", "far", "ko", "hast", "kanin", "gris", "hons", "katt"],
     );
-    assert.equal(views.animals.species[0].url, "/arter/get/");
-    assert.equal(views.animals.species[0].plural, "Getter");
+    assert.equal(views.animalsOverview.species[0].url, "/arter/get/");
+    assert.equal(views.animalsOverview.species[0].plural, "Getter");
   });
 });
 
@@ -350,7 +350,7 @@ describe("an empty dataset (02-§5.7)", () => {
   test("builds views with no pages and no map", () => {
     const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
     const views = buildViews(empty, { base: "/", farm: FARM });
-    assert.deepEqual(views.animals.species, []);
+    assert.deepEqual(views.animalsOverview.species, []);
     assert.deepEqual(views.locations, []);
     assert.deepEqual(views.animals, []);
     assert.deepEqual(views.species, []);

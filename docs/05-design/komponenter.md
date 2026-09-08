@@ -92,15 +92,19 @@ Navkortet är startsidans enda innehåll: ett kort per ärende sajten bär
 - Samma yta som kortet i 6.4 — vit, `--radius-md`, `--shadow-card` — och samma rutnät som
   djurkorten, två i bredd på mobil och tre från desktopbrytpunkten (`02-§5.64`). Hela
   kortet är länken, och rubriken bär texten (6.4).
-- I stället för ett foto står en ritad symbol, 48 px, centrerad på en ljusgrön platta
-  `--color-green-pale` i kortets fulla bredd med samma `4:3` som fotot i 6.4 — så byter
-  rutnätet inte form när ett kort har bild och ett annat inte. Symbolen är
-  `--color-green-deep`, ritad i samma streck som kartans markörer (`05-§6.39`), och
-  `aria-hidden`: rubriken säger redan vad kortet är.
+- I stället för ett foto står en ritad symbol, 48 px och 64 px från desktopbrytpunkten,
+  centrerad på en ljusgrön platta `--color-green-pale` i kortets fulla bredd. Plattan är
+  ett band med `--space-md` innermarginal, inte fotots `4:3`-ruta: navets rutnät har inga
+  bildkort att linjera mot, och en platta som växer med kortet blir mest tom grönska på en
+  bred skärm. Symbolen är `--color-green-deep`, ritad i samma streck som kartans markörer
+  (`05-§6.39`), och `aria-hidden`: rubriken säger redan vad kortet är.
 - Under plattan står rubriken i `--font-size-h3`, vikt 700, och därunder en rad i
-  `--font-size-small` och `--color-ink-soft` som säger vad besökaren hittar. En rad, inte
-  två: kortet ska gå att läsa i ett ögonkast, och två kort ska rymmas ovanför vecket på
-  en telefon.
+  `--font-size-small` och `--color-ink-soft` som säger vad besökaren hittar. Rubriken är
+  ett eller två ord — "Kartan", "Djuren" — eftersom ett kort som delar telefonens bredd
+  med ett till annars bryter rubriken över tre rader. En rad under, inte två: kortet ska
+  gå att läsa i ett ögonkast, och två kort ska rymmas ovanför vecket på en telefon.
+- Korten i en rad är lika höga, som djurkorten (`05-§6.14`), så att en längre rad på det
+  ena inte lämnar det andra hängande kort.
 
 ### 6.6 Faktaruta
 

@@ -107,8 +107,10 @@ håller på minimal JavaScript (`CL-§1.4`) avgörs i ADR 0020.
 ### Startsidan
 
 - Startsidan är sajtens nav. Den säger i en mening vad sajten är (`02-§5.8`) och visar
-  därunder ett kort per ärende sajten bär: "Karta över gården", som leder till kartsidan,
-  och "Djuren på gården", som leder till djurinfosidan. Kartan står först — besökaren står
+  därunder ett kort per ärende sajten bär: "Kartan", som leder till kartsidan, och
+  "Djuren", som leder till djurinfosidan. Rubrikerna är korta — ett kort som delar
+  telefonens bredd med ett till har plats för ett eller två ord, inte för en mening; raden
+  under bär förklaringen. Kartan står först — besökaren står
   på gården med telefonen, och frågan om vilken hage hen ska gå till är den vanligaste.
   Startsidan visar ingen karta, ingen platslista, inga djurslag och ingen
   öronmärkessökning; de bor på sidorna korten leder till. <!-- 02-§5.7 -->

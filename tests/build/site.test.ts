@@ -171,8 +171,10 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
     }
   });
 
+  // The QA dataset is the one with species; production's data has only places so far, and
+  // a fold with nothing but "Alla djuren" is what the farm's own site shows until then.
   test("Djuren fäller ut arterna, hopfällt och utan JavaScript (02-§10.43–10.44)", async () => {
-    const html = await readFile(path.join(prod, "index.html"), "utf8");
+    const html = await readFile(path.join(qa, "index.html"), "utf8");
     const card = html.slice(html.indexOf('id="site-menu"'), html.indexOf("</nav>", html.indexOf('id="site-menu"')));
     const details = card.slice(card.indexOf("<details"), card.indexOf("</details>"));
     assert.ok(details.length > 0, "fällan är ett details-element");
@@ -180,10 +182,10 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
     assert.match(details, /<summary class="site-menu__summary"/);
     const rows = [...details.matchAll(/<a class="site-menu__link site-menu__link--child" href="([^"]+)"[^>]*>([^<]+)</g)];
     assert.ok(rows.length > 0, "fällan har underrader");
-    assert.deepEqual([rows[0][1], rows[0][2]], ["/djuren/", "Alla djuren"], "första underraden är vägen till sidan");
+    assert.deepEqual([rows[0][1], rows[0][2]], [`${PREFIX}djuren/`, "Alla djuren"], "första underraden är vägen till sidan");
     assert.deepEqual(
       rows.slice(1).map((m) => m[1]),
-      ["/arter/get/", "/arter/far/", "/arter/ko/", "/arter/hast/", "/arter/kanin/", "/arter/gris/", "/arter/hons/", "/arter/katt/"],
+      ["get", "far", "ko", "hast", "kanin", "gris", "hons", "katt"].map((id) => `${PREFIX}arter/${id}/`),
       "ett djurslag per rad, i arternas ordning",
     );
   });

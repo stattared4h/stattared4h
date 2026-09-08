@@ -33,9 +33,9 @@ import {
 } from "../domain/index.ts";
 import { definitePlural, joinSwedish, lowerFirst } from "../domain/swedish.ts";
 import { renderMap, type MapBackground, type MapLocation } from "./map.ts";
-import { symbolSvg } from "./symbols.ts";
+import { HOME_CARD_SYMBOLS, symbolSvg, type HomeCardId } from "./symbols.ts";
 
-/** A species as a tappable box with its picture (05-§6.24), on the home and location pages. */
+/** A species as a tappable box with its picture (05-§6.24), on the animal and location pages. */
 export interface SpeciesTileView {
   id: string;
   name: string;
@@ -72,7 +72,23 @@ export interface SpeciesGroupView {
   populationSentence: string | null;
 }
 
+/** One errand on the home page's nav (02-§5.63): a symbol, a heading, a line and a link. */
+export interface HomeCardView {
+  id: HomeCardId;
+  title: string;
+  /** One line saying what the visitor finds there. One, not two (05-§6.45). */
+  text: string;
+  url: string;
+  /** The inside of a 24 × 24 viewBox, painted in `currentColor` (05-§6.45). */
+  symbol: string;
+}
+
 export interface HomeView {
+  cards: HomeCardView[];
+}
+
+/** The animal overview page: the ear tag search and the species on the farm (02-§5.66). */
+export interface AnimalsOverviewView {
   species: SpeciesTileView[];
 }
 
@@ -169,6 +185,7 @@ export interface MapPageView {
 
 export interface SiteViews {
   home: HomeView;
+  animalsOverview: AnimalsOverviewView;
   locations: LocationPageView[];
   animals: AnimalPageView[];
   species: SpeciesPageView[];
@@ -261,7 +278,33 @@ function link(animal: Animal): LinkView {
   return { name: animal.name, url: animalUrl(animal.id) };
 }
 
-export function homeView(dataset: Dataset): HomeView {
+/**
+ * The home page's cards (02-§5.7). They carry no data of their own — a farm without a
+ * single animal still has both errands — so the nav is a constant, and a new game becomes
+ * one more entry here, one row in the menu and one template (03-§4.7).
+ */
+export function homeView(): HomeView {
+  return {
+    cards: [
+      {
+        id: "karta",
+        title: "Kartan",
+        text: "Hitta hagarna och allt annat på gården.",
+        url: "/karta/",
+        symbol: HOME_CARD_SYMBOLS.karta,
+      },
+      {
+        id: "djuren",
+        title: "Djuren",
+        text: "Se djurslagen, eller sök på ett öronmärke.",
+        url: "/djuren/",
+        symbol: HOME_CARD_SYMBOLS.djuren,
+      },
+    ],
+  };
+}
+
+export function animalsOverviewView(dataset: Dataset): AnimalsOverviewView {
   return { species: speciesOnFarm(dataset).map(speciesTile) };
 }
 
@@ -416,7 +459,8 @@ export function mapView(dataset: Dataset, options: Pick<BuildViewsOptions, "base
 export function buildViews(dataset: Dataset, options: BuildViewsOptions): SiteViews {
   const content = options.speciesContent ?? {};
   return {
-    home: homeView(dataset),
+    home: homeView(),
+    animalsOverview: animalsOverviewView(dataset),
     locations: dataset.locations.map((location) => locationView(dataset, location, options.farm)),
     animals: dataset.animals.map((animal) => animalView(dataset, animal, options.farm)),
     species: dataset.species.map((species) => speciesView(dataset, species, options.farm, content[species.id] ?? null)),

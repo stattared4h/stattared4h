@@ -1,0 +1,25 @@
+{#
+  The home page's nav cards (02-§5.63, 05-§6.45): one tappable card per errand the site
+  carries. Takes HomeCardView[] from source/ts/build/pages.ts.
+
+  The whole card is the link and the heading carries the text, as every card on the site
+  (05-§6.16). The symbol is `aria-hidden`: the heading already says what the card is.
+
+    {% import "home-card.njk" as nav %}
+    {{ nav.cardGrid(views.home.cards) }}
+#}
+{% macro cardGrid(cards) %}
+<ul class="card-grid home-cards">
+  {%- for card in cards %}
+  <li>
+    <a class="home-card" href="{{ card.url | url }}">
+      <span class="home-card__symbol-plate">
+        <svg class="home-card__symbol" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="48" height="48">{{ card.symbol | safe }}</svg>
+      </span>
+      <h2 class="home-card__title">{{ card.title }}</h2>
+      <p class="home-card__text">{{ card.text }}</p>
+    </a>
+  </li>
+  {%- endfor %}
+</ul>
+{% endmacro %}

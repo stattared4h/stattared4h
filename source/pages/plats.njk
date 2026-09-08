@@ -23,7 +23,7 @@ eleventyComputed:
 
   {%- if not view.active %}
   <p class="lead">Den här platsen används inte just nu.</p>
-  <p><a class="button" href="{{ '/' | url }}">Karta över gården</a></p>
+  <p><a class="button" href="{{ '/karta/' | url }}">Karta över gården</a></p>
   {#- Everything but a paddock — café, toilet, playground — says nothing about
       animals (02-§5.35). #}
   {%- elif view.kind != "djurplats" %}
@@ -32,7 +32,7 @@ eleventyComputed:
   {%- endif %}
   {%- elif view.species.length == 0 %}
   <p class="lead">Just nu går inga djur här.</p>
-  <p><a class="button" href="{{ '/' | url }}">Karta över gården</a></p>
+  <p><a class="button" href="{{ '/karta/' | url }}">Karta över gården</a></p>
   {%- else %}
   {{- tiles.speciesGrid(view.species, true) }}
   {%- if view.note %}

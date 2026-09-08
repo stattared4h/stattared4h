@@ -1,0 +1,51 @@
+---
+layout: base.njk
+permalink: /djuren/
+title: Djuren på gården
+description: >-
+  Alla djurslag på Stättareds 4H-gård, och en sökning som hittar rätt djur på
+  öronmärkets nummer.
+---
+{#-
+  The animal overview page (02-§5.66). The ear tag search comes first (02-§5.52): the
+  visitor standing beside the animal with the number readable is asking the sharpest
+  question the page answers.
+#}
+{% import "species-tile.njk" as tiles %}
+<div class="container">
+  <h1>Djuren på gården</h1>
+
+  {%- if views.animalsOverview.species.length > 0 %}
+  <section class="page-section">
+    <h2>Hitta ett djur via öronmärket</h2>
+    <p>Skriv av hela numret. Mellanslag och bindestreck spelar ingen roll.</p>
+    <form data-animal-id-search>
+      <label for="animal-public-id">Öronmärke</label>
+      <input id="animal-public-id" data-animal-id-input type="search" inputmode="text" autocomplete="off" placeholder="SE 012345 0001">
+      <button class="button" type="submit">Hitta djuret</button>
+      <p data-animal-id-result role="status" aria-live="polite" hidden></p>
+      <div hidden aria-hidden="true">
+        {%- for animal in dataset.animals %}
+          {%- if animal.publicId %}
+        <span data-public-id="{{ animal.publicId }}" data-name="{{ animal.name }}" data-url="{{ ('/djur/' + animal.id + '/') | url }}"></span>
+          {%- endif %}
+        {%- endfor %}
+      </div>
+    </form>
+  </section>
+
+  <section class="page-section">
+    <h2>Djurslagen på gården</h2>
+    {{- tiles.speciesGrid(views.animalsOverview.species, true) }}
+  </section>
+
+  {%- else %}
+  <div class="note page-section">
+    <h2>Djuren är inte inlagda ännu</h2>
+    <p>
+      Snart kan du läsa om varje djur här. Under tiden hittar du allt om gården på
+      <a href="{{ site.mainSite }}">4h.se/stattared</a>.
+    </p>
+  </div>
+  {%- endif %}
+</div>

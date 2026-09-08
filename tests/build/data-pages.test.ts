@@ -82,8 +82,8 @@ describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
     const html = main(await page(""));
     const cards = [...html.matchAll(/<a class="home-card" href="\/([^"]*)">/g)].map((m) => `/${m[1]}`);
     assert.deepEqual(cards, ["/karta/", "/djuren/"], "ett kort per ärende, kartan först (02-§5.7)");
-    assert.match(html, /<h2 class="home-card__title">Karta över gården<\/h2>/);
-    assert.match(html, /<h2 class="home-card__title">Djuren på gården<\/h2>/);
+    assert.match(html, /<h2 class="home-card__title">Kartan<\/h2>/);
+    assert.match(html, /<h2 class="home-card__title">Djuren<\/h2>/);
     assert.match(html, /<ul class="card-grid home-cards">/, "korten ligger i djurkortens rutnät (02-§5.64)");
     assert.match(html, /href="https:\/\/www\.4h\.se\/stattared\/"/, "meningen om vad sajten är (02-§5.8)");
   });
@@ -146,10 +146,10 @@ describe("the location page (02-§5.9–5.13, 05-§6.24)", () => {
   test("the empty place, the inactive place and the counted population", async () => {
     const empty = main(await page("plats/a"));
     assert.match(empty, /Just nu går inga djur här/);
-    assert.match(empty, /<a class="button" href="\/">Karta över gården<\/a>/);
+    assert.match(empty, /<a class="button" href="\/karta\/">Karta över gården<\/a>/);
     const inactive = main(await page("plats/d"));
     assert.match(inactive, /Den här platsen används inte just nu/);
-    assert.match(inactive, /<a class="button" href="\/">Karta över gården<\/a>/);
+    assert.match(inactive, /<a class="button" href="\/karta\/">Karta över gården<\/a>/);
     assert.doesNotMatch(inactive, /species-tile|animal-card/);
     const hens = main(await page("plats/honshuset"));
     assert.match(hens, /<h2>Hönsen på gården<\/h2>/);
@@ -290,7 +290,7 @@ describe("the species page (02-§5.19–5.22)", () => {
   test("horses: nobody knows where; hens: a counted population; no empty editorial heading", async () => {
     const hast = main(await page("arter/hast"));
     assert.match(hast, /Just nu vet vi inte var hästarna går/);
-    assert.match(hast, /<a class="button" href="\/">Karta över gården<\/a>/);
+    assert.match(hast, /<a class="button" href="\/karta\/">Karta över gården<\/a>/);
     const hons = main(await page("arter/hons"));
     assert.match(hons, /På gården finns 18 svarta dvärghöns och 14 orusthöns\./);
     assert.doesNotMatch(hons, /animal-card/);
@@ -328,13 +328,12 @@ describe("the map page (02-§5.23–5.27, 02-§5.65)", () => {
     assert.deepEqual(
       [...html.matchAll(/href="(https?:[^"]+)"/g)].map((m) => m[1]),
       [
-        // The lead paragraph points at the main site (02-§5.8); the other two are the
-        // area maps (02-§5.34). Nothing else may lead out of the site.
-        "https://www.4h.se/stattared/",
+        // The two area maps (02-§5.34). Nothing else may lead out of the map page; the
+        // sentence about the main site belongs to the home page (02-§5.8).
         "https://www.4h.se/stattared/vandring-fiske/",
         "https://www.naturkartan.se/sv/kungsbacka",
       ],
-      "only the main site and the two area maps lead out",
+      "only the two area maps lead out",
     );
   });
 });
