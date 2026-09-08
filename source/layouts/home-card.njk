@@ -9,7 +9,7 @@
     {{ nav.cardGrid(views.home.cards) }}
 #}
 {% macro cardGrid(cards) %}
-<ul class="card-grid home-cards">
+<ul class="card-grid">
   {%- for card in cards %}
   <li>
     <a class="home-card" href="{{ card.url | url }}">

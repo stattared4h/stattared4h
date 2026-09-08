@@ -59,7 +59,7 @@ describe("djurkortens rutnät (02-§5.50, 05-§4.12)", () => {
 
   test("navkorten ligger i samma rutnät (02-§5.64)", async () => {
     const html = await read("source/layouts/home-card.njk");
-    assert.match(html, /class="card-grid home-cards"/, "navet återanvänder djurkortens rutnät");
+    assert.match(html, /<ul class="card-grid">/, "navet återanvänder djurkortens rutnät");
     const css = await read("source/assets/css/components.css");
     const rule = /\.home-card__symbol-plate\s*\{([^}]*)\}/.exec(css);
     assert.ok(rule, ".home-card__symbol-plate saknas");

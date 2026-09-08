@@ -84,7 +84,7 @@ describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
     assert.deepEqual(cards, ["/karta/", "/djuren/"], "ett kort per ärende, kartan först (02-§5.7)");
     assert.match(html, /<h2 class="home-card__title">Kartan<\/h2>/);
     assert.match(html, /<h2 class="home-card__title">Djuren<\/h2>/);
-    assert.match(html, /<ul class="card-grid home-cards">/, "korten ligger i djurkortens rutnät (02-§5.64)");
+    assert.match(html, /<ul class="card-grid">/, "korten ligger i djurkortens rutnät (02-§5.64)");
     assert.match(html, /href="https:\/\/www\.4h\.se\/stattared\/"/, "meningen om vad sajten är (02-§5.8)");
   });
 
