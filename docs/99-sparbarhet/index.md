@@ -171,6 +171,12 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§10.31` | Egen appikon | `byggd` | `source/assets/img/favicon.svg` och storlekarna från `npm run icons` (`scripts/icons.mjs`); `tests/build/pwa.test.ts` kontrollerar filerna, måtten och länkarna i `<head>` |
 | `02-§10.37` | 4H-loggans färger | `byggd` | `tests/design/logo.test.ts` kräver att den gröna filen bara bär logotypgrönt och vitt och att den vita inte bär grönt. Frizonen spåras i `05-§6.38` |
 | `02-§10.32` | Inline-SVG-ikoner med `aria-hidden` | `byggd` | Sidhuvudets och dialogens ikoner; `tests/build/pwa.test.ts` kräver `aria-hidden` på varje `<svg>` i varje sida |
+| `02-§11.1`–`11.4` | Bildverktygets adress, `noindex` och tystnaden i `robots.txt` | `saknas` | Adressen står i `README.md` och `docs/01-BIDRA.md` |
+| `02-§11.5`–`11.6` | Verktyget utanför förcachen och utanför `assets/main.js` | `saknas` | |
+| `02-§11.7`–`11.12` | Beredningen i webbläsaren: format, mått, storlek, id och tystnad utåt | `saknas` | |
+| `02-§11.13`–`11.16` | Alt-text och fotograf, obligatoriska och tillgängliga | `saknas` | |
+| `02-§11.17`–`11.23` | Leveransen: arkiv, styckvis, YAML-formen och vägen till GitHub | `saknas` | |
+| `02-§11.24` | Gränsvärdena på ett enda ställe | `saknas` | |
 
 ### Designspecifikation (`05-§`)
 
@@ -281,6 +287,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
 | `03-§10.6` | Tillbaka är en länk som klientkoden uppgraderar | `byggd` | `source/ts/ui/back.ts`; villkoret `returnsToSitePage` testas i `tests/ui/back.test.ts`, och att markupen är en `<a>` med href till startsidan i `tests/build/site.test.ts` |
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
+| `03-§11.1`–`11.2` | Adressen som en sanning i bygget; undantagen från förcachen och indexeringen | `saknas` | |
+| `03-§11.3`–`11.5` | Lagerdelningen: domänlogik i Node, canvas i `ui/`, id via `crypto.subtle` | `saknas` | |
 
 ### Källregister (`09-§`)
 
@@ -308,7 +316,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 9 |
 | `dokumenterad` | 18 |
 | `påbörjad` | 17 |
 | `byggd` | 137 |

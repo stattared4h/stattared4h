@@ -358,3 +358,46 @@ Utan `BUILD_VERSION` bygger bygget en lokal version ur senaste taggen och klocks
 Europe/Stockholm, utom när `GITHUB_ACTIONS` är satt: då sätts ingen version alls,
 eftersom en felaktig version är sämre än ingen (`02-§10.25`). Logiken bor i
 `source/ts/domain/version.ts` och testas i Node. <!-- 03-§10.5 -->
+
+---
+
+## 11. Bildverktyget
+
+Verktygssidan (`02-§11`) är en vanlig Eleventy-sida med en egen klientbunt. Den bor på
+`/verktyg/bild-3ed93205946a/`, och adressen är skriven på ett enda ställe i
+`eleventy.config.js` — som global data `tool.imagePath`. Därifrån hämtar både sidans
+`permalink` och esbuilds utfil sin sökväg, så adressen kan inte ligga i otakt med sig
+själv. <!-- 03-§11.1 -->
+
+Sidan sätter `eleventyExcludeFromCollections: true`, och det är det som håller den ur
+service workerns förcache: `source/pages/sw.njk` bygger `PRECACHE` ur `collections.all`
+(`02-§7.4`, `02-§11.5`). Klientbunten skrivs till verktygets egen katalog och inte till
+`assets/`, så den fastnar varken i förcachens tillgångslista eller i `assets/main.js`
+som varje besökare hämtar (`02-§11.6`). Sidan bär `noindex` genom `noindex: true` i sin
+front matter, vilket `source/layouts/base.njk` läser (`02-§11.2`). <!-- 03-§11.2 -->
+
+Arbetet är delat i tre lager, efter samma linje som resten av kodbasen: det som går att
+köra utan webbläsare ligger i domänskiktet och testas i Node (`CL-§2.14`), och bara
+canvas-anropen ligger i `source/ts/ui/`.
+
+| Modul | Ansvar |
+| --- | --- |
+| `source/ts/domain/image-limits.ts` | `MAX_IMAGE_EDGE`, `MAX_IMAGE_BYTES` och kvalitetstrappan — den enda sanningen (`02-§11.24`) |
+| `source/ts/domain/zip.ts` | Zip-arkivet: CRC-32, lokala huvuden, central katalog, allt lagrat utan komprimering (`02-§11.18`, `02-§11.20`) |
+| `source/ts/domain/image-post.ts` | Bildpostens YAML och kontrollen av `alt` och `credit` (`02-§11.14`, `02-§11.15`, `02-§11.21`) |
+| `source/ts/domain/image-prepare.ts` | Skalningsbeslutet och kvalitetstrappan som ren logik, med kodaren som argument (`02-§11.8`, `02-§11.10`) |
+| `source/ts/ui/image-tool/` | Filväljaren, canvas, formuläret och nedladdningarna |
+
+`prepareEncoded` i `image-prepare.ts` tar en kodarfunktion och prövar kvalitetsstegen
+tills resultatet håller storleksgränsen. Den vet ingenting om `canvas`, och testas därför
+med en påhittad kodare i Node — samma mönster som `optimiseImage` följer på andra sidan
+([ADR 0021](../adr/0021-bildberedning-i-webblasaren.md)). <!-- 03-§11.3 -->
+
+Bild-id:t räknas ut med `crypto.subtle` i stället för `node:crypto`, så `imageIdFor` är
+samma funktion i bygget, i kommandona och i webbläsaren (`02-§11.11`). Den är asynkron
+av det skälet: WebCrypto har inget synkront gränssnitt. <!-- 03-§11.4 -->
+
+Sidan skriver ingenting och talar inte med GitHub. Den bygger en adress till repots
+uppladdningsvy och låter redaktörens webbläsare öppna den, precis som feedbacklänken gör
+(`03-§10.3`). Behörigheten kontrolleras av GitHub, inte av oss
+([ADR 0014](../adr/0014-roller-via-github.md)). <!-- 03-§11.5 -->
