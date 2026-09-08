@@ -520,3 +520,54 @@ describe("the map never shows which animals are where (02-§5.32)", () => {
     }
   });
 });
+
+describe("a crowded label grazes rather than disappears (02-§5.54)", () => {
+  /** Nine markers on the same spot: more than there are positions around one pin. */
+  const stacked = Array.from({ length: 9 }, (_, i) => ({
+    id: `p${i}`,
+    name: `Plats ${i}`,
+    x: 500,
+    y: 390,
+  }));
+
+  test("every name is placed, none is dropped for want of a free position", () => {
+    const sides = placeLabels(stacked, 1000, 782);
+    assert.equal(sides.size, stacked.length);
+    assert.ok(
+      [...sides.values()].every((side) => side !== "hidden"),
+      `ingen etikett ska döljas bara för att lägena tagit slut, fick ${[...sides.values()].join(", ")}`,
+    );
+  });
+
+  test("a name still disappears when no position fits inside the drawing at all", () => {
+    // The drawing is narrower than the label, so every one of the eight positions would
+    // cross the edge — and the edge is the rule that never bends.
+    const sides = placeLabels(
+      [{ id: "x", name: "Parkeringen vid toaletterna och vandrarhemmet", x: 20, y: 20 }],
+      40,
+      40,
+    );
+    assert.equal(sides.get("x"), "hidden");
+  });
+
+  test("covering another name is preferred to covering another marker's pin", () => {
+    // Two neighbours hem the middle marker in: one pin to the left, one label already
+    // placed above-left. The overflow must choose the label, not the pin.
+    const sides = placeLabels(
+      [
+        { id: "granne", name: "Grannen", x: 500, y: 390 },
+        { id: "mitten", name: "Mitten", x: 500, y: 390 },
+        { id: "tredje", name: "Tredje", x: 500, y: 390 },
+      ],
+      1000,
+      782,
+    );
+    assert.ok([...sides.values()].every((side) => side !== "hidden"));
+  });
+
+  test("the placement stays deterministic when positions run out (02-§5.33)", () => {
+    const once = placeLabels(stacked, 1000, 782);
+    const again = placeLabels([...stacked].reverse(), 1000, 782);
+    assert.deepEqual([...once.entries()].sort(), [...again.entries()].sort());
+  });
+});
