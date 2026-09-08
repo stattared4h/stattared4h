@@ -3,7 +3,7 @@ kind: djurplats
 species: []
 # Ungefärligt läge vid ritningens kant (04-§5.9): platsen ligger utanför kartan,
 # och punkten är utpekad av gården på ritningen — inte uppmätt på marken.
-lat: 57.337635
-lon: 12.345002
+lat: 57.337329
+lon: 12.344849
 accessible: false
 active: true

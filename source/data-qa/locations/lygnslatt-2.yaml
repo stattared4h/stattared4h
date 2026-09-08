@@ -3,8 +3,8 @@ kind: djurplats
 species:
   - gris
 description: En rymlig utehage för gårdens grisar.
-lat: 57.337052
-lon: 12.345002
+lat: 57.336503
+lon: 12.344849
 accessible: true
 active: true
 photos:

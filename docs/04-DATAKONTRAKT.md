@@ -220,7 +220,11 @@ Regler:
   senare läser filen. Alternativet vore att låta platsen sakna koordinater, men då syns den
   inte alls på kartan (`02-§5.25`), och en hage som pekas ut åt rätt håll hjälper besökaren
   mer än en hage som inte finns. Ett ungefärligt läge ersätts av ett inmätt så snart gården
-  har ett. <!-- 04-§5.9 -->
+  har ett. Läget läggs så långt in att **markörens prick ryms helt** i den smalaste kartan
+  — 360 px ger kartan 312 px, och en prick vars mitt ligger närmare kanten än prickens
+  radie blir avhuggen. Det är en knapp meter på marken vid den skalan, långt inom den
+  osäkerhet ett utpekat läge ändå har, och en hel prick är skillnaden mellan en plats
+  besökaren ser och en hen anar. <!-- 04-§5.9 -->
 - `label` säger vilken sida av markören platsens namn står på i kartan: `under`, `over`,
   `hoger` eller `vanster`. Utelämnas fältet väljer bygget själv (`02-§5.53`). Det är det
   enda fältet som handlar om utseende, och det finns för att fyra lägen inte räcker åt

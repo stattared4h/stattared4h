@@ -17,7 +17,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { test } from "node:test";
 import { parse } from "yaml";
-import { loadMapBackground, projectPoint } from "../../source/ts/build/map.ts";
+import { LABEL_METRICS, loadMapBackground, projectPoint } from "../../source/ts/build/map.ts";
 import { PROD_DIR, QA_DIR, ROOT } from "./helpers.ts";
 
 interface Place {
@@ -76,6 +76,26 @@ for (const dir of [PROD_DIR, QA_DIR]) {
       assert.ok(
         x >= 0 && x <= background.width && y >= 0 && y <= background.height,
         `${place.file}: (${place.lat}, ${place.lon}) hamnar på ${x.toFixed(0)}, ${y.toFixed(0)} — utanför ritningen ${background.width} × ${background.height} (02-§5.30)`,
+      );
+    }
+  });
+}
+
+for (const dir of [PROD_DIR, QA_DIR]) {
+  test(`every active place in ${label(dir)} keeps its whole dot inside the drawing`, async () => {
+    // The drawn dot is --space-md across and centred on the place. A place whose centre
+    // sits closer to the edge than the dot's radius is cut by the map, which clips at its
+    // own edge — on the narrowest map, where it bites first (04-§5.9).
+    const background = await loadMapBackground(path.join(ROOT, "source", "map"));
+    assert.ok(background !== null);
+    const scale = LABEL_METRICS.referenceWidth / background.width;
+    const radius = LABEL_METRICS.dot / 2 / scale;
+    for (const place of await activePlaces(dir)) {
+      if (typeof place.lat !== "number" || typeof place.lon !== "number") continue;
+      const { x, y } = projectPoint({ lat: place.lat, lon: place.lon }, background);
+      assert.ok(
+        x >= radius && x <= background.width - radius && y >= radius && y <= background.height - radius,
+        `${place.file}: pricken klipps av kartans kant; mitten måste ligga minst ${radius.toFixed(0)} enheter in, ligger på ${x.toFixed(0)}, ${y.toFixed(0)}`,
       );
     }
   });
