@@ -230,6 +230,14 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   vid den skalan; ryms namnen där ryms de vid varje bredare fönster, och att zooma vidare
   ger bara mer plats. Tröskelskalan är samma tal i bygget som i klientkoden, hämtat ur en källa, så de inte kan
   glida isär. <!-- 02-§5.57 -->
+- **Bygget räknar fyra placeringar, en per bredd kartan faktiskt visas i:** den smala
+  (312 px), surfplattans (552 px), desktopens (912 px) och den inzoomade. Skälet är att en
+  placering räknad för den smalaste skärmen styr alla bredare: `Grillplatsen vid
+  ställplatsen` behöver 333 px åt höger, har 226 vid ett 600 px-fönster och 373 vid ett på
+  960 — utan en egen desktopplacering hamnar namnet på fel sida på varje skärm, för att en
+  surfplatta i porträtt inte rymde det. Brytpunkten är 960 px, samma som resten av
+  designen använder (`05-§5.3`). Varje placering räknas mot sin egen bredd, så ingen
+  etikett hamnar utanför ritningen i något fönster (`02-§5.54`). <!-- 02-§5.61 -->
 - **Det en etikett måste hålla sig undan är den ritade pricken, inte tryckytan runt den.**
   Markören är 44 × 44 px för att gå att träffa med ett finger (`05-§4.15`), men själva
   pricken är 24 px; resten är osynlig luft. Räknades hela tryckytan som upptagen sköts

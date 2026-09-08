@@ -233,6 +233,12 @@ export const LABEL_METRICS = {
   referenceWidth: 360 - 2 * 24,
   /** The same at 600 px, where the wide placement takes over (05-§5.2). */
   wideWidth: 600 - 2 * 24,
+  /**
+   * And at 960 px, the design's desktop breakpoint (05-§5.3). Without a placement of its
+   * own, the narrowest tablet in portrait would decide where the names sit on every wider
+   * screen too (02-§5.61).
+   */
+  desktopWidth: 960 - 2 * 24,
   /** `--space-sm`: how far the zoom controls sit in from the map's bottom-right corner. */
   controlInset: 16,
   /** `--space-xs`: the gap between the control buttons. */
@@ -563,6 +569,7 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   }));
   const sides = placeLabels(points, frame.width, frame.height);
   const wideSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.wideWidth);
+  const desktopSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.desktopWidth);
   // A third placement for the zoomed map (02-§5.57). Zooming shows every name (02-§5.44),
   // and a name the overview had to hide has no side of its own — so they all fell back to
   // the same spot under their pin and stacked. The reference is the narrowest map at the
@@ -579,6 +586,7 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   for (const { location, position } of drawn) {
     const side = sides.get(location.id) ?? "below";
     const wide = wideSides.get(location.id) ?? "below";
+    const desktop = desktopSides.get(location.id) ?? "below";
     const zoom = zoomSides.get(location.id) ?? "below";
     // `below` is the stylesheet's base case and needs no modifier in the narrow layout.
     // The wide class is always written: from 600 px the stylesheet starts from the
@@ -586,6 +594,7 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
     const className =
       (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
       ` map__marker--wide-${wide}` +
+      ` map__marker--desktop-${desktop}` +
       // Nothing to say when the zoomed placement has no room either: the marker then keeps
       // the default position, and the line to its pin still says which one it belongs to.
       (zoom === "hidden" ? "" : ` map__marker--zoom-${zoom}`);

@@ -536,6 +536,48 @@
   list-style: none;
 }
 
+
+/* From 960 px the --desktop- modifier decides (02-§5.61). A placement worked out for the
+   narrowest tablet in portrait would otherwise put the names on the wrong side of every
+   wider screen; the farm's own choices in 04-§5.10 need the room a desktop has. */
+@media (min-width: 960px) {
+  .map__marker .map__label {
+    inset: calc(50% + var(--map-label-offset)) auto auto 50%;
+    transform: translateX(-50%);
+  }
+
+  .map__marker--desktop-above .map__label {
+    inset: auto auto calc(50% + var(--map-label-offset)) 50%;
+    transform: translateX(-50%);
+  }
+
+  .map__marker--desktop-right .map__label {
+    inset: 50% auto auto calc(50% + var(--map-label-offset));
+    transform: translateY(-50%);
+  }
+
+  .map__marker--desktop-left .map__label {
+    inset: 50% calc(50% + var(--map-label-offset)) auto auto;
+    transform: translateY(-50%);
+  }
+
+  .map__marker--desktop-hidden .map__label {
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .map__marker--desktop-hidden:hover .map__label,
+  .map__marker--desktop-hidden:focus-visible .map__label {
+    clip-path: none;
+    width: auto;
+    height: auto;
+    padding: 0 var(--space-xs);
+  }
+}
+
 /* ── The zoomed map's own label placement (02-§5.57) ────────────────────── */
 
 /* Zooming in shows every name (02-§5.44), including the ones the overview had to hide.

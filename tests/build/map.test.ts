@@ -97,7 +97,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+(?: map__marker--zoom-[\w-]+)?" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+(?: map__marker--zoom-[\w-]+)?" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/brackebur/", "/prov/plats/lygnslatt-1/", "/prov/plats/stora-grishagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Bräckebur", "Lygnslätt 1", "Stora grishagen"]);
@@ -489,8 +489,8 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     const { html } = renderMap(crowded, { base: "/", background });
     // The first takes the default position, which is written as no modifier at all; the
     // second has to move, so it carries one (02-§5.53).
-    assert.match(html, /<a class="map__marker map__marker--wide-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/ettan\//, "den första får standardläget, alltså ingen modifierare");
-    assert.match(html, /<a class="map__marker map__marker--label-[\w-]+ map__marker--wide-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/tvaan\//);
+    assert.match(html, /<a class="map__marker map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/ettan\//, "den första får standardläget, alltså ingen modifierare");
+    assert.match(html, /<a class="map__marker map__marker--label-[\w-]+ map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/tvaan\//);
   });
 
   test("every position the build can choose has a rule in the stylesheet", async () => {
@@ -664,5 +664,32 @@ describe("a marker in the outer margin labels straight to the side (02-§5.59)",
     );
     assert.notEqual(sides.get("mitten"), "right", "grannens ritade prick ligger i vägen");
     assert.notEqual(sides.get("mitten"), "hidden", "men namnet finns kvar på en annan sida");
+  });
+});
+
+describe("the desktop placement (02-§5.61)", () => {
+  test("the build works out one placement per width the map is shown at", () => {
+    // Narrow, tablet, desktop and zoomed — each against its own width, so no label is
+    // ever placed for a window it is not shown in.
+    assert.equal(LABEL_METRICS.referenceWidth, 360 - 48);
+    assert.equal(LABEL_METRICS.wideWidth, 600 - 48);
+    assert.equal(LABEL_METRICS.desktopWidth, 960 - 48);
+    assert.ok(LABEL_METRICS.desktopWidth > LABEL_METRICS.wideWidth);
+  });
+
+  test("every marker carries a desktop position of its own", () => {
+    const background = parseMapBackground(DRAWING, EDGES);
+    const { html } = renderMap(PLACES, { base: "/", background });
+    for (const className of [...html.matchAll(/<a class="([^"]+)"/g)].map((m) => m[1])) {
+      assert.match(className, /map__marker--desktop-[a-z-]+/, `saknar desktopläge: ${className}`);
+    }
+  });
+
+  test("a side the tablet has no room for is honoured once the desktop does", () => {
+    // The farm asks for the name to the right; at 552 px the drawing ends before the name
+    // does, at 912 px it does not (02-§5.61).
+    const marker = { id: "x", name: "Grillplatsen vid ställplatsen", x: 591, y: 211, side: "right" as const };
+    assert.notEqual(placeLabels([marker], 1000, 782, LABEL_METRICS.wideWidth).get("x"), "right");
+    assert.equal(placeLabels([marker], 1000, 782, LABEL_METRICS.desktopWidth).get("x"), "right");
   });
 });
