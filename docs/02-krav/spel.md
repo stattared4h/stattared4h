@@ -119,15 +119,17 @@ sitter i.
 - Stoppen kommer ur ledtrådskatalogen (`04-§11`): en bild som visar en detalj på nära håll,
   en frivillig kort ledtrådstext och den plats som är svaret. Platsernas egna filer bär
   ingen speldata. <!-- 02-§13.5 -->
-- Sidan listar varje ledtråd i katalogen i datasetets egen ordning, med bilden, texten när
+- Bygget listar varje ledtråd i katalogen i datasetets egen ordning, med bilden, texten när
   den finns och namnet på platsen den hör till, så att två bygg av samma data ger samma
-  sida. <!-- 02-§13.6 -->
+  sida. Sidan bär dem som inerta malldelar som spelet klonar när rundan dras; platsen står
+  bara där och syns aldrig i den lista besökaren läser (`02-§13.13`). <!-- 02-§13.6 -->
 
 ### Rundan
 
 - Innan spelet börjar väljer spelaren på en startskärm hur lång rundan är — "Kort runda"
-  om fyra stopp eller "Lång runda" om åtta — och nivå: "Lätt" visar ledtrådens bild och
-  dess text när den finns, "Svårt" visar bara bilden. Valen görs bara där: under spelet
+  eller "Lång runda", fyra respektive åtta stopp när katalogen räcker till dem
+  (`02-§13.8`) — och nivå: "Lätt" visar ledtrådens bild och dess text när den finns,
+  "Svårt" visar bara bilden. Valen görs bara där: under spelet
   finns inga inställningar. <!-- 02-§13.7 -->
 - En runda har så många stopp som valet säger, men aldrig fler än katalogen har
   ledtrådar, och samma ledtråd förekommer aldrig två gånger i samma runda. Varje val bär
