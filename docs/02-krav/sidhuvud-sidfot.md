@@ -77,8 +77,10 @@ i praktiken via kartan eller en QR-kod.
   (`02-§5.66`), länkad till artsidan. Ett tryck till fäller ihop den. Raden visar en
   vinkel som pekar nedåt när den är hopfälld och uppåt när den är utfälld
   (`05-§6.46`). <!-- 02-§10.43 -->
-- Fällan är byggd av `<details>` och `<summary>` och fungerar utan JavaScript. Menyn har
-  därmed ingen egen klientkod för utfällningen. <!-- 02-§10.44 -->
+- Fällan är byggd av `<details>` och `<summary>`: webbläsaren äger det öppna läget, och
+  menyn har ingen egen klientkod för utfällningen. Menykortet självt öppnas alltjämt av
+  menyknappen (`02-§10.4`), som kräver JavaScript — fällan lägger ingen ny sådan
+  beroende till. <!-- 02-§10.44 -->
 - Menyn har ingen fällbar rad för kartan: kartsidan har inga underrader
   (`02-§10.5`). <!-- 02-§10.45 -->
 - Menyn stängs med Escape, med ett tryck utanför den och när en länk väljs. Ett tryck

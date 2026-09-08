@@ -329,8 +329,8 @@ Kartan har en egen sida, `/karta/`, och är det första på den (`02-§5.1`, `02
 - Kartan har tre knappar: zooma in, zooma ut och "Visa hela kartan". De går att nå med
   tangentbord, och genom dem finns zoomen även för den som inte nyper eller har
   mus. <!-- 02-§5.41 -->
-- Vid 1× tar kartan bara nyp, inte drag: en besökare som rullar förbi startsidan med
-  fingret på kartan rullar sidan. Först när kartan är inzoomad tar den också drag, och då
+- Vid 1× tar kartan bara nyp, inte drag: en besökare som rullar förbi kartan med
+  fingret på den rullar sidan. Först när kartan är inzoomad tar den också drag, och då
   går den att panorera. <!-- 02-§5.42 -->
 - Markören behåller sin storlek och sin träffyta om minst 44 × 44 px (`02-§5.27`) vid
   varje zoomnivå, och sitter kvar på sin koordinat när kartan flyttas eller zoomas — som

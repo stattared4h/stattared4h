@@ -172,7 +172,9 @@ sidhuvudets rad ligger ovanpå överlägget så att menyknappen aldrig döljs
   knappens `aria-expanded`, så tillståndet står på ett ställe. <!-- 05-§6.42 -->
 - Raden "Djuren" är en fälla (`02-§10.43`): en `<summary>` med samma mått och vikt som en
   vanlig menylänk, och till höger en vinkel om 16 px som pekar nedåt när raden är hopfälld
-  och uppåt när den är utfälld. Vinkeln följer `<details open>`, inte en klass, och roterar
+  och uppåt när den är utfälld. Layouten ligger på ett element inuti `<summary>`, aldrig på
+  `<summary>` självt: en flexad `<summary>` slutar växla i somliga Safari-versioner, och
+  fällan får inte behöva script för att öppnas (`02-§10.44`). Vinkeln följer `<details open>`, inte en klass, och roterar
   med samma övergång som kortet — avstängd vid `prefers-reduced-motion`. Webbläsarens egen
   triangel tas bort. Underraderna dras in `--space-md`, står i `--font-size-small` och är
   fortsatt minst `--tap-target-min` höga (`02-§10.39`); den första är "Alla djuren", och

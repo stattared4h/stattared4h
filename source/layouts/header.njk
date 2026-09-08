@@ -92,11 +92,16 @@
         {#- The fold is `<details>`: no client code, keyboard and screen reader for free
             (02-§10.44). The chevron follows `[open]` in CSS (05-§6.46). #}
         <details class="site-menu__details">
+          {#- The row inside carries the flex layout: a <summary> whose own `display` is
+              changed stops toggling in some versions of Safari, and the fold has to work
+              without JavaScript (02-§10.44). #}
           <summary class="site-menu__summary">
-            <span>{{ link.menu }}</span>
-            <svg class="site-menu__chevron" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16">
-              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="site-menu__summary-row">
+              <span class="site-menu__summary-label">{{ link.menu }}</span>
+              <svg class="site-menu__chevron" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16">
+                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
           </summary>
           <ul class="site-menu__sublist">
             <li>

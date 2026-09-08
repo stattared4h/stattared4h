@@ -157,7 +157,7 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
     for (const { file, html } of await htmlFiles(prod)) {
       const card = html.slice(html.indexOf('id="site-menu"'), html.indexOf("</nav>", html.indexOf('id="site-menu"')));
       const rows = [...card.matchAll(/class="site-menu__link[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1]);
-      const summary = [...card.matchAll(/class="site-menu__summary"[^>]*>\s*<span[^>]*>([^<]+)</g)].map((m) => m[1]);
+      const summary = [...card.matchAll(/class="site-menu__summary-label"[^>]*>([^<]+)</g)].map((m) => m[1]);
       assert.ok(rows.includes("Startsidan"), `${file}: raden Startsidan`);
       assert.ok(rows.includes("Kartan"), `${file}: raden Kartan`);
       assert.ok(rows.includes("Om sajten"), `${file}: raden Om sajten`);

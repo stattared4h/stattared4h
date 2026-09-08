@@ -221,17 +221,11 @@
 
 /* ── The menu's fold (02-§10.43–10.44, 05-§6.46) ───────────────────────── */
 
-/* The row is a <summary>, so the open state is the browser's and needs no script. The
-   default triangle goes; the chevron on the right follows [open]. */
+/* The row is a <summary>, so the open state is the browser's and needs no script. Only
+   the marker is taken away here — the layout lives on the span inside, because a
+   <summary> whose own `display` is changed stops toggling in some versions of Safari,
+   and this fold may not depend on script to open (02-§10.44). */
 .site-menu__summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: var(--tap-target-min);
-  padding-block: var(--space-xs);
-  color: var(--color-surface);
-  font-size: var(--font-size-body);
-  font-weight: 700;
   cursor: pointer;
   list-style: none;
 }
@@ -240,7 +234,18 @@
   display: none;
 }
 
-.site-menu__summary:hover {
+.site-menu__summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--tap-target-min);
+  padding-block: var(--space-xs);
+  color: var(--color-surface);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+}
+
+.site-menu__summary:hover .site-menu__summary-label {
   text-decoration: underline;
 }
 

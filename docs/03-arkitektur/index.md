@@ -313,7 +313,7 @@ kopplingen: pekar- och tangentbordshändelser in, vyn ut, satt som `transform` p
 `.map__canvas`. Markörerna motskalas med `scale(1 / z)` genom variabeln `--map-scale`, så
 de behåller sin storlek och sin träffyta medan ritningen växer (`02-§5.43`). Vid 1× har
 omslaget `touch-action: pan-y` och tar bara nyp; inzoomad byter det till `none` och tar
-också drag, så startsidan går att rulla förbi (`02-§5.42`). Knapparna är dolda tills
+också drag, så kartsidan går att rulla förbi (`02-§5.42`). Knapparna är dolda tills
 modulen kör, som installknappen (`03-§10.2`). Vid tillräcklig förstoring sätts också
 `map--names`, som byter till den inzoomade placeringen och visar varje namn (`02-§5.44`,
 `02-§5.57`); under 600 px är det där namnen alls kommer fram (`02-§5.55`). Tröskeln är
