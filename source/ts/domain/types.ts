@@ -67,9 +67,18 @@ export interface Location {
   lon: number | null;
   accessible: boolean;
   active: boolean;
+  /**
+   * The side of the marker the name stands on in the map (02-§5.60, 04-§5.10), or null to
+   * let the build choose. The one field about appearance: four positions are not enough
+   * for the farmyard's cluster, and only the farm knows which of two neighbours matters.
+   */
+  label: LabelPlacement | null;
   /** In data order; the first one is shown at the top of the page (02-§8.11). */
   photos: Image[];
 }
+
+/** Where a place asks for its name, in the data's own words (04-§5.10). */
+export type LabelPlacement = "under" | "over" | "hoger" | "vanster";
 
 export interface Species {
   id: string;

@@ -27,7 +27,7 @@ import { parse as parseYaml } from "yaml";
 import { escapeAttribute, escapeText } from "./images.ts";
 import { symbolSvg } from "./symbols.ts";
 import { NAMES_AT_SCALE } from "../domain/map-view.ts";
-import type { LocationKind } from "../domain/types.ts";
+import type { LabelPlacement, LocationKind } from "../domain/types.ts";
 
 export const MAP_DESCRIPTION = "Karta över Stättared med gårdens hagar";
 
@@ -52,6 +52,8 @@ export interface MapLocation extends MapPoint {
   accessibility: string;
   /** "Får och kor" or "Inga djur just nu" for a djurplats; empty for the rest. */
   species: string;
+  /** The side the place asks its name to stand on, or null for the build to choose. */
+  label: LabelPlacement | null;
 }
 
 /**
@@ -186,16 +188,15 @@ function assertBasePath(base: string): void {
  * slanted and four straight. `below` is the stylesheet's base case and the fallback;
  * every other position is written on the marker as a modifier and placed by CSS.
  */
-export type LabelSide =
-  | "above-left"
-  | "above-right"
-  | "below-left"
-  | "below-right"
-  | "below"
-  | "above"
-  | "right"
-  | "left"
-  | "hidden";
+export type LabelSide = "below" | "above" | "right" | "left" | "hidden";
+
+/** The data's word for a side (04-§5.10) turned into the one the placement uses. */
+const SIDE_FOR_PLACEMENT: Readonly<Record<LabelPlacement, LabelSide>> = {
+  under: "below",
+  over: "above",
+  hoger: "right",
+  vanster: "left",
+};
 
 /**
  * Measurements the estimate needs, in pixels, mirrored from `tokens.css`. There is no
@@ -211,6 +212,12 @@ export const LABEL_METRICS = {
    * air, and it is the dot a label has to keep clear of, not the air (02-§5.58).
    */
   dot: 24,
+  /**
+   * How far from the place the label's nearest edge sits: the dot's radius and half a
+   * `--space-xs` of air. It used to clear the whole tap target, which put the name eight
+   * pixels further out than anything visible called for.
+   */
+  labelOffset: 24 / 2 + 8 / 2,
   /** `--font-size-small`: the label's type size. */
   fontSize: 15,
   /** `--space-xs`: the label's padding, at each end. */
@@ -243,26 +250,15 @@ const CHAR_WIDTH_RATIO = 0.7;
 /** The label is one line. Measured at 24 px against a 15 px type size. */
 const LINE_HEIGHT_RATIO = 1.6;
 /**
- * Tried in this order (02-§5.53). The four slanted positions come first, because a
- * slanted label leaves both the lane straight below the marker and the lane straight
- * beside it free for a neighbour.
- *
- * Among the slanted four, the pasture decides the order. Its bands run north-west to
- * south-east, so a label up-and-left or down-and-right follows the paddock it belongs to,
- * while one on the other diagonal drifts across the fence into the next paddock. The two
- * along that axis are therefore tried before the two across it. The straight four come
- * last, in the order they have always had.
+ * Tried in this order (02-§5.53). All four sit square on the marker — straight below,
+ * straight above, straight beside — so a label points at its own pin and no other. The
+ * slanted positions that once came first are gone: they met the marker corner to corner,
+ * and on a map of thirty-four places a corner points at the neighbour as readily as at the
+ * place it belongs to. They were introduced to stop a paddock's name drifting across the
+ * fence (issue #50), but the cause of that was a coordinate at the paddock's edge rather
+ * than its middle, which `04-§5.8` has since fixed.
  */
-const LABEL_SIDES: readonly LabelSide[] = [
-  "above-left",
-  "below-right",
-  "above-right",
-  "below-left",
-  "below",
-  "above",
-  "right",
-  "left",
-];
+const LABEL_SIDES: readonly LabelSide[] = ["below", "above", "right", "left"];
 
 /**
  * The order to try for a marker standing at `x` in a drawing `width` px wide, both in the
@@ -292,6 +288,8 @@ export interface LabelMarker {
   name: string;
   x: number;
   y: number;
+  /** The side the place asked for (02-§5.60), or null to let the order decide. */
+  side?: LabelSide | null;
 }
 
 interface Box {
@@ -330,28 +328,23 @@ function contains(outer: Box, inner: Box): boolean {
   );
 }
 
-/** The label's box on one side of a marker standing at `x`, `y` in pixels. */
+/**
+ * The label's box on one side of a marker standing at `x`, `y` in pixels. It hangs
+ * `labelOffset` from the place rather than clearing the whole tap target: what the eye
+ * has to connect is the name and the drawn dot, and every pixel between them is a pixel
+ * the reader has to bridge.
+ */
 function labelBox(x: number, y: number, width: number, height: number, side: LabelSide): Box {
-  const half = LABEL_METRICS.tapTarget / 2;
+  const off = LABEL_METRICS.labelOffset;
   switch (side) {
     case "below":
-      return { left: x - width / 2, right: x + width / 2, top: y + half, bottom: y + half + height };
+      return { left: x - width / 2, right: x + width / 2, top: y + off, bottom: y + off + height };
     case "above":
-      return { left: x - width / 2, right: x + width / 2, top: y - half - height, bottom: y - half };
+      return { left: x - width / 2, right: x + width / 2, top: y - off - height, bottom: y - off };
     case "right":
-      return { left: x + half, right: x + half + width, top: y - height / 2, bottom: y + height / 2 };
+      return { left: x + off, right: x + off + width, top: y - height / 2, bottom: y + height / 2 };
     case "left":
-      return { left: x - half - width, right: x - half, top: y - height / 2, bottom: y + height / 2 };
-    // The slanted positions sit corner to corner with the pin's box, so they clear both
-    // the lane under the marker and the lane beside it (02-§5.53).
-    case "above-left":
-      return { left: x - half - width, right: x - half, top: y - half - height, bottom: y - half };
-    case "above-right":
-      return { left: x + half, right: x + half + width, top: y - half - height, bottom: y - half };
-    case "below-left":
-      return { left: x - half - width, right: x - half, top: y + half, bottom: y + half + height };
-    case "below-right":
-      return { left: x + half, right: x + half + width, top: y + half, bottom: y + half + height };
+      return { left: x - off - width, right: x - off, top: y - height / 2, bottom: y + height / 2 };
     case "hidden":
       // Never asked for while choosing; a hidden label occupies nothing.
       return { left: x, right: x, top: y, bottom: y };
@@ -407,6 +400,7 @@ export function placeLabels(
 
   const points = markers.map((marker) => ({
     id: marker.id,
+    side: marker.side ?? null,
     x: marker.x * scale,
     y: marker.y * scale,
     width: marker.name.length * LABEL_METRICS.fontSize * CHAR_WIDTH_RATIO + 2 * LABEL_METRICS.padding,
@@ -431,7 +425,21 @@ export function placeLabels(
 
   const taken: Box[] = [];
   const sides = new Map<string, LabelSide>();
+
+  // A place that asks for a side gets it, before anything is placed automatically
+  // (02-§5.60). It still may not leave the drawing or hide behind a zoom button; there
+  // 02-§5.54 weighs more, and the place falls through to the automatic pass instead.
   for (const point of order) {
+    const asked = point.side;
+    if (!asked || asked === "hidden") continue;
+    const box = labelBox(point.x, point.y, point.width, height, asked);
+    if (!contains(edge, box) || overlaps(box, controls)) continue;
+    sides.set(point.id, asked);
+    taken.push(box);
+  }
+
+  for (const point of order) {
+    if (sides.has(point.id)) continue;
     const free = sidesFor(point.x, referenceWidth).find((side) => {
       const box = labelBox(point.x, point.y, point.width, height, side);
       return (
@@ -567,6 +575,7 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   const points = drawn.map(({ location, position }) => ({
     id: location.id,
     name: location.name,
+    side: location.label === null ? null : SIDE_FOR_PLACEMENT[location.label],
     ...position,
   }));
   const sides = placeLabels(points, frame.width, frame.height);

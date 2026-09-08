@@ -26,6 +26,7 @@ import { sortAnimals, sortLocations } from "./sort.ts";
 import type {
   Animal,
   Breed,
+  LabelPlacement,
   Dataset,
   Image,
   Issue,
@@ -78,6 +79,7 @@ const IMAGE_FIELDS = new Set(["alt", "credit"]);
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
 const LOCATION_KINDS: readonly LocationKind[] = ["djurplats", "mat", "grill", "toalett", "parkering", "lek", "boende", "husbil"];
+const LABEL_PLACEMENTS: readonly LabelPlacement[] = ["under", "over", "hoger", "vanster"];
 
 const ANIMAL_FIELDS = new Set([
   "name",
@@ -101,6 +103,7 @@ const LOCATION_FIELDS = new Set([
   "lon",
   "accessible",
   "active",
+  "label",
   "photos",
 ]);
 const SPECIES_FIELDS = new Set(["id", "name", "plural", "photo"]);
@@ -231,6 +234,17 @@ class Fields {
     }
     if (typeof value !== "string" || !allowed.includes(value as T)) {
       this.error(field, `${quote(value)} är inte ett giltigt värde. Skriv ${listOr(allowed)}.`);
+      return null;
+    }
+    return value as T;
+  }
+
+  /** Like `requiredEnum`, but an absent field is simply null (04-§5.10). */
+  optionalEnum<T extends string>(obj: Obj, field: string, allowed: readonly T[]): T | null {
+    const value = obj[field];
+    if (value === undefined || value === null) return null;
+    if (typeof value !== "string" || !allowed.includes(value as T)) {
+      this.error(field, `${quote(value)} är inte ett giltigt värde. Skriv ${listOr(allowed)}, eller utelämna fältet.`);
       return null;
     }
     return value as T;
@@ -694,6 +708,7 @@ function validateLocation(
   const lon = fields.optionalNumber(data, "lon");
   const accessible = fields.requiredBoolean(data, "accessible");
   const active = fields.requiredBoolean(data, "active");
+  const label = fields.optionalEnum(data, "label", LABEL_PLACEMENTS);
   const photos = fields.photos(data, images);
 
   let species: string[] | null = null;
@@ -755,7 +770,7 @@ function validateLocation(
   ) {
     return null;
   }
-  return { id: record.id, name, kind, species, note, description, lat, lon, accessible, active, photos };
+  return { id: record.id, name, kind, species, note, description, lat, lon, accessible, active, label, photos };
 }
 
 // --- Warnings ------------------------------------------------------------------

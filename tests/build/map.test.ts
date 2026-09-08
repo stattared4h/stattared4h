@@ -4,6 +4,7 @@
  * to a temporary directory only for `loadMapBackground`.
  */
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -27,7 +28,7 @@ import { NAMES_AT_SCALE } from "../../source/ts/domain/map-view.ts";
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
 /** What every place needs beyond its position, so the popup has something to show. */
-const FACTS = { note: null, accessibility: "Hit når man med rullstol och barnvagn", species: "Getter" };
+const FACTS = { note: null, accessibility: "Hit når man med rullstol och barnvagn", species: "Getter", label: null };
 
 const PLACES: MapLocation[] = [
   { id: "brackebur", name: "Bräckebur", kind: "djurplats", lat: 57.4123, lon: 12.2134, ...FACTS },
@@ -155,9 +156,9 @@ describe("the popup on a marker (02-§5.46–5.49, 03-§9.7)", () => {
   test("each marker carries what the popup shows, and the empty popup rides in the canvas", () => {
     const places: MapLocation[] = [
       { id: "brackebur", name: "Bräckebur", kind: "djurplats", lat: 57.4123, lon: 12.2134,
-        note: "Här går bockarna.", accessibility: "Hit når man med rullstol och barnvagn", species: "Getter" },
+        note: "Här går bockarna.", accessibility: "Hit når man med rullstol och barnvagn", species: "Getter", label: null },
       { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.411, lon: 12.212,
-        note: null, accessibility: "Hit når man inte med rullstol eller barnvagn", species: "" },
+        note: null, accessibility: "Hit når man inte med rullstol eller barnvagn", species: "", label: null },
     ];
     const { html } = renderMap(places, { base: "/" });
 
@@ -189,7 +190,7 @@ describe("the popup on a marker (02-§5.46–5.49, 03-§9.7)", () => {
   test("a name with markup in it is escaped in the attributes too", () => {
     const { html } = renderMap(
       [{ id: "x", name: "Hagen", kind: "djurplats", lat: 57, lon: 12,
-         note: 'Sa "hej" & <log> ut', accessibility: "Hit når man med rullstol och barnvagn", species: "Får" }],
+         note: 'Sa "hej" & <log> ut', accessibility: "Hit når man med rullstol och barnvagn", species: "Får", label: null }],
       { base: "/" },
     );
     assert.match(html, /data-note="Sa &quot;hej&quot; &amp; &lt;log&gt; ut"/);
@@ -281,11 +282,8 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
   /** Drawing units per pixel at the reference width the build calculates for. */
   const UNITS_PER_PX = 800 / 360;
   /** The four slanted positions, tried before the four straight ones (02-§5.53). */
-  const SLANTED = ["above-left", "above-right", "below-left", "below-right"];
-
-  test("places far apart both get the preferred slanted position", () => {
-    // A slanted label leaves the lane straight below and straight beside the marker
-    // free for the neighbour, so it is tried before any straight one (02-§5.53).
+  test("places far apart both get the first position in the order", () => {
+    // Straight below is tried first and is free for both (02-§5.53).
     const sides = placeLabels(
       [
         { id: "a", name: "Ettan", x: 300, y: 150 },
@@ -294,58 +292,91 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
       800,
       600,
     );
-    assert.deepEqual([...sides.values()], ["above-left", "above-left"]);
+    assert.deepEqual([...sides.values()], ["below", "below"]);
   });
 
-  test("the order tries the pasture's own diagonal before the one across it", () => {
-    // The bands run north-west to south-east, so up-left and down-right follow a paddock
-    // and the other diagonal crosses the fence (02-§5.53). A marker hemmed in on the
-    // pasture's axis falls to the crossing diagonal, never the other way round.
-    const alone = placeLabels([{ id: "a", name: "1:an", x: 400, y: 300 }], 800, 600);
-    assert.equal(alone.get("a"), "above-left", "the pasture's axis comes first");
-
-    // Blocked up-left by the drawing's left edge and down-right by a neighbour's pin.
-    const hemmed = placeLabels(
-      [
-        { id: "granne", name: "2:an", x: 173, y: 389 },
-        { id: "a", name: "1:an", x: 60, y: 300 },
-      ],
-      800,
-      600,
-    );
-    assert.ok(
-      ["above-right", "below-left"].includes(hemmed.get("a") as string),
-      `faller till den korsande diagonalen, fick ${hemmed.get("a")}`,
-    );
+  test("only the four square positions exist", () => {
+    // A crowd on one spot exhausts the order; nothing slanted may appear (02-§5.53).
+    const crowd = Array.from({ length: 6 }, (_, i) => ({ id: `p${i}`, name: "Hagen", x: 400, y: 300 }));
+    const used = new Set(placeLabels(crowd, 800, 600).values());
+    for (const side of used) {
+      assert.ok(["below", "above", "right", "left", "hidden"].includes(side), `okänt läge ${side}`);
+    }
   });
 
-  test("a slanted position wins over a straight one that is equally free", () => {
-    const sides = placeLabels([{ id: "ensam", name: "Hagen", x: 400, y: 300 }], 800, 600);
-    assert.ok(
-      SLANTED.includes(sides.get("ensam") as string),
-      `en ensam markör ska få ett snett läge, fick ${sides.get("ensam")}`,
-    );
-  });
-
-  test("the four numbered paddocks label along their band, not across the fence", () => {
-    // The pasture is divided into bands running north-west to south-east, so 1:an to
-    // 4:an step down and to the left. A label straight below the marker drifts across
-    // the band into the neighbouring paddock; up and to the left follows it (issue #50).
-    // The positions are the ones the build projects from the farm's own coordinates
-    // onto the 1000 × 782 drawing.
-    const paddocks = [
-      { id: "ettan", name: "1:an", x: 820.8, y: 272.7 },
-      { id: "tvaan", name: "2:an", x: 663.2, y: 421.7 },
-      { id: "trean", name: "3:an", x: 486.3, y: 529.1 },
-      { id: "fyran", name: "4:an", x: 321.8, y: 654.2 },
+  test("the four numbered paddocks keep their names inside their own band (issue #50)", () => {
+    // What #50 asked for was never a slanted label but a name that stays in the paddock
+    // it belongs to. The pasture's three fences are straight lines in background.svg, and
+    // the test states the outcome directly: the label box must lie on the same side of
+    // each fence as its own marker. Since 04-§5.8 put the coordinates at the bands'
+    // centroids, straight below does that — which is why 02-§5.53 could drop the slanted
+    // positions again.
+    const fences: Array<[number, number, number, number]> = [
+      [665.7, 261.4, 850.0, 442.7],
+      [460.7, 377.0, 687.9, 594.9],
+      [273.6, 440.6, 542.9, 706.9],
     ];
-    for (const width of [LABEL_METRICS.referenceWidth, LABEL_METRICS.wideWidth]) {
+    // The side comes from the data, where the farm asked for it (02-§5.60): straight
+    // below leans over a fence for three of the four, straight above does not.
+    const paddocks = [
+      { id: "ettan", name: "1:an", x: 820.8, y: 272.7, side: "above" as const },
+      { id: "tvaan", name: "2:an", x: 663.2, y: 421.7, side: "above" as const },
+      { id: "trean", name: "3:an", x: 486.3, y: 529.1, side: "above" as const },
+      { id: "fyran", name: "4:an", x: 321.8, y: 654.2, side: "above" as const },
+    ];
+    /** Which side of the fence a point lies on: the sign of the cross product. */
+    const sideOfFence = ([ax, ay, bx, by]: [number, number, number, number], x: number, y: number) =>
+      Math.sign((bx - ax) * (y - ay) - (by - ay) * (x - ax));
+
+    // The widths the placement is actually shown at. Below 600 px the overview shows no
+    // names at all (02-§5.55), so the narrow placement only appears once the visitor has
+    // zoomed — and then the map is wider than the 312 px it was estimated against, which
+    // makes the label smaller on the drawing than the estimate, never larger.
+    // Both datasets must actually ask for it, or the placement above is a fiction.
+    for (const dir of ["source/data", "source/data-qa"]) {
+      for (const paddock of paddocks) {
+        const yaml = readFileSync(path.join(ROOT, dir, "locations", `${paddock.id}.yaml`), "utf8");
+        assert.match(yaml, /^label: over$/m, `${dir}/${paddock.id}.yaml ska be om över (02-§5.60)`);
+      }
+    }
+
+    for (const width of [LABEL_METRICS.wideWidth, LABEL_METRICS.referenceWidth * 4]) {
+      const scale = width / 1000;
       const sides = placeLabels(paddocks, 1000, 782, width);
-      assert.deepEqual(
-        [...sides.values()],
-        ["above-left", "above-left", "above-left", "above-left"],
-        `vid ${width} px ska alla fyra hagetiketter ligga snett upp till vänster`,
-      );
+      for (const paddock of paddocks) {
+        const side = sides.get(paddock.id);
+        assert.notEqual(side, "hidden", `${paddock.name} ska ha ett namn vid ${width} px`);
+        const labelWidth = paddock.name.length * LABEL_METRICS.fontSize * 0.7 + 2 * LABEL_METRICS.padding;
+        const off = LABEL_METRICS.labelOffset;
+        const height = LABEL_METRICS.fontSize * 1.6;
+        const px = paddock.x * scale;
+        const py = paddock.y * scale;
+        // The corners of the label box, back in drawing units.
+        const box =
+          side === "below"
+            ? { x0: px - labelWidth / 2, x1: px + labelWidth / 2, y0: py + off, y1: py + off + height }
+            : side === "above"
+              ? { x0: px - labelWidth / 2, x1: px + labelWidth / 2, y0: py - off - height, y1: py - off }
+              : side === "right"
+                ? { x0: px + off, x1: px + off + labelWidth, y0: py - height / 2, y1: py + height / 2 }
+                : { x0: px - off - labelWidth, x1: px - off, y0: py - height / 2, y1: py + height / 2 };
+        const corners = [
+          [box.x0 / scale, box.y0 / scale],
+          [box.x1 / scale, box.y0 / scale],
+          [box.x0 / scale, box.y1 / scale],
+          [box.x1 / scale, box.y1 / scale],
+        ];
+        for (const fence of fences) {
+          const marker = sideOfFence(fence, paddock.x, paddock.y);
+          for (const [cx, cy] of corners) {
+            const corner = sideOfFence(fence, cx, cy);
+            assert.ok(
+              corner === marker || corner === 0,
+              `vid ${width} px korsar ${paddock.name}s etikett ett staket in i grannhagen`,
+            );
+          }
+        }
+      }
     }
   });
 
@@ -366,24 +397,24 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
   });
 
   test("a place at the edge turns its label inwards", () => {
-    // The drawing is 360 × 270 px at the reference width. A marker in the top-left
-    // corner has room neither above nor to the left, so the label turns in and down.
     const sides = placeLabels(
       [
-        { id: "topp", name: "Lygnslätt 2", x: 40, y: 20 },
-        { id: "botten", name: "Lygnslätt 2", x: 40, y: 580 },
+        { id: "vanster", name: "Lygnslätt 2", x: 40, y: 200 },
+        { id: "hoger", name: "Lygnslätt 2", x: 760, y: 150 },
       ],
       800,
       600,
     );
-    assert.ok(
-      ["below-right", "below", "right"].includes(sides.get("topp") as string),
-      `hörnet uppe till vänster vänder etiketten in och ned, fick ${sides.get("topp")}`,
-    );
-    assert.ok(
-      ["above-right", "above", "right"].includes(sides.get("botten") as string),
-      `hörnet nere till vänster vänder etiketten in och upp, fick ${sides.get("botten")}`,
-    );
+    assert.equal(sides.get("vanster"), "right", "vid vänsterkanten vänder namnet inåt");
+    assert.equal(sides.get("hoger"), "left", "vid högerkanten likaså");
+  });
+
+  test("a long name in the very corner is hidden rather than hung over the edge", () => {
+    // With four square positions a marker pressed into a corner can run out of room:
+    // straight beside it would leave the top edge, straight below would leave the side.
+    // 02-§5.54 does not bend for that, so the name goes to the list under the map.
+    const sides = placeLabels([{ id: "horn", name: "Lygnslätt 2", x: 40, y: 20 }], 800, 600);
+    assert.equal(sides.get("horn"), "hidden");
   });
 
   test("no label is placed behind the zoom controls", () => {
@@ -404,8 +435,8 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
       800,
       600,
     );
-    assert.equal(sides.get("a"), "above-left");
-    assert.notEqual(sides.get("b"), "above-left", "the second label moves out of the way");
+    assert.equal(sides.get("a"), "below");
+    assert.notEqual(sides.get("b"), "below", "the second label moves out of the way");
   });
 
   test("the placement does not depend on the order the places arrive in", () => {
@@ -421,12 +452,11 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
   });
 
   test("when every position is taken the extra labels are hidden, not stacked", () => {
-    // Ten places on the exact same spot, in the middle of the drawing. Six labels fit,
-    // not eight: `above` overlaps both slanted positions above the marker and `below`
-    // overlaps both below, so on a single spot the straight pair up and down is never
-    // free. The four left over are hidden rather than stacked (02-§5.54): here, away from
-    // the edge, a label over a label makes both unreadable and wins nothing, and the
-    // place is still in the list under the map (02-§5.24).
+    // Ten places on the exact same spot, in the middle of the drawing. The four square
+    // positions are all free on a lone spot, so four names fit and six are hidden rather
+    // than stacked (02-§5.54): here, away from the edge, a label over a label makes both
+    // unreadable and wins nothing, and the place is still in the list under the map
+    // (02-§5.24).
     const markers = Array.from({ length: 10 }, (_, i) => ({
       id: `p${i}`,
       name: "Hagen",
@@ -435,13 +465,13 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     }));
     const sides = placeLabels(markers, 800, 600);
     assert.equal(sides.size, 10);
-    assert.equal(sides.get("p0"), "above-left");
+    assert.equal(sides.get("p0"), "below");
     assert.equal(
       [...sides.values()].filter((side) => side !== "hidden").length,
-      6,
-      "six labels fit on one spot",
+      4,
+      "four labels fit on one spot",
     );
-    assert.equal([...sides.values()].filter((side) => side === "hidden").length, 4);
+    assert.equal([...sides.values()].filter((side) => side === "hidden").length, 6);
   });
 
   test("a label that fits nowhere is hidden, and leaves room for the next one", () => {
@@ -466,24 +496,26 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
       { id: "tvaan", name: "2:an", kind: "djurplats", lat: 57.4125, lon: 12.2142, ...FACTS },
     ];
     const { html } = renderMap(crowded, { base: "/", background });
-    assert.match(html, /<a class="map__marker map__marker--label-above-left map__marker--wide-above-left map__marker--zoom-[\w-]+" href="\/plats\/ettan\//, "the first gets the preferred slanted position");
+    // The first takes the default position, which is written as no modifier at all; the
+    // second has to move, so it carries one (02-§5.53).
+    assert.match(html, /<a class="map__marker map__marker--wide-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/ettan\//, "den första får standardläget, alltså ingen modifierare");
     assert.match(html, /<a class="map__marker map__marker--label-[\w-]+ map__marker--wide-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/tvaan\//);
   });
 
   test("every position the build can choose has a rule in the stylesheet", async () => {
-    // The build writes the position as a modifier and the stylesheet places the label.
-    // A position with no rule would silently fall back to below — the very bug 02-§5.53
-    // fixes — so the two are checked against each other here.
+    // The build writes the position as a modifier and the stylesheet places the label. A
+    // position with no rule would silently fall back to below, so the two are checked
+    // against each other here — for all three placements the build works out.
     const css = await readFile(path.join(ROOT, "source/assets/css/layout.css"), "utf8");
-    for (const side of [...SLANTED, "above", "right", "left", "hidden"]) {
-      assert.ok(
-        css.includes(`.map__marker--label-${side} `),
-        `.map__marker--label-${side} saknas i layout.css`,
-      );
-      assert.ok(
-        css.includes(`.map__marker--wide-${side} `),
-        `.map__marker--wide-${side} saknas i layout.css`,
-      );
+    for (const side of ["above", "right", "left", "hidden"]) {
+      assert.ok(css.includes(`.map__marker--label-${side} `), `.map__marker--label-${side} saknas i layout.css`);
+      assert.ok(css.includes(`.map__marker--wide-${side} `), `.map__marker--wide-${side} saknas i layout.css`);
+    }
+    for (const side of ["below", "above", "right", "left"]) {
+      assert.ok(css.includes(`.map__marker--zoom-${side} `), `.map__marker--zoom-${side} saknas i layout.css`);
+    }
+    for (const slanted of ["above-left", "above-right", "below-left", "below-right"]) {
+      assert.ok(!css.includes(`-${slanted} `), `${slanted} finns inte längre (02-§5.53)`);
     }
   });
 
@@ -655,7 +687,7 @@ describe("a marker in the outer margin labels straight to the side (02-§5.59)",
   });
 
   test("inside the margin the slanted order of 02-§5.53 still decides", () => {
-    assert.equal(sideOf(500, 300), "above-left", "mitt på ritningen prövas de sneda lägena först");
+    assert.equal(sideOf(500, 300), "below", "mitt på ritningen prövas under först");
   });
 
   test("the margin is half a marker, so it holds at any drawing size", () => {
@@ -663,15 +695,18 @@ describe("a marker in the outer margin labels straight to the side (02-§5.59)",
   });
 
   test("a neighbour's dot still blocks the straight side, unlike its invisible padding", () => {
-    // The point of 02-§5.58 is that only the drawn dot counts — but it does count.
+    // The point of 02-§5.58 is that only the drawn dot counts — but it does count. Away
+    // from the edge, where 02-§5.54 does not let a label graze, a dot in the way sends the
+    // name somewhere else.
     const sides = placeLabels(
       [
-        { id: "kant", name: "Hagen", x: 10, y: 300 },
-        { id: "granne", name: "Grannen", x: 60, y: 300 },
+        { id: "mitten", name: "Hagen", x: 500, y: 300 },
+        { id: "granne", name: "Grannen", x: 560, y: 300 },
       ],
       1000,
       780,
     );
-    assert.notEqual(sides.get("kant"), "right", "grannens ritade prick ligger i vägen");
+    assert.notEqual(sides.get("mitten"), "right", "grannens ritade prick ligger i vägen");
+    assert.notEqual(sides.get("mitten"), "hidden", "men namnet finns kvar på en annan sida");
   });
 });

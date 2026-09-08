@@ -279,6 +279,11 @@
 /* The drawing scales with the page; the markers are positioned over it in percent
    and keep their size, so a marker is always at least the tap target (02-§5.27). */
 .map {
+  /* The label's near edge sits this far from the place: the drawn dot's radius plus a
+     little air. The line in 02-§5.56 spans that air, so the two are defined together. */
+  --map-label-offset: calc(var(--space-md) / 2 + var(--space-xs) / 2);
+  --map-label-gap: calc(var(--space-xs) / 2);
+
   position: relative;
   overflow: hidden;
   margin-bottom: var(--space-md);
@@ -336,87 +341,63 @@
   display: none;
 }
 
-/* Default: under the pin. The three modifiers below move it, and nothing else changes. */
+/* Where the name hangs, and the line that ties it to its own dot (02-§5.53, 02-§5.56).
+   Four positions, all square on the marker: straight below by default, and above, right or
+   left when the build or the place itself says so (02-§5.60). The label sits
+   --map-label-offset from the place — the dot's radius and a little air — rather than
+   clearing the whole 44 px tap target, which used to push the name eight pixels further
+   out than anything visible called for (02-§5.58). The line spans exactly the air that is
+   left, so it touches the dot at one end and the label at the other. */
 .map__label {
   position: absolute;
-  top: 100%;
-  left: 50%;
+  inset: calc(50% + var(--map-label-offset)) auto auto 50%;
   transform: translateX(-50%);
 }
 
-/* The line from the label to its own pin (02-§5.56). The label hangs clear of the tap
-   target, so its nearest edge is half a tap target from the place and the drawn dot is
-   --space-md across: the gap to close is half the difference, and along a diagonal it is
-   the corner's distance less the dot's radius. Both are derived here rather than typed,
-   so a change to the tap target or the dot keeps the line touching at both ends. */
 .map__label::before {
   content: "";
   position: absolute;
-  bottom: 100%;
-  left: 50%;
+  inset: auto auto 100% 50%;
   width: var(--border-width);
-  height: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  height: var(--map-label-gap);
   background: var(--color-green-deep);
   transform: translateX(-50%);
 }
 
+.map__marker--label-above .map__label {
+  inset: auto auto calc(50% + var(--map-label-offset)) 50%;
+  transform: translateX(-50%);
+}
+
 .map__marker--label-above .map__label::before {
-  top: 100%;
-  bottom: auto;
+  inset: 100% auto auto 50%;
+  width: var(--border-width);
+  height: var(--map-label-gap);
+  transform: translateX(-50%);
+}
+
+.map__marker--label-right .map__label {
+  inset: 50% auto auto calc(50% + var(--map-label-offset));
+  transform: translateY(-50%);
 }
 
 .map__marker--label-right .map__label::before {
   inset: 50% 100% auto auto;
-  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  width: var(--map-label-gap);
   height: var(--border-width);
+  transform: translateY(-50%);
+}
+
+.map__marker--label-left .map__label {
+  inset: 50% calc(50% + var(--map-label-offset)) auto auto;
   transform: translateY(-50%);
 }
 
 .map__marker--label-left .map__label::before {
-  top: 50%;
-  bottom: auto;
-  left: 100%;
-  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  inset: 50% auto auto 100%;
+  width: var(--map-label-gap);
   height: var(--border-width);
   transform: translateY(-50%);
-}
-
-/* Slanted positions: the line runs at 45° from the label's nearest corner to the dot.
-   0.7071 is half the square root of two — the corner of the tap target lies that much of
-   a tap target from its centre. */
-.map__marker--label-above-left .map__label::before,
-.map__marker--label-above-right .map__label::before,
-.map__marker--label-below-left .map__label::before,
-.map__marker--label-below-right .map__label::before {
-  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
-  height: var(--border-width);
-}
-
-.map__marker--label-above-left .map__label::before {
-  top: 100%;
-  bottom: auto;
-  left: 100%;
-  transform-origin: 0 0;
-  transform: rotate(45deg);
-}
-
-.map__marker--label-above-right .map__label::before {
-  inset: 100% 100% auto auto;
-  transform-origin: 100% 0;
-  transform: rotate(-45deg);
-}
-
-.map__marker--label-below-left .map__label::before {
-  left: 100%;
-  transform-origin: 0 100%;
-  transform: rotate(-45deg);
-}
-
-.map__marker--label-below-right .map__label::before {
-  right: 100%;
-  left: auto;
-  transform-origin: 100% 100%;
-  transform: rotate(45deg);
 }
 
 /* Under 600 px the overview shows no names at all (02-§5.55). The map is 312 px wide
@@ -443,52 +424,6 @@
     height: auto;
     padding: 0 var(--space-xs);
   }
-}
-
-.map__marker--label-above .map__label {
-  top: auto;
-  bottom: 100%;
-}
-
-.map__marker--label-right .map__label {
-  top: 50%;
-  left: 100%;
-  transform: translateY(-50%);
-}
-
-.map__marker--label-left .map__label {
-  top: 50%;
-  right: 100%;
-  left: auto;
-  transform: translateY(-50%);
-}
-
-/* The four slanted positions (02-§5.53). They sit corner to corner with the pin, so the
-   lane straight under and straight beside the marker stays free for a neighbour — and in
-   the pasture the label follows its own band instead of crossing the fence. */
-.map__marker--label-above-left .map__label {
-  inset: auto 100% 100% auto;
-  transform: none;
-}
-
-.map__marker--label-above-right .map__label {
-  top: auto;
-  bottom: 100%;
-  left: 100%;
-  transform: none;
-}
-
-.map__marker--label-below-left .map__label {
-  top: 100%;
-  right: 100%;
-  left: auto;
-  transform: none;
-}
-
-.map__marker--label-below-right .map__label {
-  top: 100%;
-  left: 100%;
-  transform: none;
 }
 
 /* Nowhere left to put the label (02-§5.33). It is hidden from sight only: the name is
@@ -529,8 +464,9 @@
    writes both on the marker; here the wide answer takes over. The first rule puts every
    label back to the default, so a narrow choice never leaks into the wide layout. */
 @media (min-width: 600px) {
+  /* From 600 px it is the --wide- modifier that says where the name hangs (02-§5.33). */
   .map__marker .map__label {
-    inset: 100% auto auto 50%;
+    inset: calc(50% + var(--map-label-offset)) auto auto 50%;
     width: auto;
     height: auto;
     padding: 0 var(--space-xs);
@@ -538,110 +474,50 @@
     transform: translateX(-50%);
   }
 
-  /* The leader follows the wide placement, not the narrow one (02-§5.56): from 600 px it
-     is the --wide- modifier that says where the label hangs, so the line has to be aimed
-     again from the same corner. Reset first, then one rule per position, mirroring the
-     eight above. */
   .map__marker .map__label::before {
     inset: auto auto 100% 50%;
     width: var(--border-width);
-    height: calc((var(--tap-target-min) - var(--space-md)) / 2);
-    transform-origin: 50% 50%;
+    height: var(--map-label-gap);
+    transform: translateX(-50%);
+  }
+
+  .map__marker--wide-above .map__label {
+    inset: auto auto calc(50% + var(--map-label-offset)) 50%;
     transform: translateX(-50%);
   }
 
   .map__marker--wide-above .map__label::before {
     inset: 100% auto auto 50%;
+    width: var(--border-width);
+    height: var(--map-label-gap);
+    transform: translateX(-50%);
+  }
+
+  .map__marker--wide-right .map__label {
+    inset: 50% auto auto calc(50% + var(--map-label-offset));
+    transform: translateY(-50%);
   }
 
   .map__marker--wide-right .map__label::before {
     inset: 50% 100% auto auto;
-    width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+    width: var(--map-label-gap);
     height: var(--border-width);
+    transform: translateY(-50%);
+  }
+
+  .map__marker--wide-left .map__label {
+    inset: 50% calc(50% + var(--map-label-offset)) auto auto;
     transform: translateY(-50%);
   }
 
   .map__marker--wide-left .map__label::before {
     inset: 50% auto auto 100%;
-    width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+    width: var(--map-label-gap);
     height: var(--border-width);
     transform: translateY(-50%);
   }
 
-  .map__marker--wide-above-left .map__label::before,
-  .map__marker--wide-above-right .map__label::before,
-  .map__marker--wide-below-left .map__label::before,
-  .map__marker--wide-below-right .map__label::before {
-    width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
-    height: var(--border-width);
-  }
-
-  .map__marker--wide-above-left .map__label::before {
-    inset: 100% auto auto 100%;
-    transform-origin: 0 0;
-    transform: rotate(45deg);
-  }
-
-  .map__marker--wide-above-right .map__label::before {
-    inset: 100% 100% auto auto;
-    transform-origin: 100% 0;
-    transform: rotate(-45deg);
-  }
-
-  .map__marker--wide-below-left .map__label::before {
-    inset: auto auto 100% 100%;
-    transform-origin: 0 100%;
-    transform: rotate(-45deg);
-  }
-
-  .map__marker--wide-below-right .map__label::before {
-    inset: auto 100% 100% auto;
-    transform-origin: 100% 100%;
-    transform: rotate(45deg);
-  }
-
-  .map__marker--wide-above .map__label {
-    top: auto;
-    bottom: 100%;
-  }
-
-  .map__marker--wide-right .map__label {
-    top: 50%;
-    left: 100%;
-    transform: translateY(-50%);
-  }
-
-  .map__marker--wide-left .map__label {
-    top: 50%;
-    right: 100%;
-    left: auto;
-    transform: translateY(-50%);
-  }
-
-  .map__marker--wide-above-left .map__label {
-    inset: auto 100% 100% auto;
-    transform: none;
-  }
-
-  .map__marker--wide-above-right .map__label {
-    top: auto;
-    bottom: 100%;
-    left: 100%;
-    transform: none;
-  }
-
-  .map__marker--wide-below-left .map__label {
-    top: 100%;
-    right: 100%;
-    left: auto;
-    transform: none;
-  }
-
-  .map__marker--wide-below-right .map__label {
-    top: 100%;
-    left: 100%;
-    transform: none;
-  }
+  
 
   .map__marker--wide-hidden .map__label {
     clip-path: inset(50%);
@@ -732,106 +608,60 @@
    Start from the default under the pin. A marker without a --zoom- class is one the third
    placement could not fit either; it keeps this position, and the line to its pin still
    says which marker the name belongs to (02-§5.56). */
-.map--names .map__marker .map__label {
-  inset: 100% auto auto 50%;
+
+/* ── The zoomed map's own label placement (02-§5.57) ────────────────────── */
+
+/* Zooming in shows every name (02-§5.44), including the ones the overview had to hide.
+   Those have no side of their own, so they all fell back to the same spot under their pin
+   and stacked. The build therefore works out a third placement, for the scale at which the
+   names appear, and writes it as --zoom-. It beats both the narrow and the wide rules on
+   specificity, so it can live here at the foot of the file and apply at every width. */
+.map--names .map__marker .map__label,
+.map--names .map__marker--zoom-below .map__label {
+  inset: calc(50% + var(--map-label-offset)) auto auto 50%;
   transform: translateX(-50%);
 }
 
-.map--names .map__marker .map__label::before {
+.map--names .map__marker .map__label::before,
+.map--names .map__marker--zoom-below .map__label::before {
   inset: auto auto 100% 50%;
   width: var(--border-width);
-  height: calc((var(--tap-target-min) - var(--space-md)) / 2);
-  transform-origin: 50% 50%;
+  height: var(--map-label-gap);
   transform: translateX(-50%);
 }
 
 .map--names .map__marker--zoom-above .map__label {
-  inset: auto auto 100% 50%;
+  inset: auto auto calc(50% + var(--map-label-offset)) 50%;
   transform: translateX(-50%);
 }
 
 .map--names .map__marker--zoom-above .map__label::before {
   inset: 100% auto auto 50%;
   width: var(--border-width);
-  height: calc((var(--tap-target-min) - var(--space-md)) / 2);
-  transform-origin: 50% 50%;
+  height: var(--map-label-gap);
   transform: translateX(-50%);
 }
 
 .map--names .map__marker--zoom-right .map__label {
-  inset: 50% auto auto 100%;
+  inset: 50% auto auto calc(50% + var(--map-label-offset));
   transform: translateY(-50%);
 }
 
 .map--names .map__marker--zoom-right .map__label::before {
   inset: 50% 100% auto auto;
-  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  width: var(--map-label-gap);
   height: var(--border-width);
-  transform-origin: 50% 50%;
   transform: translateY(-50%);
 }
 
 .map--names .map__marker--zoom-left .map__label {
-  inset: 50% 100% auto auto;
+  inset: 50% calc(50% + var(--map-label-offset)) auto auto;
   transform: translateY(-50%);
 }
 
 .map--names .map__marker--zoom-left .map__label::before {
   inset: 50% auto auto 100%;
-  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  width: var(--map-label-gap);
   height: var(--border-width);
-  transform-origin: 50% 50%;
   transform: translateY(-50%);
-}
-
-.map--names .map__marker--zoom-above-left .map__label {
-  inset: auto 100% 100% auto;
-  transform: none;
-}
-
-.map--names .map__marker--zoom-above-left .map__label::before {
-  inset: 100% auto auto 100%;
-  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
-  height: var(--border-width);
-  transform-origin: 0 0;
-  transform: rotate(45deg);
-}
-
-.map--names .map__marker--zoom-above-right .map__label {
-  inset: auto auto 100% 100%;
-  transform: none;
-}
-
-.map--names .map__marker--zoom-above-right .map__label::before {
-  inset: 100% 100% auto auto;
-  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
-  height: var(--border-width);
-  transform-origin: 100% 0;
-  transform: rotate(-45deg);
-}
-
-.map--names .map__marker--zoom-below-left .map__label {
-  inset: 100% 100% auto auto;
-  transform: none;
-}
-
-.map--names .map__marker--zoom-below-left .map__label::before {
-  inset: auto auto 100% 100%;
-  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
-  height: var(--border-width);
-  transform-origin: 0 100%;
-  transform: rotate(-45deg);
-}
-
-.map--names .map__marker--zoom-below-right .map__label {
-  inset: 100% auto auto 100%;
-  transform: none;
-}
-
-.map--names .map__marker--zoom-below-right .map__label::before {
-  inset: auto 100% 100% auto;
-  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
-  height: var(--border-width);
-  transform-origin: 100% 100%;
-  transform: rotate(45deg);
 }

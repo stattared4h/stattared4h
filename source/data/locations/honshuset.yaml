@@ -1,6 +1,7 @@
 name: Hönshuset
 kind: djurplats
 species: []
+label: vanster
 lat: 57.338384
 lon: 12.340552
 accessible: false

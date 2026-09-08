@@ -1,6 +1,7 @@
 name: Parkeringen vid toaletterna
 kind: parkering
 species: []
+label: vanster
 lat: 57.337386
 lon: 12.339786
 accessible: true

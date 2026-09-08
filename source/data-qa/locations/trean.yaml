@@ -4,6 +4,7 @@ species:
   - far
   - ko
 note: Fåren och korna delar hagen.
+label: over
 # Koordinaten är hagens mitt (04-§5.8), härledd ur betesmarken och
 # gårdens staket i source/map/background.svg. Inte uppmätt på marken.
 lat: 57.336629
