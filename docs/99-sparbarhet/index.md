@@ -36,7 +36,8 @@ källregistret (ADR 0016). QA-datasetets 100 individer delar på 25 versionshant
 permanent märkta AI-bilder (ADR 0017). Individuella djur kan dessutom ha ett publikt,
 sökbart märkningsnummer som valideras och visas för besökaren. Redaktörens bildverktyg gör
 foton webbanpassade i webbläsaren, på en adress utanför navigationen (ADR 0021, ADR 0022).
-Statusen nedan speglar det.
+Det första spelet, Djurbingo, läser samma dataset och bygger brickan i webbläsaren
+(ADR 0009, ADR 0024). Statusen nedan speglar det.
 
 ### Krav (`02-§`)
 
@@ -203,6 +204,19 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§11.18`, `11.20`–`11.21` | Arkivet och bildpostens form | `byggd` | `createZip` i `source/ts/domain/zip.ts`, läst tillbaka av en egen läsare i `tests/domain/zip.test.ts`, och `formatImagePost` i `source/ts/domain/image-post.ts`, som också är den `npm run image` skriver med |
 | `02-§11.22` | Vägen vidare till GitHubs uppladdningsvy | `byggd` | Stegen på sidan; `tests/build/site.test.ts` kräver båda länkarna till uppladdningsvyn |
 | `02-§11.24` | Gränsvärdena på ett enda ställe | `byggd` | `source/ts/domain/image-limits.ts`; `tests/domain/image-limits.test.ts` fäller om bygget och domänskiktet skiljer sig åt, eller om någon annan fil deklarerar ett eget gränsvärde |
+| `02-§12.1` | Startskärm med storlek och nivå; inga inställningar under spelet | `manuell` | Formuläret `data-bingo-start` i `source/pages/bingo.njk`; `source/ts/ui/bingo.ts` döljer det när brickan visas. Öppna `/bingo/` i 360 px, välj 4 × 4 och tryck Börja spela: sidan visar bara rubriken, lägesraden och brickan, och radioknapparna är borta |
+| `02-§12.2` | Sida, navkort och menyrad | `byggd` | `bingoUrl` och kortet i `homeView` i `source/ts/build/pages.ts`, symbolen i `HOME_CARD_SYMBOLS`, raden i `navLinks` i `source/layouts/header.njk`; `tests/build/pages.test.ts` och `tests/build/data-pages.test.ts` kräver kortet, `tests/build/site.test.ts` menyradens plats |
+| `02-§12.3` | Sidan i förcachen | `byggd` | Sidan är en vanlig sida i `collections.all`, som `source/pages/sw.njk` listar; `tests/build/pwa.test.ts` kräver varje sida i förcachen |
+| `02-§12.4` | Kandidaterna ur datat: art med bild, djur här med porträtt | `byggd` | `bingoView` i `source/ts/build/pages.ts`; `tests/build/pages.test.ts` prövar urvalet och att en art utan bild och ett djur utan porträtt lämnas utanför, `tests/build/data-pages.test.ts` att sidan bär ett `<template>` per kandidat |
+| `02-§12.5` | Slumpen i webbläsaren; varje kandidat en gång innan någon upprepas | `byggd` | `drawCandidates` och `buildBoard` i `source/ts/domain/bingo.ts` med injicerad slump; `tests/domain/bingo.test.ts` |
+| `02-§12.6` | Hela brickan utan rullning på 360 px; rutor minst 44 px | `manuell` | `.bingo-board` och `.bingo-square` i `components.css`. Öppna `/bingo/` i 360 × 640 px, starta 4 × 4 och bekräfta att nedersta raden syns utan att rulla och att en ruta är minst 44 px; upprepa med webbläsarens adressfält synligt |
+| `02-§12.7` | Dialogen från en ruta: bild, namn, mening, en knapp | `manuell` | `openSquare` i `source/ts/ui/bingo.ts` över dialogen i `source/pages/bingo.njk`; markupen bevakas av `tests/build/data-pages.test.ts`. Tryck på en ruta: dialogen visar bilden större, namnet och Hittat!; bocka av, tryck igen: knappen heter Inte hittat ändå |
+| `02-§12.8` | Avbocka och ångra är samma handling, utan kontroll | `byggd` | `toggleSquare` i `source/ts/domain/bingo.ts`; `tests/domain/bingo.test.ts` prövar att ett andra tryck tar bort bocken och att brickan inte muteras |
+| `02-§12.9` | Brickan i `localStorage`; det inaktuella förkastas; Ny bricka rensar | `byggd` | `serialiseBoard` och `restoreBoard` i `source/ts/domain/bingo.ts`, testade i `tests/domain/bingo.test.ts` inklusive en sparad ruta som sidan inte längre erbjuder; läsning och skrivning i `source/ts/ui/bingo.ts`. Bocka av två rutor, stäng fliken och öppna `/bingo/` igen: brickan och bockarna är kvar |
+| `02-§12.10` | Lägesrad och konfetti per färdig rad | `byggd` | `completedLines`, `newlyCompletedLines` och `foundCount` i `source/ts/domain/bingo.ts`, testade i `tests/domain/bingo.test.ts`; `burst("small")` i `source/ts/ui/confetti.ts`. Bocka av en hel rad: lite konfetti faller |
+| `02-§12.11` | Full bricka: konfetti, fanfar, Spela igen; reducerad rörelse | `manuell` | `isFull` i domänen är testad; `burst("big")` och `playFanfare` i `source/ts/ui/`. Bocka av alla rutor med ljudet på: konfetti, en fanfar och rutan Bingo! visas; slå på reducerad rörelse i systemet och gör om: rutan visas utan konfetti |
+| `02-§12.12` | Utan kandidater: texten om att djuren inte är inlagda | `byggd` | Grenen i `source/pages/bingo.njk`; `tests/build/data-pages.test.ts` bygger det tomma datasetet och kräver texten |
+| `02-§12.13` | Utan JavaScript säger sidan det | `byggd` | `<noscript>` i `source/pages/bingo.njk`; `tests/build/data-pages.test.ts` kräver det |
 
 ### Designspecifikation (`05-§`)
 
@@ -240,6 +254,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.42` | Menyknappens två lägen i markupen | `byggd` | Båda ikonerna och båda etiketterna ligger i `source/layouts/header.njk` och väljs av `aria-expanded` i `components.css`; `tests/build/site.test.ts` kräver att båda finns och att knappen börjar hopfälld |
 | `05-§6.45` | Navkortet | `manuell` | `.home-card*` i `components.css`; plattans färg och kortets sträckning bevakas av `tests/design/card-grid.test.ts`, men utseendet är CSS-layout och går inte att enhetstesta i Node (`CL-§8.6`). Öppna `/` i 360 px och bekräfta att de två korten är lika höga, att rubrikerna står på en rad och att båda syns utan att rulla; öppna i 1280 px och bekräfta att symbolplattan är ett band och inte en tom fjärdedel av kortet |
 | `05-§6.46` | Menyns fällbara rad och dess vinkel | `manuell` | `.site-menu__summary`, `.site-menu__chevron` och `.site-menu__sublist` i `components.css`; markupen bevakas av `tests/build/site.test.ts`. Öppna menyn i 360 px: raden Djuren har en vinkel som pekar nedåt, ett tryck fäller ut arterna och vänder vinkeln uppåt, underraderna är indragna och minst 44 px höga, och kortet rullar inuti sig självt i stället för att gå utanför skärmens nederkant |
+| `05-§6.47` | Bingobrickan | `manuell` | `.bingo-*` och `.confetti` i `components.css`; färgerna läses ur tokens i `source/ts/ui/confetti.ts`. Öppna `/bingo/` i 360 px och bekräfta att en avbockad ruta har gul ram och botten med bocken över en nedtonad bild, att namnen står på en rad, och att dialogens bild har rundade hörn; öppna i 1280 px och bekräfta att brickan inte växer förbi skärmens höjd |
 | `05-§6.35`–`6.36` | Dialog, statusrad | `manuell` | `.dialog` och `.status-bar` i `components.css`. Öppna feedbackdialogen i 360 px och 1280 px: mörkt bakgrundsskikt, vit yta med rundade hörn och kryssknapp uppe till höger, som mest 680 px bred, intonad på under 200 ms; sätt DevTools → Network → Offline: ljusgrön rad med djupgrön text direkt under sidhuvudet |
 | `05-§6.38` | Frizon runt 4H-logotypen | `manuell` | Öppna `/` i 1280 px och mät i DevTools att avståndet från logotypen till sajtnamnet är minst 8 px och till sidhuvudets över- och underkant minst 4 respektive 8 px; öppna menyn i 360 px och sidfoten och bekräfta minst 8 px under logotypen |
 | `05-§6` övrigt | Hero | `saknas` | Skrivs när markupen finns, enligt `05-§7.2`; heron väntar på ett fotografi från gården |
@@ -319,6 +334,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
 | `03-§11.1`–`11.2` | Adressen som en sanning i bygget; undantagen från förcachen och indexeringen | `byggd` | `IMAGE_TOOL_PATH` i `source/ts/build/tool-page.ts` läses av `eleventy.config.js`, mallen och byggtesterna; `tests/build/site.test.ts` och `tests/build/pwa.test.ts` |
 | `03-§11.3`–`11.5` | Lagerdelningen: domänlogik i Node, canvas i `ui/`, id via `crypto.subtle` | `byggd` | `source/ts/domain/image-prepare.ts`, `zip.ts`, `image-post.ts` och `image-limits.ts` testas i Node; `source/ts/ui/image-tool/` håller sig till canvas och DOM. `imageIdFor` är samma funktion i bygget, kommandona och webbläsaren (`tests/domain/image-id.test.ts`) |
+| `03-§12.1` | Kandidaterna från bygget som `<template>` per post | `byggd` | `bingoView` i `source/ts/build/pages.ts` och poolen i `source/pages/bingo.njk`; `tests/build/data-pages.test.ts` räknar malldelarna och kräver bildkedjans markup i dem |
+| `03-§12.2` | Regler i domänen, DOM i vyn, firande utan beroenden | `byggd` | `source/ts/domain/bingo.ts` testad i `tests/domain/bingo.test.ts`; `source/ts/ui/bingo.ts`, `confetti.ts` och `fanfare.ts` håller sig till DOM, canvas och Web Audio, och `tests/build/pwa.test.ts` kräver att den buntade koden inte pekar på någon annan värd |
 
 ### Källregister (`09-§`)
 
@@ -349,8 +366,8 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
-| `byggd` | 163 |
-| `manuell` | 57 |
+| `byggd` | 174 |
+| `manuell` | 62 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
