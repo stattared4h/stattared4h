@@ -131,33 +131,44 @@ describe("marking and unmarking (02-§12.8)", () => {
 });
 
 describe("lines and the win (02-§12.10, 02-§12.11)", () => {
-  test("3×3 has eight lines and 4×4 ten: rows, columns and two diagonals", () => {
-    assert.equal(lines(3).length, 8);
-    assert.equal(lines(4).length, 10);
-    assert.deepEqual(lines(3)[0], [0, 1, 2]);
-    assert.deepEqual(lines(3)[3], [0, 3, 6]);
-    assert.deepEqual(lines(3)[6], [0, 4, 8]);
-    assert.deepEqual(lines(3)[7], [2, 4, 6]);
+  test("only the across rows are lines: three on 3×3, four on 4×4", () => {
+    assert.deepEqual(lines(3), [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+    ]);
+    assert.equal(lines(4).length, 4);
+    assert.deepEqual(lines(4)[0], [0, 1, 2, 3]);
+    assert.deepEqual(lines(4)[3], [12, 13, 14, 15]);
   });
 
-  test("a row, a column and a diagonal each count as a completed line", () => {
+  test("a full row counts; a full column or diagonal does not", () => {
     const board = buildBoard(candidates(9), 3, "species", keepOrder);
     assert.deepEqual(completedLines(markAll(board, [3, 4, 5])), [[3, 4, 5]]);
-    assert.deepEqual(completedLines(markAll(board, [1, 4, 7])), [[1, 4, 7]]);
-    assert.deepEqual(completedLines(markAll(board, [2, 4, 6])), [[2, 4, 6]]);
+    assert.deepEqual(completedLines(markAll(board, [1, 4, 7])), [], "the middle column is no line");
+    assert.deepEqual(completedLines(markAll(board, [0, 4, 8])), [], "nor is the diagonal");
+    assert.deepEqual(completedLines(markAll(board, [2, 4, 6])), [], "nor the anti-diagonal");
   });
 
   test("only the lines a toggle just finished are reported as new", () => {
     const board = buildBoard(candidates(9), 3, "species", keepOrder);
-    const before = markAll(board, [0, 1, 3, 6]);
+    const before = markAll(board, [0, 1, 3, 4]);
     const after = toggleSquare(before, 2);
     assert.deepEqual(newlyCompletedLines(before, after), [[0, 1, 2]]);
-    const andCentre = toggleSquare(after, 4);
-    assert.deepEqual(newlyCompletedLines(after, andCentre), [[2, 4, 6]], "the anti-diagonal 2, 4, 6 was one square short");
-    const andEight = toggleSquare(andCentre, 8);
-    assert.deepEqual(newlyCompletedLines(andCentre, andEight), [[0, 4, 8]]);
-    const andFive = toggleSquare(andEight, 5);
-    assert.deepEqual(newlyCompletedLines(andEight, andFive), [[3, 4, 5], [2, 5, 8]], "one square can finish two lines at once");
+    const andSix = toggleSquare(after, 6);
+    assert.deepEqual(newlyCompletedLines(after, andSix), [], "a square that finishes nothing finishes nothing");
+    const andFive = toggleSquare(andSix, 5);
+    assert.deepEqual(newlyCompletedLines(andSix, andFive), [[3, 4, 5]]);
+  });
+
+  test("a square sits in one line only, so a press never finishes two at once", () => {
+    // Every square but the middle one. With columns and diagonals counted this press
+    // finished four lines at once, which is why the board confettied on nearly every
+    // press near the end (02-§12.10).
+    const board = buildBoard(candidates(9), 3, "species", keepOrder);
+    const before = markAll(board, [0, 1, 2, 3, 5, 6, 7, 8]);
+    const after = toggleSquare(before, 4);
+    assert.deepEqual(newlyCompletedLines(before, after), [[3, 4, 5]]);
   });
 
   test("unmarking a square never reports a new line", () => {
