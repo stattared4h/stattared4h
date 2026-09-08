@@ -871,14 +871,16 @@
 /* ── Djurbingo (02-§12, 05-§6.47) ──────────────────────────────────────── */
 
 /* The board is a square, as wide as the column allows but never taller than what is
-   left of the viewport under the header and the progress line, so a whole 4 × 4 board
-   fits a phone in portrait without scrolling (02-§12.6). `dvh` follows the browser's
-   own bars; `vh` would hide the bottom row behind the address bar. The reserved height is
-   a first estimate for header, heading and progress line together — check it against a
-   real phone (02-§12.6) and adjust the number here if a row gets clipped. */
+   left of the viewport around it, so a whole 4 × 4 board and its button fit without
+   scrolling (02-§12.6). `dvh` follows the browser's own bars; `vh` would hide the bottom
+   row behind the address bar. The reserved height is everything that is not the board:
+   header, heading and progress line above it, and the "Ny bricka" row below. Measured at
+   1280 px, where the heading is largest and the height term is the one that binds — on a
+   phone the column is narrower than the height, so `100%` wins and this number never
+   applies. Check it against a real phone (02-§12.6) and raise it if a row gets clipped. */
 .bingo-board {
   --bingo-size: 3;
-  --bingo-reserved: 230px;
+  --bingo-reserved: 310px;
 
   display: grid;
   grid-template-columns: repeat(var(--bingo-size), minmax(0, 1fr));
