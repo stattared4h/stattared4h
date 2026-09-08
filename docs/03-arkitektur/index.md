@@ -77,6 +77,7 @@ identiska filer. <!-- 03-§3.3 -->
 | Plats | `/plats/<id>/` | QR-kodens måladress. Vilka djurslag som går här, och därifrån vidare till djuren |
 | Djur | `/djur/<id>/` | Namn, art, ras, stamtavla, bilder. Aldrig var individen står |
 | Art | `/arter/<id>/` | Om djurslaget, vilka platser det finns på, och individerna |
+| Djurbingo | `/bingo/` | Startskärm och bricka; rutorna slumpas i webbläsaren ur kandidaterna bygget listar (`02-§12`) |
 | Om | `/om/` | Vad sajten är, installation, integritet, källkod, version (`02-§10.27`) |
 | 404 | `404.html` | Sajtens egen felsida; GitHub Pages serverar den för okända adresser |
 | Offline | `/offline/` | Visas av service workern vid navigering utanför cachen |
@@ -430,3 +431,25 @@ Sidan skriver ingenting och talar inte med GitHub. Den bygger en adress till rep
 uppladdningsvy och låter redaktörens webbläsare öppna den, precis som feedbacklänken gör
 (`03-§10.3`). Behörigheten kontrolleras av GitHub, inte av oss
 ([ADR 0014](../adr/0014-roller-via-github.md)). <!-- 03-§11.5 -->
+
+---
+
+## 12. Spel
+
+Ett spel följer [ADR 0009](../adr/0009-datadrivna-spel.md): reglerna i domänskiktet, DOM
+i vyskiktet, datat ur samma dataset som sidorna. Djurbingo (`02-§12`) är byggt så:
+
+Bygget räknar fram vad brickan kan fråga efter — `bingoView` i `source/ts/build/pages.ts`
+listar varje art med bild och varje djur som är kvar och har porträtt — och mallen
+`source/pages/bingo.njk` skriver dem i sidan som ett `<template>` per kandidat, med samma
+`picture`-markup som djurkorten. Malldelarna är inerta tills skriptet klonar en in i en
+ruta, så hundra djur kostar sidan ingenting att visa, och bildkedjan (`03-§6`) är den
+enda som skriver bildmarkup. <!-- 03-§12.1 -->
+
+Reglerna bor i `source/ts/domain/bingo.ts`: dragningen, som tar varje kandidat en gång
+innan någon upprepas, brickan, avbockningen, raderna och vinsten, och den form som sparas
+och läses tillbaka. Slumpen är en injicerad funktion, så testerna i
+`tests/domain/bingo.test.ts` ger den ett fast frö. `source/ts/ui/bingo.ts` läser
+kandidaterna ur sidan, bygger rutorna med `createElement`, öppnar dialogen och skriver
+brickan till `localStorage` efter varje ändring; `confetti.ts` och `fanfare.ts` bredvid
+den är firandet, utan beroenden och utan filer ([ADR 0024](../adr/0024-djurbingo-pa-arlighet.md)). <!-- 03-§12.2 -->

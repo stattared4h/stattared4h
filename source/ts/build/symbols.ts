@@ -76,7 +76,7 @@ export const PLACE_SYMBOLS: Record<LocationKind, string> = {
 };
 
 /** The errands the home page offers as cards (02-§5.7); one symbol each. */
-export type HomeCardId = "karta" | "djuren";
+export type HomeCardId = "karta" | "djuren" | "bingo";
 
 /**
  * The symbols on the home page's cards (05-§6.45). They live beside the markers' so the
@@ -91,6 +91,11 @@ export const HOME_CARD_SYMBOLS: Record<HomeCardId, string> = {
     `<path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z" ${STROKE}/>` +
     `<path d="M9 4v13.5M15 6.5V20" ${STROKE}/>`,
   djuren: PLACE_SYMBOLS.djurplats,
+  // A bingo board: three by three squares, one of them ticked. The tick is the game's
+  // whole idea — find it, mark it — and the grid says which game (02-§12.2).
+  bingo:
+    `<path d="M3.5 3.5h17v17h-17zM9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17" ${STROKE}/>` +
+    `<path d="m4.9 6.4 1.3 1.3 2.2-2.4" ${STROKE}/>`,
 };
 
 /**

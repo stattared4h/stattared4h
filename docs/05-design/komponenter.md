@@ -237,6 +237,22 @@ ljus mark och mörk byggnad. "Visa hela kartan" syns bara när kartan är inzoom
 två alltid, och den som inte kan användas mer är nedtonad och `disabled`. Alla tre är
 dolda tills JavaScript kör (`02-§5.41`). <!-- 05-§6.41 -->
 
+### 6.17 Bingobricka
+
+Brickan (`02-§12`) är ett kvadratiskt rutnät med `--space-xs` mellan rutorna, så brett
+som spalten tillåter men aldrig högre än det som återstår av skärmen under sidhuvudet,
+rubriken och lägesraden (`02-§12.6`). Varje ruta är en knapp utan innermarginal, vit med
+`--color-border` som ram och `--radius-sm`: bilden fyller rutan och namnet står under den
+i `--font-size-small`, vikt 600, `--color-green-deep`, en rad med avhugg. En avbockad ruta
+byter ram och botten till `--color-sun` (`05-§2.9`), namnet till `--color-sun-ink`, tonar
+ned bilden och lägger en bock i `--color-sun-ink` över den — bilden syns fortfarande,
+så barnet ser vilket djur bocken gäller. Lägesraden ovanför brickan är centrerad,
+`--color-ink-soft` och vikt 600. Dialogen som öppnas från en ruta är dialogen i 6.13 med
+bilden överst i `--radius-md`. Vinstrutan under brickan är faktarutan i 6.6 med rubriken
+"Bingo!" i `--font-size-h1` och `--color-sun-ink`, centrerad. Konfettin ritas i
+`--color-sun`, `--color-green`, `--color-green-pale` och `--color-green-deep`, lästa ur
+tokens vid körning. <!-- 05-§6.47 -->
+
 ### 6.15 Bildverktygets kort
 
 Verktygssidan (`02-§11`) lånar sidans egna delar: fälten är formulärfält (6.8), knapparna

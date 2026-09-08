@@ -867,3 +867,156 @@
 .image-tool__actions {
   margin: var(--space-md) 0;
 }
+
+/* ── Djurbingo (02-§12, 05-§6.47) ──────────────────────────────────────── */
+
+/* The board is a square, as wide as the column allows but never taller than what is
+   left of the viewport around it, so a whole 4 × 4 board and its button fit without
+   scrolling (02-§12.6). `dvh` follows the browser's own bars; `vh` would hide the bottom
+   row behind the address bar. The reserved height is everything that is not the board:
+   header, heading and progress line above it, and the "Ny bricka" row below. Measured at
+   1280 px, where the heading is largest and the height term is the one that binds — on a
+   phone the column is narrower than the height, so `100%` wins and this number never
+   applies. Check it against a real phone (02-§12.6) and raise it if a row gets clipped. */
+.bingo-board {
+  --bingo-size: 3;
+  --bingo-reserved: 310px;
+
+  display: grid;
+  grid-template-columns: repeat(var(--bingo-size), minmax(0, 1fr));
+  gap: var(--space-xs);
+  width: min(100%, calc(100dvh - var(--bingo-reserved)));
+  min-width: 240px;
+  margin-inline: auto;
+}
+
+.bingo-progress {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-ink-soft);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* A square is one big button: picture on top, name under it. No inner padding, so the
+   4 × 4 board's 70 px squares give the picture as much as they can (02-§12.6). */
+.bingo-square {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--tap-target-min);
+  padding: 0;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-green-deep);
+  font: inherit;
+  cursor: pointer;
+}
+
+.bingo-square:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.bingo-square__image {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.bingo-square__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bingo-square__image .image-placeholder {
+  height: 100%;
+  border-radius: 0;
+  aspect-ratio: auto;
+}
+
+.bingo-square__image .image-placeholder__label {
+  font-size: var(--font-size-small);
+}
+
+.bingo-square__name {
+  display: block;
+  flex: 0 0 auto;
+  overflow: hidden;
+  padding: 0 var(--space-xs);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  line-height: var(--line-height-body);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Found: the sun tone (05-§2.9) on the frame and the name, and a tick over the picture.
+   The picture stays visible under it, so the child can still see which animal it was. */
+.bingo-square--found {
+  border-color: var(--color-sun);
+  background: var(--color-sun);
+  color: var(--color-sun-ink);
+}
+
+.bingo-square--found .bingo-square__image {
+  opacity: 0.55;
+}
+
+/* The tick is two borders of a box turned 45°: no image and no SVG, so nothing is
+   fetched and nothing is written as markup by the script (CL-§2.13). */
+.bingo-square--found::after {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  width: 22%;
+  height: 40%;
+  border-right: 6px solid var(--color-sun-ink);
+  border-bottom: 6px solid var(--color-sun-ink);
+  transform: translate(-50%, 0) rotate(45deg);
+  pointer-events: none;
+}
+
+.bingo-win {
+  margin: var(--space-md) 0 0;
+  text-align: center;
+}
+
+.bingo-win__title {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-sun-ink);
+  font-size: var(--font-size-h1);
+}
+
+.bingo-restart {
+  margin: var(--space-md) 0 0;
+  text-align: center;
+}
+
+.bingo-dialog__image {
+  margin: 0 0 var(--space-sm);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.bingo-dialog__image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The confetti canvas lies over everything and lets every touch through; the script
+   removes it when the last piece has fallen (02-§12.10). */
+.confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
