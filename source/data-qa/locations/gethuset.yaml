@@ -3,7 +3,9 @@ kind: djurplats
 species:
   - get
 note: Getterna sover här.
-lat: 57.338100
-lon: 12.340900
+# Ungefärligt läge vid ritningens kant (04-§5.9): platsen ligger utanför kartan,
+# och punkten är utpekad av gården på ritningen — inte uppmätt på marken.
+lat: 57.338447
+lon: 12.341555
 accessible: true
 active: true

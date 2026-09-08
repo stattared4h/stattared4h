@@ -2,7 +2,9 @@ name: Dalen
 kind: djurplats
 species:
   - ko
-lat: 57.336400
-lon: 12.343500
+# Ungefärligt läge vid ritningens kant (04-§5.9): platsen ligger utanför kartan,
+# och punkten är utpekad av gården på ritningen — inte uppmätt på marken.
+lat: 57.337596
+lon: 12.344525
 accessible: false
 active: true

@@ -1,7 +1,9 @@
 name: Lygnslätt 2
 kind: djurplats
 species: []
-lat: null
-lon: null
+# Ungefärligt läge vid ritningens kant (04-§5.9): platsen ligger utanför kartan,
+# och punkten är utpekad av gården på ritningen — inte uppmätt på marken.
+lat: 57.336625
+lon: 12.344075
 accessible: false
 active: true

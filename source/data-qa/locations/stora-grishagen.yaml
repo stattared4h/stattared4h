@@ -2,7 +2,9 @@ name: Stora grishagen
 kind: djurplats
 species:
   - gris
-lat: 57.338600
-lon: 12.341200
+# Ungefärligt läge vid ritningens kant (04-§5.9): platsen ligger utanför kartan,
+# och punkten är utpekad av gården på ritningen — inte uppmätt på marken.
+lat: 57.338763
+lon: 12.342320
 accessible: true
 active: true
