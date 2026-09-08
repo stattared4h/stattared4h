@@ -152,8 +152,12 @@ describe("storing and restoring (02-§13.14)", () => {
     const hunt = buildHunt(pool, 4, "easy", keepOrder);
     const stored = { ...serialiseHunt(hunt), location: "Fel plats", text: "Fel ledtråd" } as unknown;
     const restored = restoreHunt(stored, pool);
-    assert.equal(restored?.stops[0].location, pool[0].location);
-    assert.equal(restored?.stops[0].text, pool[0].text);
+    assert.ok(restored);
+    for (const stop of restored.stops) {
+      const source = pool.find((candidate) => candidate.key === stop.key);
+      assert.equal(stop.location, source?.location);
+      assert.equal(stop.text, source?.text);
+    }
   });
 
   test("a stored stop whose clue the catalogue no longer has drops the whole round", () => {
@@ -179,6 +183,11 @@ describe("storing and restoring (02-§13.14)", () => {
       restoreHunt({ ...wellFormed, keys: [...wellFormed.keys, wellFormed.keys[0]], found: [...wellFormed.found, false] }, pool),
       null,
       "fler stopp än rundan valdes till",
+    );
+    assert.equal(
+      restoreHunt({ ...wellFormed, keys: [wellFormed.keys[0], ...wellFormed.keys.slice(0, 3)] }, pool),
+      null,
+      "samma ledtråd två gånger i rundan (02-§13.8)",
     );
   });
 });

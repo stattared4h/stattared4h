@@ -1,0 +1,94 @@
+---
+layout: base.njk
+permalink: /spana/
+title: Spana!
+description: >-
+  Spana! på Stättareds 4H-gård: hitta detaljerna på bilderna någonstans på gården, bocka
+  av dem och se var de sitter.
+---
+{#-
+  The Spana! page (02-§13, ADR 0009, ADR 0024, ADR 0025). Markup only: the round is drawn
+  by source/ts/ui/spana.ts from the clues the build lists in the pool below, one
+  <template> per clue with the same responsive picture as the rest of the site. The
+  templates are inert until the script clones one into a stop, so a large catalogue costs
+  the page nothing to load. Without script the page says so (02-§13.4).
+
+  The clue's text and the place it answers ride along as data attributes on the template.
+  The place is the answer and is deliberately nowhere else in the markup: it is shown in
+  the dialog once the player has said "Hittat!" (02-§13.13). The attribute is `data-place`
+  and not `data-location`, because no page on this site writes the word "location" — the
+  site never says where an individual animal is (ADR 0012), and the build test guards the
+  word itself rather than trusting each template to mean the right thing by it.
+
+  The start screen and the game are two sections; the script shows one of them. The long
+  round is offered only when the catalogue holds more clues than the short one, because a
+  round never repeats a clue (02-§13.8).
+#}
+<div class="container container--narrow spana" data-spana>
+  <h1>Spana!</h1>
+
+  {%- if views.spana.clues.length > 0 %}
+  <form class="spana-start" data-spana-start>
+    <p class="lead">Du får några bilder på detaljer som finns på gården. Hitta dem, bocka av dem — och få veta var de sitter.</p>
+    <fieldset class="field field--choices">
+      <legend class="field__label">Hur lång runda?</legend>
+      <label class="choice"><input class="choice__input" type="radio" name="size" value="4" checked> Kort runda, 4 stopp</label>
+      {%- if views.spana.clues.length > 4 %}
+      <label class="choice"><input class="choice__input" type="radio" name="size" value="8"> Lång runda, 8 stopp</label>
+      {%- endif %}
+    </fieldset>
+    <fieldset class="field field--choices">
+      <legend class="field__label">Hur svårt?</legend>
+      <label class="choice"><input class="choice__input" type="radio" name="level" value="easy" checked> Lätt — bild och ledtråd</label>
+      <label class="choice"><input class="choice__input" type="radio" name="level" value="hard"> Svårt — bara bilden</label>
+    </fieldset>
+    <p><button class="button" type="submit">Börja spana</button></p>
+    <noscript><p class="note">Spana! behöver JavaScript. Slå på det i webbläsaren och ladda om sidan.</p></noscript>
+  </form>
+
+  <section class="spana-game" data-spana-game hidden>
+    <p class="spana-progress" data-spana-progress aria-live="polite"></p>
+    <ol class="spana-list" data-spana-list></ol>
+    <div class="spana-win note" data-spana-win hidden aria-live="assertive">
+      <h2 class="spana-win__title">Allt hittat!</h2>
+      <p>Du hittade varje detalj på rundan.</p>
+      <p><button class="button" type="button" data-spana-again>Ny runda</button></p>
+    </div>
+    <p class="spana-restart"><button class="button button--secondary" type="button" data-spana-new>Ny runda</button></p>
+  </section>
+
+  <div hidden data-spana-pool>
+    {%- for clue in views.spana.clues %}
+    <template data-clue="{{ clue.key }}" data-place="{{ clue.location }}"{% if clue.text %} data-text="{{ clue.text }}"{% endif %}>{% picture clue.photo, "(min-width: 680px) 620px, 92vw", false %}</template>
+    {%- endfor %}
+  </div>
+
+  <dialog class="dialog" data-spana-dialog aria-labelledby="spana-dialog-heading">
+    <div class="dialog__body">
+      <div class="dialog__header">
+        <h2 class="dialog__title" id="spana-dialog-heading" data-spana-dialog-title>Stopp</h2>
+        <button class="icon-button dialog__close" type="button" aria-label="Stäng" data-spana-dialog-close>
+          <svg class="icon-button__icon" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+            <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="spana-dialog__image" data-spana-dialog-image></div>
+      <p data-spana-dialog-text hidden></p>
+      <p class="spana-answer" data-spana-dialog-answer hidden></p>
+      <div class="dialog__actions">
+        <button class="button" type="button" data-spana-dialog-toggle>Hittat!</button>
+      </div>
+    </div>
+  </dialog>
+
+  {%- else %}
+  <div class="note">
+    <h2>Ledtrådarna är inte inlagda ännu</h2>
+    <p>
+      När ledtrådarna finns på sajten kan du spana efter dem här. Under tiden hittar du
+      allt om gården på <a href="{{ site.mainSite }}">4h.se/stattared</a>.
+    </p>
+  </div>
+  {%- endif %}
+</div>

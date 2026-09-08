@@ -78,20 +78,25 @@ describe("every page exists (02-§5.1–5.2)", () => {
 });
 
 describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
-  test("is a nav of cards: the map first, the animals second, the bingo third, and nothing else", async () => {
+  test("is a nav of cards: the map first, the animals second, then a card per game, and nothing else", async () => {
     const html = main(await page(""));
     const cards = [...html.matchAll(/<a class="home-card" href="\/([^"]*)">/g)].map((m) => `/${m[1]}`);
-    assert.deepEqual(cards, ["/karta/", "/djuren/", "/bingo/"], "ett kort per ärende, kartan först (02-§5.7, 02-§12.2)");
+    assert.deepEqual(
+      cards,
+      ["/karta/", "/djuren/", "/bingo/", "/spana/"],
+      "ett kort per ärende, kartan först (02-§5.7, 02-§12.2, 02-§13.1)",
+    );
     assert.match(html, /<h2 class="home-card__title">Kartan<\/h2>/);
     assert.match(html, /<h2 class="home-card__title">Djuren<\/h2>/);
     assert.match(html, /<h2 class="home-card__title">Djurbingo<\/h2>/);
+    assert.match(html, /<h2 class="home-card__title">Spana!<\/h2>/);
     assert.match(html, /<ul class="card-grid">/, "korten ligger i djurkortens rutnät (02-§5.64)");
     assert.match(html, /href="https:\/\/www\.4h\.se\/stattared\/"/, "meningen om vad sajten är (02-§5.8)");
   });
 
   test("carries none of the content the cards lead to (02-§5.7)", async () => {
     const html = main(await page(""));
-    for (const marker of ["map__drawing", "place-list__link", "species-tile", "data-animal-id-search", "Fler kartor i området", "data-bingo-board"]) {
+    for (const marker of ["map__drawing", "place-list__link", "species-tile", "data-animal-id-search", "Fler kartor i området", "data-bingo-board", "data-spana-list"]) {
       assert.ok(!html.includes(marker), `startsidan bär inte ${marker}`);
     }
   });
@@ -99,7 +104,7 @@ describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
   test("every card's symbol is decorative; the heading carries the text (05-§6.45)", async () => {
     const html = main(await page(""));
     const symbols = [...html.matchAll(/<svg class="home-card__symbol"([^>]*)>/g)].map((m) => m[1]);
-    assert.equal(symbols.length, 3);
+    assert.equal(symbols.length, 4);
     for (const attributes of symbols) assert.match(attributes, /aria-hidden="true"/);
   });
 });
@@ -407,7 +412,7 @@ describe("the Spana! page (02-§13.1, 02-§13.4, 02-§13.7, 02-§13.10, 02-§13.
     assert.equal(templates.length, dataset.clues.length);
     assert.match(
       html,
-      /<template data-clue="img-[0-9a-f]{12}" data-location="[^"]+"[^>]*><img [^>]*srcset=/,
+      /<template data-clue="img-[0-9a-f]{12}" data-place="[^"]+"[^>]*><img [^>]*srcset=/,
       "malldelen bär sidans egen bildmarkup och platsens namn",
     );
     assert.doesNotMatch(html, /<template[^>]*><img [^>]*fetchpriority/, "en malldel är aldrig sidans ivriga bild");
@@ -420,7 +425,7 @@ describe("the Spana! page (02-§13.1, 02-§13.4, 02-§13.7, 02-§13.10, 02-§13.
     const without = dataset.clues.find((clue) => clue.text === null);
     assert.ok(withText && without, "QA har båda sorterna");
     assert.ok(
-      html.includes(`data-clue="${withText.id}" data-location="`) && html.includes(`data-text="${withText.text}"`),
+      html.includes(`data-clue="${withText.id}" data-place="`) && html.includes(`data-text="${withText.text}"`),
       "ledtrådstexten står på malldelen",
     );
     const bare = html.slice(html.indexOf(`data-clue="${without.id}"`));

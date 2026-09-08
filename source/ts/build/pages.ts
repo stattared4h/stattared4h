@@ -24,6 +24,7 @@ import {
   sortLocations,
   speciesOnFarm,
   type Animal,
+  type Clue,
   type Dataset,
   type Image,
   type Location,
@@ -102,6 +103,22 @@ export interface BingoView {
   species: BingoCandidateView[];
   /** Every animal that is here and has a portrait. */
   animals: BingoCandidateView[];
+}
+
+/** One stop Spana! can ask for (02-§13.5): the picture, the words, and the place that answers it. */
+export interface SpanaClueView {
+  /** The clue's id, which is its picture's id: what the round stores between visits (02-§13.14). */
+  key: string;
+  photo: Image;
+  /** The clue's own line, or null when the picture is the whole clue (04-§11.4). */
+  text: string | null;
+  /** The place's name, as the visitor reads it after "Hittat!" (02-§13.13). */
+  location: string;
+}
+
+/** The Spana! page (02-§13): the catalogue; the round itself is drawn in the browser (ADR 0009). */
+export interface SpanaView {
+  clues: SpanaClueView[];
 }
 
 /** The animal overview page: the ear tag search and the species on the farm (02-§5.66). */
@@ -204,6 +221,7 @@ export interface SiteViews {
   home: HomeView;
   animalsOverview: AnimalsOverviewView;
   bingo: BingoView;
+  spana: SpanaView;
   locations: LocationPageView[];
   animals: AnimalPageView[];
   species: SpeciesPageView[];
@@ -325,6 +343,13 @@ export function homeView(): HomeView {
         url: bingoUrl(),
         symbol: HOME_CARD_SYMBOLS.bingo,
       },
+      {
+        id: "spana",
+        title: "Spana!",
+        text: "Hitta detaljen på bilden, någonstans på gården.",
+        url: spanaUrl(),
+        symbol: HOME_CARD_SYMBOLS.spana,
+      },
     ],
   };
 }
@@ -355,6 +380,31 @@ export function bingoView(dataset: Dataset): BingoView {
     if (animal.status === "here" && portrait !== null) animals.push({ key: animal.id, name: animal.name, photo: portrait });
   }
   return { species, animals };
+}
+
+export function spanaUrl(): string {
+  return "/spana/";
+}
+
+/**
+ * The clue catalogue as the page shows it (02-§13.5, 02-§13.6). Every clue is listed, in
+ * the dataset's own order (04-§11.8), so two builds of the same data give the same page.
+ *
+ * The place is resolved to its name here and nowhere else: the data holds an id
+ * (ADR 0025), the visitor reads a name, and the template should not have to look
+ * anything up (03-§6.5). A clue whose place is missing cannot reach this far — the
+ * validator refuses it (04-§10.17) — but the fallback to the id keeps a broken build
+ * showing something rather than "undefined".
+ */
+export function spanaView(dataset: Dataset): SpanaView {
+  const names = new Map(dataset.locations.map((location) => [location.id, location.name]));
+  const clue = (one: Clue): SpanaClueView => ({
+    key: one.id,
+    photo: one.image,
+    text: one.text,
+    location: names.get(one.location) ?? one.location,
+  });
+  return { clues: dataset.clues.map(clue) };
 }
 
 export function locationView(dataset: Dataset, location: Location, farm: string): LocationPageView {
@@ -511,6 +561,7 @@ export function buildViews(dataset: Dataset, options: BuildViewsOptions): SiteVi
     home: homeView(),
     animalsOverview: animalsOverviewView(dataset),
     bingo: bingoView(dataset),
+    spana: spanaView(dataset),
     locations: dataset.locations.map((location) => locationView(dataset, location, options.farm)),
     animals: dataset.animals.map((animal) => animalView(dataset, animal, options.farm)),
     species: dataset.species.map((species) => speciesView(dataset, species, options.farm, content[species.id] ?? null)),

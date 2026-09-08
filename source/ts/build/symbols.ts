@@ -76,7 +76,7 @@ export const PLACE_SYMBOLS: Record<LocationKind, string> = {
 };
 
 /** The errands the home page offers as cards (02-§5.7); one symbol each. */
-export type HomeCardId = "karta" | "djuren" | "bingo";
+export type HomeCardId = "karta" | "djuren" | "bingo" | "spana";
 
 /**
  * The symbols on the home page's cards (05-§6.45). They live beside the markers' so the
@@ -96,6 +96,12 @@ export const HOME_CARD_SYMBOLS: Record<HomeCardId, string> = {
   bingo:
     `<path d="M3.5 3.5h17v17h-17zM9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17" ${STROKE}/>` +
     `<path d="m4.9 6.4 1.3 1.3 2.2-2.4" ${STROKE}/>`,
+  // A magnifying glass: the game is looking closely at something small (02-§13.1). Not
+  // the map's marker pin, which says *where* — this card is about *what*, and the pin
+  // already belongs to a place. The lens is empty, because what is in it is the clue.
+  spana:
+    `<circle cx="10.5" cy="10.5" r="6.5" ${STROKE}/>` +
+    `<path d="m15.3 15.3 5.2 5.2" ${STROKE}/>`,
 };
 
 /**

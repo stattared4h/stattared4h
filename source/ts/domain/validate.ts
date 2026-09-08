@@ -26,6 +26,7 @@ import { sortAnimals, sortLocations } from "./sort.ts";
 import type {
   Animal,
   Breed,
+  Clue,
   LabelPlacement,
   Dataset,
   Image,
@@ -107,6 +108,9 @@ const LOCATION_FIELDS = new Set([
   "label",
   "photos",
 ]);
+const CLUE_FIELDS = new Set(["location", "text"]);
+/** 04-§11.4: "kort" is a number, or it is only an opinion. */
+const MAX_CLUE_TEXT_LENGTH = 120;
 const SPECIES_FIELDS = new Set(["id", "name", "plural", "photo"]);
 const BREED_FIELDS = new Set(["id", "name", "species", "heritage"]);
 const POPULATION_FIELDS = new Set(["species", "breed", "count"]);
@@ -390,6 +394,72 @@ function validateImagePosts(records: readonly RawRecord[], issues: Issues, allow
     images.set(record.id, { id: record.id, alt, credit });
   }
   return images;
+}
+
+// --- Clues ---------------------------------------------------------------------
+
+/**
+ * `clues/<bild-id>.yaml` (04-§11, ADR 0025). The file name is the image id, so the id
+ * check and the picture check are the same check: a clue whose name is not an image with
+ * a post has no picture to show and is refused rather than dropped quietly.
+ *
+ * The place is checked here too, against the ids the location files gave. A clue that
+ * points at a paddock nobody kept is a stop the player would walk to for nothing.
+ */
+function validateClues(
+  records: readonly RawRecord[],
+  images: ReadonlyMap<string, Image>,
+  locationIds: ReadonlySet<string>,
+  issues: Issues,
+): Clue[] {
+  const clues: Clue[] = [];
+  for (const record of records) {
+    if (record.parseError !== null) {
+      issues.error(record.file, null, `kunde inte läsas som YAML: ${record.parseError}`);
+      continue;
+    }
+    if (!isImageId(record.id)) {
+      issues.error(
+        record.file,
+        "filnamn",
+        `${quote(record.id)} är inte ett bild-id. Ledtrådens filnamn ska vara bildens: ${IMAGE_ID_DESCRIPTION}.`,
+      );
+      continue;
+    }
+    const image = images.get(record.id);
+    if (image === undefined) {
+      issues.error(
+        record.file,
+        "filnamn",
+        `ledtråden har ingen bildpost. Lägg bilden i ${imagePostFile(record.id)}, eller ta bort ledtråden.`,
+      );
+      continue;
+    }
+    if (!isObject(record.data)) {
+      issues.error(record.file, null, "filen måste innehålla location, och gärna text, som fält och värden.");
+      continue;
+    }
+    const fields = new Fields(record.file, issues);
+    fields.unknown(record.data, CLUE_FIELDS);
+    fields.noHtml(record.data, null);
+    const location = fields.requiredString(record.data, "location");
+    const text = fields.optionalString(record.data, "text");
+    if (text !== null && text.length > MAX_CLUE_TEXT_LENGTH) {
+      issues.error(
+        record.file,
+        "text",
+        `ledtråden är ${text.length} tecken; högst ${MAX_CLUE_TEXT_LENGTH} tillåts. Skriv en mening, inte en beskrivning.`,
+      );
+      continue;
+    }
+    if (location === null) continue;
+    if (!locationIds.has(location)) {
+      issues.error(record.file, "location", `platsen ${quote(location)} finns inte i locations/.`);
+      continue;
+    }
+    clues.push({ id: record.id, image, text, location });
+  }
+  return clues;
 }
 
 // --- Vocabulary files ----------------------------------------------------------
@@ -783,6 +853,7 @@ function collectWarnings(
   populations: Population[],
   locations: Location[],
   images: ReadonlyMap<string, Image>,
+  clues: readonly Clue[],
   inMarkdown: ReadonlySet<string>,
   files: Map<string, string>,
   speciesFile: string,
@@ -794,6 +865,10 @@ function collectWarnings(
     ...animals.flatMap((animal) => animal.photos.map((photo) => photo.id)),
     ...locations.flatMap((location) => location.photos.map((photo) => photo.id)),
     ...species.flatMap((entry) => (entry.photo === null ? [] : [entry.photo.id])),
+    // A clue's picture is used by the clue, and usually by nothing else: it shows a
+    // detail, not an animal (04-§11.5). Without this line the farm's first clue photo
+    // would be reported as an orphan the day it was added.
+    ...clues.map((clue) => clue.image.id),
     ...inMarkdown,
   ]);
   for (const id of images.keys()) {
@@ -821,6 +896,16 @@ function collectWarnings(
     if (location.lat === null) {
       issues.warn(file, "lat", "platsen är aktiv men saknar koordinater och visas inte på kartan.");
     }
+  }
+
+  const activeLocations = new Set(locations.filter((location) => location.active).map((location) => location.id));
+  for (const clue of clues) {
+    if (activeLocations.has(clue.location)) continue;
+    issues.warn(
+      `clues/${clue.id}.yaml`,
+      "location",
+      `platsen ${quote(clue.location)} används inte just nu, så ledtråden skickar spelaren till en hage som står tom.`,
+    );
   }
 
   const speciesAtActiveLocations = new Set(locations.filter((l) => l.active).flatMap((l) => l.species));
@@ -986,6 +1071,8 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
     if (location !== null) locations.push(location);
   }
 
+  const clues = validateClues(raw.clues, images, new Set(locations.map((location) => location.id)), issues);
+
   const inMarkdown = collectMarkdownImages(
     [
       ...animals.map((animal) => ({
@@ -1004,7 +1091,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
     issues,
   );
 
-  collectWarnings(species, animals, populations, locations, images, inMarkdown, files, speciesFile, issues);
+  collectWarnings(species, animals, populations, locations, images, clues, inMarkdown, files, speciesFile, issues);
 
   const imageList = [...images.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   if (options.imagesDir) {
@@ -1022,6 +1109,9 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
     animals: sortAnimals(animals),
     locations: sortLocations(locations),
     images: imageList,
+    // The records are read in file-name order (02-§6.1), which for clues is id order
+    // (04-§11.8): the file name is the id, so nothing has to be sorted again here.
+    clues,
   };
   return { errors: [], warnings: issues.warnings, dataset };
 }

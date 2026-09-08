@@ -103,6 +103,24 @@ export interface Population {
   count: number;
 }
 
+/**
+ * One clue in the Spana! catalogue (04-§11, ADR 0025): a close-up of a detail, the place
+ * that is the answer, and words to help the player who is stuck.
+ *
+ * The clue has no id of its own — `id` is the image's, because the file is named after
+ * the picture it shows (04-§11.2). `location` stays an id: the clue refers to the place
+ * and never describes it, so a renamed paddock is renamed in one file (ADR 0009).
+ */
+export interface Clue {
+  /** The image id, which is also the clue's file name (04-§11.2). */
+  id: string;
+  image: Image;
+  /** A short line shown on the easy level, or null when the picture is the whole clue. */
+  text: string | null;
+  /** The id of the location that is the answer (04-§11.3). */
+  location: string;
+}
+
 /** Always sorted according to 02-§6.9: animals and locations by name, species in file order. */
 export interface Dataset {
   species: Species[];
@@ -112,6 +130,8 @@ export interface Dataset {
   locations: Location[];
   /** Every image post, sorted by id. Records hold the same objects (04-§9.5). */
   images: Image[];
+  /** Every clue, sorted by id (04-§11.8). */
+  clues: Clue[];
 }
 
 /** One error or warning. `message` is Swedish and says what to fix (02-§6.5). */
