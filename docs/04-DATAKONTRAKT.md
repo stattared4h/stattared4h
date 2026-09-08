@@ -210,6 +210,15 @@ Regler:
   (`02-§5.33`), så en punkt vid kanten skjuter namnet mot staketet och in i grannhagen,
   medan en punkt i mitten håller det inne i den hage det hör till. På en hage om två hektar
   är skillnaden tiotals meter. <!-- 04-§5.8 -->
+- En plats som ligger utanför den ritade kartans kanter (`02-§5.30`) bär ändå `lat` och
+  `lon`: ett **ungefärligt läge** vid ritningens kant, i den riktning platsen faktiskt
+  ligger sedd från gårdsplanen, på obebyggd mark och inte ovanpå en form som betyder något
+  annat. Läget är ett riktmärke, inte en mätning, och platsfilen säger det i en kommentar
+  ovanför `lat` — annars går det inte att skilja ett gissat läge från ett inmätt när någon
+  senare läser filen. Alternativet vore att låta platsen sakna koordinater, men då syns den
+  inte alls på kartan (`02-§5.25`), och en hage som pekas ut åt rätt håll hjälper besökaren
+  mer än en hage som inte finns. Ett ungefärligt läge ersätts av ett inmätt så snart gården
+  har ett. <!-- 04-§5.9 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död
