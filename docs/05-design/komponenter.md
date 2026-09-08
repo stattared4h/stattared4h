@@ -205,3 +205,21 @@ som ligger i kartans nedre högra hörn, staplade med `--space-xs` mellan sig oc
 ljus mark och mörk byggnad. "Visa hela kartan" syns bara när kartan är inzoomad; de andra
 två alltid, och den som inte kan användas mer är nedtonad och `disabled`. Alla tre är
 dolda tills JavaScript kör (`02-§5.41`). <!-- 05-§6.41 -->
+
+### 6.15 Bildverktygets kort
+
+Verktygssidan (`02-§11`) lånar sidans egna delar: fälten är formulärfält (6.8), knapparna
+är knappar (6.3), och kortet runt varje bild är kortet (6.4) med `--space-sm` som
+innermarginal i stället för `--space-md`, eftersom bilden själv bär höjden.
+
+Listan över beredda bilder är ett rutnät med `--space-md` mellan korten, utan punkter.
+Varje kort börjar med bilden, som är centrerad, som mest 320 px hög och aldrig bredare än
+kortet — höjden är tagen och inte bredden, så att ett stående foto inte fyller hela
+skärmen. Under bilden står filnamnet, bild-id:t, måtten och storleken i `--font-size-small`
+och `--color-ink-soft`, och därunder de två fälten. Felmeddelandet står under fälten i
+`--color-danger`, samma regel som 6.8. Nedladdningsknapparna är sekundära och ligger sist,
+sida vid sida med `--space-xs` mellan sig och radbrytning på smal skärm.
+
+Statusraden överst i verktyget är ljusgrön `--color-green-pale` med djupgrön text, samma
+par som platshållaren (6.20), eftersom den säger hur det går och inte att något är
+fel. <!-- 05-§6.44 -->

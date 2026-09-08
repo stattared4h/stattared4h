@@ -27,6 +27,10 @@ Bilderna är sajtens hjärta: ett djur man inte ser är ett djur man inte minns.
   direkt vid sidladdning. <!-- 05-§8.6 -->
 - Bilder levereras i modernt format med reserv, och i flera bredder via
   `srcset`. <!-- 05-§8.7 -->
+- Vägen fram till den webbanpassade filen är redaktörens val: `npm run image` i en
+  terminal, eller bildverktyget i webbläsaren (`02-§11`). Kraven på filen är desamma
+  oavsett väg, och valideringen är den som avgör
+  ([ADR 0021](../adr/0021-bildberedning-i-webblasaren.md)). <!-- 05-§8.13 -->
 
 ### Personer på bild
 

@@ -205,6 +205,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.13`–`6.14` | Kortet | `manuell` | `.card` och `.animal-card` i `components.css`. Öppna `/arter/get/` och bekräfta vit yta, rundade hörn, skugga och innermarginal i kortets textdel |
 | `05-§6.15` | Kortets bild i 4:3 | `manuell` | `.animal-card__image` med `aspect-ratio: 4 / 3` och `object-fit: cover`. Öppna `/plats/stora-hagen/` och bekräfta att korten med foto och korten med platshållare är lika höga |
 | `05-§6.16` | Rubriken är länk, hela kortet klickbart | `manuell` | `.card__link::after` täcker kortet. Öppna `/arter/get/`, klicka på ett korts bild och bekräfta att djursidan öppnas; tabba till kortet och bekräfta att namnet får fokusring |
+| `05-§6.44` | Bildverktygets kort, lista och statusrad | `manuell` | `.image-tool__*` i `components.css`, byggda av `source/ts/ui/image-tool/tool.ts`. Öppna verktyget med ett stående och ett liggande foto i 390 px bredd och bekräfta att båda bilderna får plats utan att fylla skärmen, att fälten står under bilden med synliga etiketter, och att nedladdningsknapparna bryter rad i stället för att svämma över |
 | `05-§6.17` | `width` och `height` på varje bild | `byggd` | `renderPicture` sätter dem; `tests/build/data-pages.test.ts` kräver dem på varje bild på Rosas sida |
 | `05-§6.18`–`6.19` | Djurkortets etiketter | `byggd` | `tags` i `animalCard` och `.tag` i `components.css`; ras, "Lantras" och "Har lämnat gården" prövas i `tests/build/pages.test.ts` och `data-pages.test.ts`. Utseendet: öppna `/arter/get/` och bekräfta ljusgröna etiketter med djupgrön text |
 | `05-§6.20` | Platshållare för saknat foto | `byggd` | `renderPlaceholder` med artnamnet som etikett; `tests/build/data-pages.test.ts` kräver plattan med "Get" på Bockens sida |
@@ -229,6 +230,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§8.5`–`8.7` | Tekniska bildregler | `byggd` | `generateImageSizes` och `renderPicture`, använda av sidorna; `srcset`, `width`, `height` och `loading` bevakas av `tests/build/data-pages.test.ts`. En bild i brödtext delar utseende med en bild i en figure i `source/assets/css/components.css` |
 | `05-§8.11` | Logotypens ursprung står i källregistret | `byggd` | `tests/design/logo.test.ts` kräver adress, hämtdatum och besked om filen ligger i repot för varje källa |
 | `05-§8.12` | Märkning och motiv för QA-bilder | `byggd` | De 25 fotorealistiska motiven i `source/images-qa/` saknar personer och har permanent märkning; `tests/build/images.test.ts` bevakar märkningen, medan motivvalet har verifierats visuellt |
+| `05-§8.13` | Två vägar fram till samma webbanpassade fil | `dokumenterad` | `npm run image` och bildverktyget (`02-§11`) delar gränsvärden, id-beräkning och bildpostens form; valideringen är grinden ([ADR 0021](../adr/0021-bildberedning-i-webblasaren.md)) |
 | `05-§9` | Tillgänglighet | `dokumenterad` | Delvis testbar med html-validate |
 | `05-§10` | Vad man inte gör | `dokumenterad` | Delvis kontrollerbar med lint |
 
@@ -324,10 +326,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | Status | Antal rader |
 | --- | --- |
 | `saknas` | 1 |
-| `dokumenterad` | 19 |
+| `dokumenterad` | 20 |
 | `påbörjad` | 17 |
 | `byggd` | 146 |
-| `manuell` | 53 |
+| `manuell` | 54 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
