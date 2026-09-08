@@ -161,14 +161,16 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
       assert.ok(rows.includes("Startsidan"), `${file}: raden Startsidan`);
       assert.ok(rows.includes("Kartan"), `${file}: raden Kartan`);
       assert.ok(rows.includes("Djurbingo"), `${file}: raden Djurbingo (02-§12.2)`);
+      assert.ok(rows.includes("Spana!"), `${file}: raden Spana! (02-§13.1)`);
       assert.ok(rows.includes("Om sajten"), `${file}: raden Om sajten`);
       assert.deepEqual(summary, ["Djuren"], `${file}: Djuren är den enda fällbara raden (02-§10.45)`);
       assert.ok(
         card.indexOf(">Startsidan<") < card.indexOf(">Kartan<") &&
           card.indexOf(">Kartan<") < card.indexOf("site-menu__summary") &&
           card.indexOf("site-menu__summary") < card.indexOf(">Djurbingo<") &&
-          card.indexOf(">Djurbingo<") < card.indexOf(">Om sajten<"),
-        `${file}: ordningen Startsidan, Kartan, Djuren, Djurbingo, Om sajten`,
+          card.indexOf(">Djurbingo<") < card.indexOf(">Spana!<") &&
+          card.indexOf(">Spana!<") < card.indexOf(">Om sajten<"),
+        `${file}: ordningen Startsidan, Kartan, Djuren, Djurbingo, Spana!, Om sajten`,
       );
     }
   });

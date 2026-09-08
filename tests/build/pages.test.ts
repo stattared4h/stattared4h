@@ -37,6 +37,18 @@ async function qaViews(): Promise<{ dataset: Dataset; views: SiteViews }> {
   return cached;
 }
 
+/** A dataset with nothing in it: the farm before its first animal (02-§6.2). */
+function emptyDataset(): Dataset {
+  return { species: [], breeds: [], populations: [], animals: [], locations: [], images: [], clues: [] };
+}
+
+let emptyCached: SiteViews | null = null;
+
+function emptyViews(): SiteViews {
+  emptyCached ??= buildViews(emptyDataset(), { base: "/", farm: FARM });
+  return emptyCached;
+}
+
 function location(views: SiteViews, id: string) {
   const found = views.locations.find((l) => l.id === id);
   if (!found) throw new Error(`no location view ${id}`);
@@ -56,7 +68,7 @@ function species(views: SiteViews, id: string) {
 }
 
 describe("the home page (02-§5.7, 02-§5.63)", () => {
-  test("is a card per errand: the map first, then the animals, then the bingo (02-§12.2)", async () => {
+  test("is a card per errand: the map, the animals and then a card per game (02-§12.2, 02-§13.1)", async () => {
     const { views } = await qaViews();
     assert.deepEqual(
       views.home.cards.map((card) => [card.id, card.url]),
@@ -64,6 +76,7 @@ describe("the home page (02-§5.7, 02-§5.63)", () => {
         ["karta", "/karta/"],
         ["djuren", "/djuren/"],
         ["bingo", "/bingo/"],
+        ["spana", "/spana/"],
       ],
     );
     for (const card of views.home.cards) {
@@ -73,10 +86,43 @@ describe("the home page (02-§5.7, 02-§5.63)", () => {
     }
   });
 
-  test("the cards carry no data of their own: an empty farm still has all three", () => {
-    const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
-    const views = buildViews(empty, { base: "/", farm: FARM });
-    assert.deepEqual(views.home.cards.map((card) => card.id), ["karta", "djuren", "bingo"]);
+  test("the cards carry no data of their own: an empty farm still has all four", () => {
+    const views = buildViews(emptyDataset(), { base: "/", farm: FARM });
+    assert.deepEqual(views.home.cards.map((card) => card.id), ["karta", "djuren", "bingo", "spana"]);
+  });
+
+  test("every card has a symbol of its own: no two errands look alike", () => {
+    const symbols = new Set(emptyViews().home.cards.map((card) => card.symbol));
+    assert.equal(symbols.size, emptyViews().home.cards.length);
+  });
+});
+
+describe("the Spana! page (02-§13.5, 02-§13.6)", () => {
+  test("lists every clue in the dataset's own order, with picture, text and place", async () => {
+    const { views, dataset } = await qaViews();
+    assert.deepEqual(
+      views.spana.clues.map((clue) => clue.key),
+      dataset.clues.map((clue) => clue.id),
+      "the catalogue's order, unsorted and unfiltered (02-§13.6)",
+    );
+    for (const clue of views.spana.clues) {
+      const source = dataset.clues.find((one) => one.id === clue.key);
+      assert.ok(source, clue.key);
+      assert.equal(clue.photo.id, source.image.id, "the clue shows its own picture");
+      assert.equal(clue.text, source.text, "the text is passed on as written, null and all");
+      const place = dataset.locations.find((one) => one.id === source.location);
+      assert.equal(clue.location, place?.name, "the answer is the place's name, not its id (02-§13.13)");
+    }
+  });
+
+  test("a clue with no text of its own is still a clue", async () => {
+    const { views } = await qaViews();
+    assert.ok(views.spana.clues.some((clue) => clue.text === null), "QA has a picture-only clue (04-§11.4)");
+    assert.ok(views.spana.clues.some((clue) => clue.text !== null), "and one with a text");
+  });
+
+  test("no clues, no round: an empty dataset gives an empty list", () => {
+    assert.deepEqual(emptyViews().spana.clues, []);
   });
 });
 
@@ -110,9 +156,7 @@ describe("the bingo page (02-§12.4)", () => {
   });
 
   test("an empty farm offers nothing, and the page says so instead of a board", () => {
-    const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
-    const views = buildViews(empty, { base: "/", farm: FARM });
-    assert.deepEqual(views.bingo, { species: [], animals: [] });
+    assert.deepEqual(emptyViews().bingo, { species: [], animals: [] });
   });
 });
 
@@ -385,8 +429,7 @@ describe("the map page (02-§5.23–5.25)", () => {
 
 describe("an empty dataset (02-§5.7)", () => {
   test("builds views with no pages and no map", () => {
-    const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
-    const views = buildViews(empty, { base: "/", farm: FARM });
+    const views = emptyViews();
     assert.deepEqual(views.animalsOverview.species, []);
     assert.deepEqual(views.locations, []);
     assert.deepEqual(views.animals, []);

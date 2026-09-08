@@ -73,6 +73,16 @@ export function editImage(raw: RawDataset, id: string, change: (data: Obj) => vo
   change(record(raw.images, id).data as Obj);
 }
 
+/** Applies `change` to the raw data of the clue for image `id` (04-§11.2). */
+export function editClue(raw: RawDataset, id: string, change: (data: Obj) => void): void {
+  change(record(raw.clues, id).data as Obj);
+}
+
+/** Adds a new raw clue named `<id>.yaml`, where the id is the picture's (04-§11.2). */
+export function addClue(raw: RawDataset, id: string, data: Obj): void {
+  raw.clues.push({ file: `clues/${id}.yaml`, id, data, parseError: null });
+}
+
 /** Adds a new raw image post named `<id>.yaml`. */
 export function addImage(raw: RawDataset, id: string, data: Obj = { alt: "En bild.", credit: "QA" }): void {
   raw.images.push({ file: `images/${id}.yaml`, id, data, parseError: null });

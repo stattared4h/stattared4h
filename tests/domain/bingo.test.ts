@@ -1,20 +1,21 @@
 /**
  * 02-§12.4–12.11: the rules of Djurbingo, tested with an injected random so every draw
  * is reproducible. The browser is never involved (03-§2.1).
+ *
+ * The draw itself belongs to both games and is tested in tests/domain/draw.test.ts
+ * (03-§12.3); what is left here is the board built on top of it.
  */
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import {
   buildBoard,
   completedLines,
-  drawCandidates,
   foundCount,
   isFull,
   lines,
   newlyCompletedLines,
   restoreBoard,
   serialiseBoard,
-  shuffle,
   toggleSquare,
   type Board,
   type Candidate,
@@ -37,46 +38,7 @@ function markAll(board: Board, indices: readonly number[]): Board {
   return indices.reduce((current, index) => toggleSquare(current, index), board);
 }
 
-describe("drawing squares (02-§12.5)", () => {
-  test("with enough candidates every square is different", () => {
-    const drawn = drawCandidates(candidates(20), 16, sequence([0.37, 0.91, 0.12, 0.66, 0.5]));
-    assert.equal(drawn.length, 16);
-    assert.equal(new Set(drawn.map((c) => c.key)).size, 16);
-  });
-
-  test("with too few candidates every candidate is used before any repeats", () => {
-    const drawn = drawCandidates(candidates(5), 9, sequence([0.3, 0.8, 0.1]));
-    assert.equal(drawn.length, 9);
-    const firstPass = new Set(drawn.slice(0, 5).map((c) => c.key));
-    assert.equal(firstPass.size, 5, "the first five are all different");
-    const secondPass = new Set(drawn.slice(5).map((c) => c.key));
-    assert.equal(secondPass.size, 4, "the next four are all different too");
-  });
-
-  test("a single candidate fills the whole board", () => {
-    const drawn = drawCandidates(candidates(1), 9, keepOrder);
-    assert.deepEqual(new Set(drawn.map((c) => c.key)), new Set(["c0"]));
-  });
-
-  test("nothing to draw from is an error, not an empty board", () => {
-    assert.throws(() => drawCandidates([], 9, keepOrder));
-  });
-
-  test("the same random sequence gives the same draw", () => {
-    const a = drawCandidates(candidates(12), 9, sequence([0.2, 0.7, 0.4]));
-    const b = drawCandidates(candidates(12), 9, sequence([0.2, 0.7, 0.4]));
-    assert.deepEqual(a, b);
-  });
-
-  test("shuffle actually permutes, and keeps every item exactly once", () => {
-    // The exact order a known random sequence produces. Asserting only that the items
-    // survive would pass for a shuffle that returns the list untouched, which is the one
-    // bug worth catching here (02-§12.5).
-    const shuffled = shuffle([1, 2, 3, 4, 5], sequence([0.9, 0.1, 0.5]));
-    assert.deepEqual(shuffled, [4, 3, 2, 1, 5]);
-    assert.deepEqual([...shuffled].sort(), [1, 2, 3, 4, 5], "every item exactly once");
-  });
-
+describe("the draw behind the board (02-§12.5)", () => {
   test("a different random gives a different board: the draw really uses it", () => {
     const pool = candidates(9);
     const a = buildBoard(pool, 3, "species", sequence([0.1, 0.9, 0.4, 0.7]));
@@ -86,6 +48,12 @@ describe("drawing squares (02-§12.5)", () => {
       b.squares.map((s) => s.key),
       "two randoms, two orders",
     );
+  });
+
+  test("a board with more squares than candidates repeats rather than falling short", () => {
+    // 02-§12.5 lets a small dataset give duplicates; the board is still full.
+    const board = buildBoard(candidates(4), 3, "species", sequence([0.3, 0.8]));
+    assert.equal(board.squares.length, 9);
   });
 });
 

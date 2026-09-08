@@ -390,6 +390,61 @@ describe("the bingo page (02-§12.2–12.4, 02-§12.7, 02-§12.13)", () => {
   });
 });
 
+describe("the Spana! page (02-§13.1, 02-§13.4, 02-§13.7, 02-§13.10, 02-§13.11)", () => {
+  test("has the start screen, the round, one template per clue and the dialog", async () => {
+    const html = main(await page("spana"));
+    const dataset = await qaDataset();
+    assert.match(html, /<h1>Spana!<\/h1>/);
+    assert.match(html, /data-spana-start/, "startskärmen");
+    assert.match(html, /name="size" value="4" checked/);
+    assert.match(html, /name="size" value="8"/, "QA har fler än fyra ledtrådar, så den långa rundan erbjuds (02-§13.8)");
+    assert.match(html, /name="level" value="easy" checked/);
+    assert.match(html, /name="level" value="hard"/);
+    assert.match(html, /data-spana-game hidden/, "spelet väntar på skriptet");
+    assert.match(html, /data-spana-dialog/, "dialogen");
+    assert.match(html, /<noscript>/, "utan JavaScript säger sidan det (02-§13.4)");
+    const templates = html.match(/<template data-clue=/g) ?? [];
+    assert.equal(templates.length, dataset.clues.length);
+    assert.match(
+      html,
+      /<template data-clue="img-[0-9a-f]{12}" data-location="[^"]+"[^>]*><img [^>]*srcset=/,
+      "malldelen bär sidans egen bildmarkup och platsens namn",
+    );
+    assert.doesNotMatch(html, /<template[^>]*><img [^>]*fetchpriority/, "en malldel är aldrig sidans ivriga bild");
+  });
+
+  test("a clue with a text carries it, and one without carries none", async () => {
+    const html = main(await page("spana"));
+    const dataset = await qaDataset();
+    const withText = dataset.clues.find((clue) => clue.text !== null);
+    const without = dataset.clues.find((clue) => clue.text === null);
+    assert.ok(withText && without, "QA har båda sorterna");
+    assert.ok(
+      html.includes(`data-clue="${withText.id}" data-location="`) && html.includes(`data-text="${withText.text}"`),
+      "ledtrådstexten står på malldelen",
+    );
+    const bare = html.slice(html.indexOf(`data-clue="${without.id}"`));
+    assert.doesNotMatch(bare.slice(0, bare.indexOf(">")), /data-text=/, "en ledtråd utan text får inget tomt attribut");
+  });
+
+  test("the answer is never written into the page as plain text (02-§13.13)", async () => {
+    // The place is the answer, and it belongs in the dialog after "Hittat!", not in the
+    // list the player reads before looking. It reaches the page only as an attribute on
+    // the inert template.
+    const html = main(await page("spana"));
+    const list = html.slice(0, html.indexOf("data-spana-pool"));
+    assert.doesNotMatch(list, /Bräckebur/);
+  });
+
+  test("the home page and the menu lead to it (02-§13.1)", async () => {
+    const home = main(await page(""));
+    assert.match(home, /href="\/spana\/"[\s\S]*?<h2 class="home-card__title">Spana!<\/h2>/);
+    assert.match(home, /Hitta detaljen på bilden, någonstans på gården\./);
+    const other = await page("karta");
+    assert.match(other, /href="\/spana\/"/);
+  });
+});
+
 describe("the dataset in the build (02-§6.2, 06-§2.1)", () => {
   test("an empty dataset builds: the home page says so and the map is empty", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "s4h-empty-"));
@@ -411,6 +466,10 @@ describe("the dataset in the build (02-§6.2, 06-§2.1)", () => {
     const bingo = main(await readFile(path.join(out, "bingo", "index.html"), "utf8"));
     assert.match(bingo, /Djuren är inte inlagda ännu/, "no candidates, no board (02-§12.12)");
     assert.doesNotMatch(bingo, /data-bingo-start/);
+    const spana = main(await readFile(path.join(out, "spana", "index.html"), "utf8"));
+    assert.match(spana, /Ledtrådarna är inte inlagda ännu/, "no clues, no round (02-§13.3)");
+    assert.match(spana, /href="https:\/\/www\.4h\.se\/stattared\/"/, "and a way on to the main site");
+    assert.doesNotMatch(spana, /data-spana-start/);
     await assert.rejects(access(path.join(out, "plats")), "no location pages");
   });
 
