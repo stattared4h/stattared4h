@@ -278,6 +278,20 @@ function overlaps(a: Box, b: Box): boolean {
   return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 }
 
+/** How much area the two boxes share, in square pixels; zero when they only touch. */
+function overlapArea(a: Box, b: Box): number {
+  const wide = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const tall = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return wide > 0 && tall > 0 ? wide * tall : 0;
+}
+
+/**
+ * How much worse it is to cover a pin than another label (02-§5.54). A covered name can
+ * still be read past; a covered pin is a place the visitor cannot find or tap, so the
+ * placement pays several times over for hiding one.
+ */
+const PIN_PENALTY = 8;
+
 /** True when `inner` lies wholly inside `outer`. */
 function contains(outer: Box, inner: Box): boolean {
   return (
@@ -385,7 +399,25 @@ export function placeLabels(
         !pins.some((pin) => overlaps(box, pin))
       );
     });
-    const side = free ?? "hidden";
+    // Nothing free: take the position that grazes least rather than drop the name
+    // (02-§5.54). The edge and the zoom controls still do not bend — a label outside the
+    // drawing is clipped into nonsense, and one behind a button cannot be read at all.
+    const side =
+      free ??
+      LABEL_SIDES.map((candidate) => {
+        const box = labelBox(point.x, point.y, point.width, height, candidate);
+        if (!contains(edge, box) || overlaps(box, controls)) return null;
+        const cost =
+          taken.reduce((sum, other) => sum + overlapArea(box, other), 0) +
+          PIN_PENALTY * pins.reduce((sum, pin) => sum + overlapArea(box, pin), 0);
+        return { side: candidate, cost };
+      })
+        // A tie keeps the order of LABEL_SIDES, so the placement stays deterministic.
+        .reduce<{ side: LabelSide; cost: number } | null>(
+          (best, next) => (next !== null && (best === null || next.cost < best.cost) ? next : best),
+          null,
+        )?.side ??
+      "hidden";
     sides.set(point.id, side);
     // A hidden label takes no room, so it must not push the next one aside.
     if (side !== "hidden") taken.push(labelBox(point.x, point.y, point.width, height, side));
