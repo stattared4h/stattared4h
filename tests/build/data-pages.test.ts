@@ -421,7 +421,9 @@ describe("the Spana! page (02-§13.1, 02-§13.4, 02-§13.7, 02-§13.10, 02-§13.
   test("a clue with a text carries it, and one without carries none", async () => {
     const html = main(await page("spana"));
     const dataset = await qaDataset();
-    const withText = dataset.clues.find((clue) => clue.text !== null);
+    // A plain text, so this test is about the attribute being there and not about the
+    // escaping — that has a test of its own below.
+    const withText = dataset.clues.find((clue) => clue.text !== null && !/["&<>]/.test(clue.text));
     const without = dataset.clues.find((clue) => clue.text === null);
     assert.ok(withText && without, "QA har båda sorterna");
     assert.ok(
@@ -430,6 +432,18 @@ describe("the Spana! page (02-§13.1, 02-§13.4, 02-§13.7, 02-§13.10, 02-§13.
     );
     const bare = html.slice(html.indexOf(`data-clue="${without.id}"`));
     assert.doesNotMatch(bare.slice(0, bare.indexOf(">")), /data-text=/, "en ledtråd utan text får inget tomt attribut");
+  });
+
+  test("a clue text with quotes and an ampersand survives the attribute it rides in", async () => {
+    // The text is written by an editor and lands in an HTML attribute (02-§13.5). A
+    // stray quote there would end the attribute and swallow the rest of the template,
+    // and the QA data carries such a text on purpose.
+    const html = main(await page("spana"));
+    const dataset = await qaDataset();
+    const tricky = dataset.clues.find((clue) => clue.text?.includes('"'));
+    assert.ok(tricky, "QA-datat saknar en ledtråd med citattecken");
+    assert.match(html, /data-text="Leta efter det &quot;enkla&quot; trästaketet &amp; grinden\."/);
+    assert.doesNotMatch(html, /data-text="[^"]*"[^>]*"enkla"/, "citattecknet får inte bryta attributet");
   });
 
   test("the answer is never written into the page as plain text (02-§13.13)", async () => {

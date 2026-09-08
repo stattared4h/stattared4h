@@ -46,14 +46,27 @@ export function answerSentence(place: string): string {
   return `Detaljen finns vid ${place}.`;
 }
 
+/**
+ * The clue's words, or null when they are not to be shown: on the hard level the picture
+ * is the whole clue, and a clue may have no words at all (02-§13.7, 04-§11.4).
+ */
+export function visibleText(level: Level, text: string | null): string | null {
+  return level === "easy" ? text : null;
+}
+
 /** "3 av 8 hittade", and something to be pleased about when the round is done (02-§13.15). */
 export function progressText(found: number, total: number): string {
   return found === total ? "Alla hittade!" : `${found} av ${total} hittade`;
 }
 
-/** What a screen reader says about a stop. The number is the one the eye sees, so it starts at one. */
-export function stopLabel(index: number, found: boolean): string {
-  const name = `Stopp ${index + 1}`;
+/**
+ * What a screen reader says about a stop. The number is the one the eye sees, so it starts
+ * at one, and the picture's own description comes with it: the picture is the clue, and a
+ * label of nothing but "Stopp 1" would hide the whole game from someone who cannot see it
+ * (`05-§9.6`).
+ */
+export function stopLabel(index: number, found: boolean, description = ""): string {
+  const name = description.trim() === "" ? `Stopp ${index + 1}` : `Stopp ${index + 1}: ${description.trim()}`;
   return found ? `${name}, hittad` : name;
 }
 
@@ -104,11 +117,13 @@ export function init(): void {
       button.type = "button";
       button.className = stop.found ? "spana-stop spana-stop--found" : "spana-stop";
       button.setAttribute("aria-pressed", String(stop.found));
-      button.setAttribute("aria-label", stopLabel(index, stop.found));
       const image = document.createElement("span");
       image.className = "spana-stop__image";
       image.append(templateContent(pool, stop.key));
       button.append(image);
+      // The alt text is the build's own (03-§6), so the label says what the picture shows
+      // without anything here writing a description of its own.
+      button.setAttribute("aria-label", stopLabel(index, stop.found, image.querySelector("img")?.alt ?? ""));
       const number = document.createElement("span");
       number.className = "spana-stop__number";
       number.textContent = `Stopp ${index + 1}`;
@@ -128,9 +143,7 @@ export function init(): void {
     dialogTitle.textContent = `Stopp ${index + 1}`;
     clear(dialogImage);
     dialogImage.append(templateContent(pool, stop.key));
-    // The clue's own words are the easy level's help; the hard level is the picture alone
-    // (02-§13.7). A clue without a text has nothing to hide either way.
-    const text = hunt.level === "easy" ? stop.text : null;
+    const text = visibleText(hunt.level, stop.text);
     dialogText.textContent = text ?? "";
     dialogText.hidden = text === null;
     dialogAnswer.textContent = stop.found ? answerSentence(stop.location) : "";
