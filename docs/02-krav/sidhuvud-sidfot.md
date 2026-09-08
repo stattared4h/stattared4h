@@ -41,8 +41,10 @@ länk ut — till artsidan — så den som följt en QR-kod till hagen och tryck
 inte kunde ta sig tillbaka till hagen. 4H-loggan, som annars är den vägen, visas först
 från desktopbrytpunkten. Och manifestet säger `display: standalone` (`02-§7.1`):
 installerad som app har sajten ingen webbläsarram och därmed ingen bakåtknapp alls.
-Därför är "Tillbaka" i `02-§10.40` sajtens egen, längst till vänster där varje telefon
-har sin.
+Därför är "Tillbaka" i `02-§10.40` sajtens egen. Den låg först längst till vänster, där
+varje telefon har sin, men då sköt den menyknappen ett steg åt höger på varje sida utom
+startsidan: knappen man trycker oftast flyttade sig när man bytte sida. Menyknappen är
+radens fasta punkt, och "Tillbaka" står till höger om den.
 
 ### Sidhuvudet
 
@@ -52,10 +54,10 @@ har sin.
 - Första fokuserbara elementet på varje sida är länken "Hoppa till innehållet", som
   leder till `<main>` och syns när den har fokus. <!-- 02-§10.2 -->
 - Under desktopbrytpunkten (`05-§5.3`) är sidhuvudet en rad ikonknappar (`05-§6.33`),
-  minst `--tap-target-min`: "Tillbaka" längst till vänster, menyknappen direkt till höger
-  om den, installknappen därefter, "till toppen" i mitten och feedbackknappen längst till
-  höger. På startsidan finns ingen "Tillbaka", och raden börjar med
-  menyknappen. <!-- 02-§10.3 -->
+  minst `--tap-target-min`: menyknappen längst till vänster, "Tillbaka" direkt till höger
+  om den, "till toppen" i mitten, och installknappen och feedbackknappen längst till
+  höger. Menyknappen och de två högerknapparna står på samma ställe på varje sida.
+  Startsidan har ingen "Tillbaka", och dess plats står då tom. <!-- 02-§10.3 -->
 - Menyknappen visar tre streck och ordet "Meny", har `aria-expanded` och
   `aria-controls`, och öppnar menyn. Medan menyn är öppen visar samma knapp ett kryss och
   ordet "Stäng", och ett tryck stänger menyn. <!-- 02-§10.4 -->

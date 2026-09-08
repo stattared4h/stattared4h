@@ -47,26 +47,24 @@
   padding-block: var(--space-xs);
 }
 
-/* One grid for both widths. On mobile: menu, install, "to top" centred, feedback.
-   From the desktop breakpoint the brand and the nav take the first two columns
-   instead, and the mobile-only buttons go away. The height never changes: every
-   item is exactly --tap-target-min tall (05-§6.37). */
+/* One grid for both widths, and the same columns on every page. On mobile: menu,
+   "Tillbaka", "to top" centred, install, feedback. From the desktop breakpoint the
+   brand and the nav take the first two columns instead, and the mobile-only buttons
+   go away. The height never changes: every item is exactly --tap-target-min tall
+   (05-§6.37). */
 .site-header__inner {
   /* Above the menu overlay, so the menu button is never dimmed and never blocked
      (02-§10.38). */
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: auto auto auto 1fr auto;
+  /* "Tillbaka" keeps its column on the start page too, where it is empty (02-§10.40):
+     an equally wide column on both sides is what puts "to top" in the true middle.
+     Every icon button is exactly this wide (05-§6.33). */
+  grid-template-columns: auto var(--tap-target-min) 1fr auto auto;
   align-items: center;
   column-gap: var(--space-xs);
   min-height: var(--tap-target-min);
-}
-
-/* The start page has no "Tillbaka" (02-§10.40), so its row is one column shorter and
-   the menu button starts at the edge like everywhere else. */
-.site-header__inner--home {
-  grid-template-columns: auto auto 1fr auto;
 }
 
 .site-header__brand,
@@ -74,43 +72,30 @@
   display: none;
 }
 
-/* The order in the row (02-§10.3): back, menu, install, "to top" centred, feedback.
-   On the start page the first column is gone and every button moves one step left. */
-.site-header__back {
+/* The order in the row (02-§10.3): menu, "Tillbaka", "to top" centred, install,
+   feedback. Every button names its column, so the row looks the same on every page:
+   the menu button and the two on the right never move, and the start page, which has
+   no "Tillbaka" (02-§10.40), simply leaves that column empty. Naming the columns is
+   also what keeps "to top" centred while the install button is hidden (02-§10.11). */
+.site-header__menu-button {
   grid-column: 1;
 }
 
-.site-header__menu-button {
+.site-header__back {
   grid-column: 2;
 }
 
-.site-header__install {
+.site-header__to-top {
   grid-column: 3;
+  justify-self: center;
 }
 
-.site-header__to-top {
+.site-header__install {
   grid-column: 4;
-  justify-self: center;
 }
 
 .site-header__feedback {
   grid-column: 5;
-}
-
-.site-header__inner--home .site-header__menu-button {
-  grid-column: 1;
-}
-
-.site-header__inner--home .site-header__install {
-  grid-column: 2;
-}
-
-.site-header__inner--home .site-header__to-top {
-  grid-column: 3;
-}
-
-.site-header__inner--home .site-header__feedback {
-  grid-column: 4;
 }
 
 .site-header__logo {

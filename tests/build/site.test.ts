@@ -176,10 +176,14 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
     }
   });
 
-  test("Tillbaka står först i sidhuvudets rad (02-§10.3)", async () => {
+  test("menyknappen står först i sidhuvudets rad, Tillbaka efter den (02-§10.3)", async () => {
     const html = await readFile(path.join(prod, "om", "index.html"), "utf8");
     const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
-    assert.ok(header.indexOf("data-back-button") < header.indexOf("data-menu-button"), "Tillbaka står före menyknappen");
+    // Markupens ordning är radens ordning, så tabbordningen följer ögats.
+    assert.ok(header.indexOf("data-menu-button") < header.indexOf("data-back-button"), "menyknappen står före Tillbaka");
+    assert.ok(header.indexOf("data-back-button") < header.indexOf("data-to-top-button"), "Tillbaka står före till toppen");
+    assert.ok(header.indexOf("data-to-top-button") < header.indexOf("data-install-button"), "till toppen står före installknappen");
+    assert.ok(header.indexOf("data-install-button") < header.indexOf("data-feedback-button"), "installknappen står före feedbackknappen");
   });
 
   test("versionsraden visar BUILD_VERSION och saknas i ett CI-bygge utan version", async () => {
