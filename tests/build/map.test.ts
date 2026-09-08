@@ -418,13 +418,13 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     assert.deepEqual([...forwards].sort(), [...backwards].sort());
   });
 
-  test("when every position is taken the extra labels graze instead of disappearing", () => {
-    // Ten places on the exact same spot. Six positions are free, not eight: `above`
-    // overlaps both slanted positions above the marker and `below` overlaps both below,
-    // so on a single spot the straight pair up and down is never free. The four that are
-    // left over take the position that grazes least rather than vanish (02-§5.54) — a
-    // name partly over another is still readable and still points at its own pin
-    // (02-§5.55), while a name nobody can see helps nobody.
+  test("when every position is taken the extra labels are hidden, not stacked", () => {
+    // Ten places on the exact same spot, in the middle of the drawing. Six labels fit,
+    // not eight: `above` overlaps both slanted positions above the marker and `below`
+    // overlaps both below, so on a single spot the straight pair up and down is never
+    // free. The four left over are hidden rather than stacked (02-§5.54): here, away from
+    // the edge, a label over a label makes both unreadable and wins nothing, and the
+    // place is still in the list under the map (02-§5.24).
     const markers = Array.from({ length: 10 }, (_, i) => ({
       id: `p${i}`,
       name: "Hagen",
@@ -433,15 +433,13 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     }));
     const sides = placeLabels(markers, 800, 600);
     assert.equal(sides.size, 10);
-    assert.deepEqual(
-      [sides.get("p0"), sides.get("p1"), sides.get("p2"), sides.get("p3"), sides.get("p4"), sides.get("p5")],
-      ["above-left", "below-right", "above-right", "below-left", "right", "left"],
-      "the first six take the free positions in the order of 02-§5.53",
+    assert.equal(sides.get("p0"), "above-left");
+    assert.equal(
+      [...sides.values()].filter((side) => side !== "hidden").length,
+      6,
+      "six labels fit on one spot",
     );
-    assert.ok(
-      [...sides.values()].every((side) => side !== "hidden"),
-      `ingen döljs bara för att lägena tagit slut, fick ${[...sides.values()].join(", ")}`,
-    );
+    assert.equal([...sides.values()].filter((side) => side === "hidden").length, 4);
   });
 
   test("a label that fits nowhere is hidden, and leaves room for the next one", () => {

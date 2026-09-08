@@ -399,25 +399,34 @@ export function placeLabels(
         !pins.some((pin) => overlaps(box, pin))
       );
     });
-    // Nothing free: take the position that grazes least rather than drop the name
-    // (02-§5.54). The edge and the zoom controls still do not bend — a label outside the
-    // drawing is clipped into nonsense, and one behind a button cannot be read at all.
+    // Nothing free. At the drawing's edge the name grazes rather than disappears; in the
+    // middle it is hidden as before (02-§5.54). The edge is where the places that lie
+    // outside the drawing are parked, one under the other (04-§5.9), so there the choice
+    // is between a name that grazes and a name that is never shown. Around the farmyard
+    // it is the opposite: a label over a label makes both unreadable and wins nothing.
+    // The drawing's edge and the zoom controls do not bend either way.
+    const atEdge =
+      point.x < half ||
+      point.x > referenceWidth - half ||
+      point.y < half ||
+      point.y > edge.bottom - half;
     const side =
       free ??
-      LABEL_SIDES.map((candidate) => {
-        const box = labelBox(point.x, point.y, point.width, height, candidate);
-        if (!contains(edge, box) || overlaps(box, controls)) return null;
-        const cost =
-          taken.reduce((sum, other) => sum + overlapArea(box, other), 0) +
-          PIN_PENALTY * pins.reduce((sum, pin) => sum + overlapArea(box, pin), 0);
-        return { side: candidate, cost };
-      })
-        // A tie keeps the order of LABEL_SIDES, so the placement stays deterministic.
-        .reduce<{ side: LabelSide; cost: number } | null>(
-          (best, next) => (next !== null && (best === null || next.cost < best.cost) ? next : best),
-          null,
-        )?.side ??
-      "hidden";
+      (!atEdge
+        ? "hidden"
+        : LABEL_SIDES.map((candidate) => {
+            const box = labelBox(point.x, point.y, point.width, height, candidate);
+            if (!contains(edge, box) || overlaps(box, controls)) return null;
+            const cost =
+              taken.reduce((sum, other) => sum + overlapArea(box, other), 0) +
+              PIN_PENALTY * pins.reduce((sum, pin) => sum + overlapArea(box, pin), 0);
+            return { side: candidate, cost };
+          })
+            // A tie keeps the order of LABEL_SIDES, so the placement stays deterministic.
+            .reduce<{ side: LabelSide; cost: number } | null>(
+              (best, next) => (next !== null && (best === null || next.cost < best.cost) ? next : best),
+              null,
+            )?.side ?? "hidden");
     sides.set(point.id, side);
     // A hidden label takes no room, so it must not push the next one aside.
     if (side !== "hidden") taken.push(labelBox(point.x, point.y, point.width, height, side));

@@ -344,6 +344,81 @@
   transform: translateX(-50%);
 }
 
+/* The line from the label to its own pin (02-§5.56). The label hangs clear of the tap
+   target, so its nearest edge is half a tap target from the place and the drawn dot is
+   --space-md across: the gap to close is half the difference, and along a diagonal it is
+   the corner's distance less the dot's radius. Both are derived here rather than typed,
+   so a change to the tap target or the dot keeps the line touching at both ends. */
+.map__label::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: var(--border-width);
+  height: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  background: var(--color-green-deep);
+  transform: translateX(-50%);
+}
+
+.map__marker--label-above .map__label::before {
+  top: 100%;
+  bottom: auto;
+}
+
+.map__marker--label-right .map__label::before {
+  inset: 50% 100% auto auto;
+  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  height: var(--border-width);
+  transform: translateY(-50%);
+}
+
+.map__marker--label-left .map__label::before {
+  top: 50%;
+  bottom: auto;
+  left: 100%;
+  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  height: var(--border-width);
+  transform: translateY(-50%);
+}
+
+/* Slanted positions: the line runs at 45° from the label's nearest corner to the dot.
+   0.7071 is half the square root of two — the corner of the tap target lies that much of
+   a tap target from its centre. */
+.map__marker--label-above-left .map__label::before,
+.map__marker--label-above-right .map__label::before,
+.map__marker--label-below-left .map__label::before,
+.map__marker--label-below-right .map__label::before {
+  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
+  height: var(--border-width);
+}
+
+.map__marker--label-above-left .map__label::before {
+  top: 100%;
+  bottom: auto;
+  left: 100%;
+  transform-origin: 0 0;
+  transform: rotate(45deg);
+}
+
+.map__marker--label-above-right .map__label::before {
+  inset: 100% 100% auto auto;
+  transform-origin: 100% 0;
+  transform: rotate(-45deg);
+}
+
+.map__marker--label-below-left .map__label::before {
+  left: 100%;
+  transform-origin: 0 100%;
+  transform: rotate(-45deg);
+}
+
+.map__marker--label-below-right .map__label::before {
+  right: 100%;
+  left: auto;
+  transform-origin: 100% 100%;
+  transform: rotate(45deg);
+}
+
 /* Under 600 px the overview shows no names at all (02-§5.55). The map is 312 px wide
    there, and thirty-four names cannot stand beside each other however they are placed —
    02-§5.54 would turn them into a wall of text over the drawing. The symbols still say
@@ -461,6 +536,68 @@
     padding: 0 var(--space-xs);
     clip-path: none;
     transform: translateX(-50%);
+  }
+
+  /* The leader follows the wide placement, not the narrow one (02-§5.56): from 600 px it
+     is the --wide- modifier that says where the label hangs, so the line has to be aimed
+     again from the same corner. Reset first, then one rule per position, mirroring the
+     eight above. */
+  .map__marker .map__label::before {
+    inset: auto auto 100% 50%;
+    width: var(--border-width);
+    height: calc((var(--tap-target-min) - var(--space-md)) / 2);
+    transform-origin: 50% 50%;
+    transform: translateX(-50%);
+  }
+
+  .map__marker--wide-above .map__label::before {
+    inset: 100% auto auto 50%;
+  }
+
+  .map__marker--wide-right .map__label::before {
+    inset: 50% 100% auto auto;
+    width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+    height: var(--border-width);
+    transform: translateY(-50%);
+  }
+
+  .map__marker--wide-left .map__label::before {
+    inset: 50% auto auto 100%;
+    width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+    height: var(--border-width);
+    transform: translateY(-50%);
+  }
+
+  .map__marker--wide-above-left .map__label::before,
+  .map__marker--wide-above-right .map__label::before,
+  .map__marker--wide-below-left .map__label::before,
+  .map__marker--wide-below-right .map__label::before {
+    width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
+    height: var(--border-width);
+  }
+
+  .map__marker--wide-above-left .map__label::before {
+    inset: 100% auto auto 100%;
+    transform-origin: 0 0;
+    transform: rotate(45deg);
+  }
+
+  .map__marker--wide-above-right .map__label::before {
+    inset: 100% 100% auto auto;
+    transform-origin: 100% 0;
+    transform: rotate(-45deg);
+  }
+
+  .map__marker--wide-below-left .map__label::before {
+    inset: auto auto 100% 100%;
+    transform-origin: 0 100%;
+    transform: rotate(-45deg);
+  }
+
+  .map__marker--wide-below-right .map__label::before {
+    inset: auto 100% 100% auto;
+    transform-origin: 100% 100%;
+    transform: rotate(45deg);
   }
 
   .map__marker--wide-above .map__label {
