@@ -139,6 +139,7 @@ export function init(): void {
   };
 
   const openStop = (index: number): void => {
+    if (hunt === null) return;
     openIndex = index;
     showStop(index);
     dialog.showModal();

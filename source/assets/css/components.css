@@ -1048,20 +1048,24 @@
   outline-offset: var(--focus-offset);
 }
 
-/* The picture is capped by height, not width: a portrait photo of a swing would
-   otherwise fill the whole screen and hide the stop under it (05-§6.48). */
+/* The picture is capped by height and never cropped: the detail is the whole question,
+   and a crop can cut away the very thing the player is meant to look for. A portrait
+   photo is therefore narrower than the card rather than taller than the screen
+   (05-§6.48) — the same rule the tool's own cards follow (05-§6.15). */
 .spana-stop__image {
   position: relative;
   display: block;
-  overflow: hidden;
   border-radius: var(--radius-sm);
 }
 
 .spana-stop__image img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  height: auto;
   max-height: 240px;
-  object-fit: cover;
+  margin-inline: auto;
+  border-radius: var(--radius-sm);
 }
 
 .spana-stop__number {
@@ -1123,10 +1127,15 @@
   border-radius: var(--radius-md);
 }
 
+/* Tall enough to see the detail, short enough that the answer and the button are still
+   on the screen under it on a phone (05-§6.48). */
 .spana-dialog__image img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: 45dvh;
+  margin-inline: auto;
 }
 
 /* The answer is a message, not a fault: the status bar's pale green, never the danger

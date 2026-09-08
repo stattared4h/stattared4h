@@ -437,6 +437,11 @@ text: Den sitter på grinden.   # frivillig, kort
 - Bilden ska vara en **närbild på detaljen** — en gunga, en käpphäst, en gärsgård — och
   inte platsens översiktsbild: en bild som visar hela hagen besvarar sin egen fråga. Det
   är en redaktionell regel som ingen validering kan avgöra åt oss. <!-- 04-§11.5 -->
+- Bildpostens `alt` säger vad som syns, aldrig var det står. Alt-texten läses upp för den
+  som inte ser bilden, och en text som nämner platsen avslöjar då svaret innan spelaren
+  har letat — "Närbild på en gunga" duger, "Gungan på lekplatsen" gör det inte. Regeln
+  gäller bilder som är ledtrådar; en vanlig bild får gärna nämna hagen. Också den är
+  redaktionell. <!-- 04-§11.9 -->
 - Flera ledtrådar får peka på samma plats, och en plats behöver ingen ledtråd alls. En
   bild kan däremot vara ledtråd högst en gång, eftersom filnamnet är bild-id:t. Ska samma
   motiv vara två ledtrådar är det två foton. <!-- 04-§11.6 -->

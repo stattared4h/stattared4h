@@ -151,11 +151,13 @@ sitter i.
 - Rundan, med sina bockar, sparas i `localStorage` i besökarens egen webbläsare
   (ADR 0010) under en egen nyckel, skild från bingots, och visas igen när sidan öppnas
   nästa gång. En sparad runda som nämner en ledtråd katalogen inte längre har förkastas i
-  sin helhet, och startskärmen visas. Knappen "Ny runda" rensar det sparade och visar
-  startskärmen. Inget annat sparas. <!-- 02-§13.14 -->
+  sin helhet, och startskärmen visas. Knapparna "Ny runda" och "Spela igen" rensar det
+  sparade och visar startskärmen. Inget annat sparas. <!-- 02-§13.14 -->
 - Ovanför listan står hur många stopp som är avbockade av hur många. Varje avbockning ger
   lite konfetti. <!-- 02-§13.15 -->
 - När alla stopp är avbockade är rundan klar: mycket konfetti, en fanfar och en ruta under
-  listan som säger det och erbjuder "Ny runda". Konfettin och fanfaren är sajtens egna
+  listan som säger det och erbjuder "Spela igen". Den heter inte samma sak som knappen
+  under listan: två knappar med samma namn på samma skärm säger inte vilken som är
+  vilken. Konfettin och fanfaren är sajtens egna
   (`02-§12.11`), och med `prefers-reduced-motion: reduce` visas rutan utan
   konfetti. <!-- 02-§13.16 -->

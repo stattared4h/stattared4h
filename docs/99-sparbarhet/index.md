@@ -210,6 +210,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§11.25`, `11.27` | Kryssrutan för ledtråd; platsen obligatorisk medan den är i | `manuell` | `cluePostProblems` i `source/ts/domain/clue-post.ts` är testad i `tests/domain/clue-post.test.ts`; kopplingen till fälten är DOM. Bered en bild, kryssa i *Det här är en ledtråd till Spana!*, lämna platsen ovald och tryck Ladda ner alla som zip: nedladdningen uteblir, felrutan säger vilken bild det gäller och fokus hamnar i platsväljaren |
 | `02-§11.26` | Platslistan bakas in i sidan vid byggtillfället | `byggd` | `imageToolView` i `source/ts/build/pages.ts` och mallen `data-image-tool-places`; `tests/build/site.test.ts` kräver listan i produktionsbygget, i bokstavsordning och utan anrop i körtid. Utan platser i datat är rutan avstängd med en förklaring — bygg med en tom datakatalog och bekräfta det |
 | `02-§11.28`–`11.29` | Ledtrådsfilen i arkivet och som egen knapp, i katalogens form | `byggd` | `entriesFor` och knappen i `source/ts/ui/image-tool/tool.ts` över `formatCluePost` och `cluePostFile` i `source/ts/domain/clue-post.ts`; `tests/domain/clue-post.test.ts` kör den skrivna filen genom `loadDataset` och kräver att den passerar utan efterarbete |
+| `02-§11.30` | Samma filnamn i olika mappar; telefonstegen säger hur | `byggd` | Stycket i `source/pages/verktyg-bild.njk`; `tests/build/site.test.ts` kräver det på den byggda sidan |
 | `02-§12.1` | Startskärm med storlek och nivå; inga inställningar under spelet | `manuell` | Formuläret `data-bingo-start` i `source/pages/bingo.njk`; `source/ts/ui/bingo.ts` döljer det när brickan visas. Öppna `/bingo/` i 360 px, välj 4 × 4 och tryck Börja spela: sidan visar bara rubriken, lägesraden och brickan, och radioknapparna är borta |
 | `02-§12.2` | Sida, navkort och menyrad | `byggd` | `bingoUrl` och kortet i `homeView` i `source/ts/build/pages.ts`, symbolen i `HOME_CARD_SYMBOLS`, raden i `navLinks` i `source/layouts/header.njk`; `tests/build/pages.test.ts` och `tests/build/data-pages.test.ts` kräver kortet, `tests/build/site.test.ts` menyradens plats |
 | `02-§12.3` | Sidan i förcachen | `byggd` | Sidan är en vanlig sida i `collections.all`, som `source/pages/sw.njk` listar; `tests/build/pwa.test.ts` kräver varje sida i förcachen |
@@ -238,7 +239,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§13.13` | Platsen avslöjas i dialogen när Hittat! trycks | `manuell` | `answerSentence` i `source/ts/ui/spana.ts` är testad i `tests/ui/spana.test.ts`, inklusive att svaret inte nämner rätt eller fel; `tests/build/data-pages.test.ts` kräver att platsen inte står i listan besökaren läser före tryck. Tryck Hittat! i dialogen och bekräfta att den står kvar och visar platsen, och att namnet försvinner när bocken tas bort |
 | `02-§13.14` | Rundan i `localStorage` under egen nyckel; det inaktuella förkastas | `byggd` | `serialiseHunt` och `restoreHunt` i `source/ts/domain/spana.ts`, testade i `tests/domain/spana.test.ts` inklusive en sparad ledtråd katalogen inte längre har och att nyckeln är en annan än bingots; läsning och skrivning i `source/ts/ui/spana.ts`. Bocka av två stopp, stäng fliken och öppna `/spana/` igen: rundan och bockarna är kvar |
 | `02-§13.15` | Lägesrad och konfetti per avbockning | `byggd` | `foundCount` i domänen och `progressText` i `source/ts/ui/spana.ts`, testade i `tests/domain/spana.test.ts` och `tests/ui/spana.test.ts`; `burst("small")` i `source/ts/ui/confetti.ts`. Bocka av ett stopp: lite konfetti faller |
-| `02-§13.16` | Klar runda: konfetti, fanfar, Ny runda; reducerad rörelse | `manuell` | `isComplete` i domänen är testad; `burst("big")` och `playFanfare` i `source/ts/ui/`. Bocka av alla stopp med ljudet på: konfetti, en fanfar och rutan Allt hittat! visas när dialogen stängs; slå på reducerad rörelse i systemet och gör om: rutan visas utan konfetti |
+| `02-§13.16` | Klar runda: konfetti, fanfar, Ny runda; reducerad rörelse | `manuell` | `isComplete` i domänen är testad; `burst("big")` och `playFanfare` i `source/ts/ui/`. Bocka av alla stopp med ljudet på: konfetti, en fanfar och rutan Allt hittat! med knappen Spela igen visas när dialogen stängs; slå på reducerad rörelse i systemet och gör om: rutan visas utan konfetti |
 
 ### Designspecifikation (`05-§`)
 
@@ -394,7 +395,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
-| `byggd` | 192 |
+| `byggd` | 193 |
 | `manuell` | 69 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i

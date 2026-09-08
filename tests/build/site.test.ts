@@ -298,6 +298,9 @@ describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
     assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/images"/);
     assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/data\/images"/);
     assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/data\/clues"/, "ledtrådens katalog (02-§11.28)");
+    // Both YAML files carry the picture's id and are told apart only by their folder, so
+    // a phone's flat downloads folder renames the second one (02-§11.30).
+    assert.match(main, /heter <strong>samma sak<\/strong>/, "varningen om filnamnen på telefonen");
   });
 
   test("platsväljaren är inbakad i sidan, inte hämtad i körtid (02-§11.26)", async () => {

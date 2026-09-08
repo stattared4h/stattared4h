@@ -94,6 +94,8 @@ lekplatsen, grillplatsen och caféet — eftersom en detalj kan sitta var som he
 gården.
 
 Ledtrådarna **återbrukar datasetets befintliga bilder**, som föreställer djur och hagar
-och inte de närbilder på detaljer som `04-§11.5` beskriver. QA prövar formen — postens
-fält, urvalet, dragningen och sidan — inte motivvalet. Bilderna byts när riktiga
+och inte de närbilder på detaljer som `04-§11.5` beskriver. Flera av alt-texterna nämner
+dessutom platsen — "Träden i Tåmossen" — vilket `04-§11.9` förbjuder en riktig ledtråd,
+eftersom det avslöjar svaret för den som lyssnar i stället för att se. QA prövar formen —
+postens fält, urvalet, dragningen och sidan — inte motivvalet. Bilderna byts när riktiga
 ledtrådsfoton finns, utan att någon annan del av datasetet rörs.

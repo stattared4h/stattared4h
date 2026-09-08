@@ -263,11 +263,14 @@ frågan, så den får all bredd spalten har.
 
 Ett stopp är en knapp i kortets yta (6.4) med bilden överst i `--radius-md`, som mest
 240 px hög så att åtta stopp inte blir åtta skärmar att rulla igenom, och ordningsnumret
-i `--color-ink-soft` under den. Ett avbockat stopp bär samma soltoner och samma bock som
+i `--color-ink-soft` under den. Bilden beskärs aldrig: höjden är tagen och inte bredden,
+som i verktygets kort (6.15), eftersom en beskärning kan klippa bort just den detalj
+spelaren ska leta efter. Ett stående foto blir därför smalare än kortet, centrerat. Ett avbockat stopp bär samma soltoner och samma bock som
 bingots ruta (`05-§6.47`), så att de två spelen känns igen som ett par.
 
-Dialogen är dialogen i 6.13 med bilden överst i `--radius-md`, ledtrådstexten under den i
-brödtext, och därunder — bara när stoppet är avbockat — svaret: platsens namn i
+Dialogen är dialogen i 6.13 med bilden överst i `--radius-md` och som mest 45 % av
+skärmhöjden — högre, och svaret och knappen hamnar utanför skärmen på en telefon —
+ledtrådstexten under den i brödtext, och därunder — bara när stoppet är avbockat — svaret: platsens namn i
 halvfet på en ljusgrön platta `--color-green-pale`, samma par som statusraden i 6.14,
 eftersom det är ett besked och inte ett fel. Knappen ligger sist och byter etikett med
 tillståndet. <!-- 05-§6.48 -->

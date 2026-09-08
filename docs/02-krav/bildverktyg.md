@@ -133,6 +133,11 @@ bara sista steget ut.
   för varje ikryssad bild, bredvid bildens `.webp` och `.yaml`, och varje ikryssad bild har
   dessutom en egen knapp för sin ledtrådsfil. Ledtrådens filnamn är bildens id (`04-§11.2`),
   så de två filerna hör ihop av sig själva och kan inte hamna fel. <!-- 02-§11.28 -->
+- Bildposten och ledtråden bär därmed samma filnamn och skiljs bara av katalogen. I
+  arkivet är det ingen fråga, men en telefons nedladdningsmapp är platt och lägger en tvåa
+  i namnet på den andra filen — och då heter den fel i repot. Sidan säger därför i
+  telefonstegen att man laddar ner en fil, laddar upp den, och först därefter hämtar
+  nästa. <!-- 02-§11.30 -->
 - Ledtrådsposten har samma form som katalogen (`04-§11`): `location`, och `text` när den
   har skrivits, i den ordningen, en rad var. Filerna passerar `npm run validate` utan
   efterarbete, som `02-§11.23` kräver av allt sidan lämnar ifrån sig. <!-- 02-§11.29 -->
