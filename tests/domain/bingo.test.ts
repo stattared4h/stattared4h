@@ -68,9 +68,24 @@ describe("drawing squares (02-§12.5)", () => {
     assert.deepEqual(a, b);
   });
 
-  test("shuffle returns every item exactly once", () => {
+  test("shuffle actually permutes, and keeps every item exactly once", () => {
+    // The exact order a known random sequence produces. Asserting only that the items
+    // survive would pass for a shuffle that returns the list untouched, which is the one
+    // bug worth catching here (02-§12.5).
     const shuffled = shuffle([1, 2, 3, 4, 5], sequence([0.9, 0.1, 0.5]));
-    assert.deepEqual([...shuffled].sort(), [1, 2, 3, 4, 5]);
+    assert.deepEqual(shuffled, [4, 3, 2, 1, 5]);
+    assert.deepEqual([...shuffled].sort(), [1, 2, 3, 4, 5], "every item exactly once");
+  });
+
+  test("a different random gives a different board: the draw really uses it", () => {
+    const pool = candidates(9);
+    const a = buildBoard(pool, 3, "species", sequence([0.1, 0.9, 0.4, 0.7]));
+    const b = buildBoard(pool, 3, "species", sequence([0.8, 0.2, 0.6, 0.3]));
+    assert.notDeepEqual(
+      a.squares.map((s) => s.key),
+      b.squares.map((s) => s.key),
+      "two randoms, two orders",
+    );
   });
 });
 
@@ -178,6 +193,11 @@ describe("storing and restoring (02-§12.9)", () => {
     assert.equal(restoreBoard(null, pool), null);
     assert.equal(restoreBoard("nonsense", pool), null);
     assert.equal(restoreBoard({ version: 2 }, pool), null);
+    // A board that is complete in every other way, so only the version can reject it.
+    // Without this the line above passes because `keys` and `found` are missing, and the
+    // version gate could be deleted unnoticed (02-§12.9).
+    const wellFormed = serialiseBoard(buildBoard(pool.species, 3, "species", keepOrder));
+    assert.equal(restoreBoard({ ...wellFormed, version: 2 }, pool), null, "bara versionen skiljer");
     assert.equal(restoreBoard({ version: 1, size: 5, level: "species", keys: [], found: [] }, pool), null);
     assert.equal(restoreBoard({ version: 1, size: 3, level: "species", keys: ["s0"], found: [true] }, pool), null);
     assert.equal(
