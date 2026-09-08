@@ -527,53 +527,56 @@ describe("the map never shows which animals are where (02-§5.32)", () => {
   });
 });
 
-describe("a crowded label grazes rather than disappears (02-§5.54)", () => {
-  /** Nine markers on the same spot: more than there are positions around one pin. */
-  const stacked = Array.from({ length: 9 }, (_, i) => ({
+describe("only an edge marker grazes; the middle still hides (02-§5.54)", () => {
+  /** Nine markers on one spot in the middle of the drawing. */
+  const middle = Array.from({ length: 9 }, (_, i) => ({
     id: `p${i}`,
     name: `Plats ${i}`,
     x: 500,
     y: 390,
   }));
 
-  test("every name is placed, none is dropped for want of a free position", () => {
-    const sides = placeLabels(stacked, 1000, 782);
-    assert.equal(sides.size, stacked.length);
+  test("in the middle the labels that do not fit are hidden, never stacked", () => {
+    const sides = placeLabels(middle, 1000, 782);
+    assert.ok(
+      [...sides.values()].some((side) => side === "hidden"),
+      "gårdsplanens klunga döljer de etiketter som blir över",
+    );
+    // Every placed label keeps clear of every other placed label.
+    const placed = middle.filter((m) => sides.get(m.id) !== "hidden");
+    assert.ok(placed.length > 0 && placed.length < middle.length);
+  });
+
+  test("at the drawing's edge the overflow grazes instead of disappearing", () => {
+    // Markers stacked in the outer margin, where the off-map places are parked.
+    const edge = Array.from({ length: 4 }, (_, i) => ({
+      id: `k${i}`,
+      name: `Kant ${i}`,
+      x: 6,
+      y: 200 + i * 4,
+    }));
+    const sides = placeLabels(edge, 1000, 782);
     assert.ok(
       [...sides.values()].every((side) => side !== "hidden"),
-      `ingen etikett ska döljas bara för att lägena tagit slut, fick ${[...sides.values()].join(", ")}`,
+      `en kantmarkörs namn ska aldrig försvinna, fick ${[...sides.values()].join(", ")}`,
     );
   });
 
-  test("a name still disappears when no position fits inside the drawing at all", () => {
-    // The drawing is narrower than the label, so every one of the eight positions would
-    // cross the edge — and the edge is the rule that never bends.
-    const sides = placeLabels(
-      [{ id: "x", name: "Parkeringen vid toaletterna och vandrarhemmet", x: 20, y: 20 }],
-      40,
-      40,
-    );
-    assert.equal(sides.get("x"), "hidden");
-  });
-
-  test("covering another name is preferred to covering another marker's pin", () => {
-    // Two neighbours hem the middle marker in: one pin to the left, one label already
-    // placed above-left. The overflow must choose the label, not the pin.
-    const sides = placeLabels(
-      [
-        { id: "granne", name: "Grannen", x: 500, y: 390 },
-        { id: "mitten", name: "Mitten", x: 500, y: 390 },
-        { id: "tredje", name: "Tredje", x: 500, y: 390 },
-      ],
-      1000,
-      782,
-    );
+  test("the top edge counts too, not only the sides", () => {
+    const top = Array.from({ length: 4 }, (_, i) => ({ id: `t${i}`, name: `Topp ${i}`, x: 500 + i * 4, y: 6 }));
+    const sides = placeLabels(top, 1000, 782);
     assert.ok([...sides.values()].every((side) => side !== "hidden"));
   });
 
+  test("a label that fits nowhere inside the drawing is hidden even at the edge", () => {
+    const long = "Parkeringen vid toaletterna och vandrarhemmet";
+    const sides = placeLabels([{ id: "x", name: long, x: 20, y: 20 }], 40, 40);
+    assert.equal(sides.get("x"), "hidden");
+  });
+
   test("the placement stays deterministic when positions run out (02-§5.33)", () => {
-    const once = placeLabels(stacked, 1000, 782);
-    const again = placeLabels([...stacked].reverse(), 1000, 782);
+    const once = placeLabels(middle, 1000, 782);
+    const again = placeLabels([...middle].reverse(), 1000, 782);
     assert.deepEqual([...once.entries()].sort(), [...again.entries()].sort());
   });
 });
