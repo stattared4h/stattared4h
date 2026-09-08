@@ -69,6 +69,11 @@ Adressen `/` ska vara vägen in till allt, inte till ett av ärendena.
 Besökaren som börjar på startsidan och vill till kartan trycker en gång extra. Det är
 priset, och det betalas av varje ärende som slipper ligga i vägen för de andra.
 
+Den som följt en QR-kod till en hage och sedan vill se kartan når den på ett tryck i
+menyn, där "Kartan" ligger överst bland ärendena (`02-§10.5`). Det är därför menyn måste
+spegla navet och inte bara upprepa startsidan: utan raden vore vägen tillbaka via
+startsidan, alltså två tryck.
+
 Sajten går från fyra sidtyper till sex (`02-§5.1`). Två av dem är sidor utan egen data —
 de visar vyer som redan finns — så bygget växer med två mallar, inte med en ny modell.
 
