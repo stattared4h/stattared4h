@@ -18,6 +18,7 @@ import {
   projectPoint,
   renderMap,
   renderMapSvg,
+  type LabelSide,
   type MapLocation,
 } from "../../source/ts/build/map.ts";
 import { PLACE_SYMBOLS } from "../../source/ts/build/symbols.ts";
@@ -518,5 +519,38 @@ describe("the map never shows which animals are where (02-§5.32)", () => {
         "the pin, the symbol and the name — no species (02-§5.32)",
       );
     }
+  });
+});
+
+describe("a marker in the outer margin labels straight to the side (02-§5.54)", () => {
+  /** A drawing wide enough that a name fits beside a marker standing at the edge. */
+  const WIDE = { width: 1000, height: 780 };
+
+  function sideOf(x: number, y: number, name = "Tåmossen"): LabelSide | undefined {
+    return placeLabels([{ id: "x", name, x, y }], WIDE.width, WIDE.height).get("x");
+  }
+
+  test("the left margin sends the name straight right, the right margin straight left", () => {
+    assert.equal(sideOf(20, 300), "right", "vid vänsterkanten hamnar namnet rakt till höger");
+    assert.equal(sideOf(980, 300), "left", "vid högerkanten hamnar namnet rakt till vänster");
+  });
+
+  test("inside the margin the slanted order of 02-§5.53 still decides", () => {
+    assert.equal(sideOf(500, 300), "above-left", "mitt på ritningen prövas de sneda lägena först");
+  });
+
+  test("the margin is a fraction of the drawing, so it holds at any size", () => {
+    const small = placeLabels([{ id: "x", name: "A", x: 8, y: 120 }], 400, 300);
+    assert.equal(small.get("x"), "right");
+  });
+
+  test("a straight side that does not fit still falls back, never off the drawing", () => {
+    // A name too long to stand beside a marker in the margin must not be forced there:
+    // the placement falls through to the rest of the order, or to hidden.
+    const long = "Parkeringen vid toaletterna och vandrarhemmet";
+    const side = sideOf(20, 300, long);
+    assert.notEqual(side, "left", "vänster skulle hamna utanför ritningen");
+    assert.notEqual(side, "above-left", "de vänstra lägena ryms inte heller");
+    assert.notEqual(side, "below-left", "de vänstra lägena ryms inte heller");
   });
 });
