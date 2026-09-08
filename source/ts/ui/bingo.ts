@@ -105,7 +105,7 @@ export function init(): void {
     openIndex = index;
     dialogTitle.textContent = square.name;
     clear(dialogImage);
-    dialogImage.append(picture(pool, board.level, square.key));
+    dialogImage.append(templateContent(pool, board.level, square.key));
     dialogText.textContent = square.found
       ? "Den här är avbockad. Tryck om du vill ta bort bocken."
       : board.level === "species"
@@ -195,14 +195,24 @@ function readPool(poolElement: HTMLElement): Pool {
   return { candidates, templates };
 }
 
-/** A fresh copy of the candidate's picture, or an empty span when the pool has none. */
+/** A fresh copy of the candidate's picture, wrapped for the square it fills. */
 function picture(pool: Pool, level: Level, key: string): Node {
-  const template = pool.templates.get(`${level}:${key}`);
-  if (template === undefined) return document.createElement("span");
   const wrapper = document.createElement("span");
   wrapper.className = "bingo-square__image";
-  wrapper.append(template.content.cloneNode(true));
+  wrapper.append(templateContent(pool, level, key));
   return wrapper;
+}
+
+/**
+ * A fresh, unwrapped copy of the candidate's picture. The dialog's own element already
+ * carries the class that sizes the picture there (`bingo-dialog__image`), so this is
+ * appended directly instead of inside another `.bingo-square__image` — two contexts
+ * fighting over one class name is exactly the kind of thing that quietly breaks the next
+ * time either one's CSS changes.
+ */
+function templateContent(pool: Pool, level: Level, key: string): Node {
+  const template = pool.templates.get(`${level}:${key}`);
+  return template === undefined ? document.createElement("span") : template.content.cloneNode(true);
 }
 
 /** "en get", "ett får": the indefinite article the species' own name takes. */
