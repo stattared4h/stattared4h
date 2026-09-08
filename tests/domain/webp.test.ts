@@ -4,7 +4,7 @@
  */
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { inspectWebp } from "../../source/ts/domain/webp.ts";
+import { inspectWebp, stripWebpMetadata } from "../../source/ts/domain/webp.ts";
 import {
   chunk,
   extendedWebp,
@@ -46,4 +46,35 @@ test("rejects bytes that are not WebP", () => {
   assert.equal(inspectWebp(new Uint8Array()).ok, false, "empty");
   assert.equal(inspectWebp(riff([chunk("XXXX", [0, 0])])).ok, false, "no bitstream chunk");
   assert.equal(inspectWebp(riff([chunk("VP8 ", [0, 0, 0, 1, 2, 3, 0, 0, 0, 0])])).ok, false, "bad start code");
+});
+
+test("stripping removes an ICC profile and the flag that announced it (02-§11.9)", () => {
+  const withIcc = extendedWebp(1600, 900, VP8X_ICC, [chunk("ICCP", new Array(64).fill(7))]);
+  assert.equal(inspectWebp(withIcc).hasMetadata, true, "utgångsläget bär metadata");
+  const stripped = stripWebpMetadata(withIcc);
+  assert.deepEqual(inspectWebp(stripped), { ok: true, width: 1600, height: 900, hasMetadata: false });
+  assert.ok(stripped.length < withIcc.length, "filen blir mindre när profilen försvinner");
+});
+
+test("stripping removes EXIF and XMP too, and keeps the picture", () => {
+  const loaded = extendedWebp(800, 600, VP8X_EXIF | VP8X_XMP | VP8X_ICC, [
+    chunk("EXIF", new Array(30).fill(1)),
+    chunk("XMP ", new Array(31).fill(2)),
+    chunk("ICCP", new Array(16).fill(3)),
+  ]);
+  const stripped = stripWebpMetadata(loaded);
+  assert.deepEqual(inspectWebp(stripped), { ok: true, width: 800, height: 600, hasMetadata: false });
+  const text = new TextDecoder("latin1").decode(stripped);
+  for (const id of ["EXIF", "XMP ", "ICCP"]) assert.equal(text.includes(id), false, `${id} ligger kvar`);
+  assert.ok(text.includes("VP8 "), "bildströmmen ligger kvar");
+});
+
+test("a file without metadata comes back byte for byte", () => {
+  const plain = lossyWebp(1200, 800);
+  assert.deepEqual([...stripWebpMetadata(plain)], [...plain]);
+});
+
+test("bytes that are not a WebP are left alone rather than rewritten", () => {
+  const rubbish = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+  assert.deepEqual([...stripWebpMetadata(rubbish)], [...rubbish]);
 });

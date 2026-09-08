@@ -39,3 +39,5 @@ Mall: `NNNN-kort-titel.md` med rubrikerna **Status** (Antagen/Ersatt + datum),
 | 0018 | [Platsen har en sort](0018-platsen-har-en-sort.md) |
 | 0019 | [Platsens sort styr markörens symbol](0019-platsens-sort-styr-symbolen.md) |
 | 0020 | [Kartan zoomas i klienten](0020-kartan-zoomas-i-klienten.md) |
+| 0021 | [Bilden bereds i webbläsaren, med valideringen som enda grind](0021-bildberedning-i-webblasaren.md) |
+| 0022 | [Verktygssidor ligger utanför navigationen, inte bakom ett lås](0022-verktygssidor-utanfor-navigationen.md) |

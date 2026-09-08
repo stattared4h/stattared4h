@@ -690,3 +690,58 @@
   margin-right: var(--space-xs);
   color: var(--color-green-deep);
 }
+
+/* ── Bildverktyget (02-§11) ─────────────────────────────────────────────────
+   Redaktörens sida, inte besökarens. Den lånar kort, fält och knappar från
+   resten av sajten och lägger bara till listan med beredda bilder. */
+
+.image-tool__status {
+  margin: var(--space-sm) 0;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-green-pale);
+  color: var(--color-green-deep);
+}
+
+.image-tool__list {
+  display: grid;
+  gap: var(--space-md);
+  margin: var(--space-md) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.image-tool__item {
+  padding: var(--space-sm);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+/* Höjden är tagen, inte bredden: ett stående foto ska inte fylla hela skärmen. */
+.image-tool__preview {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 320px;
+  margin: 0 0 var(--space-xs);
+  border-radius: var(--radius-sm);
+  background: var(--color-page);
+}
+
+.image-tool__error {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-danger);
+}
+
+.image-tool__downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.image-tool__actions {
+  margin: var(--space-md) 0;
+}

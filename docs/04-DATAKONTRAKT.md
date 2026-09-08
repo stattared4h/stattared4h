@@ -295,8 +295,9 @@ Båda fälten är obligatoriska. `alt` beskriver vad som är viktigt i bilden, p
 
 Ett bild-id är `img-` följt av **tolv hexadecimala tecken**: `img-a3f2c1d8b901`.
 
-- Tecknen är de första av SHA-256 över den färdiga WebP-filen. `npm run image` räknar ut
-  dem; ingen skriver ett bild-id för hand. <!-- 04-§9.7 -->
+- Tecknen är de första av SHA-256 över den färdiga WebP-filen. `npm run image` och
+  bildverktyget (`02-§11`) räknar ut dem med samma funktion; ingen skriver ett bild-id
+  för hand. <!-- 04-§9.7 -->
 - Ingen räknare behövs, så två pull requests kan lägga till varsin bild utan att
   kollidera, och samma foto får alltid samma id i stället för en andra kopia. <!-- 04-§9.8 -->
 - Prefixet finns för att YAML annars skulle läsa ett id med bara siffror som ett

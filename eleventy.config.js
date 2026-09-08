@@ -32,6 +32,7 @@ import { readContentFiles, renderMarkdown } from "./source/ts/build/markdown.ts"
 import { imagesDirFor } from "./source/ts/build/images.ts";
 import { loadMapBackground } from "./source/ts/build/map.ts";
 import { buildViews } from "./source/ts/build/pages.ts";
+import { IMAGE_TOOL_PATH, IMAGE_TOOL_SCRIPT } from "./source/ts/build/tool-page.ts";
 
 const ROOT = import.meta.dirname;
 
@@ -165,6 +166,12 @@ export default function (eleventyConfig) {
     repo: "https://github.com/stattared4h/stattared4h",
     isQa: dataDir.endsWith("data-qa"),
   });
+  // The editors' tools (02-§11, ADR 0022). The address comes from source/ts/build/tool-page.ts
+  // so the template, the bundle below and the build tests all read the same one.
+  eleventyConfig.addGlobalData("tool", {
+    imagePath: IMAGE_TOOL_PATH,
+    imageScript: `${IMAGE_TOOL_PATH}${IMAGE_TOOL_SCRIPT}`,
+  });
   eleventyConfig.addGlobalData("build", {
     version: readBuildVersion(),
     dataDir,
@@ -206,6 +213,18 @@ export default function (eleventyConfig) {
     await esbuild.build({
       entryPoints: [path.join(directories.input, "ts/ui/main.ts")],
       outfile: path.join(directories.output, "assets/main.js"),
+      bundle: true,
+      minify: true,
+      format: "esm",
+      target: "es2022",
+      logLevel: "warning",
+    });
+    // The image tool is the editors', not the visitor's: its code is a bundle of its own,
+    // written beside the page rather than under assets/, so it stays out of assets/main.js
+    // and out of the service worker's precache (02-§11.5, 02-§11.6).
+    await esbuild.build({
+      entryPoints: [path.join(directories.input, "ts/ui/image-tool/main.ts")],
+      outfile: path.join(directories.output, IMAGE_TOOL_PATH.slice(1), IMAGE_TOOL_SCRIPT),
       bundle: true,
       minify: true,
       format: "esm",

@@ -55,6 +55,13 @@ Lägg inte in:
 - skärmbilder eller loggar med adresser, kontonamn eller tokens,
 - personuppgifter av något slag.
 
+En svårgissad adress är däremot inte en hemlighet, och ska aldrig behandlas som en.
+Bildverktygets adress står med flit i `README.md` (`02-§11.1`): den håller sidan borta
+från besökaren vid en hage, inte från någon som vill hitta den. Det duger bara därför att
+sidan inte innehåller något som behöver skyddas — inga hemligheter, inga personuppgifter,
+ingen skrivrätt. Se [ADR 0022](adr/0022-verktygssidor-utanfor-navigationen.md). En sida
+som behöver ett skydd får aldrig nöja sig med en adress.
+
 Läs konfiguration ur miljön i stället för att hårdkoda den:
 
 ```js

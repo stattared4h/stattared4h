@@ -14,7 +14,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ title }} – {{ site.farm }}</title>
     <meta name="description" content="{{ description }}">
-    {%- if site.isQa %}
+    {#- QA is never indexed (06-§1.3), and neither is a page that sets `noindex` itself:
+        the editors' tools, whose address is written in a public README
+        (02-§11.2, ADR 0022). #}
+    {%- if site.isQa or noindex %}
     <meta name="robots" content="noindex">
     {%- endif %}
     <meta name="theme-color" content="{{ theme.themeColor }}">

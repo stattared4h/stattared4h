@@ -22,7 +22,6 @@
  */
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { stringify } from "yaml";
 import {
   formatIdsByPost,
   formatIssue,
@@ -30,6 +29,7 @@ import {
   templateCsv,
 } from "./lib/image-import.ts";
 import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
+import { formatImagePost } from "../source/ts/domain/image-post.ts";
 import {
   MAX_IMAGE_BYTES,
   MAX_IMAGE_EDGE,
@@ -166,7 +166,7 @@ async function importTable(options) {
     }
     try {
       const result = await optimiseImage(data, { maxEdge: MAX_IMAGE_EDGE, maxBytes: MAX_IMAGE_BYTES });
-      prepared.push({ row, id: imageIdFor(result.data), data: result.data });
+      prepared.push({ row, id: await imageIdFor(result.data), data: result.data });
     } catch (error) {
       failures.push(`rad ${row.line}: kunde inte omvandla ${row.file}: ${error.message}`);
     }
@@ -194,7 +194,7 @@ async function importTable(options) {
       continue;
     }
     await writeFile(imagePath, data);
-    await writeFile(postPath, stringify({ alt: row.alt, credit: row.credit }, { lineWidth: 0 }));
+    await writeFile(postPath, formatImagePost({ alt: row.alt, credit: row.credit }));
     written += 1;
   }
 

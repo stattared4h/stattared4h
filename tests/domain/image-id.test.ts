@@ -15,16 +15,16 @@ import {
 
 const photo = new TextEncoder().encode("pretend this is a WebP file");
 
-test("an id is img- followed by twelve hexadecimal characters", () => {
-  const id = imageIdFor(photo);
+test("an id is img- followed by twelve hexadecimal characters", async () => {
+  const id = await imageIdFor(photo);
   assert.match(id, IMAGE_ID_PATTERN);
   assert.equal(id.length, "img-".length + 12);
   assert.equal(id.slice(0, 4), "img-");
 });
 
-test("the same bytes always give the same id, different bytes a different one", () => {
-  assert.equal(imageIdFor(photo), imageIdFor(photo));
-  assert.notEqual(imageIdFor(photo), imageIdFor(new TextEncoder().encode("another photo")));
+test("the same bytes always give the same id, different bytes a different one", async () => {
+  assert.equal(await imageIdFor(photo), await imageIdFor(photo));
+  assert.notEqual(await imageIdFor(photo), await imageIdFor(new TextEncoder().encode("another photo")));
 });
 
 test("isImageId accepts the form and rejects everything else", () => {

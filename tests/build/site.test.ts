@@ -10,6 +10,7 @@ import os from "node:os";
 import path from "node:path";
 import { after, before, describe, test } from "node:test";
 import { buildSite, listFiles, ROOT } from "./build-site.ts";
+import { IMAGE_TOOL_PATH, IMAGE_TOOL_SCRIPT } from "../../source/ts/build/tool-page.ts";
 
 const PREFIX = "/prov/";
 const QA_VERSION = "1.0.4 – QA PR212";
@@ -189,12 +190,62 @@ describe("sidhuvud och sidfot (02-§1.9, 02-§10.10, 02-§10.22)", () => {
   });
 });
 
+const TOOL_PAGE = path.join(...IMAGE_TOOL_PATH.slice(1, -1).split("/"), "index.html");
+
 describe("QA-bygget (06-§1.3)", () => {
-  test("varje QA-sida bär noindex; ingen produktionssida gör det", async () => {
+  test("varje QA-sida bär noindex; i produktion bär bara bildverktyget det (02-§11.2)", async () => {
     const noindex = /<meta name="robots" content="noindex">/;
     const qaPages = await htmlFiles(qa);
     assert.ok(qaPages.length > 0);
     for (const { file, html } of qaPages) assert.match(html, noindex, `${file} i QA saknar noindex`);
-    for (const { file, html } of await htmlFiles(prod)) assert.doesNotMatch(html, noindex, `${file} i produktion har noindex`);
+    let tools = 0;
+    for (const { file, html } of await htmlFiles(prod)) {
+      if (file === TOOL_PAGE) {
+        assert.match(html, noindex, `${file} saknar noindex, men adressen står i ett publikt README`);
+        tools += 1;
+      } else {
+        assert.doesNotMatch(html, noindex, `${file} i produktion har noindex`);
+      }
+    }
+    assert.equal(tools, 1, "bildverktygets sida saknas i produktionsbygget");
+  });
+});
+
+describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
+  test("sidan och dess egen bunt byggs på den svårgissade adressen", async () => {
+    const files = await listFiles(prod);
+    assert.ok(files.includes(TOOL_PAGE), `${TOOL_PAGE} byggdes inte`);
+    const script = path.join(path.dirname(TOOL_PAGE), IMAGE_TOOL_SCRIPT);
+    assert.ok(files.includes(script), `${script} byggdes inte`);
+    const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
+    assert.match(html, new RegExp(`src="${IMAGE_TOOL_PATH}${IMAGE_TOOL_SCRIPT}"`), "sidan laddar sin egen bunt");
+  });
+
+  // Stilarna delar besökarens components.css — det är ett kilobyte och sajtens enda
+  // stilmönster. Koden är det som ska hållas borta: den är hundratals rader som en
+  // besökare vid en hage aldrig kör.
+  test("ingen JS-bunt under assets/ bär verktygets kod (02-§11.6)", async () => {
+    const files = (await listFiles(prod)).filter((file) => file.startsWith(`assets${path.sep}`) && file.endsWith(".js"));
+    assert.ok(files.length > 0, "hittade ingen bunt under assets/ att pröva");
+    for (const file of files) {
+      const text = await readFile(path.join(prod, file), "utf8");
+      assert.doesNotMatch(text, /image-tool|Ladda ner alla som zip/i, `${file} bär verktygets kod`);
+    }
+  });
+
+  test("ingen annan sida länkar dit, och robots.txt pekar inte ut den (02-§11.1, 02-§11.3)", async () => {
+    for (const { file, html } of await htmlFiles(prod)) {
+      if (file === TOOL_PAGE) continue;
+      assert.equal(html.includes(IMAGE_TOOL_PATH), false, `${file} länkar till verktyget`);
+    }
+    const robots = await readFile(path.join(prod, "robots.txt"), "utf8");
+    assert.equal(robots.includes("verktyg"), false, "robots.txt får inte peka ut adressen");
+  });
+
+  test("sidan visar vägen vidare till GitHubs uppladdningsvy (02-§11.22)", async () => {
+    const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
+    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/images"/);
+    assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/data\/images"/);
   });
 });

@@ -115,6 +115,7 @@ Kraven delas upp i ämnesfiler allteftersom de skrivs. Varje fil äger ett inter
 | [`bilder.md`](./bilder.md) | Bildfiler, bildkedja, leverans | §8 |
 | [`bygge.md`](./bygge.md) | Verktygskedja, kontroller, deploy | §9 |
 | [`sidhuvud-sidfot.md`](./sidhuvud-sidfot.md) | Sidhuvud, meny, installation, feedback, sidfot, version | §10 |
+| [`bildverktyg.md`](./bildverktyg.md) | Bildverktyget i webbläsaren: adress, beredning, leverans | §11 |
 
 Filerna ovan täcker fas 1 enligt epic #3. Nya kravområden — spel enligt ADR 0009,
 redaktörsgränssnittet i fas 2 — får egna filer och nästa lediga avsnittsnummer.
