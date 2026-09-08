@@ -607,6 +607,11 @@
 }
 
 .map__label {
+  /* The label takes no pointer events, so it can never answer a tap meant for a
+     neighbour's marker (02-§5.58). It hangs outside its own 44 px tap target and may
+     reach over the invisible air around another one; the pin underneath still gets every
+     press. The name stays reachable in the list under the map (02-§5.24). */
+  pointer-events: none;
   padding: 0 var(--space-xs);
   border-radius: var(--radius-full);
   background: var(--color-surface);

@@ -18,6 +18,7 @@ import {
   projectPoint,
   renderMap,
   renderMapSvg,
+  type LabelSide,
   type MapLocation,
 } from "../../source/ts/build/map.ts";
 import { PLACE_SYMBOLS } from "../../source/ts/build/symbols.ts";
@@ -614,5 +615,63 @@ describe("the zoomed map gets its own placement (02-§5.57)", () => {
     for (const className of markers) {
       assert.match(className, /map__marker--zoom-[a-z-]+/, `saknar zoomläge: ${className}`);
     }
+  });
+});
+
+describe("a label keeps clear of the drawn dot, not the tap target (02-§5.58)", () => {
+  test("the dot's size is the one in tokens.css", async () => {
+    const css = await readFile(path.join(ROOT, "source/assets/css/tokens.css"), "utf8");
+    const match = css.match(/--space-md\s*:\s*(\d+)px/);
+    assert.ok(match);
+    assert.equal(LABEL_METRICS.dot, Number(match[1]), "pricken är --space-md bred");
+    assert.ok(LABEL_METRICS.dot < LABEL_METRICS.tapTarget, "pricken är mindre än tryckytan");
+  });
+
+  test("a neighbour's invisible padding no longer vetoes a straight position", () => {
+    // Two places side by side: the label of the left one reaches into the right one's tap
+    // target but never onto its drawn dot. Before 02-§5.58 that counted as a collision.
+    const gap = LABEL_METRICS.tapTarget + LABEL_METRICS.padding;
+    const sides = placeLabels(
+      [
+        { id: "kant", name: "Hagen", x: 10, y: 300 },
+        { id: "granne", name: "Grannen", x: 10 + gap * 4, y: 300 },
+      ],
+      1000,
+      782,
+    );
+    assert.notEqual(sides.get("kant"), "hidden");
+    assert.notEqual(sides.get("granne"), "hidden");
+  });
+});
+
+describe("a marker in the outer margin labels straight to the side (02-§5.59)", () => {
+  function sideOf(x: number, y: number, name = "Tåmossen"): LabelSide | undefined {
+    return placeLabels([{ id: "x", name, x, y }], 1000, 780).get("x");
+  }
+
+  test("the left margin sends the name straight right, the right margin straight left", () => {
+    assert.equal(sideOf(20, 300), "right", "vid vänsterkanten hamnar namnet rakt till höger");
+    assert.equal(sideOf(980, 300), "left", "vid högerkanten hamnar namnet rakt till vänster");
+  });
+
+  test("inside the margin the slanted order of 02-§5.53 still decides", () => {
+    assert.equal(sideOf(500, 300), "above-left", "mitt på ritningen prövas de sneda lägena först");
+  });
+
+  test("the margin is half a marker, so it holds at any drawing size", () => {
+    assert.equal(placeLabels([{ id: "x", name: "A", x: 8, y: 120 }], 400, 300).get("x"), "right");
+  });
+
+  test("a neighbour's dot still blocks the straight side, unlike its invisible padding", () => {
+    // The point of 02-§5.58 is that only the drawn dot counts — but it does count.
+    const sides = placeLabels(
+      [
+        { id: "kant", name: "Hagen", x: 10, y: 300 },
+        { id: "granne", name: "Grannen", x: 60, y: 300 },
+      ],
+      1000,
+      780,
+    );
+    assert.notEqual(sides.get("kant"), "right", "grannens ritade prick ligger i vägen");
   });
 });

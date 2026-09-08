@@ -206,6 +206,11 @@ export type LabelSide =
 export const LABEL_METRICS = {
   /** `--tap-target-min`: the pin's box, centred on the place. */
   tapTarget: 44,
+  /**
+   * `--space-md`: the drawn dot inside that box. The rest of the tap target is invisible
+   * air, and it is the dot a label has to keep clear of, not the air (02-§5.58).
+   */
+  dot: 24,
   /** `--font-size-small`: the label's type size. */
   fontSize: 15,
   /** `--space-xs`: the label's padding, at each end. */
@@ -258,6 +263,28 @@ const LABEL_SIDES: readonly LabelSide[] = [
   "right",
   "left",
 ];
+
+/**
+ * The order to try for a marker standing at `x` in a drawing `width` px wide, both in the
+ * reference pixels the placement is worked out in (02-§5.59).
+ *
+ * A marker whose own pin reaches the drawing's left or right edge is *in the margin*, and
+ * there the straight side pointing inwards comes first. A straight label sits level with
+ * the pin, so the name plainly belongs to it; a slanted one meets the pin corner to
+ * corner. Corner to corner is fine out in the pasture, where the markers are spread out —
+ * but the places that lie outside the drawing are parked along these very edges
+ * (04-§5.9), one under the other, and there a corner points at two pins as readily as one.
+ *
+ * Half a tap target is the threshold rather than a chosen fraction: it is exactly when the
+ * marker stops being a dot in the drawing and becomes a dot on its edge. It also scales
+ * with the layout, so the same markers count as edge markers at 312 px and at 552 px.
+ */
+function sidesFor(x: number, width: number): readonly LabelSide[] {
+  const half = LABEL_METRICS.tapTarget / 2;
+  const inwards: LabelSide | null = x < half ? "right" : x > width - half ? "left" : null;
+  if (inwards === null) return LABEL_SIDES;
+  return [inwards, ...LABEL_SIDES.filter((side) => side !== inwards)];
+}
 
 /** A marker to place a label for, positioned in drawing units. */
 export interface LabelMarker {
@@ -384,11 +411,18 @@ export function placeLabels(
     y: marker.y * scale,
     width: marker.name.length * LABEL_METRICS.fontSize * CHAR_WIDTH_RATIO + 2 * LABEL_METRICS.padding,
   }));
+  // What a label must not cover is the drawn dot, not the tap target around it (02-§5.58).
+  // The tap target is 44 px so a finger can hit it; the dot is --space-md, and the rest is
+  // air nobody can see. Guarding the whole target pushed labels out of positions where
+  // nothing was in the way — the places along the edge lost their straight position to a
+  // neighbour they never touched. A label may end up over that air; it takes no pointer
+  // events (05-§6.44), so the neighbour's target still answers every tap.
+  const dot = LABEL_METRICS.dot / 2;
   const pins: Box[] = points.map((p) => ({
-    left: p.x - half,
-    right: p.x + half,
-    top: p.y - half,
-    bottom: p.y + half,
+    left: p.x - dot,
+    right: p.x + dot,
+    top: p.y - dot,
+    bottom: p.y + dot,
   }));
 
   // North to south, then west to east, then by id: the same places always place in the
@@ -398,7 +432,7 @@ export function placeLabels(
   const taken: Box[] = [];
   const sides = new Map<string, LabelSide>();
   for (const point of order) {
-    const free = LABEL_SIDES.find((side) => {
+    const free = sidesFor(point.x, referenceWidth).find((side) => {
       const box = labelBox(point.x, point.y, point.width, height, side);
       return (
         contains(edge, box) &&

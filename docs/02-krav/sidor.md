@@ -236,6 +236,25 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   pixlar mellan två namn som står långt isär — inte den hög det vore i överblick.
   Tröskelskalan är samma tal i bygget som i klientkoden, hämtat ur en källa, så de inte kan
   glida isär. <!-- 02-§5.57 -->
+- **Det en etikett måste hålla sig undan är den ritade pricken, inte tryckytan runt den.**
+  Markören är 44 × 44 px för att gå att träffa med ett finger (`05-§4.15`), men själva
+  pricken är 24 px; resten är osynlig luft. Räknades hela tryckytan som upptagen sköts
+  etiketter undan från lägen där ingenting syntes — och de fem platserna längs kanten
+  förlorade sitt raka läge till en granne de aldrig hade rört. Med prickens mått som gräns
+  får de sitt raka läge, och ingen etikett hamnar någonsin ovanpå en synlig prick. En
+  etikett kan då nudda ytterkanten av en grannes tryckyta; på gårdens data rör det 1 till
+  12 procent av den, alltid i den osynliga marginalen. Det kostar ingenting, eftersom
+  **etiketten inte tar emot tryck**: markören under svarar på varje tryck i sin tryckyta,
+  också där ett namn ligger över. Namnet är kvar som markörens tillgängliga namn och som
+  länk i listan under kartan (`02-§5.24`). <!-- 02-§5.58 -->
+- **En markör i ritningens ytterkant får sitt namn rakt åt sidan**, inte snett: står
+  markören i vänsterkanten hamnar namnet rakt till höger, i högerkanten rakt till vänster.
+  Ett rakt läge ligger mitt för pricken och pekar ut den entydigt; ett snett sätter
+  etikettens hörn mot markörens, och längs kanten — där platserna utanför ritningen står på
+  rad (`04-§5.9`) — pekar ett hörn lika gärna på grannen. Innanför ytterkanten gäller
+  ordningen i `02-§5.53`, eftersom betesmarkens band då avgör. Regeln biter först sedan
+  `02-§5.58` slutade räkna grannens osynliga tryckyta som upptagen: dessförinnan var det
+  raka läget alltid blockerat, och placeringen föll till ett snett ändå. <!-- 02-§5.59 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är
