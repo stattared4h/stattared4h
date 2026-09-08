@@ -71,7 +71,9 @@ identiska filer. <!-- 03-§3.3 -->
 
 | Sida | Adress | Innehåll |
 | --- | --- | --- |
-| Start | `/` | Kartan med gårdens platser, textlistan under den, och djurslagen som ingång till artsidorna |
+| Start | `/` | Navet: ett kort per ärende sajten bär (ADR 0023) |
+| Karta | `/karta/` | Kartan med gårdens platser, textlistan under den, och fler kartor i området |
+| Djurinfo | `/djuren/` | Sökning på öronmärke, och djurslagen som ingång till artsidorna |
 | Plats | `/plats/<id>/` | QR-kodens måladress. Vilka djurslag som går här, och därifrån vidare till djuren |
 | Djur | `/djur/<id>/` | Namn, art, ras, stamtavla, bilder. Aldrig var individen står |
 | Art | `/arter/<id>/` | Om djurslaget, vilka platser det finns på, och individerna |
@@ -79,8 +81,20 @@ identiska filer. <!-- 03-§3.3 -->
 | 404 | `404.html` | Sajtens egen felsida; GitHub Pages serverar den för okända adresser |
 | Offline | `/offline/` | Visas av service workern vid navigering utanför cachen |
 
-Platssidan är navet. QR-koden på hagen är permanent och pekar på `/plats/<id>/`; den behöver
-aldrig bytas när djuren flyttar, eftersom det är platsfilen som ändras. <!-- 03-§4.1 -->
+Platssidan är navet för den som står på gården. QR-koden på hagen är permanent och pekar på
+`/plats/<id>/`; den behöver aldrig bytas när djuren flyttar, eftersom det är platsfilen som
+ändras. <!-- 03-§4.1 -->
+
+Startsidan är navet för den som kommer utan QR-kod. Den har ingen egen data: korten är en
+lista i `homeView` i `source/ts/build/pages.ts` — id, rubrik, rad, adress och symbol — och
+ett nytt ärende blir en post i den listan, en rad i menyns `navLinks` och en mall. Kartsidan
+och djurinfosidan bär vyer som redan fanns (`views.map`, `views.animals`); ingen ny
+härledning tillkom när startsidan delades. <!-- 03-§4.7 -->
+
+Kortens symboler ritas i `HOME_CARD_SYMBOLS` i `source/ts/build/symbols.ts`, bredvid
+markörernas, så att de två uppsättningarna delar streck och viewBox och inte kan glida isär.
+Djurkortet återanvänder markörens `djurplats`-figur: samma djur på kartan som på
+navet. <!-- 03-§4.8 -->
 
 En plats utan djurslag visar det rakt ut och pekar vidare, i stället för en tom
 sida. <!-- 03-§4.2 -->
@@ -99,7 +113,7 @@ fåren?" — härleds ur `plural` i `source/ts/domain/swedish.ts`: plural på -a
 andra fält i vokabulären som kunde glida isär från det första. <!-- 03-§4.4 -->
 
 Djurkortet och djurslagsrutan är Nunjucks-makron i `source/layouts/animal-card.njk` och
-`species-tile.njk`, så att start-, plats- och artsidan delar markup. Markdown i
+`species-tile.njk`, så att djurinfo-, plats- och artsidan delar markup. Markdown i
 `description` och i `source/content/arter/` renderas av filtret `markdown`, en
 markdown-it utan HTML-genomsläpp; valideringen har redan avvisat HTML i
 datat. <!-- 03-§4.5 -->
@@ -299,7 +313,7 @@ kopplingen: pekar- och tangentbordshändelser in, vyn ut, satt som `transform` p
 `.map__canvas`. Markörerna motskalas med `scale(1 / z)` genom variabeln `--map-scale`, så
 de behåller sin storlek och sin träffyta medan ritningen växer (`02-§5.43`). Vid 1× har
 omslaget `touch-action: pan-y` och tar bara nyp; inzoomad byter det till `none` och tar
-också drag, så startsidan går att rulla förbi (`02-§5.42`). Knapparna är dolda tills
+också drag, så kartsidan går att rulla förbi (`02-§5.42`). Knapparna är dolda tills
 modulen kör, som installknappen (`03-§10.2`). Vid tillräcklig förstoring sätts också
 `map--names`, som byter till den inzoomade placeringen och visar varje namn (`02-§5.44`,
 `02-§5.57`); under 600 px är det där namnen alls kommer fram (`02-§5.55`). Tröskeln är
@@ -321,7 +335,7 @@ förblir en `<a>` till platssidan; modulen fångar klicket med `preventDefault`,
 det som gör att sidan fungerar likadant som förut när JavaScript uteblir
 (`02-§5.49`). <!-- 03-§9.7 -->
 
-Startsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
+Kartsidan länkar vidare till gårdens egna kartor och till Naturkartan (`02-§5.34`). Det
 är vanliga länkar i markupen, inte inbäddat innehåll: sajten hämtar fortfarande ingenting
 utifrån (`02-§5.26`). <!-- 03-§9.4 -->
 
@@ -338,6 +352,14 @@ dela — är små moduler under `source/ts/ui/`, buntade till en fil. Varje modu
 sitt element och gör ingenting om det saknas, så en sida utan feedbackknapp kostar inget.
 Sidorna är läsbara och länkarna följbara utan JavaScript; bara menyknappen, dialogen
 och knapparna kräver det. <!-- 03-§10.2 -->
+
+Menyns rader kommer ur `navLinks` i `source/layouts/header.njk`, som sidhuvudets rad och
+menykortet båda läser: en post per ärende, och för "Djuren" dessutom en lista med
+underrader byggd ur `views.animals.species`. Fällan är `<details>`/`<summary>`
+(`02-§10.44`), så utfällningen har ingen klientkod alls — `source/ts/ui/menu.ts` rör bara
+kortet, som förut. Att en rad har underrader syns i markupen, inte i en klass: mallen
+väljer `<details>` när posten bär `children` och `<a>` när den inte gör
+det. <!-- 03-§10.7 -->
 
 "Tillbaka" (`02-§10.40`) är en länk till startsidan i markupen, och `source/ts/ui/back.ts`
 byter den mot `history.back()` först när `document.referrer` pekar på en sida under samma

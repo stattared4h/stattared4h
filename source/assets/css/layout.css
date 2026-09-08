@@ -255,7 +255,8 @@
   display: flex;
 }
 
-.card-grid > li > .card {
+.card-grid > li > .card,
+.card-grid > li > .home-card {
   flex: 1;
 }
 

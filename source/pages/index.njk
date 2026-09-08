@@ -8,12 +8,11 @@ description: >-
   huvudsida på 4h.se/stattared.
 ---
 {#-
-  The home page (02-§5.7–5.8). The map comes first: the visitor is standing in the yard
-  with a phone, and the question is which paddock to walk to. The map markup comes
-  rendered from source/ts/build/map.ts; the list under it is the full text alternative
-  (02-§5.24).
+  The home page (02-§5.7–5.8, ADR 0023). A nav, not a page of content: one card per
+  errand, and nothing the cards lead to. The map lives on /karta/, the animals on
+  /djuren/, and a game later becomes one more card.
 #}
-{% import "species-tile.njk" as tiles %}
+{% import "home-card.njk" as nav %}
 <div class="container">
   <h1>Djuren och hagarna på Stättared</h1>
 
@@ -22,80 +21,5 @@ description: >-
     bokningar och nyheter finns på <a href="{{ site.mainSite }}">gårdens huvudsida</a>.
   </p>
 
-  {%- if views.map.html %}
-  {{ views.map.html | safe }}
-  {%- endif %}
-
-  {#- The map's full text alternative (02-§5.24), in two groups so the places with animals
-      come before the parking and the toilets (02-§5.51). Every place the map shows is
-      still here, in the same order within its group. #}
-  {%- for group in views.map.groups %}
-  <section class="page-section">
-    <h2>{{ group.heading }}</h2>
-    <ul class="place-list">
-      {%- for place in group.items %}
-      <li class="place-list__item">
-        <a class="place-list__link" href="{{ place.url | url }}">{{ place.symbol | safe }}{{ place.name }}</a>
-        {%- if place.species %}
-        <span class="place-list__species">{{ place.species }}</span>
-        {%- endif %}
-      </li>
-      {%- endfor %}
-    </ul>
-  </section>
-  {%- endfor %}
-
-  {%- if views.home.species.length > 0 %}
-  <section class="page-section">
-    <h2>Djuren på gården</h2>
-    {{- tiles.speciesGrid(views.home.species, true) }}
-  </section>
-
-  {%- else %}
-  <div class="note page-section">
-    <h2>Djuren är inte inlagda ännu</h2>
-    <p>
-      Snart kan du läsa om varje djur här. Under tiden hittar du allt om gården på
-      <a href="{{ site.mainSite }}">4h.se/stattared</a>.
-    </p>
-  </div>
-  {%- endif %}
-
-  {#- The ear tag search is the page's last section before the outward links (02-§5.52):
-      it needs the visitor to stand next to the animal with the number readable, which is
-      the rarest of the errands the start page serves, and in the middle it split the page
-      in two. #}
-  {%- if views.home.species.length > 0 %}
-  <section class="page-section">
-    <h2>Hitta ett djur via öronmärket</h2>
-    <p>Skriv av hela numret. Mellanslag och bindestreck spelar ingen roll.</p>
-    <form data-animal-id-search>
-      <label for="animal-public-id">Öronmärke</label>
-      <input id="animal-public-id" data-animal-id-input type="search" inputmode="text" autocomplete="off" placeholder="SE 012345 0001">
-      <button class="button" type="submit">Hitta djuret</button>
-      <p data-animal-id-result role="status" aria-live="polite" hidden></p>
-      <div hidden aria-hidden="true">
-        {%- for animal in dataset.animals %}
-          {%- if animal.publicId %}
-        <span data-public-id="{{ animal.publicId }}" data-name="{{ animal.name }}" data-url="{{ ('/djur/' + animal.id + '/') | url }}"></span>
-          {%- endif %}
-        {%- endfor %}
-      </div>
-    </form>
-  </section>
-  {%- endif %}
-
-  {#- Maps of the area belong to the main site and to Naturkartan, not here (02-§5.34,
-      02-§1.8). Ordinary links: nothing is embedded and nothing is fetched (02-§5.26). #}
-  <section class="page-section">
-    <h2>Fler kartor i området</h2>
-    <ul class="place-list">
-      {%- for map in site.areaMaps %}
-      <li class="place-list__item">
-        <a class="place-list__link" href="{{ map.url }}">{{ map.name }}</a>
-        <span class="place-list__note">{{ map.about }}</span>
-      </li>
-      {%- endfor %}
-    </ul>
-  </section>
+  {{- nav.cardGrid(views.home.cards) }}
 </div>

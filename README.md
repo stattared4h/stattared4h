@@ -68,8 +68,8 @@ fungerar offline som installerbar app, och varje merge till `main` deployar QA u
 [`/qa/`](https://stattared4h.github.io/stattared4h/qa/). Produktionen släpps för hand
 enligt [`docs/08-SLAPP.md`](docs/08-SLAPP.md).
 
-Gårdens egna djur är ännu inte inlagda — `source/data/` är tom, så produktionen visar
-bara startsidan medan QA visar sajten med påhittat innehåll. Se
+Gårdens egna djur är ännu inte inlagda — `source/data/` bär platserna men inga djur, så
+produktionen visar navet och kartan medan QA visar sajten med påhittat innehåll. Se
 [spårbarhetsmatrisen](docs/99-sparbarhet/index.md) för vad varje krav har för status.
 
 Designen ärver 4H:s visuella identitet från `4h.se/stattared`, med tillstånd.

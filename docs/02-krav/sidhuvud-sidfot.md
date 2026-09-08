@@ -46,6 +46,13 @@ varje telefon har sin, men då sköt den menyknappen ett steg åt höger på var
 startsidan: knappen man trycker oftast flyttade sig när man bytte sida. Menyknappen är
 radens fasta punkt, och "Tillbaka" står till höger om den.
 
+Menyn bar länge två rader — "Startsidan" och "Om sajten" — därför att sajten bara hade en
+sida att navigera till. När startsidan blev ett nav (`02-§5.7`) fick menyn samma uppgift
+som navet: en rad per ärende. Djurslagen lades under "Djuren" som en fälla, eftersom de
+åtta arterna annars gör menyn till en lista man rullar i. Kartan fick ingen fälla: dess
+trettiofyra platser är en lista att läsa på kartsidan, inte i en meny, och platssidan nås
+i praktiken via kartan eller en QR-kod.
+
 ### Sidhuvudet
 
 - Varje sida har samma sidhuvud överst, klistrat i fönstrets topp så att det syns vid
@@ -62,8 +69,20 @@ radens fasta punkt, och "Tillbaka" står till höger om den.
   `aria-controls`, och öppnar menyn. Medan menyn är öppen visar samma knapp ett kryss och
   ordet "Stäng", och ett tryck stänger menyn. <!-- 02-§10.4 -->
 - Menyn fälls ut under raden som ett kort (`05-§6.34`) med 4H-loggan överst, följd av
-  länkarna "Startsidan" och "Om sajten". Kartan har ingen egen länk: den ligger på
-  startsidan (`02-§5.1`). <!-- 02-§10.5 -->
+  raderna "Startsidan", "Kartan", "Djuren" och "Om sajten", i den ordningen. "Kartan" och
+  "Startsidan" är vanliga länkar; "Djuren" är en fällbar rad
+  (`02-§10.43`). <!-- 02-§10.5 -->
+- Raden "Djuren" är hopfälld när menyn öppnas. Ett tryck fäller ut den och visar först
+  "Alla djuren", länken till djurinfosidan, och därefter en rad per djurslag på gården
+  (`02-§5.66`), länkad till artsidan. Ett tryck till fäller ihop den. Raden visar en
+  vinkel som pekar nedåt när den är hopfälld och uppåt när den är utfälld
+  (`05-§6.46`). <!-- 02-§10.43 -->
+- Fällan är byggd av `<details>` och `<summary>`: webbläsaren äger det öppna läget, och
+  menyn har ingen egen klientkod för utfällningen. Menykortet självt öppnas alltjämt av
+  menyknappen (`02-§10.4`), som kräver JavaScript — fällan lägger ingen ny sådan
+  beroende till. <!-- 02-§10.44 -->
+- Menyn har ingen fällbar rad för kartan: kartsidan har inga underrader
+  (`02-§10.5`). <!-- 02-§10.45 -->
 - Menyn stängs med Escape, med ett tryck utanför den och när en länk väljs. Ett tryck
   utanför menyn stänger den utan att aktivera det som ligger under. Stängs den med
   Escape återgår fokus till menyknappen. <!-- 02-§10.6 -->
@@ -73,8 +92,8 @@ radens fasta punkt, och "Tillbaka" står till höger om den.
   tiden. <!-- 02-§10.38 -->
 - Menyns länkar är minst `--tap-target-min` höga. <!-- 02-§10.39 -->
 - Från desktopbrytpunkten visar sidhuvudet 4H-loggan till vänster med sajtens namn
-  "Djuren på Stättared" som text intill, länkarna "Hem" och "Om sajten" i
-  raden, och installknappen och feedbackknappen som ikoner utan botten längst till
+  "Djuren på Stättared" som text intill, länkarna "Hem", "Kartan", "Djuren" och
+  "Om sajten" i raden — utan fälla, eftersom bredden räcker, och installknappen och feedbackknappen som ikoner utan botten längst till
   höger. Menyknappen och "till toppen" finns inte i den bredden. <!-- 02-§10.7 -->
 - Länken för aktuell sida är markerad enligt `05-§6.3` och har
   `aria-current="page"`. <!-- 02-§10.8 -->
@@ -90,7 +109,7 @@ radens fasta punkt, och "Tillbaka" står till höger om den.
 - Varje sida utom startsidan har knappen "Tillbaka" under desktopbrytpunkten, med en
   vänsterpil och `aria-label` "Tillbaka". Kom besökaren från en annan sida på sajten går
   den dit. Kom hen utifrån — en QR-kod, en delad länk eller appens startpunkt — går den
-  till startsidan med kartan. <!-- 02-§10.40 -->
+  till startsidan. <!-- 02-§10.40 -->
 - Knappen är en länk till startsidan i markupen och fungerar därför utan JavaScript.
   Klientkoden byter den mot historiken först när den vet att föregående sida är sajtens
   egen. QA och produktionen delar värd men har var sin bas-sökväg (ADR 0005), och en sida

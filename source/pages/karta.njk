@@ -1,0 +1,50 @@
+---
+layout: base.njk
+permalink: /karta/
+title: Karta över gården
+description: >-
+  Karta över Stättareds 4H-gård med hagar, djurhus och allt annat på gården —
+  och vilka djurslag som går var.
+---
+{#-
+  The map page (02-§5.65). The map markup comes rendered from source/ts/build/map.ts;
+  the list under it is the full text alternative (02-§5.24), in two groups so the places
+  with animals come before the parking and the toilets (02-§5.51).
+#}
+<div class="container">
+  <h1>Karta över gården</h1>
+
+  {%- if views.map.html %}
+  {{ views.map.html | safe }}
+  {%- endif %}
+
+  {%- for group in views.map.groups %}
+  <section class="page-section">
+    <h2>{{ group.heading }}</h2>
+    <ul class="place-list">
+      {%- for place in group.items %}
+      <li class="place-list__item">
+        <a class="place-list__link" href="{{ place.url | url }}">{{ place.symbol | safe }}{{ place.name }}</a>
+        {%- if place.species %}
+        <span class="place-list__species">{{ place.species }}</span>
+        {%- endif %}
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {%- endfor %}
+
+  {#- Maps of the area belong to the main site and to Naturkartan, not here (02-§5.34,
+      02-§1.8). Ordinary links: nothing is embedded and nothing is fetched (02-§5.26). #}
+  <section class="page-section">
+    <h2>Fler kartor i området</h2>
+    <ul class="place-list">
+      {%- for map in site.areaMaps %}
+      <li class="place-list__item">
+        <a class="place-list__link" href="{{ map.url }}">{{ map.name }}</a>
+        <span class="place-list__note">{{ map.about }}</span>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+</div>

@@ -47,8 +47,8 @@ DATA_DIR=source/data-qa npm run build  # QA
 ```
 
 `DATA_DIR` avgör också om bygget är ett QA-bygge — varje sida får `noindex` när
-katalogen slutar på `data-qa` (`06-§1.3`). Ett tomt dataset bygger: startsidan säger då
-att djuren inte är inlagda ännu, och kartan att inga platser finns.
+katalogen slutar på `data-qa` (`06-§1.3`). Ett tomt dataset bygger: startsidans nav står kvar,
+djurinfosidan säger att djuren inte är inlagda ännu, och kartsidan visar ingen karta.
 
 Bildkatalogen följer datasetet (`04-§9.4`): `source/data-qa` läser bilder från
 `source/images-qa/`. AI-genererade QA-bilder versionshanteras där; `npm run qa:images`

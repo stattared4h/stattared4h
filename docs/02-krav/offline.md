@@ -29,9 +29,9 @@ QA aldrig får QA-innehåll i produktionens cache.
 
 - Varje sida registrerar service workern på `<bas>sw.js` med scope lika med
   bas-sökvägen. <!-- 02-§7.3 -->
-- Vid installation förcachar service workern startsidan med kartan, om-sidan, alla
-  plats-, djur- och artsidor, 404-sidan, offline-sidan, CSS, buntad JS, manifestet och
-  ikonerna. <!-- 02-§7.4 -->
+- Vid installation förcachar service workern startsidan, kartsidan, djurinfosidan,
+  om-sidan, alla plats-, djur- och artsidor, 404-sidan, offline-sidan, CSS, buntad JS,
+  manifestet och ikonerna. <!-- 02-§7.4 -->
 - Sidor och tillgångar i förcachen svaras cache först. Fotografier svaras nätverk först
   med cache som reserv, och läggs i cachen när de hämtats. <!-- 02-§7.5 -->
 - Cachens namn är bas-sökvägen följd av versionssträngen, `/stattared4h/1.0.4`

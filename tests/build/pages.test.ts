@@ -55,15 +55,39 @@ function species(views: SiteViews, id: string) {
   return found;
 }
 
-describe("the home page (02-§5.7)", () => {
+describe("the home page (02-§5.7, 02-§5.63)", () => {
+  test("is a card per errand: the map first, then the animals", async () => {
+    const { views } = await qaViews();
+    assert.deepEqual(
+      views.home.cards.map((card) => [card.id, card.url]),
+      [
+        ["karta", "/karta/"],
+        ["djuren", "/djuren/"],
+      ],
+    );
+    for (const card of views.home.cards) {
+      assert.ok(card.title.length > 0, `${card.id} saknar rubrik`);
+      assert.ok(card.text.length > 0, `${card.id} saknar rad`);
+      assert.match(card.symbol, /^<(path|circle|g)\s/, `${card.id} saknar ritad symbol`);
+    }
+  });
+
+  test("the cards carry no data of their own: an empty farm still has both", () => {
+    const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
+    const views = buildViews(empty, { base: "/", farm: FARM });
+    assert.deepEqual(views.home.cards.map((card) => card.id), ["karta", "djuren"]);
+  });
+});
+
+describe("the animal overview page (02-§5.66)", () => {
   test("lists the species with present animals or counted populations, linked to their pages", async () => {
     const { views } = await qaViews();
     assert.deepEqual(
-      views.home.species.map((s) => s.id),
+      views.animalsOverview.species.map((s) => s.id),
       ["get", "far", "ko", "hast", "kanin", "gris", "hons", "katt"],
     );
-    assert.equal(views.home.species[0].url, "/arter/get/");
-    assert.equal(views.home.species[0].plural, "Getter");
+    assert.equal(views.animalsOverview.species[0].url, "/arter/get/");
+    assert.equal(views.animalsOverview.species[0].plural, "Getter");
   });
 });
 
@@ -326,7 +350,7 @@ describe("an empty dataset (02-§5.7)", () => {
   test("builds views with no pages and no map", () => {
     const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
     const views = buildViews(empty, { base: "/", farm: FARM });
-    assert.deepEqual(views.home.species, []);
+    assert.deepEqual(views.animalsOverview.species, []);
     assert.deepEqual(views.locations, []);
     assert.deepEqual(views.animals, []);
     assert.deepEqual(views.species, []);
