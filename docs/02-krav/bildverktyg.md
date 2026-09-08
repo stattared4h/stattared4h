@@ -8,7 +8,8 @@ Beslut: [ADR 0008](../adr/0008-bilder-i-repot.md),
 [ADR 0014](../adr/0014-roller-via-github.md),
 [ADR 0015](../adr/0015-bilden-som-egen-post.md),
 [ADR 0021](../adr/0021-bildberedning-i-webblasaren.md),
-[ADR 0022](../adr/0022-verktygssidor-utanfor-navigationen.md).
+[ADR 0022](../adr/0022-verktygssidor-utanfor-navigationen.md),
+[ADR 0025](../adr/0025-spelets-ledtradar-ar-egna-poster.md).
 
 ---
 
@@ -114,6 +115,27 @@ bara sista steget ut.
 - Filerna sidan levererar passerar `npm run validate` och CI utan efterarbete: WebP inom
   måtten och storleken, utan metadata, med ett id som är hashen av filen och en bildpost
   med `alt` och `credit`. <!-- 02-§11.23 -->
+
+### Ledtrådar till Spana!
+
+- Varje beredd bild har en kryssruta med etiketten "Det här är en ledtråd till Spana!".
+  Ikryssad visar den två fält bredvid bilden, med samma synliga etiketter som `alt` och
+  `credit`: en platsväljare och en fritextruta för ledtrådstexten. <!-- 02-§11.25 -->
+- Platsväljaren listar gårdens aktiva platser, ur en lista bygget skriver in i sidan vid
+  byggtillfället. Sidan hämtar ingenting i körtid
+  ([ADR 0021](../adr/0021-bildberedning-i-webblasaren.md)). Har datasetet inga platser går
+  kryssrutan inte att kryssa i, och sidan säger varför. <!-- 02-§11.26 -->
+- Platsen är obligatorisk så länge kryssrutan är i: filerna går inte att hämta förrän varje
+  ikryssad bild har en plats, och sidan säger vilken bild det gäller — samma spärr och
+  samma sorts meddelande som alt-textens (`02-§11.14`). Ledtrådstexten är frivillig och
+  högst 120 tecken (`04-§11.4`). <!-- 02-§11.27 -->
+- Leveransen bär ledtråden med sig. Arkivet innehåller `source/data/clues/<bild-id>.yaml`
+  för varje ikryssad bild, bredvid bildens `.webp` och `.yaml`, och varje ikryssad bild har
+  dessutom en egen knapp för sin ledtrådsfil. Ledtrådens filnamn är bildens id (`04-§11.2`),
+  så de två filerna hör ihop av sig själva och kan inte hamna fel. <!-- 02-§11.28 -->
+- Ledtrådsposten har samma form som katalogen (`04-§11`): `location`, och `text` när den
+  har skrivits, i den ordningen, en rad var. Filerna passerar `npm run validate` utan
+  efterarbete, som `02-§11.23` kräver av allt sidan lämnar ifrån sig. <!-- 02-§11.29 -->
 
 ### Gränsvärdena
 

@@ -416,6 +416,8 @@ canvas-anropen ligger i `source/ts/ui/`.
 | `source/ts/domain/image-limits.ts` | `MAX_IMAGE_EDGE`, `MAX_IMAGE_BYTES` och kvalitetstrappan — den enda sanningen (`02-§11.24`) |
 | `source/ts/domain/zip.ts` | Zip-arkivet: CRC-32, lokala huvuden, central katalog, allt lagrat utan komprimering (`02-§11.18`, `02-§11.20`) |
 | `source/ts/domain/image-post.ts` | Bildpostens YAML och kontrollen av `alt` och `credit` (`02-§11.14`, `02-§11.15`, `02-§11.21`) |
+| `source/ts/domain/clue-post.ts` | Ledtrådspostens YAML och kontrollen av plats och text (`02-§11.25`–`11.29`, `04-§11`) |
+| `source/ts/domain/yaml-scalar.ts` | Citeringen båda posterna skriver med, så samma värde stavas likadant |
 | `source/ts/domain/image-prepare.ts` | Skalningsbeslutet och kvalitetstrappan som ren logik, med kodaren som argument (`02-§11.8`, `02-§11.10`) |
 | `source/ts/ui/image-tool/` | Filväljaren, canvas, formuläret och nedladdningarna |
 
@@ -427,6 +429,12 @@ med en påhittad kodare i Node — samma mönster som `optimiseImage` följer p�
 Bild-id:t räknas ut med `crypto.subtle` i stället för `node:crypto`, så `imageIdFor` är
 samma funktion i bygget, i kommandona och i webbläsaren (`02-§11.11`). Den är asynkron
 av det skälet: WebCrypto har inget synkront gränssnitt. <!-- 03-§11.4 -->
+
+Platsväljaren för ledtrådar (`02-§11.26`) är byggd på samma sätt som spelens kandidater:
+`imageToolView` i `source/ts/build/pages.ts` listar gårdens aktiva platser, mallen skriver
+dem i sidan som en `<template>` med en färdig `<select>`, och verktyget klonar den in i
+varje kort som kryssas i. Ingen förfrågan går iväg när redaktören står i en hage, och
+listan kan inte gå i otakt med datat: den byggdes ur det. <!-- 03-§11.6 -->
 
 Sidan skriver ingenting och talar inte med GitHub. Den bygger en adress till repots
 uppladdningsvy och låter redaktörens webbläsare öppna den, precis som feedbacklänken gör

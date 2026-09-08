@@ -48,6 +48,22 @@ description: >-
 
     <p class="image-tool__status" role="status" data-image-tool-status hidden></p>
 
+    {#- The places a clue can answer with (02-§11.26). The build writes the list into the
+        page; the tool clones this select into every card that is ticked as a clue, so
+        nothing is fetched while the editor is standing in a paddock (ADR 0021). Without
+        places in the dataset there is nothing to pick, and the tool says so instead of
+        offering an empty list. #}
+    {%- if views.imageTool.places.length > 0 %}
+    <template data-image-tool-places>
+      <select class="field__input">
+        <option value="">Välj plats …</option>
+        {%- for place in views.imageTool.places %}
+        <option value="{{ place.id }}">{{ place.name }}</option>
+        {%- endfor %}
+      </select>
+    </template>
+    {%- endif %}
+
     <ol class="image-tool__list" data-image-tool-list></ol>
 
     <div class="image-tool__actions" data-image-tool-actions hidden>
@@ -82,7 +98,8 @@ description: >-
   <ol>
     <li>Ladda ner bildens <code>.webp</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/images"><code>source/images/</code></a>.</li>
     <li>Ladda ner bildens <code>.yaml</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/data/images"><code>source/data/images/</code></a>.</li>
-    <li>Välj samma gren båda gångerna, så hamnar filerna i samma pull request.</li>
+    <li>Är bilden en ledtråd: ladda ner ledtrådens <code>.yaml</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/data/clues"><code>source/data/clues/</code></a>.</li>
+    <li>Välj samma gren varje gång, så hamnar filerna i samma pull request.</li>
   </ol>
 
   <h2>Bra att veta</h2>
@@ -93,6 +110,8 @@ description: >-
     <li>Platsuppgiften i mobilfotot följer aldrig med. Verktyget ritar om bilden, och då finns det ingen sådan uppgift kvar att ta med.</li>
     <li>Publicera aldrig en bild på en identifierbar person utan samtycke.</li>
     <li>När bilden ligger i repot refererar du den från djuret eller platsen. Bidragsguiden visar hur.</li>
+    <li>Kryssa i <strong>Det här är en ledtråd till Spana!</strong> när bilden är en närbild på något besökaren ska leta upp — en gunga, en grind, en käpphäst. Välj platsen där detaljen sitter; den är svaret spelaren får när hen tryckt Hittat!. Ledtrådens fil får samma namn som bilden, så de två hör ihop av sig själva.</li>
+    <li>Låt bli att skriva var detaljen finns i alt-texten. Den läses upp för den som inte ser bilden, och skulle då avslöja svaret innan spelaren letat.</li>
   </ul>
 </div>
 

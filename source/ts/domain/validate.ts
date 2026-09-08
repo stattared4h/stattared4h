@@ -11,6 +11,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { normaliseBorn } from "./born.ts";
+import { MAX_CLUE_TEXT_LENGTH } from "./clue-post.ts";
 import {
   IMAGE_ID_DESCRIPTION,
   IMAGE_SUFFIX,
@@ -109,8 +110,6 @@ const LOCATION_FIELDS = new Set([
   "photos",
 ]);
 const CLUE_FIELDS = new Set(["location", "text"]);
-/** 04-§11.4: "kort" is a number, or it is only an opinion. */
-const MAX_CLUE_TEXT_LENGTH = 120;
 const SPECIES_FIELDS = new Set(["id", "name", "plural", "photo"]);
 const BREED_FIELDS = new Set(["id", "name", "species", "heritage"]);
 const POPULATION_FIELDS = new Set(["species", "breed", "count"]);

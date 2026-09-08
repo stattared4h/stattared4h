@@ -121,6 +121,20 @@ export interface SpanaView {
   clues: SpanaClueView[];
 }
 
+/** One place the image tool offers as a clue's answer (02-§11.26). */
+export interface ToolPlaceView {
+  id: string;
+  name: string;
+}
+
+/**
+ * What the editors' image tool needs from the dataset (02-§11.26). The page is built with
+ * the list inside it, so the tool asks no one for it at run time (ADR 0021).
+ */
+export interface ImageToolView {
+  places: ToolPlaceView[];
+}
+
 /** The animal overview page: the ear tag search and the species on the farm (02-§5.66). */
 export interface AnimalsOverviewView {
   species: SpeciesTileView[];
@@ -219,6 +233,7 @@ export interface MapPageView {
 
 export interface SiteViews {
   home: HomeView;
+  imageTool: ImageToolView;
   animalsOverview: AnimalsOverviewView;
   bingo: BingoView;
   spana: SpanaView;
@@ -380,6 +395,20 @@ export function bingoView(dataset: Dataset): BingoView {
     if (animal.status === "here" && portrait !== null) animals.push({ key: animal.id, name: animal.name, photo: portrait });
   }
   return { species, animals };
+}
+
+/**
+ * The places the image tool can hand a clue (02-§11.26). Active places only, by name: a
+ * clue that answers with a paddock nobody keeps would send the player nowhere, and the
+ * validator warns about exactly that (04-§10.10). The sort is the site's own, so the
+ * picker reads like the list under the map.
+ */
+export function imageToolView(dataset: Dataset): ImageToolView {
+  return {
+    places: sortLocations(dataset.locations)
+      .filter((location) => location.active)
+      .map((location) => ({ id: location.id, name: location.name })),
+  };
 }
 
 export function spanaUrl(): string {
@@ -559,6 +588,7 @@ export function buildViews(dataset: Dataset, options: BuildViewsOptions): SiteVi
   const content = options.speciesContent ?? {};
   return {
     home: homeView(),
+    imageTool: imageToolView(dataset),
     animalsOverview: animalsOverviewView(dataset),
     bingo: bingoView(dataset),
     spana: spanaView(dataset),

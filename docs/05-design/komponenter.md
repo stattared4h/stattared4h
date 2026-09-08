@@ -286,6 +286,12 @@ och `--color-ink-soft`, och därunder de två fälten. Felmeddelandet står unde
 `--color-danger`, samma regel som 6.8. Nedladdningsknapparna är sekundära och ligger sist,
 sida vid sida med `--space-xs` mellan sig och radbrytning på smal skärm.
 
+Kryssrutan "Det här är en ledtråd till Spana!" står under de två fälten, som en vanlig
+kryssruta (6.8) med etiketten efter rutan. Ikryssad fäller den ut platsväljaren och
+ledtrådsfältet i samma spalt och med samma etikettstil som fälten ovanför; ofylld syns
+ingenting av dem. Ledtrådens nedladdningsknapp står sist bland de andra sekundära
+knapparna och finns bara när rutan är i.
+
 Statusraden överst i verktyget är ljusgrön `--color-green-pale` med djupgrön text, samma
 par som platshållaren (6.20), eftersom den säger hur det går och inte att något är
 fel. <!-- 05-§6.44 -->

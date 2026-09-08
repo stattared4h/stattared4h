@@ -297,5 +297,22 @@ describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/images"/);
     assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/data\/images"/);
+    assert.match(main, /href="https:\/\/github\.com\/stattared4h\/stattared4h\/upload\/main\/source\/data\/clues"/, "ledtrådens katalog (02-§11.28)");
+  });
+
+  test("platsväljaren är inbakad i sidan, inte hämtad i körtid (02-§11.26)", async () => {
+    // The production dataset is the one the editor actually works against, so it is the
+    // one the picker is checked against: its places, by name, in the site's own order.
+    const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
+    const template = html.slice(html.indexOf("<template data-image-tool-places>"), html.indexOf("</template>"));
+    assert.ok(template.length > 0, "sidan bär ingen platsmall");
+    const options = [...template.matchAll(/<option value="([^"]*)">([^<]+)<\/option>/g)];
+    assert.equal(options[0][1], "", "första valet är tomt, så inget väljs av misstag");
+    const places = options.slice(1);
+    assert.ok(places.length >= 30, `bara ${places.length} platser i väljaren`);
+    assert.ok(places.every(([, id]) => id !== ""), "varje plats har ett id");
+    const names = places.map((option) => option[2]);
+    assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, "sv")), "platserna står i bokstavsordning");
+    assert.equal(html.includes("fetch("), false, "sidan hämtar ingenting i körtid (ADR 0021)");
   });
 });
