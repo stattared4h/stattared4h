@@ -70,6 +70,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.32` | Markören visar namn och symbol, inte djurslag | `byggd` | Markören bär bricka, symbol och namn och inget annat; `tests/build/map.test.ts` läser varje markörs innehåll, djurslagen står bara i listan under kartan |
 | `02-§5.33` | Etiketter som annars överlappar | `byggd` | `placeLabels` i `source/ts/build/map.ts` med modifierarna i `layout.css`; `tests/build/map.test.ts` prövar krock, kant, ordningsoberoende och att etiketter utöver fyra döljs. Konstanterna jämförs med `tokens.css` i samma fil. Referensbredderna är kartans egen bredd, inte fönstrets — `tests/build/map.test.ts` härleder dem ur `--space-md` och `.container` |
 | `02-§5.53` | Etikettens åtta lägen, sneda före raka | `byggd` | `LABEL_SIDES` och `labelBox` i `source/ts/build/map.ts` med modifierarna i `layout.css`; `tests/build/map.test.ts` prövar att ett snett läge väljs före ett rakt, att betesmarkens diagonal går före den korsande, att zoomknapparnas hörn räknas som upptaget och att inget läge saknar CSS-regel. Öppna `/` i 648 px: 1:an, 3:an och 4:an har sina namn snett upp till vänster och 2:an snett ned till höger, alla längs bandet |
+| `02-§5.54` | Etiketten skaver hellre än döljs, men aldrig utanför kanten | `byggd` | `placeLabels` i `source/ts/build/map.ts` faller till det läge som överlappar minst när inget är helt ledigt; kant och zoomhörn är hårda villkor, och en pinne kostar åtta gånger en etikett. `tests/build/map.test.ts` prövar nio markörer på samma fläck, att exakt sex lägen är lediga där, att ett namn som inte ryms innanför kanten ändå döljs och då inte tar plats från grannen, och att placeringen är deterministisk |
+| `02-§5.55` | Under 600 px visar överblicken inga namn | `manuell` | Mediefrågan i `source/assets/css/layout.css` döljer `.map__label` under brytpunkten om kartan varken är zoomad eller pekad på. CSS-layout går inte att enhetstesta i Node (`CL-§8.6`): öppna `/` i 360 px bredd och bekräfta att markörerna står utan namn, tryck sedan `+` tre gånger och bekräfta att namnen kommer fram; kontrollera i 1280 px att namnen syns direkt |
 | `02-§5.34` | Fler kartor i området | `byggd` | `site.areaMaps` i `eleventy.config.js` och avsnittet i `source/pages/karta.njk`; `tests/build/data-pages.test.ts` kräver rubriken och exakt de två länkmålen, och att inget hämtas utifrån |
 | `02-§5.35` | En plats som inte är en djurplats nämner inte djur | `byggd` | `kind` i `source/ts/domain/validate.ts` och `locationView` i `pages.ts`, grenen i `source/pages/plats.njk`; `tests/build/data-pages.test.ts` öppnar QA-datats caféer och toaletter och `tests/domain/validate.test.ts` prövar att djurslag på en sådan plats fäller bygget |
 | `02-§5.36` | Visa och söka på öronmärke | `manuell` | Markup och visning bevakas av `tests/build/public-id.test.ts`, söklogiken av `tests/ui/animal-id-search.test.ts`. Bygg QA-sajten, öppna `/` i 360 px, sök `se-012345-0001` och bekräfta att `/djur/far-astrid/` öppnas och visar `Öronmärke: SE 012345 0001` |
@@ -329,8 +331,8 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
-| `byggd` | 147 |
-| `manuell` | 54 |
+| `byggd` | 148 |
+| `manuell` | 55 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->

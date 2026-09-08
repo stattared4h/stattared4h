@@ -206,13 +206,13 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   förbi, en dold prick går inte att hitta. Zoomknapparnas hörn (`02-§5.41`) är fortsatt
   helt förbjudet. En etikett som ligger delvis över en annan hör fortfarande ihop med sin
   prick, eftersom strecket i `02-§5.55` visar vilken. <!-- 02-§5.54 -->
-- Varje synlig etikett är förbunden med sin markör med ett tunt streck från etikettens
-  närmaste kant in mot prickens mitt. Utan strecket är kopplingen en gissning: etiketten
-  hänger några pixlar från pricken, och på en karta med trettio platser ligger det ofta en
-  annan prick lika nära — särskilt i ytterkanten, där platserna utanför ritningen står på
-  rad (`04-§5.9`). Strecket ritas i sidan, hämtar inget utifrån (`02-§5.26`), följer
-  etiketten till vart och ett av de åtta lägena i `02-§5.53`, och är dekoration som inte
-  läses upp för skärmläsaren. <!-- 02-§5.55 -->
+- **Under 600 px visar överblicken inga namn alls.** Kartan är då 312 px bred, och
+  gårdens trettiofyra platser får inte plats med namn bredvid varandra hur de än placeras;
+  `02-§5.54` skulle lägga dem i en vägg av text över ritningen. Markörerna med sina
+  symboler (`02-§5.38`) räcker för att se var platserna ligger, namnen står i listan under
+  kartan (`02-§5.24`), och de kommer fram så snart besökaren zoomar (`02-§5.44`) eller
+  pekar på en markör. Från 600 px finns utrymmet, och då gäller `02-§5.54` som skrivet:
+  namnen syns direkt. <!-- 02-§5.55 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är

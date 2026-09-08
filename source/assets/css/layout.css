@@ -344,6 +344,32 @@
   transform: translateX(-50%);
 }
 
+/* Under 600 px the overview shows no names at all (02-§5.55). The map is 312 px wide
+   there, and thirty-four names cannot stand beside each other however they are placed —
+   02-§5.54 would turn them into a wall of text over the drawing. The symbols still say
+   what each place is (02-§5.38), the names are in the list under the map (02-§5.24), and
+   they come back on zoom (02-§5.44) or when a marker is touched. The wide layout from
+   600 px keeps its labels; the media query at the foot of this file does not undo this
+   rule, it simply never applies below the breakpoint. */
+@media (max-width: 599.98px) {
+  .map:not(.map--zoomed, .map--names) .map__label {
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .map:not(.map--zoomed) .map__marker:hover .map__label,
+  .map:not(.map--zoomed) .map__marker:focus-visible .map__label {
+    clip-path: none;
+    width: auto;
+    height: auto;
+    padding: 0 var(--space-xs);
+  }
+}
+
 .map__marker--label-above .map__label {
   top: auto;
   bottom: 100%;
