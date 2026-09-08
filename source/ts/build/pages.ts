@@ -87,6 +87,23 @@ export interface HomeView {
   cards: HomeCardView[];
 }
 
+/** One thing the bingo board can ask the visitor to find (02-§12.4): a species or an animal, with its picture. */
+export interface BingoCandidateView {
+  /** The species or animal id: the key the board stores between visits (02-§12.9). */
+  key: string;
+  /** The species' singular name, or the animal's name. */
+  name: string;
+  photo: Image;
+}
+
+/** The bingo page (02-§12): the candidates per level; the board itself is drawn in the browser (ADR 0009). */
+export interface BingoView {
+  /** Every species on the farm with a photo. */
+  species: BingoCandidateView[];
+  /** Every animal that is here and has a portrait. */
+  animals: BingoCandidateView[];
+}
+
 /** The animal overview page: the ear tag search and the species on the farm (02-§5.66). */
 export interface AnimalsOverviewView {
   species: SpeciesTileView[];
@@ -186,6 +203,7 @@ export interface MapPageView {
 export interface SiteViews {
   home: HomeView;
   animalsOverview: AnimalsOverviewView;
+  bingo: BingoView;
   locations: LocationPageView[];
   animals: AnimalPageView[];
   species: SpeciesPageView[];
@@ -300,12 +318,43 @@ export function homeView(): HomeView {
         url: "/djuren/",
         symbol: HOME_CARD_SYMBOLS.djuren,
       },
+      {
+        id: "bingo",
+        title: "Djurbingo",
+        text: "Hitta djuren på gården och bocka av dem.",
+        url: bingoUrl(),
+        symbol: HOME_CARD_SYMBOLS.bingo,
+      },
     ],
   };
 }
 
 export function animalsOverviewView(dataset: Dataset): AnimalsOverviewView {
   return { species: speciesOnFarm(dataset).map(speciesTile) };
+}
+
+export function bingoUrl(): string {
+  return "/bingo/";
+}
+
+/**
+ * What the bingo board can draw from (02-§12.4). A species without a photo and an
+ * animal without a portrait are left out: a square has to show something to look for.
+ * Counted populations are not individuals and never reach the animal level; their
+ * species can still be a square on the species level. Order is the dataset's own
+ * (02-§6.9), so two builds of the same data list the same candidates.
+ */
+export function bingoView(dataset: Dataset): BingoView {
+  const species: BingoCandidateView[] = [];
+  for (const one of speciesOnFarm(dataset)) {
+    if (one.photo !== null) species.push({ key: one.id, name: one.name, photo: one.photo });
+  }
+  const animals: BingoCandidateView[] = [];
+  for (const animal of dataset.animals) {
+    const portrait = portraitOf(animal);
+    if (animal.status === "here" && portrait !== null) animals.push({ key: animal.id, name: animal.name, photo: portrait });
+  }
+  return { species, animals };
 }
 
 export function locationView(dataset: Dataset, location: Location, farm: string): LocationPageView {
@@ -461,6 +510,7 @@ export function buildViews(dataset: Dataset, options: BuildViewsOptions): SiteVi
   return {
     home: homeView(),
     animalsOverview: animalsOverviewView(dataset),
+    bingo: bingoView(dataset),
     locations: dataset.locations.map((location) => locationView(dataset, location, options.farm)),
     animals: dataset.animals.map((animal) => animalView(dataset, animal, options.farm)),
     species: dataset.species.map((species) => speciesView(dataset, species, options.farm, content[species.id] ?? null)),

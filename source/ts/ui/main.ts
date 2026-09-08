@@ -18,7 +18,8 @@ import { init as initMapPopup } from "./map-popup.ts";
 import { init as initOffline } from "./offline.ts";
 import { init as initServiceWorker } from "./sw-register.ts";
 import { init as initAnimalIdSearch } from "./animal-id-search.ts";
+import { init as initBingo } from "./bingo.ts";
 
-for (const init of [initBack, initMenu, initInstall, initToTop, initFeedback, initShare, initMapZoom, initMapPopup, initOffline, initAnimalIdSearch, initServiceWorker]) {
+for (const init of [initBack, initMenu, initInstall, initToTop, initFeedback, initShare, initMapZoom, initMapPopup, initOffline, initAnimalIdSearch, initBingo, initServiceWorker]) {
   init();
 }
