@@ -84,6 +84,24 @@ datat vet — rasen, "lantras", och "har lämnat gården" för `status: gone`. <
 - Saknar djuret foto visas en ljusgrön platta med djurslagets namn i djupgrön text,
   aldrig en trasig bild. <!-- 05-§6.20 -->
 
+### 6.16 Navkort
+
+Navkortet är startsidans enda innehåll: ett kort per ärende sajten bär
+(`02-§5.7`, ADR 0023). <!-- 05-§6.45 -->
+
+- Samma yta som kortet i 6.4 — vit, `--radius-md`, `--shadow-card` — och samma rutnät som
+  djurkorten, två i bredd på mobil och tre från desktopbrytpunkten (`02-§5.64`). Hela
+  kortet är länken, och rubriken bär texten (6.4).
+- I stället för ett foto står en ritad symbol, 48 px, centrerad på en ljusgrön platta
+  `--color-green-pale` i kortets fulla bredd med samma `4:3` som fotot i 6.4 — så byter
+  rutnätet inte form när ett kort har bild och ett annat inte. Symbolen är
+  `--color-green-deep`, ritad i samma streck som kartans markörer (`05-§6.39`), och
+  `aria-hidden`: rubriken säger redan vad kortet är.
+- Under plattan står rubriken i `--font-size-h3`, vikt 700, och därunder en rad i
+  `--font-size-small` och `--color-ink-soft` som säger vad besökaren hittar. En rad, inte
+  två: kortet ska gå att läsa i ett ögonkast, och två kort ska rymmas ovanför vecket på
+  en telefon.
+
 ### 6.6 Faktaruta
 
 Ljusgrön botten, `--radius-md`, ingen kantlinje. Används för platsens `note`,
@@ -148,6 +166,13 @@ sidhuvudets rad ligger ovanpå överlägget så att menyknappen aldrig döljs
 - Menyknappen bär båda lägena i markupen: tre streck med ordet "Meny" när kortet är
   stängt, ett kryss med ordet "Stäng" när det är öppet. Vilket som syns avgörs av
   knappens `aria-expanded`, så tillståndet står på ett ställe. <!-- 05-§6.42 -->
+- Raden "Djuren" är en fälla (`02-§10.43`): en `<summary>` med samma mått och vikt som en
+  vanlig menylänk, och till höger en vinkel om 16 px som pekar nedåt när raden är hopfälld
+  och uppåt när den är utfälld. Vinkeln följer `<details open>`, inte en klass, och roterar
+  med samma övergång som kortet — avstängd vid `prefers-reduced-motion`. Webbläsarens egen
+  triangel tas bort. Underraderna dras in `--space-md`, står i `--font-size-small` och är
+  fortsatt minst `--tap-target-min` höga (`02-§10.39`); den första är "Alla djuren", och
+  under den ett djurslag per rad. <!-- 05-§6.46 -->
 
 ### 6.13 Dialog
 

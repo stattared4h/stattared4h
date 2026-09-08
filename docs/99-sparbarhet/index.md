@@ -55,6 +55,10 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.5` | Sidfot | `byggd` | `source/layouts/footer.njk` på varje sida; innehåll och versionsrad bevakas av `tests/build/site.test.ts` |
 | `02-§5.6` | En `h1`, `lang`, `title`, `description` | `byggd` | `source/layouts/base.njk`; bevakas per byggd sida av `tests/build/site.test.ts` |
 | `02-§5.7`–`5.8` | Startsidan | `byggd` | `source/pages/index.njk` med `homeView` i `source/ts/build/pages.ts`; artvalet i `tests/build/pages.test.ts`, sidan och det tomma datasetet i `tests/build/data-pages.test.ts` |
+| `02-§5.63` | Kortet är en tryckyta med symbol, rubrik och en rad | `saknas` | Planerat: makrot `source/layouts/home-card.njk` och `homeView` i `source/ts/build/pages.ts` |
+| `02-§5.64` | Två navkort i bredd på mobil, tre från desktopbrytpunkten | `saknas` | Planerat: samma `.card-grid` som djurkorten (`02-§5.50`) |
+| `02-§5.65` | Kartsidan | `saknas` | Planerat: `source/pages/karta.njk` med `views.map` |
+| `02-§5.66` | Djurinfosidan | `saknas` | Planerat: `source/pages/djuren.njk` med `views.animals` |
 | `02-§5.9`–`5.13` | Platssidan | `byggd` | `source/pages/plats.njk` med `locationView`; Tåmossen, Bräckebur, Lygnslätt 1, A, D och Hönshuset prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
 | `02-§5.14`–`5.18` | Djursidan | `byggd` | `source/pages/djur.njk` med `animalView`; Rosa, Bocken, Tuva och Vinter prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
 | `02-§5.19`–`5.22` | Artsidan | `byggd` | `source/pages/arter.njk` med `speciesView` och `readSpeciesContent` i `source/ts/build/content.ts`; getter, hästar och höns prövas i `tests/build/pages.test.ts` och `data-pages.test.ts` |
@@ -158,6 +162,9 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§10.38` | Överlägget tar emot trycket utanför menyn | `manuell` | `[data-menu-overlay]` i `source/layouts/header.njk`, visat av `source/ts/ui/menu.ts` och format av `.site-menu-overlay` i `components.css`; att elementet finns på varje sida bevakas av `tests/build/site.test.ts`. Öppna `/plats/brackebur/` i 360 px, öppna menyn och tryck på artrutan under kortet: menyn stängs och sidan står kvar på platssidan |
 | `02-§10.40`–`10.42` | Tillbaka i sidhuvudet | `byggd` | Valet mellan historiken och startsidan är `returnsToSitePage` i `source/ts/ui/back.ts`, testad i `tests/ui/back.test.ts`; `tests/build/site.test.ts` kräver knappen på varje sida utom startsidan, med `aria-label` och en href till startsidan. Öppna `/djur/get-klara/` i 360 px efter att ha kommit från `/plats/brackebur/`: Tillbaka går till hagen; öppna samma adress direkt i en ny flik: Tillbaka går till startsidan med kartan |
 | `02-§10.39` | Menyns länkar håller träffytan | `manuell` | `.site-menu__link` i `components.css`. Öppna menyn i 360 px och mät en länk i DevTools: minst 44 px hög |
+| `02-§10.43` | Djuren i menyn fäller ut arterna | `saknas` | Planerat: `navLinks` med `children` i `source/layouts/header.njk` |
+| `02-§10.44` | Fällan är `<details>` och kräver ingen JavaScript | `saknas` | Planerat: `source/layouts/header.njk`; `source/ts/ui/menu.ts` rör bara kortet |
+| `02-§10.45` | Kartan i menyn har inga underrader | `saknas` | Planerat: `navLinks` utan `children` för kartan |
 | `02-§10.9` | 4H-loggan | `byggd` | Förbundets egna banor i `source/assets/img/4h-logo.svg`, härledda ur vektorfilen i `docs/09-kallor/`; `tests/design/logo.test.ts` jämför konstverkets kontrollsumma med registret |
 | `02-§10.10` | Ingen huvudsidelänk i sidhuvudet | `byggd` | `tests/build/site.test.ts` |
 | `02-§10.11`–`10.13` | Installknapp | `manuell` | `source/ts/ui/install.ts`; läget avgörs av `installButtonState` i `source/ts/domain/install.ts`, testad i `tests/domain/install.test.ts`, och `aria-label` bevakas av `tests/build/pwa.test.ts`. Öppna sajten i Chrome på Android: knappen syns när installationserbjudandet kommer, ett tryck visar dialogen, och knappen försvinner efter installation; i Safari på iPhone syns den alltid och ett tryck växlar texten om Dela under sidhuvudet |
@@ -230,6 +237,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `05-§6.30` | Sidfot | `manuell` | `source/layouts/footer.njk`, `layout.css`. Öppna en sida och bekräfta djupgrön botten, vit text, och ordningen logga, huvudsidelänk, repolänk, integritetsmening, version |
 | `05-§6.33`–`6.34`, `6.37` | Ikonknapp, meny, sidhuvudets höjd | `manuell` | `components.css`, `layout.css`. I 360 px: knapparna är 44 px, menykortet är grönt med vita länkar och glider in under sidhuvudet över ett mörkt överlägg som lämnar sidhuvudets rad synlig; sidhuvudets höjd är densamma före och efter rullning och i 1280 px |
 | `05-§6.42` | Menyknappens två lägen i markupen | `byggd` | Båda ikonerna och båda etiketterna ligger i `source/layouts/header.njk` och väljs av `aria-expanded` i `components.css`; `tests/build/site.test.ts` kräver att båda finns och att knappen börjar hopfälld |
+| `05-§6.45` | Navkortet | `saknas` | Planerat: `.home-card` i `components.css`, symbolplattan i `--color-green-pale` |
+| `05-§6.46` | Menyns fällbara rad och dess vinkel | `saknas` | Planerat: `.site-menu__details` i `components.css`, vinkeln följer `[open]` |
 | `05-§6.35`–`6.36` | Dialog, statusrad | `manuell` | `.dialog` och `.status-bar` i `components.css`. Öppna feedbackdialogen i 360 px och 1280 px: mörkt bakgrundsskikt, vit yta med rundade hörn och kryssknapp uppe till höger, som mest 680 px bred, intonad på under 200 ms; sätt DevTools → Network → Offline: ljusgrön rad med djupgrön text direkt under sidhuvudet |
 | `05-§6.38` | Frizon runt 4H-logotypen | `manuell` | Öppna `/` i 1280 px och mät i DevTools att avståndet från logotypen till sajtnamnet är minst 8 px och till sidhuvudets över- och underkant minst 4 respektive 8 px; öppna menyn i 360 px och sidfoten och bekräfta minst 8 px under logotypen |
 | `05-§6` övrigt | Hero | `saknas` | Skrivs när markupen finns, enligt `05-§7.2`; heron väntar på ett fotografi från gården |
@@ -336,7 +345,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 10 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
 | `byggd` | 156 |
