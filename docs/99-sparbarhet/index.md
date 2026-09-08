@@ -95,6 +95,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§5.39` | Samma symbol framför namnet i listan under kartan | `byggd` | `symbol` på `MapListItem` i `source/ts/build/pages.ts`, skriven i länken av `source/pages/index.njk`; `tests/build/pages.test.ts` kräver rätt symbol för Caféet och en symbol på varje listad plats, `data-pages.test.ts` att den står före namnet i den byggda sidan |
 | `04-§5.8` | Koordinaten är den punkt besökaren ska gå till, för en yta dess mitt | `dokumenterad` | Konventionen gäller datat, inte koden: bygget projicerar den punkt som står i filen. De fyra numrerade hagarna bär bandens tyngdpunkter, härledda ur ritningen enligt `docs/09-kallor/index.md`; de elva som låg utanför ritningen bär ungefärliga lägen enligt `04-§5.9` |
 | `04-§5.9` | Plats utanför ritningen får ett ungefärligt läge vid kanten | `byggd` | Konventionen gäller datat; de elva lägena står i `source/data/locations/` med en kommentar ovanför `lat`, och härkomsten i `docs/09-kallor/index.md`. `tests/domain/location-coordinates.test.ts` kräver att varje aktiv plats i båda dataseten har koordinater och projiceras innanför ritningen — annars faller regeln tillbaka, en fil i taget, utan att bygget märker det |
+| `04-§5.10` | Platsen får ange sin egen etikettsida med `label` | `byggd` | `optionalEnum` i `source/ts/domain/validate.ts` tar emot `under`, `over`, `hoger` och `vanster`; `renderMap` översätter till placeringens ord och lägger valet före automatiken. Tolv platser bär det i båda dataseten. `tests/domain/validate.test.ts` och `tests/build/map.test.ts` |
+| `04-§5.11` | Kort namn som bara kartan använder, `shortName` | `byggd` | `optionalString` i `source/ts/domain/validate.ts`; `renderMap` sätter det som etikettens text, mäter placeringen mot det och behåller det fullständiga namnet i `aria-label` och `data-name`. Sex platser bär det. `tests/build/map.test.ts` |
 | `04-§5.7` | Platsen har en sort | `byggd` | ADR 0019; obligatoriskt `kind` med åtta värden i `source/ts/domain/validate.ts`. `tests/domain/validate.test.ts` prövar att var och en tas emot, att `besoksmal` avvisas, att felmeddelandet räknar upp värdena och att djurslag på annat än en `djurplats` fäller bygget; `tests/domain/qa-data.test.ts` kräver att QA-datat innehåller varje sort |
 | `02-§5.33` (dold etikett) | Etiketten kommer fram vid fokus | `manuell` | Bygg med `DATA_DIR=source/data-qa`, öppna `/` i 360 px bredd och tabba till en markör i klungan i mitten: namnet ska komma fram, och markören ska ligga överst |
 | `02-§6.1` | Bara `*.yaml` läses ur `DATA_DIR` | `byggd` | `source/ts/domain/load.ts`; `tests/domain/load.test.ts` |
@@ -337,7 +339,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 | `saknas` | 1 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
-| `byggd` | 154 |
+| `byggd` | 156 |
 | `manuell` | 55 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i

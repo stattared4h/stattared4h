@@ -340,13 +340,10 @@
   display: none;
 }
 
-/* Where the name hangs, and the line that ties it to its own dot (02-§5.53, 02-§5.56).
-   Four positions, all square on the marker: straight below by default, and above, right or
-   left when the build or the place itself says so (02-§5.60). The label sits
-   --map-label-offset from the place — the dot's radius and a little air — rather than
-   clearing the whole 44 px tap target, which used to push the name eight pixels further
-   out than anything visible called for (02-§5.58). The line spans exactly the air that is
-   left, so it touches the dot at one end and the label at the other. */
+/* Where the name hangs (02-§5.53). Four positions, all square on the marker: straight
+   below by default, and above, right or left when the build or the place itself says so
+   (02-§5.60). The label's near edge sits --map-label-offset from the place, which is the
+   drawn dot's radius exactly, so the name rests against its own dot (02-§5.58). */
 .map__label {
   position: absolute;
   inset: calc(50% + var(--map-label-offset)) auto auto 50%;
@@ -553,9 +550,8 @@
    rules, which it does on specificity, so it can live here at the foot of the file and
    apply at every viewport width.
 
-   Start from the default under the pin. A marker without a --zoom- class is one the third
-   placement could not fit either; it keeps this position, and the line to its pin still
-   says which marker the name belongs to (02-§5.56). */
+   Start from the default under the pin, for a marker the third placement could not fit
+   either. */
 
 /* ── The zoomed map's own label placement (02-§5.57) ────────────────────── */
 
