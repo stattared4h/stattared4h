@@ -281,7 +281,7 @@ describe("the map on the home page (02-§5.23–5.27)", () => {
   test("a marker per active place with coordinates, the description, and the list", async () => {
     const html = main(await page(""));
     assert.match(html, /<svg class="map__drawing" [^>]*role="img" aria-label="Karta över Stättared med gårdens hagar">/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+(?: map__marker--zoom-[\w-]+)?" href="\/plats\/([^/]+)\/"/g)].map((m) => m[1]);
     assert.equal(markers.length, 31, "32 places minus the inactive one without coordinates");
     assert.ok(!markers.includes("d"));
     const list = html.slice(html.indexOf('<ul class="place-list">'));

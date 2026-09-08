@@ -225,6 +225,17 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   sidan, hämtar inget utifrån (`02-§5.26`), följer etiketten till vart och ett av de åtta
   lägena i `02-§5.53`, och är dekoration som inte läses upp för
   skärmläsaren. <!-- 02-§5.56 -->
+- **Den inzoomade kartan har en egen etikettplacering.** Bygget räknar ut tre placeringar:
+  en för den smala kartan, en för den breda, och en för den skala där alla namn tänds
+  (`02-§5.44`). Utan den tredje har en etikett som överblicken tvingats dölja inget eget
+  läge, och alla sådana faller tillbaka på samma plats rakt under sin markör — så just de
+  namn zoomen finns till för att visa hamnar i en hög. Referensen är den smalaste kartan
+  vid den skalan; ryms namnen där ryms de vid varje bredare fönster, och att zooma vidare
+  ger bara mer plats. I den här omgången får en etikett skava var som helst, inte bara i
+  ytterkanten som `02-§5.54` kräver: kartan är då fyra gånger rutan, så ett skav är några
+  pixlar mellan två namn som står långt isär — inte den hög det vore i överblick.
+  Tröskelskalan är samma tal i bygget som i klientkoden, hämtat ur en källa, så de inte kan
+  glida isär. <!-- 02-§5.57 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är

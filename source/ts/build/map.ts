@@ -26,6 +26,7 @@ import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import { escapeAttribute, escapeText } from "./images.ts";
 import { symbolSvg } from "./symbols.ts";
+import { NAMES_AT_SCALE } from "../domain/map-view.ts";
 import type { LocationKind } from "../domain/types.ts";
 
 export const MAP_DESCRIPTION = "Karta över Stättared med gårdens hagar";
@@ -353,6 +354,13 @@ export function placeLabels(
   drawingWidth: number,
   drawingHeight: number,
   referenceWidth: number = LABEL_METRICS.referenceWidth,
+  /**
+   * Let a label graze anywhere, not only at the drawing's edge (02-§5.57). True for the
+   * zoomed placement: there the map is four times the frame, so a graze is a few pixels
+   * of overlap between two names that stand well apart — not the pile it would be in the
+   * overview, which is why 02-§5.54 forbids it there.
+   */
+  grazeAnywhere = false,
 ): Map<string, LabelSide> {
   const scale = referenceWidth / drawingWidth;
   const edge: Box = { left: 0, right: referenceWidth, top: 0, bottom: drawingHeight * scale };
@@ -406,6 +414,7 @@ export function placeLabels(
     // it is the opposite: a label over a label makes both unreadable and wins nothing.
     // The drawing's edge and the zoom controls do not bend either way.
     const atEdge =
+      grazeAnywhere ||
       point.x < half ||
       point.x > referenceWidth - half ||
       point.y < half ||
@@ -528,17 +537,33 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   }));
   const sides = placeLabels(points, frame.width, frame.height);
   const wideSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.wideWidth);
+  // A third placement for the zoomed map (02-§5.57). Zooming shows every name (02-§5.44),
+  // and a name the overview had to hide has no side of its own — so they all fell back to
+  // the same spot under their pin and stacked. The reference is the narrowest map at the
+  // scale where the names appear: what fits there fits at every wider viewport, and
+  // zooming further only adds room.
+  const zoomSides = placeLabels(
+    points,
+    frame.width,
+    frame.height,
+    LABEL_METRICS.referenceWidth * NAMES_AT_SCALE,
+    true,
+  );
 
   const markers: string[] = [];
   for (const { location, position } of drawn) {
     const side = sides.get(location.id) ?? "below";
     const wide = wideSides.get(location.id) ?? "below";
+    const zoom = zoomSides.get(location.id) ?? "below";
     // `below` is the stylesheet's base case and needs no modifier in the narrow layout.
     // The wide class is always written: from 600 px the stylesheet starts from the
     // default and follows it (05-§5.2).
     const className =
       (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
-      ` map__marker--wide-${wide}`;
+      ` map__marker--wide-${wide}` +
+      // Nothing to say when the zoomed placement has no room either: the marker then keeps
+      // the default position, and the line to its pin still says which one it belongs to.
+      (zoom === "hidden" ? "" : ` map__marker--zoom-${zoom}`);
     const style = `left: ${percent(position.x, frame.width)}; top: ${percent(position.y, frame.height)}`;
     // What the popup shows, carried on the marker so the client needs no second source
     // (03-§9.7). Only a djurplats reports animals (02-§5.47), and a place without a note

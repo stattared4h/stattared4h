@@ -21,6 +21,7 @@ import {
   type MapLocation,
 } from "../../source/ts/build/map.ts";
 import { PLACE_SYMBOLS } from "../../source/ts/build/symbols.ts";
+import { NAMES_AT_SCALE } from "../../source/ts/domain/map-view.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
@@ -94,7 +95,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+(?: map__marker--zoom-[\w-]+)?" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/brackebur/", "/prov/plats/lygnslatt-1/", "/prov/plats/stora-grishagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Bräckebur", "Lygnslätt 1", "Stora grishagen"]);
@@ -464,8 +465,8 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
       { id: "tvaan", name: "2:an", kind: "djurplats", lat: 57.4125, lon: 12.2142, ...FACTS },
     ];
     const { html } = renderMap(crowded, { base: "/", background });
-    assert.match(html, /<a class="map__marker map__marker--label-above-left map__marker--wide-above-left" href="\/plats\/ettan\//, "the first gets the preferred slanted position");
-    assert.match(html, /<a class="map__marker map__marker--label-[\w-]+ map__marker--wide-[\w-]+" href="\/plats\/tvaan\//);
+    assert.match(html, /<a class="map__marker map__marker--label-above-left map__marker--wide-above-left map__marker--zoom-[\w-]+" href="\/plats\/ettan\//, "the first gets the preferred slanted position");
+    assert.match(html, /<a class="map__marker map__marker--label-[\w-]+ map__marker--wide-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/tvaan\//);
   });
 
   test("every position the build can choose has a rule in the stylesheet", async () => {
@@ -576,5 +577,42 @@ describe("only an edge marker grazes; the middle still hides (02-§5.54)", () =>
     const once = placeLabels(middle, 1000, 782);
     const again = placeLabels([...middle].reverse(), 1000, 782);
     assert.deepEqual([...once.entries()].sort(), [...again.entries()].sort());
+  });
+});
+
+describe("the zoomed map gets its own placement (02-§5.57)", () => {
+  test("the build's zoom reference is the narrow map at the scale where names appear", () => {
+    // The threshold lives in the domain so the build and map-zoom.ts cannot drift apart.
+    assert.equal(NAMES_AT_SCALE, 4);
+    assert.equal(LABEL_METRICS.referenceWidth * NAMES_AT_SCALE, 1248);
+  });
+
+  test("grazing anywhere places every name, unlike the overview's rule", () => {
+    const crowd = Array.from({ length: 9 }, (_, i) => ({
+      id: `p${i}`,
+      name: `Plats ${i}`,
+      x: 500,
+      y: 390,
+    }));
+    const overview = placeLabels(crowd, 1000, 782);
+    const zoomed = placeLabels(crowd, 1000, 782, LABEL_METRICS.referenceWidth * NAMES_AT_SCALE, true);
+    assert.ok(
+      [...overview.values()].some((side) => side === "hidden"),
+      "överblicken döljer, som 02-§5.54 kräver",
+    );
+    assert.ok(
+      [...zoomed.values()].every((side) => side !== "hidden"),
+      `den inzoomade omgången placerar alla, fick ${[...zoomed.values()].join(", ")}`,
+    );
+  });
+
+  test("every marker carries a zoom position, so none falls back to the same spot", () => {
+    const background = parseMapBackground(DRAWING, EDGES);
+    const { html } = renderMap(PLACES, { base: "/", background });
+    const markers = [...html.matchAll(/<a class="([^"]+)"/g)].map((m) => m[1]);
+    assert.equal(markers.length, PLACES.length);
+    for (const className of markers) {
+      assert.match(className, /map__marker--zoom-[a-z-]+/, `saknar zoomläge: ${className}`);
+    }
   });
 });

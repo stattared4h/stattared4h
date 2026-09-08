@@ -719,3 +719,119 @@
   padding: 0;
   list-style: none;
 }
+
+/* ── The zoomed map's own label placement (02-§5.57) ────────────────────── */
+
+/* Zooming in shows every name (02-§5.44), including the ones the overview had to hide.
+   Those have no side of their own, so they all fell back to the same spot under their pin
+   and stacked. The build therefore works out a third placement, for the scale at which the
+   names appear, and writes it as --zoom-. It has to beat both the narrow and the wide
+   rules, which it does on specificity, so it can live here at the foot of the file and
+   apply at every viewport width.
+
+   Start from the default under the pin. A marker without a --zoom- class is one the third
+   placement could not fit either; it keeps this position, and the line to its pin still
+   says which marker the name belongs to (02-§5.56). */
+.map--names .map__marker .map__label {
+  inset: 100% auto auto 50%;
+  transform: translateX(-50%);
+}
+
+.map--names .map__marker .map__label::before {
+  inset: auto auto 100% 50%;
+  width: var(--border-width);
+  height: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  transform-origin: 50% 50%;
+  transform: translateX(-50%);
+}
+
+.map--names .map__marker--zoom-above .map__label {
+  inset: auto auto 100% 50%;
+  transform: translateX(-50%);
+}
+
+.map--names .map__marker--zoom-above .map__label::before {
+  inset: 100% auto auto 50%;
+  width: var(--border-width);
+  height: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  transform-origin: 50% 50%;
+  transform: translateX(-50%);
+}
+
+.map--names .map__marker--zoom-right .map__label {
+  inset: 50% auto auto 100%;
+  transform: translateY(-50%);
+}
+
+.map--names .map__marker--zoom-right .map__label::before {
+  inset: 50% 100% auto auto;
+  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  height: var(--border-width);
+  transform-origin: 50% 50%;
+  transform: translateY(-50%);
+}
+
+.map--names .map__marker--zoom-left .map__label {
+  inset: 50% 100% auto auto;
+  transform: translateY(-50%);
+}
+
+.map--names .map__marker--zoom-left .map__label::before {
+  inset: 50% auto auto 100%;
+  width: calc((var(--tap-target-min) - var(--space-md)) / 2);
+  height: var(--border-width);
+  transform-origin: 50% 50%;
+  transform: translateY(-50%);
+}
+
+.map--names .map__marker--zoom-above-left .map__label {
+  inset: auto 100% 100% auto;
+  transform: none;
+}
+
+.map--names .map__marker--zoom-above-left .map__label::before {
+  inset: 100% auto auto 100%;
+  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
+  height: var(--border-width);
+  transform-origin: 0 0;
+  transform: rotate(45deg);
+}
+
+.map--names .map__marker--zoom-above-right .map__label {
+  inset: auto auto 100% 100%;
+  transform: none;
+}
+
+.map--names .map__marker--zoom-above-right .map__label::before {
+  inset: 100% 100% auto auto;
+  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
+  height: var(--border-width);
+  transform-origin: 100% 0;
+  transform: rotate(-45deg);
+}
+
+.map--names .map__marker--zoom-below-left .map__label {
+  inset: 100% 100% auto auto;
+  transform: none;
+}
+
+.map--names .map__marker--zoom-below-left .map__label::before {
+  inset: auto auto 100% 100%;
+  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
+  height: var(--border-width);
+  transform-origin: 0 100%;
+  transform: rotate(-45deg);
+}
+
+.map--names .map__marker--zoom-below-right .map__label {
+  inset: 100% auto auto 100%;
+  transform: none;
+}
+
+.map--names .map__marker--zoom-below-right .map__label::before {
+  inset: auto 100% 100% auto;
+  width: calc(var(--tap-target-min) * 0.7071 - var(--space-md) / 2);
+  height: var(--border-width);
+  transform-origin: 100% 100%;
+  transform: rotate(45deg);
+}

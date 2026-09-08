@@ -40,6 +40,17 @@ export const MIN_SCALE = 1;
  */
 export const MAX_SCALE = 6;
 
+/**
+ * The scale at which every name is shown, hidden ones included (02-§5.44). Measured on the
+ * yard cluster in Chromium: at 2x its labels still stack, at 4x they stand apart.
+ *
+ * It lives here rather than in the module that toggles the class, because the build needs
+ * the same number: it works out a third label placement for exactly this scale (02-§5.57).
+ * A threshold that drifted between the two would place the labels for one zoom level and
+ * reveal them at another.
+ */
+export const NAMES_AT_SCALE = 4;
+
 /** Rounding slack: a pinch never lands exactly on 1, but it should still mean "home". */
 const EPSILON = 1e-9;
 
