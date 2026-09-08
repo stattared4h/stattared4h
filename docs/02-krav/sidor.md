@@ -53,11 +53,22 @@ skärmen (issue #61). `02-§5.50` sätter antalet per bredd i stället.
 
 Etiketterna hade först fyra lägen — under, över, höger, vänster — och tog det första
 lediga. "Under" är ledig för de fyra numrerade hagarna, så den vann varje gång. Betesmarken
-är indelad i band som löper nordväst–sydost, och en etikett rakt under markören glider
-därför på tvärs mot bandet, mot staketet och in i grannhagen (issue #50). `02-§5.53` ger
-placeringen fyra sneda lägen till och prövar dem först. Alternativet — att låta varje plats
-välja sida i sin YAML — avvisades: utseende hör inte hemma i datat, och en regel som gäller
-alla platser lika är värd mer än handpåläggning per plats.
+är indelad i band som löper nordväst–sydost, och en etikett rakt under markören gled därför
+på tvärs mot bandet, in i grannhagen (issue #50). Svaret blev fyra sneda lägen till, prövade
+först, och alternativet — att låta varje plats välja sida i sin YAML — avvisades då som
+handpåläggning.
+
+Båda de besluten är omprövade. Den egentliga orsaken till #50 var inte att lägena var för
+få utan att hagarnas koordinater låg vid kanten i stället för i mitten; `04-§5.8` rättade
+det, och därmed föll skälet till de sneda lägena bort. Kvar av dem blev nackdelen: ett
+snett läge möter markören hörn mot hörn, och på en karta med trettiofyra platser pekar ett
+hörn lika gärna på grannen som på den egna pricken. `02-§5.53` har därför åter fyra lägen.
+
+Med fyra lägen räcker inte automatiken för gårdsplanen, där ett tiotal platser ligger inom
+några tiotal meter: åtta av dem blir utan namn. Därför får en plats ange sin sida själv
+(`02-§5.60`). Invändningen att utseende inte hör hemma i datat står kvar och är riktig i
+allmänhet — men en regel som gäller alla lika kan inte veta vilken av två grannar som är
+viktigast att namnge, och gården kan. Fältet är frivilligt; utan det gäller automatiken.
 
 Samma issue bad också om att kunna zooma. Åtta av gårdens platser ligger i en klunga kring
 gårdsplanen, inom några tiotal meter från varandra, och i överblick får deras namn inte
@@ -189,15 +200,12 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   under kartan (`02-§5.24`). Bygget räknar placeringen för kartans egen bredd, inte
   fönstrets: på en 360 px telefon är kartan 312 px bred, resten är behållarens innerkant.
   Räkningen är deterministisk: samma platsdata ger samma placering. <!-- 02-§5.33 -->
-- Etiketten har åtta möjliga lägen kring markören: fyra sneda och fyra raka. De sneda
-  prövas först — ett snett läge lämnar stråket rakt under och rakt bredvid markören fritt
-  åt grannen. Betesmarkens band löper nordväst–sydost, så av de sneda prövas de två som
-  följer den riktningen först: snett upp till vänster och snett ned till höger. En etikett
-  på den andra diagonalen går på tvärs över staketet in i grannhagen. Ordningen är därmed
-  snett upp vänster, snett ned höger, snett upp höger, snett ned vänster, och därefter de
-  raka: under, över, höger, vänster. Ordningen är fast, så placeringen är
-  deterministisk. Hörnet där zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så
-  ingen etikett hamnar bakom en knapp. <!-- 02-§5.53 -->
+- Etiketten har fyra möjliga lägen kring markören: under, över, höger och vänster, prövade
+  i den ordningen. Alla fyra ligger mitt för markören — rakt under, rakt över, rakt bredvid
+  — så etiketten pekar ut sin egen prick och ingen annan. Sneda lägen, som möter markören
+  hörn mot hörn, finns inte. Ordningen är fast, så placeringen är deterministisk. Hörnet där
+  zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så ingen etikett hamnar bakom en
+  knapp. <!-- 02-§5.53 -->
 - **Ingen etikett hamnar utanför ritningens kant, och ingen lägger sig över en annan** —
   utom för en markör i ritningens ytterkant, där den som blir över hellre skaver än döljs.
   Undantaget följer av var platserna står. De som ligger utanför ritningen är parkerade
@@ -255,6 +263,14 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   ordningen i `02-§5.53`, eftersom betesmarkens band då avgör. Regeln biter först sedan
   `02-§5.58` slutade räkna grannens osynliga tryckyta som upptagen: dessförinnan var det
   raka läget alltid blockerat, och placeringen föll till ett snett ändå. <!-- 02-§5.59 -->
+- **En plats får ange sin egen etikettsida** med fältet `label` (`04-§5.10`). Anges det
+  läggs namnet där, före all automatik, och de platser som placeras automatiskt viker undan
+  för det. Anges det inte gäller `02-§5.53` som förut. Skälet är att fyra lägen inte räcker
+  åt gårdsplanen: ett tiotal platser ligger där inom några tiotal meter, och automatiken —
+  som tar platserna i tur och ordning från norr — kan inte veta att Stallet är viktigare att
+  namnge än grillplatsen intill. Gården vet. Ett angivet läge som skulle hamna utanför
+  ritningen eller bakom en zoomknapp följs inte; där väger `02-§5.54` tyngre, och platsen
+  placeras automatiskt i stället. <!-- 02-§5.60 -->
 - Varje markör bär en symbol som visar vad platsen är. Sorterna i `kind` (`04-§5.7`) har
   var sin symbol: hage, mat, grill, toalett, parkering, lek, boende och husbil. Finns ett
   svenskt vägmärke för det platsen är, och stämmer märkets figur med gårdens plats, är

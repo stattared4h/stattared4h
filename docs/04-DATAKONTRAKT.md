@@ -172,6 +172,7 @@ kind: enum                   # vad platsen är, se regeln nedan
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
 description: string | null   # markdown
+label: enum | null           # sidan namnet står på i kartan, se regeln nedan
 lat: number | null           # WGS84 i decimalgrader; ytans mitt, se regeln nedan
 lon: number | null
 accessible: boolean          # nåbar med rullstol eller barnvagn
@@ -219,6 +220,13 @@ Regler:
   inte alls på kartan (`02-§5.25`), och en hage som pekas ut åt rätt håll hjälper besökaren
   mer än en hage som inte finns. Ett ungefärligt läge ersätts av ett inmätt så snart gården
   har ett. <!-- 04-§5.9 -->
+- `label` säger vilken sida av markören platsens namn står på i kartan: `under`, `over`,
+  `hoger` eller `vanster`. Utelämnas fältet väljer bygget själv (`02-§5.53`). Det är det
+  enda fältet som handlar om utseende, och det finns för att fyra lägen inte räcker åt
+  gårdsplanens klunga: automatiken tar platserna norrifrån och kan inte veta vilken av två
+  grannar som är viktigast att namnge. Sätt det bara när automatikens val faktiskt är
+  fel — ett fält satt i onödan blir ett fält som är kvar när kartan ändrats runt
+  det. <!-- 04-§5.10 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död
