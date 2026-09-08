@@ -1,0 +1,8 @@
+name: B
+kind: djurplats
+species: []
+# Läget är utpekat av gården på ritningen, inte uppmätt på marken.
+lat: 57.338529
+lon: 12.340115
+accessible: false
+active: true
