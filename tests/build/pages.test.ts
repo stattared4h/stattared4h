@@ -56,13 +56,14 @@ function species(views: SiteViews, id: string) {
 }
 
 describe("the home page (02-§5.7, 02-§5.63)", () => {
-  test("is a card per errand: the map first, then the animals", async () => {
+  test("is a card per errand: the map first, then the animals, then the bingo (02-§12.2)", async () => {
     const { views } = await qaViews();
     assert.deepEqual(
       views.home.cards.map((card) => [card.id, card.url]),
       [
         ["karta", "/karta/"],
         ["djuren", "/djuren/"],
+        ["bingo", "/bingo/"],
       ],
     );
     for (const card of views.home.cards) {
@@ -72,10 +73,46 @@ describe("the home page (02-§5.7, 02-§5.63)", () => {
     }
   });
 
-  test("the cards carry no data of their own: an empty farm still has both", () => {
+  test("the cards carry no data of their own: an empty farm still has all three", () => {
     const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
     const views = buildViews(empty, { base: "/", farm: FARM });
-    assert.deepEqual(views.home.cards.map((card) => card.id), ["karta", "djuren"]);
+    assert.deepEqual(views.home.cards.map((card) => card.id), ["karta", "djuren", "bingo"]);
+  });
+});
+
+describe("the bingo page (02-§12.4)", () => {
+  test("offers every species with a photo, and every animal here with a portrait", async () => {
+    const { views, dataset } = await qaViews();
+    assert.deepEqual(
+      views.bingo.species.map((c) => c.key),
+      dataset.species.filter((s) => s.photo !== null).map((s) => s.id),
+    );
+    const here = dataset.animals.filter((a) => a.status === "here" && a.photos.length > 0);
+    assert.equal(views.bingo.animals.length, here.length);
+    assert.ok(views.bingo.animals.some((c) => c.key === "rosa"), "Rosa is here with a portrait");
+    assert.ok(!views.bingo.animals.some((c) => c.key === "bocken"), "the gone Bocken is never a square");
+    for (const candidate of [...views.bingo.species, ...views.bingo.animals]) {
+      assert.ok(candidate.name.length > 0, `${candidate.key} saknar namn`);
+      assert.match(candidate.photo.id, /^img-[0-9a-f]{12}$/, `${candidate.key} saknar bild`);
+    }
+  });
+
+  test("a species without a photo and an animal without a portrait are left out", async () => {
+    const { dataset } = await qaViews();
+    const trimmed: Dataset = {
+      ...dataset,
+      species: dataset.species.map((s) => (s.id === "get" ? { ...s, photo: null } : s)),
+      animals: dataset.animals.map((a) => (a.id === "rosa" ? { ...a, photos: [] } : a)),
+    };
+    const views = buildViews(trimmed, { base: "/", farm: FARM });
+    assert.ok(!views.bingo.species.some((c) => c.key === "get"));
+    assert.ok(!views.bingo.animals.some((c) => c.key === "rosa"));
+  });
+
+  test("an empty farm offers nothing, and the page says so instead of a board", () => {
+    const empty: Dataset = { species: [], breeds: [], populations: [], animals: [], locations: [], images: [] };
+    const views = buildViews(empty, { base: "/", farm: FARM });
+    assert.deepEqual(views.bingo, { species: [], animals: [] });
   });
 });
 

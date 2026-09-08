@@ -78,19 +78,20 @@ describe("every page exists (02-§5.1–5.2)", () => {
 });
 
 describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
-  test("is a nav of cards: the map first, the animals second, and nothing else", async () => {
+  test("is a nav of cards: the map first, the animals second, the bingo third, and nothing else", async () => {
     const html = main(await page(""));
     const cards = [...html.matchAll(/<a class="home-card" href="\/([^"]*)">/g)].map((m) => `/${m[1]}`);
-    assert.deepEqual(cards, ["/karta/", "/djuren/"], "ett kort per ärende, kartan först (02-§5.7)");
+    assert.deepEqual(cards, ["/karta/", "/djuren/", "/bingo/"], "ett kort per ärende, kartan först (02-§5.7, 02-§12.2)");
     assert.match(html, /<h2 class="home-card__title">Kartan<\/h2>/);
     assert.match(html, /<h2 class="home-card__title">Djuren<\/h2>/);
+    assert.match(html, /<h2 class="home-card__title">Djurbingo<\/h2>/);
     assert.match(html, /<ul class="card-grid">/, "korten ligger i djurkortens rutnät (02-§5.64)");
     assert.match(html, /href="https:\/\/www\.4h\.se\/stattared\/"/, "meningen om vad sajten är (02-§5.8)");
   });
 
   test("carries none of the content the cards lead to (02-§5.7)", async () => {
     const html = main(await page(""));
-    for (const marker of ["map__drawing", "place-list__link", "species-tile", "data-animal-id-search", "Fler kartor i området"]) {
+    for (const marker of ["map__drawing", "place-list__link", "species-tile", "data-animal-id-search", "Fler kartor i området", "data-bingo-board"]) {
       assert.ok(!html.includes(marker), `startsidan bär inte ${marker}`);
     }
   });
@@ -98,7 +99,7 @@ describe("the home page (02-§5.7–5.8, 02-§5.63–5.64)", () => {
   test("every card's symbol is decorative; the heading carries the text (05-§6.45)", async () => {
     const html = main(await page(""));
     const symbols = [...html.matchAll(/<svg class="home-card__symbol"([^>]*)>/g)].map((m) => m[1]);
-    assert.equal(symbols.length, 2);
+    assert.equal(symbols.length, 3);
     for (const attributes of symbols) assert.match(attributes, /aria-hidden="true"/);
   });
 });
@@ -360,6 +361,35 @@ describe("a place that is not a djurplats never mentions animals (02-§5.35, ADR
   });
 });
 
+describe("the bingo page (02-§12.2–12.4, 02-§12.7, 02-§12.13)", () => {
+  test("has the start screen, the game, one template per candidate and the dialog", async () => {
+    const html = main(await page("bingo"));
+    const dataset = await qaDataset();
+    assert.match(html, /<h1>Djurbingo<\/h1>/);
+    assert.match(html, /data-bingo-start/, "startskärmen");
+    assert.match(html, /name="size" value="3" checked/);
+    assert.match(html, /name="size" value="4"/);
+    assert.match(html, /name="level" value="species" checked/);
+    assert.match(html, /name="level" value="animal"/, "the QA data has animals with portraits, so the level is offered");
+    assert.match(html, /data-bingo-game hidden/, "the game waits for the script");
+    assert.match(html, /data-bingo-dialog/, "dialogen");
+    assert.match(html, /<noscript>/, "utan JavaScript säger sidan det (02-§12.13)");
+    const species = html.match(/<template data-level="species"/g) ?? [];
+    const animals = html.match(/<template data-level="animal"/g) ?? [];
+    assert.equal(species.length, dataset.species.filter((s) => s.photo !== null).length);
+    assert.equal(animals.length, dataset.animals.filter((a) => a.status === "here" && a.photos.length > 0).length);
+    assert.match(html, /<template data-level="species" data-key="get" data-name="Get"><img [^>]*srcset=/, "the template holds the site's own picture markup");
+    assert.doesNotMatch(html, /<template[^>]*><img [^>]*fetchpriority/, "a template is never the page's eager image");
+  });
+
+  test("the home page and the menu lead to it (02-§12.2)", async () => {
+    const home = main(await page(""));
+    assert.match(home, /href="\/bingo\/"[\s\S]*?<h2 class="home-card__title">Djurbingo<\/h2>/);
+    const menu = await page("karta");
+    assert.match(menu, /href="\/bingo\/"/);
+  });
+});
+
 describe("the dataset in the build (02-§6.2, 06-§2.1)", () => {
   test("an empty dataset builds: the home page says so and the map is empty", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "s4h-empty-"));
@@ -378,6 +408,9 @@ describe("the dataset in the build (02-§6.2, 06-§2.1)", () => {
     assert.doesNotMatch(animals, /species-tile/);
     const map = main(await readFile(path.join(out, "karta", "index.html"), "utf8"));
     assert.doesNotMatch(map, /class="map"/, "no places, no map (02-§5.65)");
+    const bingo = main(await readFile(path.join(out, "bingo", "index.html"), "utf8"));
+    assert.match(bingo, /Djuren är inte inlagda ännu/, "no candidates, no board (02-§12.12)");
+    assert.doesNotMatch(bingo, /data-bingo-start/);
     await assert.rejects(access(path.join(out, "plats")), "no location pages");
   });
 
