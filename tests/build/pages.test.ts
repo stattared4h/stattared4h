@@ -19,6 +19,7 @@ import {
   NOT_ACCESSIBLE_TEXT,
   OTHER_PLACES_HEADING,
   portraitOf,
+  spanaRounds,
   type SiteViews,
 } from "../../source/ts/build/pages.ts";
 import { PLACE_SYMBOLS } from "../../source/ts/build/symbols.ts";
@@ -121,8 +122,37 @@ describe("the Spana! page (02-§13.5, 02-§13.6)", () => {
     assert.ok(views.spana.clues.some((clue) => clue.text !== null), "and one with a text");
   });
 
-  test("no clues, no round: an empty dataset gives an empty list", () => {
+  test("no clues, no round: an empty dataset gives an empty list and nothing to choose", () => {
     assert.deepEqual(emptyViews().spana.clues, []);
+    assert.deepEqual(emptyViews().spana.rounds, []);
+  });
+
+  test("the round lengths say how many stops they really give (02-§13.8)", async () => {
+    const { views } = await qaViews();
+    assert.deepEqual(
+      views.spana.rounds.map((round) => [round.size, round.stops, round.label]),
+      [
+        [4, 4, "Kort runda, 4 stopp"],
+        [8, 8, "Lång runda, 8 stopp"],
+      ],
+      "tolv ledtrådar räcker till båda",
+    );
+  });
+
+  test("a small catalogue is offered fewer lengths, and never promises stops it cannot give", () => {
+    // A length that would give no more stops than a shorter one is not a choice at all,
+    // and a label that says eight while the round is five has told the player something
+    // untrue (02-§13.8).
+    assert.deepEqual(spanaRounds(0), []);
+    assert.deepEqual(spanaRounds(1).map((round) => round.label), ["Kort runda, 1 stopp"]);
+    assert.deepEqual(spanaRounds(4).map((round) => round.label), ["Kort runda, 4 stopp"]);
+    assert.deepEqual(spanaRounds(5).map((round) => round.label), ["Kort runda, 4 stopp", "Lång runda, 5 stopp"]);
+    assert.deepEqual(spanaRounds(20).map((round) => round.label), ["Kort runda, 4 stopp", "Lång runda, 8 stopp"]);
+    for (const count of [1, 3, 4, 5, 8, 12]) {
+      for (const round of spanaRounds(count)) {
+        assert.ok(round.stops <= count, `${count} ledtrådar lovade ${round.stops} stopp`);
+      }
+    }
   });
 });
 

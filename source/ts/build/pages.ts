@@ -32,6 +32,7 @@ import {
   type Population,
   type Species,
 } from "../domain/index.ts";
+import { HUNT_SIZES, type HuntSize } from "../domain/spana.ts";
 import { definitePlural, joinSwedish, lowerFirst } from "../domain/swedish.ts";
 import { renderMap, type MapBackground, type MapLocation } from "./map.ts";
 import { HOME_CARD_SYMBOLS, symbolSvg, type HomeCardId } from "./symbols.ts";
@@ -116,9 +117,21 @@ export interface SpanaClueView {
   location: string;
 }
 
+/** One round length the start screen offers (02-§13.7, 02-§13.8). */
+export interface SpanaRoundView {
+  /** What the form submits, and what the round is measured against when it is restored. */
+  size: HuntSize;
+  /** How many stops it actually gives with this catalogue: never more than it holds. */
+  stops: number;
+  /** "Kort runda, 4 stopp" — the number the player will really get. */
+  label: string;
+}
+
 /** The Spana! page (02-§13): the catalogue; the round itself is drawn in the browser (ADR 0009). */
 export interface SpanaView {
   clues: SpanaClueView[];
+  /** The lengths worth offering, shortest first; empty when there are no clues. */
+  rounds: SpanaRoundView[];
 }
 
 /** One place the image tool offers as a clue's answer (02-§11.26). */
@@ -425,6 +438,28 @@ export function spanaUrl(): string {
  * validator refuses it (04-§10.17) — but the fallback to the id keeps a broken build
  * showing something rather than "undefined".
  */
+/** The name each length goes by on the start screen. Swedish, like everything the visitor reads. */
+const ROUND_NAMES: Record<HuntSize, string> = { 4: "Kort runda", 8: "Lång runda" };
+
+/**
+ * The round lengths to offer for a catalogue of `count` clues (02-§13.7, 02-§13.8).
+ *
+ * A round never repeats a clue, so a length can only give as many stops as the catalogue
+ * holds — and a length that would give no more stops than a shorter one is not offered at
+ * all: "Lång runda" beside "Kort runda" when both give four stops is a choice that is not
+ * a choice. The label carries the number the player actually gets, because a button that
+ * promises eight and hands over five has told them something untrue.
+ */
+export function spanaRounds(count: number): SpanaRoundView[] {
+  const rounds: SpanaRoundView[] = [];
+  for (const size of HUNT_SIZES) {
+    const stops = Math.min(size, count);
+    if (stops === 0 || rounds.some((round) => round.stops >= stops)) continue;
+    rounds.push({ size, stops, label: `${ROUND_NAMES[size]}, ${stops} stopp` });
+  }
+  return rounds;
+}
+
 export function spanaView(dataset: Dataset): SpanaView {
   const names = new Map(dataset.locations.map((location) => [location.id, location.name]));
   const clue = (one: Clue): SpanaClueView => ({
@@ -433,7 +468,7 @@ export function spanaView(dataset: Dataset): SpanaView {
     text: one.text,
     location: names.get(one.location) ?? one.location,
   });
-  return { clues: dataset.clues.map(clue) };
+  return { clues: dataset.clues.map(clue), rounds: spanaRounds(dataset.clues.length) };
 }
 
 export function locationView(dataset: Dataset, location: Location, farm: string): LocationPageView {

@@ -401,8 +401,8 @@ describe("the Spana! page (02-§13.1, 02-§13.4, 02-§13.7, 02-§13.10, 02-§13.
     const dataset = await qaDataset();
     assert.match(html, /<h1>Spana!<\/h1>/);
     assert.match(html, /data-spana-start/, "startskärmen");
-    assert.match(html, /name="size" value="4" checked/);
-    assert.match(html, /name="size" value="8"/, "QA har fler än fyra ledtrådar, så den långa rundan erbjuds (02-§13.8)");
+    assert.match(html, /name="size" value="4" checked> Kort runda, 4 stopp/);
+    assert.match(html, /name="size" value="8"> Lång runda, 8 stopp/, "tolv ledtrådar räcker till den långa rundan (02-§13.8)");
     assert.match(html, /name="level" value="easy" checked/);
     assert.match(html, /name="level" value="hard"/);
     assert.match(html, /data-spana-game hidden/, "spelet väntar på skriptet");

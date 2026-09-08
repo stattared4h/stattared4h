@@ -20,9 +20,10 @@ description: >-
   site never says where an individual animal is (ADR 0012), and the build test guards the
   word itself rather than trusting each template to mean the right thing by it.
 
-  The start screen and the game are two sections; the script shows one of them. The long
-  round is offered only when the catalogue holds more clues than the short one, because a
-  round never repeats a clue (02-§13.8).
+  The start screen and the game are two sections; the script shows one of them. The round
+  lengths come from `spanaRounds` in the build: a round never repeats a clue, so a small
+  catalogue is offered fewer lengths, and each label says how many stops it really gives
+  (02-§13.8).
 #}
 <div class="container container--narrow spana" data-spana>
   <h1>Spana!</h1>
@@ -32,10 +33,9 @@ description: >-
     <p class="lead">Du får några bilder på detaljer som finns på gården. Hitta dem, bocka av dem — och få veta var de sitter.</p>
     <fieldset class="field field--choices">
       <legend class="field__label">Hur lång runda?</legend>
-      <label class="choice"><input class="choice__input" type="radio" name="size" value="4" checked> Kort runda, 4 stopp</label>
-      {%- if views.spana.clues.length > 4 %}
-      <label class="choice"><input class="choice__input" type="radio" name="size" value="8"> Lång runda, 8 stopp</label>
-      {%- endif %}
+      {%- for round in views.spana.rounds %}
+      <label class="choice"><input class="choice__input" type="radio" name="size" value="{{ round.size }}"{% if loop.first %} checked{% endif %}> {{ round.label }}</label>
+      {%- endfor %}
     </fieldset>
     <fieldset class="field field--choices">
       <legend class="field__label">Hur svårt?</legend>

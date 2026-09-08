@@ -474,7 +474,9 @@ ett ställe i stället för en gång per spel. <!-- 03-§12.3 -->
 
 Spana! (`02-§13`) följer samma tre lager. Bygget listar katalogens ledtrådar — `spanaView`
 i `source/ts/build/pages.ts` läser `dataset.clues`, slår upp platsens namn och lämnar
-ordningen som datasetet har den — och `source/pages/spana.njk` skriver dem som ett
+ordningen som datasetet har den — och räknar samtidigt ut vilka rundlängder som är värda
+att erbjuda, så att startskärmen aldrig lovar fler stopp än katalogen räcker till
+(`spanaRounds`, `02-§13.8`) — och `source/pages/spana.njk` skriver dem som ett
 `<template>` per ledtråd, med ledtrådens text och platsens namn på `data`-attribut bredvid
 bilden. Reglerna ligger i `source/ts/domain/spana.ts`: rundan, avbockningen, den sparade
 formen och hur många stopp en runda får när katalogen är mindre än rundan

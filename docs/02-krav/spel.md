@@ -130,8 +130,9 @@ sitter i.
   dess text när den finns, "Svårt" visar bara bilden. Valen görs bara där: under spelet
   finns inga inställningar. <!-- 02-§13.7 -->
 - En runda har så många stopp som valet säger, men aldrig fler än katalogen har
-  ledtrådar, och samma ledtråd förekommer aldrig två gånger i samma runda. "Lång runda"
-  erbjuds bara när katalogen har fler ledtrådar än den korta rundan. Stoppen slumpas i
+  ledtrådar, och samma ledtråd förekommer aldrig två gånger i samma runda. Varje val bär
+  antalet stopp det faktiskt ger — "Lång runda, 5 stopp" när katalogen har fem — och en
+  längd som inte ger fler stopp än en kortare erbjuds inte alls. Stoppen slumpas i
   webbläsaren varje gång en runda börjar. <!-- 02-§13.8 -->
 - Nivån avgör vad spelaren ser, inte vilka ledtrådar som dras: samma katalog och samma
   slump ger samma runda på båda nivåerna. <!-- 02-§13.9 -->
