@@ -59,6 +59,8 @@ export type LocationKind =
 export interface Location {
   id: string;
   name: string;
+  /** A shorter name the map's marker uses instead, or null (02-§5.62, 04-§5.11). */
+  shortName: string | null;
   kind: LocationKind;
   species: string[];
   note: string | null;

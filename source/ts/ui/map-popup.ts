@@ -52,7 +52,8 @@ export function init(): void {
   };
 
   const open = (marker: HTMLAnchorElement): void => {
-    name.textContent = marker.querySelector(".map__label")?.textContent ?? "";
+    // The label may carry a short name (02-§5.62); data-name has the full one.
+    name.textContent = marker.dataset.name ?? marker.querySelector(".map__label")?.textContent ?? "";
     facts.replaceChildren();
 
     if (marker.dataset.species) facts.append(line(marker.dataset.species, "map-popup__species"));

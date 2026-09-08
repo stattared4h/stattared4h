@@ -238,6 +238,15 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   surfplatta i porträtt inte rymde det. Brytpunkten är 960 px, samma som resten av
   designen använder (`05-§5.3`). Varje placering räknas mot sin egen bredd, så ingen
   etikett hamnar utanför ritningen i något fönster (`02-§5.54`). <!-- 02-§5.61 -->
+- **En plats får ha ett kort namn som bara kartan använder** (`04-§5.11`). Markörens
+  etikett visar då det korta namnet; platssidan, listan under kartan och rutan man öppnar
+  visar det fullständiga. Skälet är gårdsplanen: *Grillplatsen vid ställplatsen* är 310 px
+  bred, och tre grillplatser och två parkeringar med sådana namn ligger inom ett par hundra
+  pixlar av varandra. Ingen placering löser det — namnen är för långa för ytan, inte fel
+  placerade. Markörens **tillgängliga namn förblir det fullständiga**, så den som lyssnar
+  hör "Grillplatsen vid gårdsplanen" och inte "Grillplats" tre gånger. Kortnamnet är
+  frivilligt; utan det står det fullständiga namnet på kartan som
+  förut. <!-- 02-§5.62 -->
 - **Det en etikett måste hålla sig undan är den ritade pricken, inte tryckytan runt den.**
   Markören är 44 × 44 px för att gå att träffa med ett finger (`05-§4.15`), men själva
   pricken är 24 px; resten är osynlig luft. Räknades hela tryckytan som upptagen sköts

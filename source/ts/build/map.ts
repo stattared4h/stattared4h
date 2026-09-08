@@ -44,6 +44,8 @@ export interface MapPoint {
 export interface MapLocation extends MapPoint {
   id: string;
   name: string;
+  /** What the marker's label says, when the full name is too long for the map. */
+  shortName: string | null;
   /** Decides the marker's symbol (02-§5.38, 04-§5.7). */
   kind: LocationKind;
   /** The place's short human note, or null (02-§5.46). */
@@ -563,7 +565,8 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
   // crowds a 360 px map has room on a 648 px one, and the visitor sees one or the other.
   const points = drawn.map(({ location, position }) => ({
     id: location.id,
-    name: location.name,
+    // The placement measures what is actually drawn, so a short name takes less room.
+    name: location.shortName ?? location.name,
     side: location.label === null ? null : SIDE_FOR_PLACEMENT[location.label],
     ...position,
   }));
@@ -607,10 +610,18 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
       ` data-access="${escapeAttribute(location.accessibility)}"` +
       (location.note === null ? "" : ` data-note="${escapeAttribute(location.note)}"`) +
       (location.kind === "djurplats" ? ` data-species="${escapeAttribute(location.species)}"` : "");
+    // A short name shortens the label, never the place (02-§5.62). The link keeps the full
+    // name as its accessible name, so a screen reader does not hear "Grillplats" three
+    // times, and `data-name` hands the same full name to the popup.
+    const short = location.shortName;
+    const full =
+      short === null
+        ? ""
+        : ` aria-label="${escapeAttribute(location.name)}" data-name="${escapeAttribute(location.name)}"`;
     markers.push(
-      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}"${facts}>` +
+      `<a class="${className}" href="${escapeAttribute(`${options.base}plats/${location.id}/`)}" style="${style}" data-place="${escapeAttribute(location.id)}"${full}${facts}>` +
         `<span class="map__pin map__pin--${location.kind}" aria-hidden="true">${symbolSvg(location.kind, "map__symbol")}</span>` +
-        `<span class="map__label">${escapeText(location.name)}</span>` +
+        `<span class="map__label">${escapeText(short ?? location.name)}</span>` +
         `</a>`,
     );
   }

@@ -28,7 +28,7 @@ import { NAMES_AT_SCALE } from "../../source/ts/domain/map-view.ts";
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
 /** What every place needs beyond its position, so the popup has something to show. */
-const FACTS = { note: null, accessibility: "Hit når man med rullstol och barnvagn", species: "Getter", label: null };
+const FACTS = { note: null, accessibility: "Hit når man med rullstol och barnvagn", species: "Getter", label: null, shortName: null };
 
 const PLACES: MapLocation[] = [
   { id: "brackebur", name: "Bräckebur", kind: "djurplats", lat: 57.4123, lon: 12.2134, ...FACTS },
@@ -156,9 +156,9 @@ describe("the popup on a marker (02-§5.46–5.49, 03-§9.7)", () => {
   test("each marker carries what the popup shows, and the empty popup rides in the canvas", () => {
     const places: MapLocation[] = [
       { id: "brackebur", name: "Bräckebur", kind: "djurplats", lat: 57.4123, lon: 12.2134,
-        note: "Här går bockarna.", accessibility: "Hit når man med rullstol och barnvagn", species: "Getter", label: null },
+        note: "Här går bockarna.", accessibility: "Hit når man med rullstol och barnvagn", species: "Getter", label: null, shortName: null },
       { id: "cafeet", name: "Caféet", kind: "mat", lat: 57.411, lon: 12.212,
-        note: null, accessibility: "Hit når man inte med rullstol eller barnvagn", species: "", label: null },
+        note: null, accessibility: "Hit når man inte med rullstol eller barnvagn", species: "", label: null, shortName: null },
     ];
     const { html } = renderMap(places, { base: "/" });
 
@@ -190,7 +190,7 @@ describe("the popup on a marker (02-§5.46–5.49, 03-§9.7)", () => {
   test("a name with markup in it is escaped in the attributes too", () => {
     const { html } = renderMap(
       [{ id: "x", name: "Hagen", kind: "djurplats", lat: 57, lon: 12,
-         note: 'Sa "hej" & <log> ut', accessibility: "Hit når man med rullstol och barnvagn", species: "Får", label: null }],
+         note: 'Sa "hej" & <log> ut', accessibility: "Hit når man med rullstol och barnvagn", species: "Får", label: null, shortName: null }],
       { base: "/" },
     );
     assert.match(html, /data-note="Sa &quot;hej&quot; &amp; &lt;log&gt; ut"/);
@@ -691,5 +691,48 @@ describe("the desktop placement (02-§5.61)", () => {
     const marker = { id: "x", name: "Grillplatsen vid ställplatsen", x: 591, y: 211, side: "right" as const };
     assert.notEqual(placeLabels([marker], 1000, 782, LABEL_METRICS.wideWidth).get("x"), "right");
     assert.equal(placeLabels([marker], 1000, 782, LABEL_METRICS.desktopWidth).get("x"), "right");
+  });
+});
+
+describe("a short name on the map only (02-§5.62)", () => {
+  const long: MapLocation = {
+    ...FACTS,
+    id: "grillplatsen-vid-gardsplanen",
+    name: "Grillplatsen vid gårdsplanen",
+    shortName: "Grillplats",
+    kind: "grill",
+    lat: 57.4123,
+    lon: 12.2134,
+    species: "",
+  };
+
+  test("the label says the short name, the link still says the whole one", () => {
+    const { html } = renderMap([long], { base: "/" });
+    assert.match(html, /<span class="map__label">Grillplats<\/span>/);
+    assert.match(
+      html,
+      /aria-label="Grillplatsen vid gårdsplanen" data-name="Grillplatsen vid gårdsplanen"/,
+      "markörens tillgängliga namn är det fullständiga, och popupen får det via data-name",
+    );
+  });
+
+  test("a place without a short name is written exactly as before", () => {
+    const { html } = renderMap([{ ...long, shortName: null, name: "Caféet" }], { base: "/" });
+    assert.match(html, /<span class="map__label">Caféet<\/span>/);
+    const marker = /<a class="map__marker[^>]*>/.exec(html)?.[0] ?? "";
+    assert.doesNotMatch(marker, /aria-label=|data-name=/, "inget extra skrivs när namnet räcker");
+  });
+
+  test("the placement measures the name that is actually drawn", () => {
+    // The short name is a third of the width, so it fits where the full one does not.
+    const at = (name: string, shortName: string | null) =>
+      placeLabels(
+        [{ id: "x", name: shortName ?? name, x: 700, y: 300, side: "right" as const }],
+        1000,
+        782,
+        LABEL_METRICS.desktopWidth,
+      ).get("x");
+    assert.notEqual(at("Grillplatsen vid gårdsplanen", null), "right");
+    assert.equal(at("Grillplatsen vid gårdsplanen", "Grillplats"), "right");
   });
 });

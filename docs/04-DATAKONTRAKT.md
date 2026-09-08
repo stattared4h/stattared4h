@@ -168,6 +168,7 @@ djuren som finns där. <!-- 04-§5.1 -->
 
 ```yaml
 name: string                 # platsens namn, t.ex. "Bräckebur"
+shortName: string | null     # kortare namn som bara kartan använder
 kind: enum                   # vad platsen är, se regeln nedan
 species: [string]            # art-id:n som går här nu — kan vara flera
 note: string | null          # kort mänsklig upplysning, t.ex. "Här går bockarna."
@@ -227,6 +228,12 @@ Regler:
   grannar som är viktigast att namnge. Sätt det bara när automatikens val faktiskt är
   fel — ett fält satt i onödan blir ett fält som är kvar när kartan ändrats runt
   det. <!-- 04-§5.10 -->
+- `shortName` är ett kortare namn som **bara kartans markör** använder (`02-§5.62`).
+  Platssidan, listan och rutan man öppnar visar `name`. Sätt det bara när det fullständiga
+  namnet är för långt för kartan — *Grillplatsen vid gårdsplanen* blir `Grillplats`,
+  *Parkeringen vid infarten* blir `Parkering` — och låt det vara begripligt intill
+  markörens symbol, som ändå säger vad platsen är (`02-§5.38`). Utelämnat visas hela
+  namnet. <!-- 04-§5.11 -->
 - `accessible` sätts medvetet för varje plats. Utelämnas fältet fälls valideringen — det
   är ingen uppgift att gissa. <!-- 04-§5.3 -->
 - En inaktiv plats behålls, så att en uppsatt QR-kod aldrig leder till en död

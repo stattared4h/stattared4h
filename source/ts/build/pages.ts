@@ -368,6 +368,7 @@ export function mapLocations(dataset: Dataset): MapLocation[] {
     .filter((location) => location.active && location.lat !== null && location.lon !== null)
     .map((location) => ({
       id: location.id,
+      shortName: location.shortName,
       label: location.label,
       name: location.name,
       kind: location.kind,

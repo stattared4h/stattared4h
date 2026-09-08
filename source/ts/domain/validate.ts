@@ -95,6 +95,7 @@ const ANIMAL_FIELDS = new Set([
 ]);
 const LOCATION_FIELDS = new Set([
   "name",
+  "shortName",
   "kind",
   "species",
   "note",
@@ -701,6 +702,7 @@ function validateLocation(
   fields.noHtml(data, null);
 
   const name = fields.requiredString(data, "name");
+  const shortName = fields.optionalString(data, "shortName");
   const kind = fields.requiredEnum(data, "kind", LOCATION_KINDS);
   const note = fields.optionalString(data, "note");
   const description = fields.optionalString(data, "description");
@@ -770,7 +772,7 @@ function validateLocation(
   ) {
     return null;
   }
-  return { id: record.id, name, kind, species, note, description, lat, lon, accessible, active, label, photos };
+  return { id: record.id, name, shortName, kind, species, note, description, lat, lon, accessible, active, label, photos };
 }
 
 // --- Warnings ------------------------------------------------------------------
