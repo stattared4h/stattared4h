@@ -33,7 +33,9 @@ art och karta, byggda ur det validerade datasetet. Bilderna är egna poster med 
 innehållet (ADR 0015), och 4H-loggan är förbundets egen, härledd ur vektorfilen i
 källregistret (ADR 0016). QA-datasetets 100 individer delar på 25 versionshanterade,
 permanent märkta AI-bilder (ADR 0017). Individuella djur kan dessutom ha ett publikt,
-sökbart märkningsnummer som valideras och visas för besökaren. Statusen nedan speglar det.
+sökbart märkningsnummer som valideras och visas för besökaren. Redaktörens bildverktyg gör
+foton webbanpassade i webbläsaren, på en adress utanför navigationen (ADR 0021, ADR 0022).
+Statusen nedan speglar det.
 
 ### Krav (`02-§`)
 
@@ -171,12 +173,17 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§10.31` | Egen appikon | `byggd` | `source/assets/img/favicon.svg` och storlekarna från `npm run icons` (`scripts/icons.mjs`); `tests/build/pwa.test.ts` kontrollerar filerna, måtten och länkarna i `<head>` |
 | `02-§10.37` | 4H-loggans färger | `byggd` | `tests/design/logo.test.ts` kräver att den gröna filen bara bär logotypgrönt och vitt och att den vita inte bär grönt. Frizonen spåras i `05-§6.38` |
 | `02-§10.32` | Inline-SVG-ikoner med `aria-hidden` | `byggd` | Sidhuvudets och dialogens ikoner; `tests/build/pwa.test.ts` kräver `aria-hidden` på varje `<svg>` i varje sida |
-| `02-§11.1`–`11.4` | Bildverktygets adress, `noindex` och tystnaden i `robots.txt` | `saknas` | Adressen står i `README.md` och `docs/01-BIDRA.md` |
-| `02-§11.5`–`11.6` | Verktyget utanför förcachen och utanför `assets/main.js` | `saknas` | |
-| `02-§11.7`–`11.12` | Beredningen i webbläsaren: format, mått, storlek, id och tystnad utåt | `saknas` | |
-| `02-§11.13`–`11.16` | Alt-text och fotograf, obligatoriska och tillgängliga | `saknas` | |
-| `02-§11.17`–`11.23` | Leveransen: arkiv, styckvis, YAML-formen och vägen till GitHub | `saknas` | |
-| `02-§11.24` | Gränsvärdena på ett enda ställe | `saknas` | |
+| `02-§11.1`–`11.3` | Bildverktygets adress, `noindex` och tystnaden i `robots.txt` | `byggd` | `source/pages/verktyg-bild.njk` med adressen ur `source/ts/build/tool-page.ts`; `tests/build/site.test.ts` kräver sidan på adressen, `noindex` bara där, att ingen annan sida länkar dit och att `robots.txt` inte pekar ut den |
+| `02-§11.4` | Adressen är bekvämlighet, inte skydd | `dokumenterad` | [ADR 0022](../adr/0022-verktygssidor-utanfor-navigationen.md); `README.md` säger det rakt ut |
+| `02-§11.5`–`11.6` | Verktyget utanför förcachen och utanför `assets/main.js` | `byggd` | `eleventyExcludeFromCollections` och en egen esbuild-bunt bredvid sidan; `tests/build/pwa.test.ts` kräver att inget i förcachen nämner adressen och `tests/build/site.test.ts` att ingen bunt under `assets/` bär koden |
+| `02-§11.7`, `11.11`–`11.12` | Flera bilder i samma vända, id ur den färdiga filen, ingenting lämnar webbläsaren | `manuell` | Öppna verktyget, välj två foton på en gång och bekräfta: två kort visas, id:t under varje bild börjar med `img-`, och nätverksfliken visar inga anrop till någon annan värd. Välj sedan samma foto igen — statusraden ska säga att bilden redan är tillagd, och antalet kort ska vara oförändrat |
+| `02-§11.8`–`11.10` | Skalning, kvalitetstrappa och en färdig fil utan metadata | `byggd` | `fitWithin` och `encodeUnderLimit` i `source/ts/domain/image-prepare.ts` (`tests/domain/image-prepare.test.ts`) och `stripWebpMetadata` i `source/ts/domain/webp.ts` (`tests/domain/webp.test.ts`). Att `canvas` inte släpper igenom EXIF, och att ett porträttfoto blir stående, är webbläsarens beteende och ingår i kontrollpunkten för `02-§11.23` |
+| `02-§11.13`, `11.16` | Bilden bredvid fälten; tangentbord och skärmläsare | `manuell` | Öppna verktyget med två bilder, tabba genom sidan och bekräfta att varje alt-fält, fotograffält och knapp nås i tur och ordning, att varje fält har en synlig etikett, och att felrutan är kopplad till fälten med `aria-describedby` och har `role="alert"` |
+| `02-§11.14`–`11.15` | Alt och fotograf obligatoriska; `AI-genererad` avvisas | `byggd` | `imagePostProblems` i `source/ts/domain/image-post.ts`; `tests/domain/image-post.test.ts` prövar tomma fält, HTML och AI-krediten |
+| `02-§11.17`, `11.19`, `11.23` | Två leveranssätt, och att filerna passerar valideringen | `manuell` | Bered två foton i verktyget, fyll i fälten, ladda ner arkivet och packa upp det: mappen `source` ska innehålla `source/images/<id>.webp` och `source/data/images/<id>.yaml`. Kopiera dem till en tom datakatalog och kör `DATA_DIR=<katalog> node scripts/validate.mjs` — enda anmärkningen ska vara varningen att ingen post använder bilden. Ladda sedan ner en bild styckvis och bekräfta att de två knapparna ger samma två filer |
+| `02-§11.18`, `11.20`–`11.21` | Arkivet och bildpostens form | `byggd` | `createZip` i `source/ts/domain/zip.ts`, läst tillbaka av en egen läsare i `tests/domain/zip.test.ts`, och `formatImagePost` i `source/ts/domain/image-post.ts`, som också är den `npm run image` skriver med |
+| `02-§11.22` | Vägen vidare till GitHubs uppladdningsvy | `byggd` | Stegen på sidan; `tests/build/site.test.ts` kräver båda länkarna till uppladdningsvyn |
+| `02-§11.24` | Gränsvärdena på ett enda ställe | `byggd` | `source/ts/domain/image-limits.ts`; `tests/domain/image-limits.test.ts` fäller om bygget och domänskiktet skiljer sig åt, eller om någon annan fil deklarerar ett eget gränsvärde |
 
 ### Designspecifikation (`05-§`)
 
@@ -287,8 +294,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§10.1`, `10.4`–`10.5` | Sidhuvud, sidfot, version | `dokumenterad` | Mekanismen bakom `02-§10` |
 | `03-§10.6` | Tillbaka är en länk som klientkoden uppgraderar | `byggd` | `source/ts/ui/back.ts`; villkoret `returnsToSitePage` testas i `tests/ui/back.test.ts`, och att markupen är en `<a>` med href till startsidan i `tests/build/site.test.ts` |
 | `03-§10.2`–`10.3` | Beteendemoduler under `source/ts/ui/`; feedback-adressen | `byggd` | `source/ts/ui/main.ts` registrerar modulerna, som var och en gör ingenting utan sitt element; `tests/build/pwa.test.ts` bevakar markupen de hakar i och `tests/domain/feedback.test.ts` adressen |
-| `03-§11.1`–`11.2` | Adressen som en sanning i bygget; undantagen från förcachen och indexeringen | `saknas` | |
-| `03-§11.3`–`11.5` | Lagerdelningen: domänlogik i Node, canvas i `ui/`, id via `crypto.subtle` | `saknas` | |
+| `03-§11.1`–`11.2` | Adressen som en sanning i bygget; undantagen från förcachen och indexeringen | `byggd` | `IMAGE_TOOL_PATH` i `source/ts/build/tool-page.ts` läses av `eleventy.config.js`, mallen och byggtesterna; `tests/build/site.test.ts` och `tests/build/pwa.test.ts` |
+| `03-§11.3`–`11.5` | Lagerdelningen: domänlogik i Node, canvas i `ui/`, id via `crypto.subtle` | `byggd` | `source/ts/domain/image-prepare.ts`, `zip.ts`, `image-post.ts` och `image-limits.ts` testas i Node; `source/ts/ui/image-tool/` håller sig till canvas och DOM. `imageIdFor` är samma funktion i bygget, kommandona och webbläsaren (`tests/domain/image-id.test.ts`) |
 
 ### Källregister (`09-§`)
 
@@ -316,11 +323,11 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 9 |
-| `dokumenterad` | 18 |
+| `saknas` | 1 |
+| `dokumenterad` | 19 |
 | `påbörjad` | 17 |
-| `byggd` | 137 |
-| `manuell` | 50 |
+| `byggd` | 146 |
+| `manuell` | 53 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i
 `CLAUDE.md`. Dokumentkontrollen i `02-§9.10` fäller när den inte stämmer. <!-- 99-§1.2 -->
