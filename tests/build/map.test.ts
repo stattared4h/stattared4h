@@ -539,7 +539,7 @@ describe("a marker in the outer margin labels straight to the side (02-§5.54)",
     assert.equal(sideOf(500, 300), "above-left", "mitt på ritningen prövas de sneda lägena först");
   });
 
-  test("the margin is a fraction of the drawing, so it holds at any size", () => {
+  test("the margin is half a marker, so it holds at any drawing size", () => {
     const small = placeLabels([{ id: "x", name: "A", x: 8, y: 120 }], 400, 300);
     assert.equal(small.get("x"), "right");
   });

@@ -258,6 +258,30 @@ const LABEL_SIDES: readonly LabelSide[] = [
   "left",
 ];
 
+/**
+ * The order to try for a marker standing at `x` in a drawing `width` px wide, both in the
+ * reference pixels the placement is worked out in (02-§5.54).
+ *
+ * A marker whose own pin reaches the drawing's left or right edge is *in the margin*, and
+ * there the straight side pointing inwards comes first. The reason is what the visitor
+ * sees: a straight label sits level with the pin, so the name plainly belongs to it, while
+ * a slanted one meets the pin corner to corner. Corner to corner is fine out in the
+ * pasture, where the markers are spread out — but the places that lie outside the drawing
+ * are parked along these very edges (04-§5.9), one under the other, and there a corner
+ * points at two pins as readily as one.
+ *
+ * Half a tap target is the threshold rather than a chosen fraction: it is exactly when the
+ * marker stops being a dot in the drawing and becomes a dot on its edge. It also scales
+ * with the layout, so the same markers count as edge markers at 312 px and at 552 px.
+ * Anywhere else nothing changes — there the pasture's bands decide (02-§5.53).
+ */
+function sidesFor(x: number, width: number): readonly LabelSide[] {
+  const half = LABEL_METRICS.tapTarget / 2;
+  const inwards: LabelSide | null = x < half ? "right" : x > width - half ? "left" : null;
+  if (inwards === null) return LABEL_SIDES;
+  return [inwards, ...LABEL_SIDES.filter((side) => side !== inwards)];
+}
+
 /** A marker to place a label for, positioned in drawing units. */
 export interface LabelMarker {
   id: string;
@@ -376,7 +400,7 @@ export function placeLabels(
   const taken: Box[] = [];
   const sides = new Map<string, LabelSide>();
   for (const point of order) {
-    const free = LABEL_SIDES.find((side) => {
+    const free = sidesFor(point.x, referenceWidth).find((side) => {
       const box = labelBox(point.x, point.y, point.width, height, side);
       return (
         contains(edge, box) &&
