@@ -12,6 +12,7 @@ import path from "node:path";
 import { after, before, describe, test } from "node:test";
 import { ISSUE_LABEL, ISSUE_TEMPLATE } from "../../source/ts/domain/feedback.ts";
 import { buildSite, listFiles, ROOT } from "./build-site.ts";
+import { IMAGE_TOOL_PATH } from "../../source/ts/build/tool-page.ts";
 
 const PREFIX = "/prov/qa/";
 const VERSION = "1.2.3 – QA PR9";
@@ -126,9 +127,13 @@ describe("service workern (02-§7.3–7.9, 02-§10.26, 03-§5)", () => {
   test("förcachen har varje sida, CSS, JS, manifestet, ikonerna och offline-sidan (02-§7.4)", async () => {
     const precache = precacheOf(await read(qa, "sw.js"));
     const files = await listFiles(qa);
+    // Verktygssidan är redaktörens, inte besökarens, och står utanför förcachen
+    // (02-§11.5). Att den faktiskt står utanför prövas i testet under det här.
+    const toolDir = IMAGE_TOOL_PATH.slice(1, -1).split("/").join(path.sep);
+    const visitorFiles = files.filter((file) => !file.startsWith(`${toolDir}${path.sep}`));
     const expected = [
-      ...files.filter((file) => file.endsWith(".html")).map((file) => (file === "404.html" ? file : path.dirname(file) === "." ? "" : `${path.dirname(file)}/`)),
-      ...files.filter((file) => file.startsWith("assets/")),
+      ...visitorFiles.filter((file) => file.endsWith(".html")).map((file) => (file === "404.html" ? file : path.dirname(file) === "." ? "" : `${path.dirname(file)}/`)),
+      ...visitorFiles.filter((file) => file.startsWith("assets/")),
       "manifest.webmanifest",
     ].map((relative) => `${PREFIX}${relative}`);
     const missing = expected.filter((url) => !precache.includes(url));
@@ -138,6 +143,15 @@ describe("service workern (02-§7.3–7.9, 02-§10.26, 03-§5)", () => {
     assert.ok(precache.includes(`${PREFIX}assets/main.js`), "buntad JS");
     for (const icon of ICON_FILES) assert.ok(precache.includes(`${PREFIX}assets/img/${icon}`), icon);
     assert.ok(precache.length > 5, "förcachen är misstänkt kort");
+  });
+
+  test("bildverktyget ligger inte i förcachen (02-§11.5)", async () => {
+    const precache = precacheOf(await read(qa, "sw.js"));
+    const inside = precache.filter((url) => url.includes(IMAGE_TOOL_PATH));
+    assert.deepEqual(inside, [], "verktygssidan hör inte hemma i besökarens förcache");
+    const files = await listFiles(qa);
+    const toolDir = IMAGE_TOOL_PATH.slice(1, -1).split("/").join(path.sep);
+    assert.ok(files.some((file) => file.startsWith(`${toolDir}${path.sep}`)), "verktyget byggdes inte alls — prövar testet något?");
   });
 
   test("varje post i förcachen finns i utdatan och ligger under bas-sökvägen", async () => {

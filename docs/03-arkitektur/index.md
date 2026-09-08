@@ -364,9 +364,9 @@ eftersom en felaktig version är sämre än ingen (`02-§10.25`). Logiken bor i
 ## 11. Bildverktyget
 
 Verktygssidan (`02-§11`) är en vanlig Eleventy-sida med en egen klientbunt. Den bor på
-`/verktyg/bild-3ed93205946a/`, och adressen är skriven på ett enda ställe i
-`eleventy.config.js` — som global data `tool.imagePath`. Därifrån hämtar både sidans
-`permalink` och esbuilds utfil sin sökväg, så adressen kan inte ligga i otakt med sig
+`/verktyg/bild-3ed93205946a/`, och adressen är skriven på ett enda ställe:
+`IMAGE_TOOL_PATH` i `source/ts/build/tool-page.ts`. Därifrån hämtar sidans `permalink`,
+esbuilds utfil och byggtesterna sin sökväg, så adressen kan inte ligga i otakt med sig
 själv. <!-- 03-§11.1 -->
 
 Sidan sätter `eleventyExcludeFromCollections: true`, och det är det som håller den ur
