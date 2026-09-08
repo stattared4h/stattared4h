@@ -206,18 +206,15 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   hörn mot hörn, finns inte. Ordningen är fast, så placeringen är deterministisk. Hörnet där
   zoomknapparna ligger (`02-§5.41`) räknas som upptaget, så ingen etikett hamnar bakom en
   knapp. <!-- 02-§5.53 -->
-- **Ingen etikett hamnar utanför ritningens kant, och ingen lägger sig över en annan** —
-  utom för en markör i ritningens ytterkant, där den som blir över hellre skaver än döljs.
-  Undantaget följer av var platserna står. De som ligger utanför ritningen är parkerade
-  längs kanterna (`04-§5.9`), en under den andra, och där är alternativet till att skava
-  att namnet aldrig syns. Inne på ritningen gäller det motsatta: gårdsplanens platser
-  ligger inom några tiotal meter, och en etikett ovanpå en annan där gör båda oläsbara utan
-  att någon vinner — de som blir över döljs som förut (`02-§5.33`). Att täcka en annan
-  markörs prick väger tyngre än att täcka en etikett, också i ytterkanten, eftersom pricken
-  är det besökaren trycker på. Zoomknapparnas hörn (`02-§5.41`) är förbjudet överallt.
-  En etikett som skaver hör ändå ihop med sin egen prick, eftersom strecket i `02-§5.56`
-  visar vilken. En markör räknas till ytterkanten när dess egen prick når ritningens kant,
-  alltså inom en halv markör från den. <!-- 02-§5.54 -->
+- **Ingen etikett hamnar utanför ritningens kant, och ingen döljs för att det är trångt.**
+  Kanten är det som aldrig böjs: en etikett som sticker ut klipps av kartan och blir
+  obegriplig, och zoomknapparnas hörn (`02-§5.41`) är förbjudet av samma skäl. Finns inget
+  helt ledigt läge innanför kanten väljs i stället det som skaver minst mot det som redan
+  står där. Ett namn som delvis ligger över ett annat är fortfarande ett namn; ett namn som
+  inte visas alls finns bara i listan under kartan, och den som står i hagen med telefonen
+  läser inte listan. Att skava mot en annan etikett väger lättare än att täcka en annan
+  markörs prick, eftersom pricken är det besökaren trycker på. Först när inget av de fyra
+  lägena ryms innanför kanten visas etiketten inte (`02-§5.33`). <!-- 02-§5.54 -->
 - **Under 600 px visar överblicken inga namn alls.** Kartan är då 312 px bred, och
   gårdens trettiofyra platser får inte plats med namn bredvid varandra hur de än placeras;
   `02-§5.54` skulle lägga dem i en vägg av text över ritningen. Markörerna med sina
@@ -225,36 +222,26 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   kartan (`02-§5.24`), och de kommer fram så snart besökaren zoomar (`02-§5.44`) eller
   pekar på en markör. Från 600 px finns utrymmet, och då gäller `02-§5.54` som skrivet:
   namnen syns direkt. <!-- 02-§5.55 -->
-- Varje synlig etikett är förbunden med sin markör med ett tunt streck från etikettens
-  närmaste kant in mot prickens mitt. Utan strecket är kopplingen en gissning: etiketten
-  hänger några pixlar från pricken, ett snett läge sätter dessutom hörn mot hörn, och på en
-  karta med trettiofyra platser ligger det ofta en annan prick lika nära. Det gäller också
-  inzoomad, där varje namn visas (`02-§5.44`) och grannarna därmed är fler. Strecket ritas i
-  sidan, hämtar inget utifrån (`02-§5.26`), följer etiketten till vart och ett av de åtta
-  lägena i `02-§5.53`, och är dekoration som inte läses upp för
-  skärmläsaren. <!-- 02-§5.56 -->
 - **Den inzoomade kartan har en egen etikettplacering.** Bygget räknar ut tre placeringar:
   en för den smala kartan, en för den breda, och en för den skala där alla namn tänds
   (`02-§5.44`). Utan den tredje har en etikett som överblicken tvingats dölja inget eget
   läge, och alla sådana faller tillbaka på samma plats rakt under sin markör — så just de
   namn zoomen finns till för att visa hamnar i en hög. Referensen är den smalaste kartan
   vid den skalan; ryms namnen där ryms de vid varje bredare fönster, och att zooma vidare
-  ger bara mer plats. I den här omgången får en etikett skava var som helst, inte bara i
-  ytterkanten som `02-§5.54` kräver: kartan är då fyra gånger rutan, så ett skav är några
-  pixlar mellan två namn som står långt isär — inte den hög det vore i överblick.
-  Tröskelskalan är samma tal i bygget som i klientkoden, hämtat ur en källa, så de inte kan
+  ger bara mer plats. Tröskelskalan är samma tal i bygget som i klientkoden, hämtat ur en källa, så de inte kan
   glida isär. <!-- 02-§5.57 -->
 - **Det en etikett måste hålla sig undan är den ritade pricken, inte tryckytan runt den.**
   Markören är 44 × 44 px för att gå att träffa med ett finger (`05-§4.15`), men själva
   pricken är 24 px; resten är osynlig luft. Räknades hela tryckytan som upptagen sköts
   etiketter undan från lägen där ingenting syntes — och de fem platserna längs kanten
   förlorade sitt raka läge till en granne de aldrig hade rört. Med prickens mått som gräns
-  får de sitt raka läge, och ingen etikett hamnar någonsin ovanpå en synlig prick. En
-  etikett kan då nudda ytterkanten av en grannes tryckyta; på gårdens data rör det 1 till
-  12 procent av den, alltid i den osynliga marginalen. Det kostar ingenting, eftersom
-  **etiketten inte tar emot tryck**: markören under svarar på varje tryck i sin tryckyta,
-  också där ett namn ligger över. Namnet är kvar som markörens tillgängliga namn och som
-  länk i listan under kartan (`02-§5.24`). <!-- 02-§5.58 -->
+  får de sitt raka läge, och ingen etikett hamnar någonsin ovanpå en synlig prick. Etiketten
+  ligger **kloss an mot pricken** — dess kant vid prickens kant — eftersom luft mellan dem
+  är luft ögat måste överbrygga, och ett namn som vilar mot sin prick hör synligt ihop med
+  den. En etikett kan då nudda ytterkanten av en grannes tryckyta, men det kostar
+  ingenting: **etiketten tar inte emot tryck**, så markören under svarar på varje tryck i
+  sin tryckyta, också där ett namn ligger över. Namnet är kvar som markörens tillgängliga
+  namn och som länk i listan under kartan (`02-§5.24`). <!-- 02-§5.58 -->
 - **En markör i ritningens ytterkant får sitt namn rakt åt sidan**, inte snett: står
   markören i vänsterkanten hamnar namnet rakt till höger, i högerkanten rakt till vänster.
   Ett rakt läge ligger mitt för pricken och pekar ut den entydigt; ett snett sätter

@@ -2,6 +2,7 @@ name: A
 kind: djurplats
 species: []
 description: Hagen står tom just nu och vilar inför nästa betessäsong.
+label: over
 lat: 57.338131
 lon: 12.338765
 accessible: true

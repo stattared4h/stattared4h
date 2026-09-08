@@ -279,10 +279,9 @@
 /* The drawing scales with the page; the markers are positioned over it in percent
    and keep their size, so a marker is always at least the tap target (02-§5.27). */
 .map {
-  /* The label's near edge sits this far from the place: the drawn dot's radius plus a
-     little air. The line in 02-§5.56 spans that air, so the two are defined together. */
-  --map-label-offset: calc(var(--space-md) / 2 + var(--space-xs) / 2);
-  --map-label-gap: calc(var(--space-xs) / 2);
+  /* The label's near edge sits exactly the drawn dot's radius from the place, so the two
+     touch. Air between them is air the eye has to bridge (02-§5.58). */
+  --map-label-offset: calc(var(--space-md) / 2);
 
   position: relative;
   overflow: hidden;
@@ -354,25 +353,8 @@
   transform: translateX(-50%);
 }
 
-.map__label::before {
-  content: "";
-  position: absolute;
-  inset: auto auto 100% 50%;
-  width: var(--border-width);
-  height: var(--map-label-gap);
-  background: var(--color-green-deep);
-  transform: translateX(-50%);
-}
-
 .map__marker--label-above .map__label {
   inset: auto auto calc(50% + var(--map-label-offset)) 50%;
-  transform: translateX(-50%);
-}
-
-.map__marker--label-above .map__label::before {
-  inset: 100% auto auto 50%;
-  width: var(--border-width);
-  height: var(--map-label-gap);
   transform: translateX(-50%);
 }
 
@@ -381,22 +363,8 @@
   transform: translateY(-50%);
 }
 
-.map__marker--label-right .map__label::before {
-  inset: 50% 100% auto auto;
-  width: var(--map-label-gap);
-  height: var(--border-width);
-  transform: translateY(-50%);
-}
-
 .map__marker--label-left .map__label {
   inset: 50% calc(50% + var(--map-label-offset)) auto auto;
-  transform: translateY(-50%);
-}
-
-.map__marker--label-left .map__label::before {
-  inset: 50% auto auto 100%;
-  width: var(--map-label-gap);
-  height: var(--border-width);
   transform: translateY(-50%);
 }
 
@@ -474,22 +442,8 @@
     transform: translateX(-50%);
   }
 
-  .map__marker .map__label::before {
-    inset: auto auto 100% 50%;
-    width: var(--border-width);
-    height: var(--map-label-gap);
-    transform: translateX(-50%);
-  }
-
   .map__marker--wide-above .map__label {
     inset: auto auto calc(50% + var(--map-label-offset)) 50%;
-    transform: translateX(-50%);
-  }
-
-  .map__marker--wide-above .map__label::before {
-    inset: 100% auto auto 50%;
-    width: var(--border-width);
-    height: var(--map-label-gap);
     transform: translateX(-50%);
   }
 
@@ -498,22 +452,8 @@
     transform: translateY(-50%);
   }
 
-  .map__marker--wide-right .map__label::before {
-    inset: 50% 100% auto auto;
-    width: var(--map-label-gap);
-    height: var(--border-width);
-    transform: translateY(-50%);
-  }
-
   .map__marker--wide-left .map__label {
     inset: 50% calc(50% + var(--map-label-offset)) auto auto;
-    transform: translateY(-50%);
-  }
-
-  .map__marker--wide-left .map__label::before {
-    inset: 50% auto auto 100%;
-    width: var(--map-label-gap);
-    height: var(--border-width);
     transform: translateY(-50%);
   }
 
@@ -622,23 +562,8 @@
   transform: translateX(-50%);
 }
 
-.map--names .map__marker .map__label::before,
-.map--names .map__marker--zoom-below .map__label::before {
-  inset: auto auto 100% 50%;
-  width: var(--border-width);
-  height: var(--map-label-gap);
-  transform: translateX(-50%);
-}
-
 .map--names .map__marker--zoom-above .map__label {
   inset: auto auto calc(50% + var(--map-label-offset)) 50%;
-  transform: translateX(-50%);
-}
-
-.map--names .map__marker--zoom-above .map__label::before {
-  inset: 100% auto auto 50%;
-  width: var(--border-width);
-  height: var(--map-label-gap);
   transform: translateX(-50%);
 }
 
@@ -647,21 +572,8 @@
   transform: translateY(-50%);
 }
 
-.map--names .map__marker--zoom-right .map__label::before {
-  inset: 50% 100% auto auto;
-  width: var(--map-label-gap);
-  height: var(--border-width);
-  transform: translateY(-50%);
-}
-
 .map--names .map__marker--zoom-left .map__label {
   inset: 50% calc(50% + var(--map-label-offset)) auto auto;
   transform: translateY(-50%);
 }
 
-.map--names .map__marker--zoom-left .map__label::before {
-  inset: 50% auto auto 100%;
-  width: var(--map-label-gap);
-  height: var(--border-width);
-  transform: translateY(-50%);
-}

@@ -4,6 +4,7 @@ species:
   - kanin
 note: Gå in tyst, kaninerna blir lätt skrämda.
 description: Liten hage bakom stallet där kaninerna får springa.
+label: over
 lat: 57.338457
 lon: 12.339422
 accessible: true

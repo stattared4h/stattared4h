@@ -1,6 +1,7 @@
 name: B
 kind: djurplats
 species: []
+label: over
 # Läget är utpekat av gården på ritningen, inte uppmätt på marken.
 lat: 57.338457
 lon: 12.339422

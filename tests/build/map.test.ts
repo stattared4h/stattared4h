@@ -451,27 +451,18 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     assert.deepEqual([...forwards].sort(), [...backwards].sort());
   });
 
-  test("when every position is taken the extra labels are hidden, not stacked", () => {
-    // Ten places on the exact same spot, in the middle of the drawing. The four square
-    // positions are all free on a lone spot, so four names fit and six are hidden rather
-    // than stacked (02-§5.54): here, away from the edge, a label over a label makes both
-    // unreadable and wins nothing, and the place is still in the list under the map
-    // (02-§5.24).
-    const markers = Array.from({ length: 10 }, (_, i) => ({
-      id: `p${i}`,
-      name: "Hagen",
-      x: 400,
-      y: 300,
-    }));
+  test("when every position is taken the extra labels graze, they are not dropped", () => {
+    // Ten places on the exact same spot. The four square positions are free on a lone
+    // spot, so four names stand clear; the other six take the position that grazes least
+    // rather than vanish (02-§5.54). A name partly over another is still a name.
+    const markers = Array.from({ length: 10 }, (_, i) => ({ id: `p${i}`, name: "Hagen", x: 400, y: 300 }));
     const sides = placeLabels(markers, 800, 600);
     assert.equal(sides.size, 10);
     assert.equal(sides.get("p0"), "below");
-    assert.equal(
-      [...sides.values()].filter((side) => side !== "hidden").length,
-      4,
-      "four labels fit on one spot",
+    assert.ok(
+      [...sides.values()].every((side) => side !== "hidden"),
+      `ingen döljs för att lägena tagit slut, fick ${[...sides.values()].join(", ")}`,
     );
-    assert.equal([...sides.values()].filter((side) => side === "hidden").length, 6);
   });
 
   test("a label that fits nowhere is hidden, and leaves room for the next one", () => {
@@ -559,51 +550,26 @@ describe("the map never shows which animals are where (02-§5.32)", () => {
   });
 });
 
-describe("only an edge marker grazes; the middle still hides (02-§5.54)", () => {
-  /** Nine markers on one spot in the middle of the drawing. */
-  const middle = Array.from({ length: 9 }, (_, i) => ({
-    id: `p${i}`,
-    name: `Plats ${i}`,
-    x: 500,
-    y: 390,
-  }));
+describe("a crowded label grazes rather than disappears (02-§5.54)", () => {
+  const middle = Array.from({ length: 9 }, (_, i) => ({ id: `p${i}`, name: `Plats ${i}`, x: 500, y: 390 }));
 
-  test("in the middle the labels that do not fit are hidden, never stacked", () => {
+  test("in the middle too, the names that do not fit graze instead of vanishing", () => {
     const sides = placeLabels(middle, 1000, 782);
     assert.ok(
-      [...sides.values()].some((side) => side === "hidden"),
-      "gårdsplanens klunga döljer de etiketter som blir över",
-    );
-    // Every placed label keeps clear of every other placed label.
-    const placed = middle.filter((m) => sides.get(m.id) !== "hidden");
-    assert.ok(placed.length > 0 && placed.length < middle.length);
-  });
-
-  test("at the drawing's edge the overflow grazes instead of disappearing", () => {
-    // Markers stacked in the outer margin, where the off-map places are parked.
-    const edge = Array.from({ length: 4 }, (_, i) => ({
-      id: `k${i}`,
-      name: `Kant ${i}`,
-      x: 6,
-      y: 200 + i * 4,
-    }));
-    const sides = placeLabels(edge, 1000, 782);
-    assert.ok(
       [...sides.values()].every((side) => side !== "hidden"),
-      `en kantmarkörs namn ska aldrig försvinna, fick ${[...sides.values()].join(", ")}`,
+      `gårdsplanens klunga behåller sina namn, fick ${[...sides.values()].join(", ")}`,
     );
   });
 
-  test("the top edge counts too, not only the sides", () => {
-    const top = Array.from({ length: 4 }, (_, i) => ({ id: `t${i}`, name: `Topp ${i}`, x: 500 + i * 4, y: 6 }));
-    const sides = placeLabels(top, 1000, 782);
-    assert.ok([...sides.values()].every((side) => side !== "hidden"));
+  test("at the drawing's edge the same holds", () => {
+    const edge = Array.from({ length: 4 }, (_, i) => ({ id: `k${i}`, name: `Kant ${i}`, x: 6, y: 200 + i * 4 }));
+    assert.ok([...placeLabels(edge, 1000, 782).values()].every((side) => side !== "hidden"));
   });
 
-  test("a label that fits nowhere inside the drawing is hidden even at the edge", () => {
+  test("a label that fits nowhere inside the drawing is hidden even so", () => {
+    // The drawing's edge is the one rule that never bends (02-§5.54).
     const long = "Parkeringen vid toaletterna och vandrarhemmet";
-    const sides = placeLabels([{ id: "x", name: long, x: 20, y: 20 }], 40, 40);
-    assert.equal(sides.get("x"), "hidden");
+    assert.equal(placeLabels([{ id: "x", name: long, x: 20, y: 20 }], 40, 40).get("x"), "hidden");
   });
 
   test("the placement stays deterministic when positions run out (02-§5.33)", () => {
@@ -620,23 +586,13 @@ describe("the zoomed map gets its own placement (02-§5.57)", () => {
     assert.equal(LABEL_METRICS.referenceWidth * NAMES_AT_SCALE, 1248);
   });
 
-  test("grazing anywhere places every name, unlike the overview's rule", () => {
-    const crowd = Array.from({ length: 9 }, (_, i) => ({
-      id: `p${i}`,
-      name: `Plats ${i}`,
-      x: 500,
-      y: 390,
-    }));
+  test("the zoom pass leaves more names in their first-choice position", () => {
+    const crowd = Array.from({ length: 9 }, (_, i) => ({ id: `p${i}`, name: `Plats ${i}`, x: 500, y: 390 }));
     const overview = placeLabels(crowd, 1000, 782);
-    const zoomed = placeLabels(crowd, 1000, 782, LABEL_METRICS.referenceWidth * NAMES_AT_SCALE, true);
-    assert.ok(
-      [...overview.values()].some((side) => side === "hidden"),
-      "överblicken döljer, som 02-§5.54 kräver",
-    );
-    assert.ok(
-      [...zoomed.values()].every((side) => side !== "hidden"),
-      `den inzoomade omgången placerar alla, fick ${[...zoomed.values()].join(", ")}`,
-    );
+    const zoomed = placeLabels(crowd, 1000, 782, LABEL_METRICS.referenceWidth * NAMES_AT_SCALE);
+    const clear = (sides: Map<string, string>) => crowd.filter((m) => sides.get(m.id) === "below").length;
+    assert.ok(clear(zoomed) >= clear(overview), "fyra gånger så bred karta ger minst lika många förstahandslägen");
+    assert.ok([...zoomed.values()].every((side) => side !== "hidden"));
   });
 
   test("every marker carries a zoom position, so none falls back to the same spot", () => {

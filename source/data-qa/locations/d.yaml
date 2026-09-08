@@ -2,6 +2,7 @@ name: D
 kind: djurplats
 species: []
 description: Används inte längre för djur. QR-koden sitter kvar på grinden.
+label: over
 lat: null
 lon: null
 accessible: false
