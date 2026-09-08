@@ -58,10 +58,9 @@
   position: relative;
   z-index: 2;
   display: grid;
-  /* menu, "Tillbaka", the free middle that centres "to top", install, feedback.
-     "Tillbaka" keeps its column on the start page too, where it is empty (02-§10.40):
-     an equally wide column on both sides is what puts "to top" in the true middle,
-     and every icon button is exactly this wide (05-§6.33). */
+  /* "Tillbaka" keeps its column on the start page too, where it is empty (02-§10.40):
+     an equally wide column on both sides is what puts "to top" in the true middle.
+     Every icon button is exactly this wide (05-§6.33). */
   grid-template-columns: auto var(--tap-target-min) 1fr auto auto;
   align-items: center;
   column-gap: var(--space-xs);
