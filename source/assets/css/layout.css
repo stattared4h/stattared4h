@@ -353,30 +353,17 @@
   transform: translateX(-50%);
 }
 
-.map__marker--label-above .map__label {
-  inset: auto auto calc(50% + var(--map-label-offset)) 50%;
-  transform: translateX(-50%);
-}
-
-.map__marker--label-right .map__label {
-  inset: 50% auto auto calc(50% + var(--map-label-offset));
-  transform: translateY(-50%);
-}
-
-.map__marker--label-left .map__label {
-  inset: 50% calc(50% + var(--map-label-offset)) auto auto;
-  transform: translateY(-50%);
-}
-
 /* Under 600 px the overview shows no names at all (02-§5.55). The map is 312 px wide
    there, and thirty-four names cannot stand beside each other however they are placed —
    02-§5.54 would turn them into a wall of text over the drawing. The symbols still say
    what each place is (02-§5.38), the names are in the list under the map (02-§5.24), and
-   they come back on zoom (02-§5.44) or when a marker is touched. The wide layout from
-   600 px keeps its labels; the media query at the foot of this file does not undo this
-   rule, it simply never applies below the breakpoint. */
+   they come back once the map is zoomed far enough for all of them (02-§5.44), or when a
+   marker is touched. One or two presses is not far enough: the map is still too narrow,
+   and names lit there are a wall of text rather than a map. The wide layout from 600 px
+   keeps its labels; the media query at the foot of this file does not undo this rule, it
+   simply never applies below the breakpoint. */
 @media (max-width: 599.98px) {
-  .map:not(.map--zoomed, .map--names) .map__label {
+  .map:not(.map--names) .map__label {
     clip-path: inset(50%);
     width: 1px;
     height: 1px;
@@ -385,8 +372,8 @@
     white-space: nowrap;
   }
 
-  .map:not(.map--zoomed) .map__marker:hover .map__label,
-  .map:not(.map--zoomed) .map__marker:focus-visible .map__label {
+  .map:not(.map--names) .map__marker:hover .map__label,
+  .map:not(.map--names) .map__marker:focus-visible .map__label {
     clip-path: none;
     width: auto;
     height: auto;
@@ -394,32 +381,12 @@
   }
 }
 
-/* Nowhere left to put the label (02-§5.33). It is hidden from sight only: the name is
-   still the link's accessible name, it is still in the list under the map, and pointing
-   at or focusing the marker brings it back. */
-.map__marker--label-hidden .map__label {
-  clip-path: inset(50%);
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.map__marker--label-hidden:hover .map__label,
-.map__marker--label-hidden:focus-visible .map__label {
-  clip-path: none;
-  width: auto;
-  height: auto;
-  padding: 0 var(--space-xs);
-}
-
 /* Far enough in there is room for every name, including the ones the build had to hide
    when the markers crowded each other in the overview (02-§5.44, 02-§5.33). Merely being
-   zoomed is not enough: eight places within a few tens of metres still stack their labels
-   at 2x, and stacked names are worse than none. */
-.map--names .map__marker--label-hidden .map__label,
-.map--names .map__marker--wide-hidden .map__label {
+   zoomed is not enough: places within a few tens of metres of each other still stack their
+   labels at 2x, and stacked names are worse than none. */
+.map--names .map__marker--wide-hidden .map__label,
+.map--names .map__marker--desktop-hidden .map__label {
   width: auto;
   height: auto;
   padding: 0 var(--space-xs);
@@ -535,7 +502,6 @@
   padding: 0;
   list-style: none;
 }
-
 
 /* From 960 px the --desktop- modifier decides (02-§5.61). A placement worked out for the
    narrowest tablet in portrait would otherwise put the names on the wrong side of every

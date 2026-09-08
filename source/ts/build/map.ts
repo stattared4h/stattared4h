@@ -570,7 +570,9 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
     side: location.label === null ? null : SIDE_FOR_PLACEMENT[location.label],
     ...position,
   }));
-  const sides = placeLabels(points, frame.width, frame.height);
+  // No narrow placement: under 600 px no name is shown until the map is zoomed far enough
+  // for the zoomed placement to take over (02-§5.55), so one worked out for a 312 px map
+  // would never be seen.
   const wideSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.wideWidth);
   const desktopSides = placeLabels(points, frame.width, frame.height, LABEL_METRICS.desktopWidth);
   // A third placement for the zoomed map (02-§5.57). Zooming shows every name (02-§5.44),
@@ -587,16 +589,11 @@ export function renderMap(locations: readonly MapLocation[], options: MapOptions
 
   const markers: string[] = [];
   for (const { location, position } of drawn) {
-    const side = sides.get(location.id) ?? "below";
     const wide = wideSides.get(location.id) ?? "below";
     const desktop = desktopSides.get(location.id) ?? "below";
     const zoom = zoomSides.get(location.id) ?? "below";
-    // `below` is the stylesheet's base case and needs no modifier in the narrow layout.
-    // The wide class is always written: from 600 px the stylesheet starts from the
-    // default and follows it (05-§5.2).
     const className =
-      (side === "below" ? "map__marker" : `map__marker map__marker--label-${side}`) +
-      ` map__marker--wide-${wide}` +
+      `map__marker map__marker--wide-${wide}` +
       ` map__marker--desktop-${desktop}` +
       // Nothing to say when the zoomed placement has no room either: the marker then keeps
       // the default position, and the line to its pin still says which one it belongs to.

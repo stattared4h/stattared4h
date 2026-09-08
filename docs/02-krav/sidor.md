@@ -215,13 +215,14 @@ Kartan har ingen egen sida. Den är det första på startsidan (`02-§5.1`, `02-
   läser inte listan. Att skava mot en annan etikett väger lättare än att täcka en annan
   markörs prick, eftersom pricken är det besökaren trycker på. Först när inget av de fyra
   lägena ryms innanför kanten visas etiketten inte (`02-§5.33`). <!-- 02-§5.54 -->
-- **Under 600 px visar överblicken inga namn alls.** Kartan är då 312 px bred, och
-  gårdens trettiofyra platser får inte plats med namn bredvid varandra hur de än placeras;
-  `02-§5.54` skulle lägga dem i en vägg av text över ritningen. Markörerna med sina
-  symboler (`02-§5.38`) räcker för att se var platserna ligger, namnen står i listan under
-  kartan (`02-§5.24`), och de kommer fram så snart besökaren zoomar (`02-§5.44`) eller
-  pekar på en markör. Från 600 px finns utrymmet, och då gäller `02-§5.54` som skrivet:
-  namnen syns direkt. <!-- 02-§5.55 -->
+- **Under 600 px visas inga namn förrän kartan är inzoomad så långt att alla får plats**
+  (`02-§5.44`). Kartan är där 312 px bred, och gårdens trettiofyra platser får inte plats
+  med namn bredvid varandra hur de än placeras. Det gäller inte bara överblicken: vid ett
+  eller två zoomtryck är kartan fortfarande för trång, och namn som tänds då blir en vägg
+  av text i stället för en karta. Markörerna med sina symboler (`02-§5.38`) räcker för att
+  se var platserna ligger, namnen står i listan under kartan (`02-§5.24`), och ett enskilt
+  namn kommer fram om besökaren pekar på sin markör. Från 600 px finns utrymmet, och då
+  syns namnen direkt. <!-- 02-§5.55 -->
 - **Den inzoomade kartan har en egen etikettplacering.** Bygget räknar ut tre placeringar:
   en för den smala kartan, en för den breda, och en för den skala där alla namn tänds
   (`02-§5.44`). Utan den tredje har en etikett som överblicken tvingats dölja inget eget

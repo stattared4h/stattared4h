@@ -97,7 +97,7 @@ describe("renderMap (02-§5.23, 02-§5.27)", () => {
     const { html, warnings } = renderMap(PLACES, { base: "/prov/" });
     assert.deepEqual(warnings, []);
     assert.match(html, /^<div class="map" data-map><div class="map__canvas" data-map-canvas><svg class="map__drawing" viewBox="0 0 800 \d+" role="img" aria-label="Karta över Stättared med gårdens hagar"><title>Karta över Stättared med gårdens hagar<\/title>/);
-    const markers = [...html.matchAll(/<a class="map__marker(?: map__marker--label-[\w-]+)? map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+(?: map__marker--zoom-[\w-]+)?" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
+    const markers = [...html.matchAll(/<a class="map__marker map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+(?: map__marker--zoom-[\w-]+)?" href="([^"]+)" style="left: ([\d.]+)%; top: ([\d.]+)%" data-place="([^"]+)"[^>]*>.*?<span class="map__label">([^<]+)<\/span><\/a>/g)];
     assert.equal(markers.length, PLACES.length);
     assert.deepEqual(markers.map((m) => m[1]), ["/prov/plats/brackebur/", "/prov/plats/lygnslatt-1/", "/prov/plats/stora-grishagen/"]);
     assert.deepEqual(markers.map((m) => m[5]), ["Bräckebur", "Lygnslätt 1", "Stora grishagen"]);
@@ -490,7 +490,7 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     // The first takes the default position, which is written as no modifier at all; the
     // second has to move, so it carries one (02-§5.53).
     assert.match(html, /<a class="map__marker map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/ettan\//, "den första får standardläget, alltså ingen modifierare");
-    assert.match(html, /<a class="map__marker map__marker--label-[\w-]+ map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/tvaan\//);
+    assert.match(html, /<a class="map__marker map__marker--wide-[\w-]+ map__marker--desktop-[\w-]+ map__marker--zoom-[\w-]+" href="\/plats\/tvaan\//);
   });
 
   test("every position the build can choose has a rule in the stylesheet", async () => {
@@ -499,7 +499,6 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     // against each other here — for all three placements the build works out.
     const css = await readFile(path.join(ROOT, "source/assets/css/layout.css"), "utf8");
     for (const side of ["above", "right", "left", "hidden"]) {
-      assert.ok(css.includes(`.map__marker--label-${side} `), `.map__marker--label-${side} saknas i layout.css`);
       assert.ok(css.includes(`.map__marker--wide-${side} `), `.map__marker--wide-${side} saknas i layout.css`);
     }
     for (const side of ["below", "above", "right", "left"]) {
