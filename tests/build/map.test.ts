@@ -498,8 +498,10 @@ describe("label placement (02-§5.33, 02-§5.53, 03-§9.3)", () => {
     // position with no rule would silently fall back to below, so the two are checked
     // against each other here — for all three placements the build works out.
     const css = await readFile(path.join(ROOT, "source/assets/css/layout.css"), "utf8");
-    for (const side of ["above", "right", "left", "hidden"]) {
-      assert.ok(css.includes(`.map__marker--wide-${side} `), `.map__marker--wide-${side} saknas i layout.css`);
+    for (const set of ["wide", "desktop"]) {
+      for (const side of ["below", "above", "right", "left", "hidden"]) {
+        assert.ok(css.includes(`.map__marker--${set}-${side} `), `.map__marker--${set}-${side} saknas i layout.css`);
+      }
     }
     for (const side of ["below", "above", "right", "left"]) {
       assert.ok(css.includes(`.map__marker--zoom-${side} `), `.map__marker--zoom-${side} saknas i layout.css`);

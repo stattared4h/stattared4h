@@ -397,7 +397,8 @@
    label back to the default, so a narrow choice never leaks into the wide layout. */
 @media (min-width: 600px) {
   /* From 600 px it is the --wide- modifier that says where the name hangs (02-§5.33). */
-  .map__marker .map__label {
+  .map__marker .map__label,
+  .map__marker--wide-below .map__label {
     inset: calc(50% + var(--map-label-offset)) auto auto 50%;
     width: auto;
     height: auto;
@@ -504,7 +505,8 @@
    narrowest tablet in portrait would otherwise put the names on the wrong side of every
    wider screen; the farm's own choices in 04-§5.10 need the room a desktop has. */
 @media (min-width: 960px) {
-  .map__marker .map__label {
+  .map__marker .map__label,
+  .map__marker--desktop-below .map__label {
     inset: calc(50% + var(--map-label-offset)) auto auto 50%;
     transform: translateX(-50%);
   }

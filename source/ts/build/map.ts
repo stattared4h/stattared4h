@@ -227,10 +227,13 @@ export const LABEL_METRICS = {
   /** `--space-md`: the container's padding, which the map does not get to use. */
   containerPadding: 24,
   /**
-   * The map's own width, not the window's: the canvas is the viewport less the
-   * container's padding at each side. A 360 px phone — the narrowest width the design
-   * targets (05-§5.1) — leaves the map 312 px, and estimating against 360 would let a
-   * label hang over the edge.
+   * The map's own width on the narrowest phone the design targets (05-§5.1): the canvas
+   * is the viewport less the container's padding at each side, so 360 px leaves 312.
+   *
+   * No placement is worked out against it any more — under 600 px no name is shown until
+   * the map is zoomed (02-§5.55), and by then the zoomed placement has taken over. It is
+   * the basis for that one: the zoomed map is this width times the scale at which the
+   * names appear (02-§5.57).
    */
   referenceWidth: 360 - 2 * 24,
   /** The same at 600 px, where the wide placement takes over (05-§5.2). */

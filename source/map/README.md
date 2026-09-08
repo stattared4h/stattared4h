@@ -1,6 +1,6 @@
 # Ritad kartbakgrund
 
-Kartan på `/karta/` ritas ur platsernas koordinater i `source/data/locations/`. Utan
+Kartan på startsidan ritas ur platsernas koordinater i `source/data/locations/`. Utan
 något i den här katalogen visas markörerna på en tom ljusgrön platta. Lägger man två
 filer här ritas en egen bakgrund — byggnader, vägar, hagarnas former — under
 markörerna (`02-§5.30`, `03-§9.2`):
@@ -49,8 +49,10 @@ med platsens id och ber dig vidga kanterna.
 ## Byta ritningen
 
 Ersätt `background.svg` med den nya filen och uppdatera `background.yaml` om hörnen
-flyttat. Bygg om, öppna `/karta/` och kontrollera att markörerna sitter där hagarna är.
+flyttat. Bygg om, öppna `/` och kontrollera att markörerna sitter där hagarna är.
 Sitter de fel är det nästan alltid ett av de fyra talen i `background.yaml`.
 
-Ingen ritning ligger i repot ännu: ingen har ritat gården. Mekanismen finns och testas
-med en liten SVG i `tests/build/map.test.ts`.
+Gårdens ritning ligger i repot. Den är härledd ur OSM-uttaget i
+[källregistret](../../docs/09-kallor/index.md), som också säger vad i den som är gårdens
+egna markeringar och hur säkra de är. Mekanismen testas dessutom med en liten SVG i
+`tests/build/map.test.ts`.

@@ -254,25 +254,30 @@ utåt — bygget vägrar då. Konventionen i detalj står i `source/map/README.m
 Platsernas geometri bor ändå i YAML, aldrig i ritningen. <!-- 03-§9.2 -->
 
 Etiketterna placeras vid bygget så att de inte döljer varandra (`02-§5.33`). Bygget kan
-inte mäta text — det finns ingen webbläsare vid bygget — så det uppskattar etikettens
-ruta ur namnets längd och de mått som gäller i `tokens.css`: teckenstorlek, innerkant och
-träffytans minsta mått. Rutorna räknas i pixlar för kartans egen bredd i den trängsta vyn — 312 px, alltså en
-360 px telefon minus behållarens innerkant på var sida — och prövas mot varandra i en
-bestämd ordning: platserna tas norrifrån och söderut,
-och varje etikett får det första lediga av åtta lägen (`02-§5.51`). De fyra sneda prövas
-före de fyra raka, och bland de sneda går de två som följer betesmarkens band
-(nordväst–sydost) före de två som korsar det: snett upp vänster, snett ned höger, snett
-upp höger, snett ned vänster, och därefter under, över, höger, vänster. Ett läge som skulle skjuta
-etiketten utanför ritningen räknas också som upptaget, så en plats vid kanten vänder
-etiketten inåt. Räcker inget av de åtta döljs etiketten visuellt
-i stället för att staplas oläslig ovanpå en annan; namnet finns kvar för skärmläsaren och
-kommer fram vid fokus. Konstanterna för teckenbredd och radhöjd är uppmätta i Chromium
-och satta strax över det värsta uppmätta fallet: att gissa för brett flyttar en etikett i
-onödan, att gissa för smalt lägger två ovanpå varandra, och bara det senare syns för
-besökaren. Sidan
-skrivs som en modifierare på markören, och CSS lägger etiketten där. Uppskattningen är
-just en uppskattning: den skiljer bra fall från dåliga, den garanterar inga
-pixlar. <!-- 03-§9.3 -->
+inte mäta text — det finns ingen webbläsare vid bygget — så det uppskattar etikettens ruta
+ur namnets längd och måtten i `tokens.css`: teckenstorlek, innerkant och den ritade
+prickens storlek. Konstanterna för teckenbredd och radhöjd är uppmätta i Chromium och satta
+strax över det värsta uppmätta fallet: att gissa för brett flyttar en etikett i onödan, att
+gissa för smalt lägger två ovanpå varandra, och bara det senare syns för besökaren.
+Uppskattningen är just en uppskattning: den skiljer bra fall från dåliga, den garanterar
+inga pixlar.
+
+Rutorna räknas i pixlar, och **en gång per bredd kartan faktiskt visas i** (`02-§5.61`):
+552 px för surfplattan, 912 för desktopen och 1248 för den inzoomade kartan. En placering
+räknad för den smalaste skärmen skulle annars styra alla bredare. Under 600 px räknas ingen
+placering alls, eftersom inget namn visas där förrän kartan är inzoomad så långt att den
+inzoomade placeringen tagit över (`02-§5.55`).
+
+Inom varje omgång tas platserna norrifrån och söderut. Först läggs de namn platsen själv
+bett om en sida för (`02-§5.60`); resten får det första lediga av fyra raka lägen — under,
+över, höger, vänster (`02-§5.53`). Ett läge som skulle skjuta etiketten utanför ritningen
+eller in bakom en zoomknapp räknas som upptaget, så en plats vid kanten vänder etiketten
+inåt. Det en etikett i övrigt måste hålla sig undan är den ritade pricken, inte tryckytan
+runt den (`02-§5.58`). Finns inget helt ledigt läge tas det som överlappar minst, hellre än
+att namnet döljs (`02-§5.54`); först när inget av de fyra ryms innanför kanten döljs
+etiketten visuellt, och namnet finns då kvar för skärmläsaren och i listan under kartan.
+Sidan skrivs som en modifierare på markören — `--wide-`, `--desktop-` och `--zoom-` — och
+CSS lägger etiketten där. <!-- 03-§9.3 -->
 
 Markören bär en symbol per sorts plats (`02-§5.38`). `source/ts/build/symbols.ts` håller
 en symbol per `kind`-värde (`04-§5.7`) som en sträng med SVG-banor, och bygget skriver in
@@ -296,8 +301,10 @@ de behåller sin storlek och sin träffyta medan ritningen växer (`02-§5.43`).
 omslaget `touch-action: pan-y` och tar bara nyp; inzoomad byter det till `none` och tar
 också drag, så startsidan går att rulla förbi (`02-§5.42`). Knapparna är dolda tills
 modulen kör, som installknappen (`03-§10.2`). Vid tillräcklig förstoring sätts också
-`map--names`, som upphäver döljandet av de etiketter bygget inte fick plats med
-(`02-§5.44`); tröskeln är mätt i Chromium mot klungan vid gårdsplanen. <!-- 03-§9.6 -->
+`map--names`, som byter till den inzoomade placeringen och visar varje namn (`02-§5.44`,
+`02-§5.57`); under 600 px är det där namnen alls kommer fram (`02-§5.55`). Tröskeln är
+mätt i Chromium mot klungan vid gårdsplanen och bor i `map-view.ts`, så bygget och
+klientkoden läser samma tal. <!-- 03-§9.6 -->
 
 Rutan på markören (`02-§5.46`) är **en** ruta, inte trettio. Bygget skriver den tom, som
 feedbackdialogen skrivs tom (`03-§10.2`), och lägger det den ska visa på varje markör som
