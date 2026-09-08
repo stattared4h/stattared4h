@@ -12,10 +12,10 @@
 import { copyFile, mkdir, readdir, stat, utimes } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import { IMAGE_QUALITY_STEPS, MAX_IMAGE_BYTES, MAX_IMAGE_EDGE } from "../domain/image-limits.ts";
 
-/** Limits from ADR 0008: longest edge in pixels and file size in bytes. */
-export const MAX_IMAGE_EDGE = 1600;
-export const MAX_IMAGE_BYTES = 250 * 1024;
+/** Limits from ADR 0008, declared once in the domain layer (02-§11.24) and re-exported for the commands. */
+export { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE };
 
 /**
  * Originals `optimiseImage` accepts. WebP is in the list because a photo can already be
@@ -26,8 +26,6 @@ export const SOURCE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 /** Widths generated for `srcset` (02-§8.5). */
 export const SRCSET_WIDTHS: readonly number[] = [400, 800, 1600];
 
-/** WebP quality steps tried in order until the file fits under the size limit. */
-const QUALITY_STEPS = [82, 74, 66, 58, 50, 42, 34, 26];
 
 /** Quality for the derived `srcset` sizes. The source is already compressed once. */
 const DERIVED_QUALITY = 80;
@@ -167,7 +165,7 @@ export async function optimiseImage(
     .rotate()
     .resize({ width: maxEdge, height: maxEdge, fit: "inside", withoutEnlargement: true });
 
-  for (const quality of QUALITY_STEPS) {
+  for (const quality of IMAGE_QUALITY_STEPS) {
     const { data, info } = await pipeline.clone().webp({ quality }).toBuffer({ resolveWithObject: true });
     if (data.byteLength <= maxBytes) {
       return { data, width: info.width, height: info.height, quality };

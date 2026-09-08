@@ -19,6 +19,8 @@ import {
   imagePostFile,
   isImageId,
 } from "./image-id.ts";
+import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE } from "./image-limits.ts";
+import { HTML_PATTERN } from "./plain-text.ts";
 import type { RawDataset, RawRecord } from "./load.ts";
 import { sortAnimals, sortLocations } from "./sort.ts";
 import type {
@@ -65,16 +67,12 @@ interface MarkdownField extends MarkdownSource {
   field?: string | null;
 }
 
-/** 04-§9.3: longest side in pixels and file size in bytes. */
-export const MAX_IMAGE_SIDE = 1600;
-export const MAX_IMAGE_BYTES = 250 * 1024;
 
 /** 04-§3.2: lowercase a–z, digits and single hyphens between groups. */
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** 04-§10.9: anything that looks like the start of an HTML tag, comment or doctype. */
 /** A Markdown image, `![](img-a3f2c1d8b901)`. The address is checked with `isImageId`. */
 const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*\]\(([^)\s]*)\)/g;
-const HTML_PATTERN = /<[a-zA-Z/!]/;
 const IMAGE_FIELDS = new Set(["alt", "credit"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
@@ -891,11 +889,11 @@ async function validateImageFiles(images: readonly Image[], imagesDir: string, i
       issues.error(file, null, `bilden ${name} är inte en WebP-fil. Kör npm run image.`);
       continue;
     }
-    if (info.width > MAX_IMAGE_SIDE || info.height > MAX_IMAGE_SIDE) {
+    if (info.width > MAX_IMAGE_EDGE || info.height > MAX_IMAGE_EDGE) {
       issues.error(
         file,
         null,
-        `bilden ${name} är ${info.width}×${info.height} px; högst ${MAX_IMAGE_SIDE} px på längsta sidan tillåts. Kör npm run image.`,
+        `bilden ${name} är ${info.width}×${info.height} px; högst ${MAX_IMAGE_EDGE} px på längsta sidan tillåts. Kör npm run image.`,
       );
     }
     if (info.hasMetadata) {

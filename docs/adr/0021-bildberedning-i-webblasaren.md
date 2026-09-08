@@ -41,9 +41,13 @@ Två följder skrivs ut, så att ingen upptäcker dem själv senare:
 - **Samma foto kan få två id.** Berett i webbläsaren och berett med `npm run image` ger
   olika bytes och därmed olika id. Duplikatskyddet i `npm run image` — samma foto ger
   samma id — gäller bara inom en och samma kedja.
-- **Metadata försvinner av mekanismen, inte av en flagga.** `canvas` bär bildpunkter,
-  ingenting annat. EXIF, XMP och ICC kan inte följa med, och GPS-positionen i ett
-  mobilfoto stannar i telefonen. Det är samma skydd som sharp ger, av ett annat skäl.
+- **EXIF och XMP försvinner av mekanismen, ICC av en rad kod.** `canvas` bär bildpunkter
+  och ingenting annat, så EXIF och XMP kan inte ta sig igenom den och GPS-positionen i ett
+  mobilfoto stannar i telefonen. Kodaren på andra sidan är en annan sak: Chromium lägger
+  in en ICC-profil i varje WebP den skriver, och den skulle fälla valideringen
+  (`04-§10.7`). Verktyget tar därför bort ICCP-, EXIF- och XMP-blocken ur den färdiga
+  filen med `stripWebpMetadata`, innan storleken mäts och innan id:t räknas ut. sharp
+  slipper steget bara för att den har en flagga för det.
 
 Uppräteringen efter EXIF-orientering överlåts på webbläsaren. Sedan `image-orientation:
 from-image` blev normalläge läser varje aktuell webbläsare orienteringen ur filen och

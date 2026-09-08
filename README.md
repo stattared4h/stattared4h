@@ -26,6 +26,21 @@ och utan personuppgifter om besökaren. Hur långt det kommit står under *Läge
 | Säkerhet i ett publikt repo | [`docs/07-SAKERHET.md`](docs/07-SAKERHET.md) |
 | Släpp till produktion | [`docs/08-SLAPP.md`](docs/08-SLAPP.md) |
 | Varför saker ser ut som de gör | [`docs/adr/`](docs/adr/README.md) |
+| Göra ett foto webbanpassat i webbläsaren | [Bildverktyget](https://stattared4h.github.io/stattared4h/verktyg/bild-3ed93205946a/) |
+
+## Bildverktyget
+
+Foton måste webbanpassas innan de läggs in. Det görs utan utvecklarmiljö på
+**<https://stattared4h.github.io/stattared4h/verktyg/bild-3ed93205946a/>** — sidan räknar
+om bilderna i din egen webbläsare och lämnar färdiga filer att ladda upp på GitHub med
+ditt eget konto. Se [`docs/01-BIDRA.md`](docs/01-BIDRA.md) §2.
+
+Adressen står här därför att den inte står någon annanstans: sidan finns varken i menyn
+eller i någon länk från sajten, eftersom den är redaktörens verktyg och inte något
+besökaren vid en hage ska ladda ner. Den är svårgissad men **inte hemlig** — repot är
+publikt, och den här filen är det med. Det är ofarligt: sidan innehåller inga
+hemligheter, samlar inga uppgifter och kan inte skriva någonstans. Se
+[ADR 0022](docs/adr/0022-verktygssidor-utanfor-navigationen.md).
 
 ## Säkerhet
 

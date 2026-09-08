@@ -43,9 +43,9 @@ function encoderOf(bytesAt: (quality: number) => number): { encode: (quality: nu
 test("the first quality that fits is the one kept, and no further step is tried", async () => {
   const encoder = encoderOf((quality) => quality * 10);
   const result = await encodeUnderLimit(encoder.encode, { maxBytes: 700 });
-  assert.equal(result.quality, IMAGE_QUALITY_STEPS[1]);
-  assert.equal(result.data.byteLength, IMAGE_QUALITY_STEPS[1] * 10);
-  assert.deepEqual(encoder.asked, [IMAGE_QUALITY_STEPS[0], IMAGE_QUALITY_STEPS[1]]);
+  assert.equal(result.quality, IMAGE_QUALITY_STEPS[2]);
+  assert.equal(result.data.byteLength, IMAGE_QUALITY_STEPS[2] * 10);
+  assert.deepEqual(encoder.asked, IMAGE_QUALITY_STEPS.slice(0, 3));
 });
 
 test("the highest quality is tried first", async () => {

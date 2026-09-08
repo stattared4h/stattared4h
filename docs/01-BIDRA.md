@@ -1,8 +1,8 @@
 # Att bidra
 
 Den här sajten förvaltas av Stättareds 4H-gård. Det mesta som behöver ändras är
-**innehåll** — ett nytt djur, ett djurslag som bytt hage — och det kräver ingen
-utvecklarmiljö. Bara en ny bild behöver ett kommando, se *Lägga till en bild* nedan.
+**innehåll** — ett nytt djur, ett djurslag som bytt hage, ett foto — och det kräver ingen
+utvecklarmiljö. Allt i §2 görs i webbläsaren.
 
 ---
 
@@ -98,10 +98,39 @@ avkomman förlorar sin förälder.
 
 ### Lägga till en bild
 
-Bilder kräver utvecklingsmiljön i §3, eftersom originalet måste webbanpassas först: repot
-tar bara WebP, högst 1600 pixlar på längsta sidan och högst 250 KB, utan EXIF — mobilfoton
-bär annars med sig GPS-positionen där bilden togs
-([ADR 0008](adr/0008-bilder-i-repot.md)). Kommandot `npm run image` gör allt det:
+En bild måste webbanpassas innan den läggs in: repot tar bara WebP, högst 1600 pixlar på
+längsta sidan och högst 250 KB, utan EXIF — mobilfoton bär annars med sig GPS-positionen
+där bilden togs ([ADR 0008](adr/0008-bilder-i-repot.md)).
+
+#### I webbläsaren, utan att installera något
+
+**Bildverktyget** gör om dina foton åt dig och lämnar färdiga filer att ladda upp:
+
+<https://stattared4h.github.io/stattared4h/verktyg/bild-3ed93205946a/>
+
+Sidan står med flit varken i menyn eller i någon länk från sajten — den är redaktörens
+verktyg, inte något besökaren vid en hage ska ladda ner
+([ADR 0022](adr/0022-verktygssidor-utanfor-navigationen.md)). Adressen står här och i
+`README.md`. Den är svårgissad men inte hemlig: repot är publikt, och sidan innehåller
+inga hemligheter och kan inte skriva någonstans. Förhandsvisningen har samma sida under
+`/qa/`.
+
+1. Öppna sidan på telefonen eller datorn och välj dina foton. Flera på en gång går bra.
+2. Skriv alt-text och fotograf för varje bild, med bilden framför dig. Båda måste fyllas i.
+3. **På datorn:** tryck *Ladda ner alla som zip*, packa upp filen och dra mappen `source`
+   till [uppladdningsvyn](https://github.com/stattared4h/stattared4h/upload/main).
+   GitHub behåller mapparna, så båda filsorterna hamnar rätt.
+4. **På telefonen:** ladda ner en fil i taget med knapparna vid varje bild, och lägg
+   `.webp`-filen i `source/images/` och `.yaml`-filen i `source/data/images/`.
+5. Välj **Create a new branch for this commit** och öppna pull requesten som vanligt.
+
+Verktyget räknar ut bildens id ur bilden själv och skriver bildposten åt dig, precis som
+kommandot nedan gör. Ingenting skickas någon annanstans: bilderna räknas om i din egen
+webbläsare, och det är du som laddar upp dem, inloggad med ditt GitHub-konto.
+
+#### Med utvecklingsmiljön
+
+Har du miljön i §3 gör `npm run image` samma sak från terminalen:
 
 ```bash
 npm run image -- ~/Bilder/IMG_1234.jpg \
@@ -123,7 +152,7 @@ kommandot säger att bilden redan finns i stället för att göra en kopia.
 
 `--alt` beskriver vad som är viktigt i bilden och `--credit` vem som tagit den. Båda
 krävs: en bild utan alt-text kommer ändå inte förbi valideringen. Publicera aldrig en
-bild på en identifierbar person utan samtycke.
+bild på en identifierbar person utan samtycke — det gäller lika mycket i verktyget.
 
 Referera sedan id:t från djuret eller platsen:
 
@@ -150,7 +179,9 @@ i bildposten:
 ### Många bilder på en gång
 
 Ska du lägga in en hög med foton — den första omgången är runt hundra — är `npm run
-image` en bild i taget för långsamt. Använd importen i stället. Den arbetar i två steg,
+image` en bild i taget för långsamt. Bildverktyget ovan tar flera bilder i samma vända
+och räcker långt. Har du utvecklingsmiljön och en lista över vilket djur varje foto hör
+till finns importen, som också kopplar ihop bild och post åt dig. Den arbetar i två steg,
 med ditt eget ifyllande emellan.
 
 **Steg 1. Låt kommandot skriva listan.**

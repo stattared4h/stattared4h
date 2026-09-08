@@ -10,15 +10,15 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { test } from "node:test";
 import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE } from "../../source/ts/domain/image-limits.ts";
-import * as validate from "../../source/ts/domain/validate.ts";
+import * as domain from "../../source/ts/domain/index.ts";
 import * as buildImages from "../../source/ts/build/images.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 const LIMITS_FILE = path.join("source", "ts", "domain", "image-limits.ts");
 
-test("the validator and the build read the same limits", () => {
-  assert.equal(validate.MAX_IMAGE_EDGE, MAX_IMAGE_EDGE);
-  assert.equal(validate.MAX_IMAGE_BYTES, MAX_IMAGE_BYTES);
+test("the domain front door and the build hand out the same limits", () => {
+  assert.equal(domain.MAX_IMAGE_EDGE, MAX_IMAGE_EDGE);
+  assert.equal(domain.MAX_IMAGE_BYTES, MAX_IMAGE_BYTES);
   assert.equal(buildImages.MAX_IMAGE_EDGE, MAX_IMAGE_EDGE);
   assert.equal(buildImages.MAX_IMAGE_BYTES, MAX_IMAGE_BYTES);
 });

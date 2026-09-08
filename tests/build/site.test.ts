@@ -221,11 +221,15 @@ describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
     assert.match(html, new RegExp(`src="${IMAGE_TOOL_PATH}${IMAGE_TOOL_SCRIPT}"`), "sidan laddar sin egen bunt");
   });
 
-  test("ingen bunt under assets/ bär verktygets kod (02-§11.6)", async () => {
-    const files = (await listFiles(prod)).filter((file) => file.startsWith(`assets${path.sep}`));
+  // Stilarna delar besökarens components.css — det är ett kilobyte och sajtens enda
+  // stilmönster. Koden är det som ska hållas borta: den är hundratals rader som en
+  // besökare vid en hage aldrig kör.
+  test("ingen JS-bunt under assets/ bär verktygets kod (02-§11.6)", async () => {
+    const files = (await listFiles(prod)).filter((file) => file.startsWith(`assets${path.sep}`) && file.endsWith(".js"));
+    assert.ok(files.length > 0, "hittade ingen bunt under assets/ att pröva");
     for (const file of files) {
       const text = await readFile(path.join(prod, file), "utf8");
-      assert.doesNotMatch(text, /image-tool|bildverktyg/i, `${file} bär verktygets kod`);
+      assert.doesNotMatch(text, /image-tool|Ladda ner alla som zip/i, `${file} bär verktygets kod`);
     }
   });
 

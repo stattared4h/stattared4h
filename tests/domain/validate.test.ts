@@ -7,7 +7,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { imageFileName } from "../../source/ts/domain/image-id.ts";
-import { formatIssue, MAX_IMAGE_BYTES } from "../../source/ts/domain/validate.ts";
+import { formatIssue } from "../../source/ts/domain/validate.ts";
+import { MAX_IMAGE_BYTES } from "../../source/ts/domain/image-limits.ts";
 import {
   addAnimal,
   addImage,

@@ -59,9 +59,10 @@ bara sista steget ut.
 - Varje bild rätas upp efter sin EXIF-orientering, skalas till högst `MAX_IMAGE_EDGE` på
   längsta sidan och kodas om till WebP under `MAX_IMAGE_BYTES` — samma gränser som
   `02-§8.1`. En bild som redan är mindre förstoras inte. <!-- 02-§11.8 -->
-- Omkodningen sker i webbläsarens `canvas`, som bara bär bildpunkter vidare. Därmed
-  följer varken EXIF, XMP eller ICC med den färdiga filen, och mobilfotots
-  GPS-position stannar i telefonen ([ADR 0008](../adr/0008-bilder-i-repot.md)). <!-- 02-§11.9 -->
+- Den färdiga filen bär varken EXIF, XMP eller ICC. Omkodningen sker i webbläsarens
+  `canvas`, som bara bär bildpunkter vidare, så mobilfotots GPS-position stannar i
+  telefonen ([ADR 0008](../adr/0008-bilder-i-repot.md)); den färgprofil kodaren lägger
+  till på egen hand tas bort ur filen innan den lämnas ifrån sig. <!-- 02-§11.9 -->
 - Kvaliteten sänks steg för steg tills filen håller storleksgränsen, efter samma
   princip som `optimiseImage`. Håller den inte ens på lägsta steget rapporteras bilden
   som ett fel, och de övriga bilderna bereds ändå. <!-- 02-§11.10 -->

@@ -1,0 +1,100 @@
+---
+layout: base.njk
+permalink: "{{ tool.imagePath }}"
+eleventyExcludeFromCollections: true
+noindex: true
+title: Bildverktyg
+description: >-
+  Redaktörsverktyg: gör foton webbanpassade i webbläsaren och lämna färdiga filer till
+  GitHub. Ingenting lämnar din telefon eller dator härifrån.
+---
+{#-
+  The image tool (02-§11, ADR 0021, ADR 0022). An editors' page, not a visitor's: it is
+  excluded from the collections, which keeps it out of the service worker's precache
+  (02-§11.5), it carries `noindex` (02-§11.2), and nothing on the site links here — the
+  address is written in README.md and docs/01-BIDRA.md.
+
+  The markup is the empty frame; source/ts/ui/image-tool/ fills the list with one card per
+  picture. The page is deliberately readable without JavaScript, so that someone who lands
+  here understands what the page is before deciding to allow it.
+-#}
+<div class="container container--narrow">
+  <h1>Bildverktyg</h1>
+
+  <p class="lead">
+    Gör foton webbanpassade direkt i webbläsaren och lämna de färdiga filerna till GitHub.
+    Bilderna räknas om här på din telefon eller dator — ingenting skickas någon annanstans.
+  </p>
+
+  <p class="note">
+    Sidan är för dig som förvaltar innehållet. Den ligger inte i menyn och länkas inte från
+    sajten.
+  </p>
+
+  <noscript>
+    <p class="note">
+      Verktyget räknar om bilderna i webbläsaren och behöver därför JavaScript. Utan det
+      går det fortfarande att lägga in en bild med kommandot <code>npm run image</code>,
+      som beskrivs i bidragsguiden.
+    </p>
+  </noscript>
+
+  <div class="image-tool" data-image-tool>
+    <div class="field">
+      <label class="field__label" for="image-tool-files">Välj bilder från kameran eller datorn</label>
+      <input class="field__input" id="image-tool-files" type="file" accept="image/jpeg,image/png,image/webp" multiple data-image-tool-input>
+      <p class="meta">JPEG, PNG eller WebP. Flera bilder på en gång går bra.</p>
+    </div>
+
+    <p class="image-tool__status" role="status" data-image-tool-status hidden></p>
+
+    <ol class="image-tool__list" data-image-tool-list></ol>
+
+    <div class="image-tool__actions" data-image-tool-actions hidden>
+      <button class="button" type="button" data-image-tool-zip>Ladda ner alla som zip</button>
+      <p class="meta" data-image-tool-blocked hidden></p>
+    </div>
+  </div>
+
+  <h2>Så lägger du in bilderna på GitHub</h2>
+
+  <p>
+    Verktyget skriver inte i repot. Det gör du, inloggad med ditt eget GitHub-konto — samma
+    väg som för allt annat innehåll.
+  </p>
+
+  <h3>På datorn: hela högen på en gång</h3>
+
+  <ol>
+    <li>Tryck <strong>Ladda ner alla som zip</strong> och packa upp filen. Du får en mapp som heter <code>source</code>.</li>
+    <li>Öppna <a href="{{ site.repo }}/upload/main">repot i uppladdningsläge</a>.</li>
+    <li>Dra mappen <code>source</code> till rutan. GitHub behåller mapparna, så bilderna och bildposterna hamnar rätt.</li>
+    <li>Välj <strong>Create a new branch for this commit</strong> och sedan <strong>Propose changes</strong> följt av <strong>Create pull request</strong>.</li>
+  </ol>
+
+  <h3>På telefonen: en bild i taget</h3>
+
+  <p>
+    Telefoner packar sällan upp zip-filer, och de kan inte ladda upp mappar. Använd knapparna
+    vid varje bild i stället — de laddar ner en fil åt gången till telefonen.
+  </p>
+
+  <ol>
+    <li>Ladda ner bildens <code>.webp</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/images"><code>source/images/</code></a>.</li>
+    <li>Ladda ner bildens <code>.yaml</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/data/images"><code>source/data/images/</code></a>.</li>
+    <li>Välj samma gren båda gångerna, så hamnar filerna i samma pull request.</li>
+  </ol>
+
+  <h2>Bra att veta</h2>
+
+  <ul>
+    <li>Bildens namn räknas ut ur bilden själv. Samma foto får alltid samma namn, så du väljer inget och kan ladda upp samma bild två gånger utan att det blir en kopia.</li>
+    <li>Alt-texten beskriver vad som är viktigt i bilden, för den som inte kan se den. Fotografen är den som tagit bilden. Båda måste fyllas i.</li>
+    <li>Platsuppgiften i mobilfotot följer aldrig med. Verktyget ritar om bilden, och då finns det ingen sådan uppgift kvar att ta med.</li>
+    <li>Publicera aldrig en bild på en identifierbar person utan samtycke.</li>
+    <li>När bilden ligger i repot refererar du den från djuret eller platsen. Bidragsguiden visar hur.</li>
+  </ul>
+</div>
+
+{#- The tool's own bundle, next to the page (02-§11.6). A module script defers by itself. #}
+<script type="module" src="{{ tool.imageScript | url }}"></script>

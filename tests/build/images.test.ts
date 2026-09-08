@@ -316,7 +316,7 @@ describe("npm run image", () => {
   test("the id is the hash of the written file (02-§8.9)", async () => {
     const { id } = await addImage();
     const { readFile } = await import("node:fs/promises");
-    assert.equal(imageIdFor(await readFile(path.join(imagesDir, `${id}.webp`))), id);
+    assert.equal(await imageIdFor(await readFile(path.join(imagesDir, `${id}.webp`))), id);
   });
 
   test("writes the image post with alt and credit beside the file (02-§8.8)", async () => {

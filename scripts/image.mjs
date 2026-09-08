@@ -19,8 +19,8 @@
  */
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { stringify } from "yaml";
 import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
+import { formatImagePost } from "../source/ts/domain/image-post.ts";
 import {
   MAX_IMAGE_BYTES,
   MAX_IMAGE_EDGE,
@@ -74,11 +74,6 @@ function shownPath(file) {
   return relative.startsWith("..") ? file : relative;
 }
 
-/** The image post as YAML: two lines, quoted only where the yaml package says it must be. */
-function imagePostYaml({ alt, credit }) {
-  return stringify({ alt, credit }, { lineWidth: 0 });
-}
-
 /** The images directory for a dataset, with the failure phrased for an editor, not a developer. */
 function imagesDirOrFail(dataDir) {
   try {
@@ -110,7 +105,7 @@ async function main() {
     fail(`Kunde inte omvandla ${options.file}: ${error.message}`);
   }
 
-  const id = imageIdFor(result.data);
+  const id = await imageIdFor(result.data);
   const imagesDir = imagesDirOrFail(options.dataDir);
   const imagePath = path.join(imagesDir, imageFileName(id));
   const postPath = path.join(options.dataDir, imagePostFile(id));
@@ -130,7 +125,7 @@ async function main() {
   await mkdir(imagesDir, { recursive: true });
   await mkdir(path.dirname(postPath), { recursive: true });
   await writeFile(imagePath, result.data);
-  await writeFile(postPath, imagePostYaml(options));
+  await writeFile(postPath, formatImagePost(options));
 
   console.log(
     `Skrev ${shownPath(imagePath)} ` +

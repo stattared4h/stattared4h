@@ -1,9 +1,15 @@
 /**
- * Minimal WebP inspector for the image checks in the validator (04-§10.7, 02-§8.2).
+ * Minimal WebP container reader and metadata remover (04-§10.7, 02-§8.2, 02-§11.9).
  *
- * Reads only the RIFF container and the first bitstream chunk — enough to learn the
- * dimensions and whether the file carries ICC, EXIF or XMP metadata. No dependencies,
- * no decoding. Reference: the WebP container specification.
+ * `inspectWebp` reads only the RIFF container and the first bitstream chunk — enough to
+ * learn the dimensions and whether the file carries ICC, EXIF or XMP metadata. No
+ * dependencies, no decoding. Reference: the WebP container specification.
+ *
+ * `stripWebpMetadata` takes those blocks back out. The image tool needs it because a
+ * browser's WebP encoder writes an ICC profile of its own accord — sharp on the build
+ * side strips metadata unless asked to keep it, but `canvas.toBlob` has no such switch
+ * (ADR 0021). Neither function decodes a pixel: the bitstream chunks are copied through
+ * untouched.
  */
 
 export interface WebpInfo {
@@ -105,4 +111,57 @@ export function inspectWebp(bytes: Uint8Array): WebpInfo {
 
   if (!dimensions) return NOT_WEBP;
   return { ok: true, width: dimensions.width, height: dimensions.height, hasMetadata };
+}
+
+/** The three chunks that carry metadata, and the VP8X flags that announce them. */
+const METADATA_CHUNKS = new Set(["ICCP", "EXIF", "XMP "]);
+const VP8X_METADATA_FLAGS = VP8X_ICC | VP8X_EXIF | VP8X_XMP;
+
+function writeU32le(bytes: Uint8Array, offset: number, value: number): void {
+  bytes[offset] = value & 0xff;
+  bytes[offset + 1] = (value >>> 8) & 0xff;
+  bytes[offset + 2] = (value >>> 16) & 0xff;
+  bytes[offset + 3] = (value >>> 24) & 0xff;
+}
+
+/**
+ * The same picture without its ICC profile, EXIF or XMP block. The VP8X flags that
+ * announced them are cleared with the chunks, so the file does not promise something it
+ * no longer has.
+ *
+ * Bytes that are not a WebP this parser understands are returned untouched: rewriting a
+ * file we cannot read would be worse than leaving it to the validator to refuse.
+ */
+export function stripWebpMetadata(bytes: Uint8Array): Uint8Array {
+  if (!inspectWebp(bytes).ok) return bytes;
+
+  const riffEnd = Math.min(bytes.length, 8 + u32le(bytes, 4));
+  const kept: Uint8Array[] = [];
+  let offset = 12;
+
+  while (offset + 8 <= riffEnd) {
+    const id = fourCC(bytes, offset);
+    const size = u32le(bytes, offset + 4);
+    const whole = 8 + size + (size % 2);
+    if (!METADATA_CHUNKS.has(id)) {
+      const chunk = bytes.slice(offset, offset + whole);
+      // The extended header keeps its size and its canvas, and loses only its claim to
+      // metadata that is no longer in the file.
+      if (id === "VP8X" && chunk.length > 8) chunk[8] &= ~VP8X_METADATA_FLAGS;
+      kept.push(chunk);
+    }
+    offset += whole;
+  }
+
+  const body = kept.reduce((total, chunk) => total + chunk.length, 0) + 4;
+  const out = new Uint8Array(8 + body);
+  out.set(bytes.subarray(0, 4));
+  writeU32le(out, 4, body);
+  out.set(bytes.subarray(8, 12), 8);
+  let at = 12;
+  for (const chunk of kept) {
+    out.set(chunk, at);
+    at += chunk.length;
+  }
+  return out;
 }
