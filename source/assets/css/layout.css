@@ -63,19 +63,15 @@
   min-height: var(--tap-target-min);
 }
 
-/* The start page has no "Tillbaka" (02-§10.40), so its row is one column shorter and
-   the menu button starts at the edge like everywhere else. */
-.site-header__inner--home {
-  grid-template-columns: auto auto 1fr auto;
-}
-
 .site-header__brand,
 .site-nav {
   display: none;
 }
 
 /* The order in the row (02-§10.3): back, menu, install, "to top" centred, feedback.
-   On the start page the first column is gone and every button moves one step left. */
+   Every button names its column, so "to top" stays centred even while the install
+   button is hidden (02-§10.11). The start page is one column shorter; its placements
+   are in the media query below. */
 .site-header__back {
   grid-column: 1;
 }
@@ -97,20 +93,30 @@
   grid-column: 5;
 }
 
-.site-header__inner--home .site-header__menu-button {
-  grid-column: 1;
-}
+/* The start page has no "Tillbaka" (02-§10.40), so its row is one column shorter and
+   every button moves one step left. These placements belong to the mobile row alone:
+   they are more specific than the desktop rules further down, so left unbounded they
+   would follow the buttons past the breakpoint and drop them under the navigation. */
+@media (max-width: 959.98px) {
+  .site-header__inner--home {
+    grid-template-columns: auto auto 1fr auto;
+  }
 
-.site-header__inner--home .site-header__install {
-  grid-column: 2;
-}
+  .site-header__inner--home .site-header__menu-button {
+    grid-column: 1;
+  }
 
-.site-header__inner--home .site-header__to-top {
-  grid-column: 3;
-}
+  .site-header__inner--home .site-header__install {
+    grid-column: 2;
+  }
 
-.site-header__inner--home .site-header__feedback {
-  grid-column: 4;
+  .site-header__inner--home .site-header__to-top {
+    grid-column: 3;
+  }
+
+  .site-header__inner--home .site-header__feedback {
+    grid-column: 4;
+  }
 }
 
 .site-header__logo {
