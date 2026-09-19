@@ -32,7 +32,11 @@ import { extendedWebp, lossyWebp, paddedWebp, VP8X_EXIF } from "./webp-fixtures.
 
 test("the QA dataset is valid and normalised", async () => {
   const raw = await rawQa();
-  editAnimal(raw, "tuva", (animal) => delete animal.photos);
+  // Tuva shares her only picture with the other goats, so taking her out of its subject
+  // list is what leaves an animal without photos now (ADR 0026).
+  editImage(raw, await photoId("tuva"), (image) => {
+    image.animals = (image.animals as string[]).filter((id) => id !== "tuva");
+  });
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
   assert.notEqual(result.dataset, null);
@@ -374,54 +378,63 @@ test("an image post file name must be a valid image id", async () => {
   assert.match(errorsFor(result, "images/rosa-1.yaml", "filnamn")[0].message, /och tolv tecken 0–9 och a–f/);
 });
 
-test("a photo reference must name an image post that exists", async () => {
-  const raw = await rawQa();
-  editAnimal(raw, "rosa", (a) => ((a.photos as string[])[0] = "img-ffffffffffff"));
-  editLocation(raw, "brackebur", (l) => (l.photos = ["img-eeeeeeeeeeee"]));
-  speciesList(raw)[0].photo = "img-dddddddddddd";
-  const result = await validate(raw);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /finns inte i images\//);
-  assert.match(errorsFor(result, "locations/brackebur.yaml", "photos[0]")[0].message, /finns inte i images\//);
-  assert.match(errorsFor(result, "species.yaml", "species[get].photo")[0].message, /finns inte i images\//);
-});
+// --- What the picture shows (02-§8.10, 02-§8.30, 04-§10.18, ADR 0026) -------------
 
-test("a photo reference that is not an image id fails with the form in the message", async () => {
-  const raw = await rawQa();
-  editAnimal(raw, "rosa", (a) => ((a.photos as unknown[])[0] = "rosa-1.webp"));
-  const result = await validate(raw);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /och tolv tecken 0–9 och a–f/);
-});
-
-test("photos must be a list of ids, not a list of mappings", async () => {
-  const raw = await rawQa();
-  editAnimal(raw, "rosa", (a) => (a.photos = [{ file: "rosa-1.webp", alt: "Rosa", credit: "QA" }]));
-  const result = await validate(raw);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[0]")[0].message, /bild-id/);
-});
-
-test("the same image may not be listed twice on one record", async () => {
+test("a subject must name a record that exists", async () => {
   const raw = await rawQa();
   const id = await photoId("rosa");
-  editAnimal(raw, "rosa", (a) => (a.photos = [id, id]));
+  editImage(raw, id, (image) => {
+    image.animals = ["finns-inte"];
+    image.locations = ["ingen-hage"];
+    image.species = ["enhorning"];
+  });
   const result = await validate(raw);
-  assert.match(errorsFor(result, "animals/rosa.yaml", "photos[1]")[0].message, /står med två gånger/);
+  const file = `images/${id}.yaml`;
+  assert.match(errorsFor(result, file, "animals[0]")[0].message, /djuret "finns-inte" finns inte/);
+  assert.match(errorsFor(result, file, "locations[0]")[0].message, /platsen "ingen-hage" finns inte/);
+  assert.match(errorsFor(result, file, "species[0]")[0].message, /arten "enhorning" finns inte/);
 });
 
-test("two records may share the same image (ADR 0015)", async () => {
+test("a subject list must be a list of ids", async () => {
   const raw = await rawQa();
   const id = await photoId("rosa");
-  editAnimal(raw, "tuva", (a) => (a.photos = [id]));
-  editLocation(raw, "brackebur", (l) => (l.photos = [id]));
-  speciesList(raw)[0].photo = id;
+  editImage(raw, id, (image) => (image.animals = "rosa"));
+  editImage(raw, await photoId("stjarna"), (image) => (image.locations = [{ id: "brackebur" }]));
+  const result = await validate(raw);
+  assert.match(errorsFor(result, `images/${id}.yaml`, "animals")[0].message, /en lista med id:n/);
+  assert.match(
+    errorsFor(result, `images/${await photoId("stjarna")}.yaml`, "locations[0]")[0].message,
+    /små bokstäver/,
+  );
+});
+
+test("the same subject may not stand twice in one list", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editImage(raw, id, (image) => (image.animals = ["rosa", "rosa"]));
+  const result = await validate(raw);
+  assert.match(errorsFor(result, `images/${id}.yaml`, "animals[1]")[0].message, /står med två gånger/);
+});
+
+test("one picture can show two animals, a place and a species (ADR 0026)", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editImage(raw, id, (image) => {
+    image.animals = ["rosa", "tuva"];
+    image.locations = ["brackebur"];
+    image.species = ["get"];
+  });
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
   const dataset = result.dataset;
-  assert.equal(dataset?.animals.find((a) => a.id === "tuva")?.photos[0].id, id);
-  assert.equal(dataset?.locations.find((l) => l.id === "brackebur")?.photos[0].id, id);
+  const has = (photos: readonly { id: string }[]) => photos.some((photo) => photo.id === id);
+  assert.ok(has(dataset?.animals.find((a) => a.id === "rosa")?.photos ?? []));
+  assert.ok(has(dataset?.animals.find((a) => a.id === "tuva")?.photos ?? []), "the animal never names the picture");
+  assert.ok(has(dataset?.locations.find((l) => l.id === "brackebur")?.photos ?? []));
   assert.equal(dataset?.species.find((s) => s.id === "get")?.photo?.id, id);
 });
 
-test("a reference is resolved to the post's alt and credit", async () => {
+test("a subject is resolved to the post's alt and credit", async () => {
   const raw = await rawQa();
   const id = await photoId("rosa");
   editImage(raw, id, (image) => {
@@ -429,8 +442,65 @@ test("a reference is resolved to the post's alt and credit", async () => {
     image.credit = "Anna Andersson";
   });
   const result = await validate(raw);
-  const photo = result.dataset?.animals.find((a) => a.id === "rosa")?.photos[0];
-  assert.deepEqual(photo, { id, alt: "Rosa står i Bräckebur.", credit: "Anna Andersson" });
+  const photos = result.dataset?.animals.find((a) => a.id === "rosa")?.photos ?? [];
+  assert.deepEqual(
+    photos.find((photo) => photo.id === id),
+    { id, alt: "Rosa står i Bräckebur.", credit: "Anna Andersson" },
+  );
+});
+
+// --- The main picture and the order (02-§8.28, 02-§8.29, 04-§10.19) ---------------
+
+test("portrait comes first and the rest follow in image-id order", async () => {
+  const raw = await rawQa();
+  const [first, second, third] = [await photoId("rosa", 0), await photoId("rosa", 1), await photoId("rosa", 2)];
+  const chosen = [first, second, third].sort()[2];
+  editAnimal(raw, "rosa", (a) => (a.portrait = chosen));
+  const result = await validate(raw);
+  assert.deepEqual(result.errors, []);
+  const photos = result.dataset?.animals.find((a) => a.id === "rosa")?.photos.map((photo) => photo.id) ?? [];
+  const rest = [first, second, third].filter((id) => id !== chosen).sort();
+  assert.deepEqual(photos, [chosen, ...rest]);
+});
+
+test("without portrait the first picture in id order is the main one", async () => {
+  const raw = await rawQa();
+  const ids = [await photoId("rosa", 0), await photoId("rosa", 1), await photoId("rosa", 2)].sort();
+  const result = await validate(raw);
+  const photos = result.dataset?.animals.find((a) => a.id === "rosa")?.photos.map((photo) => photo.id) ?? [];
+  assert.deepEqual(photos, ids, "the order is the image ids', so every build agrees");
+});
+
+test("a portrait must be a picture that shows the record", async () => {
+  const raw = await rawQa();
+  const strangerId = await photoId("majros");
+  editImage(raw, strangerId, (image) => (image.animals = ["majros"]));
+  editAnimal(raw, "rosa", (a) => (a.portrait = strangerId));
+  editLocation(raw, "brackebur", (l) => (l.portrait = strangerId));
+  speciesList(raw)[0].portrait = strangerId;
+  const result = await validate(raw);
+  assert.match(errorsFor(result, "animals/rosa.yaml", "portrait")[0].message, /visar inte djuret/);
+  assert.match(errorsFor(result, "locations/brackebur.yaml", "portrait")[0].message, /visar inte platsen/);
+  assert.match(errorsFor(result, "species.yaml", "species[get].portrait")[0].message, /visar inte arten/);
+});
+
+test("a portrait must name an image post that exists", async () => {
+  const raw = await rawQa();
+  editAnimal(raw, "rosa", (a) => (a.portrait = "img-ffffffffffff"));
+  const result = await validate(raw);
+  assert.match(errorsFor(result, "animals/rosa.yaml", "portrait")[0].message, /finns inte i images\//);
+});
+
+test("photos and photo are unknown fields, so an old picture list is caught (02-§8.31)", async () => {
+  const raw = await rawQa();
+  const id = await photoId("rosa");
+  editAnimal(raw, "tuva", (a) => (a.photos = [id]));
+  editLocation(raw, "brackebur", (l) => (l.photos = [id]));
+  speciesList(raw)[0].photo = id;
+  const result = await validate(raw);
+  assert.match(errorsFor(result, "animals/tuva.yaml", "photos")[0].message, /okänt fält/);
+  assert.equal(errorsFor(result, "locations/brackebur.yaml", "photos").length, 1);
+  assert.equal(errorsFor(result, "species.yaml", "species[get].photo").length, 1);
 });
 
 // --- Coordinates ------------------------------------------------------------------
@@ -476,14 +546,25 @@ test("an active location without coordinates warns", async () => {
   assert.ok(result.warnings.some((w) => w.file === "locations/d.yaml" && w.field === "species"));
 });
 
-test("a species with a photo and a place stops warning", async () => {
+test("a species kept at an active place stops warning", async () => {
   const raw = await rawQa();
-  speciesList(raw)[3].photo = await photoId("rosa");
   editLocation(raw, "a", (l) => (l.species = ["hast"]));
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
   assert.ok(!result.warnings.some((w) => w.file === "species.yaml" && w.field?.startsWith("species[hast]")));
   assert.ok(!result.warnings.some((w) => w.file === "locations/a.yaml"));
+});
+
+test("a species no picture names warns and falls back to the name plate", async () => {
+  const raw = await rawQa();
+  for (const record of raw.images) {
+    const data = record.data as Record<string, unknown>;
+    data.species = ((data.species as string[] | undefined) ?? []).filter((id) => id !== "katt");
+  }
+  const result = await validate(raw);
+  assert.deepEqual(result.errors, []);
+  const warning = result.warnings.find((w) => w.file === "species.yaml" && w.field === "species[katt].portrait");
+  assert.match(warning?.message ?? "", /ingen bild/);
 });
 
 // --- Image files (04-§10.7, 02-§8.2) ----------------------------------------------
