@@ -32,6 +32,13 @@ i historiken även efter en omdöpning. Bilden blev därför en egen post med et
 härleds ur innehållet, och undermapparna per posttyp föll bort i samma veva: en bild på
 en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
 
+Kvar stod kopplingen åt andra hållet: djuret räknade upp sina bilder. Den som tar fotot
+och den som känner igen djuret är sällan samma person, och sällan på plats samtidigt —
+så svaret "det där är Bosse" blev en redigering av Bosses fil, som två svar samtidigt
+inte kan göra utan att krocka. ADR 0026 vänder riktningen: bilden bär sina motiv, och
+posternas bilder härleds. Ett svar är då ett tillägg i bildens egen fil, och den som
+svarar behöver inte veta något om djurets.
+
 ### Bildposten
 
 - Varje bild är en egen post, `source/data/images/<bild-id>.yaml`, med `alt` på svenska
@@ -40,14 +47,30 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
   `img-a3f2c1d8b901`. Tecknen är de första av SHA-256 över den färdiga WebP-filen, så
   id:t kräver ingen räknare och samma foto får alltid samma id. Prefixet gör att YAML
   läser id:t som text även när alla tolv tecknen är siffror. <!-- 02-§8.9 -->
-- Djur och platser refererar bilder med `photos`, en lista av bild-id:n; en art med
-  `photo`, ett enda bild-id. Samma bild-id får stå i flera poster — ett foto med två
-  djur på finns som en fil och en alt-text. <!-- 02-§8.10 -->
-- Den första bilden i `photos` är postens huvudbild: djurets porträtt och platsens
-  toppbild. Ordningen i listan är ordningen på sidan. <!-- 02-§8.11 -->
+- Bildposten bär vad bilden visar: `animals`, `locations` och `species`, listor av id:n
+  ur gårdens data. Alla tre är frivilliga, och var och en får bära flera id:n — ett foto
+  med två djur på är en fil, en alt-text och två djur-id:n. <!-- 02-§8.10 -->
+- Ett djurs, en plats och en arts bilder härleds ur bildposterna: posten visar varje bild
+  som bär dess id. Ingen post räknar upp sina bilder, så kopplingen står på ett enda
+  ställe — i bilden, som är det den handlar om. <!-- 02-§8.11 -->
 - En innehållssida i Markdown infogar en bild med bildsyntax där adressen är bild-id:t
   och alt-texten är tom: `![](img-a3f2c1d8b901)`. Alt-texten kommer ur bildposten, så
   den står på ett ställe. <!-- 02-§8.12 -->
+
+### Huvudbild och ordning
+
+- Djuret, platsen och arten har ett frivilligt `portrait` med ett enda bild-id: djurets
+  porträtt, platsens toppbild och artens bild. Bilden ska bära postens eget id — en
+  huvudbild som inte visar djuret fäller valideringen. <!-- 02-§8.28 -->
+- En posts bilder står i bild-id:ts ordning med `portrait` först. Utan `portrait` är den
+  första i den ordningen postens huvudbild. Ordningen är därmed densamma i varje bygge
+  (`02-§6.9`) utan att någon håller en redaktionell lista i takt. <!-- 02-§8.29 -->
+- Varje id i `animals`, `locations` och `species` pekar på en post som finns, och står
+  högst en gång i sin lista. <!-- 02-§8.30 -->
+- Inget djur och ingen plats har ett `photos`-fält, och ingen art ett `photo`-fält.
+  Kontraktet känner inte fältnamnen, och valideringen fäller därför för dem
+  (`04-§10.11`) i stället för att tyst låta en bildlista ligga kvar utan
+  verkan. <!-- 02-§8.31 -->
 
 ### Filer i repot
 
@@ -65,9 +88,10 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
   i `source/images-qa/`. Varje fotografi är WebP, högst 1200 px på längsta sidan och
   högst 50 KB, utan EXIF, XMP eller ICC, och bär den inbrända märkningen
   "AI-bild · QA". <!-- 02-§8.4 -->
-- Valideringen varnar för en bildpost som ingen refererar, och för en bildfil i
-  bildkatalogen som ingen bildpost hör till. Båda är utrymme som aldrig når
-  besökaren. <!-- 02-§8.13 -->
+- Valideringen varnar för en bildpost utan motiv som varken en innehållssida eller en
+  ledtråd använder, och för en bildfil i bildkatalogen som ingen bildpost hör till. Den
+  första är en bild som väntar på någon som vet vad den visar; den andra är utrymme som
+  aldrig når besökaren. <!-- 02-§8.13 -->
 
 ### Många bilder på en gång
 
@@ -80,8 +104,10 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
   eller arternas filer. <!-- 02-§8.15 -->
 - Importen är allt-eller-inget: varje rad kontrolleras först, och hittas ett fel skrivs
   ingenting alls. En avbruten import lämnar aldrig hälften av bilderna inlagda. <!-- 02-§8.16 -->
-- Kommandot skriver ut bild-id:na grupperade per `post`, i den form de har i en
-  YAML-fil, så att de går att klistra in i djurets eller platsens `photos`. <!-- 02-§8.17 -->
+- Kolumnen `post` är id:t på det djur, den plats eller den art bilden visar, och
+  kommandot skriver in id:t i bildpostens motivlista. Redaktören klistrar inte in något
+  efteråt. Ett `post` som inte finns i datasetet, eller som finns som både djur och
+  plats, fäller importen med de andra radfelen. <!-- 02-§8.17 -->
 - Fel rapporteras med radnummer, kolumn och vad som ska rättas, på svenska, på samma
   form som datavalideringens meddelanden (`02-§6.5`). <!-- 02-§8.18 -->
 - Tabellen läses som CSV med citerade fält, så att en alt-text får innehålla kommatecken,
@@ -99,7 +125,7 @@ en get i en hage hör inte hemma i vare sig `animals/` eller `places/`.
   att en genererad QA-bild inte kan publiceras som gårdens foto. <!-- 02-§8.21 -->
 - `npm run qa:prompts` läser QA-datasetet och skriver en tabell med en rad per bildpost.
   Varje rad innehåller bild-id, målfil och en svensk bildprompt sammansatt av alt-texten
-  och de djur, arter eller platser som refererar bilden. <!-- 02-§8.22 -->
+  och de djur, arter och platser bilden visar. <!-- 02-§8.22 -->
 - `npm run qa:images -- --import <katalog>` läser genererade JPEG-, PNG- eller
   WebP-filer vars filnamn är ett befintligt bild-id, lägger märkningen "AI-bild · QA"
   i bildens nedre hörn och skriver den webbanpassade filen under samma id i
