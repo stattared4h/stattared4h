@@ -17,6 +17,14 @@ import { yamlScalar } from "./yaml-scalar.ts";
 export interface ImagePostFields {
   alt: string;
   credit: string;
+  /**
+   * What the picture shows (04-§9.13, ADR 0026). The browser tool leaves these out —
+   * it knows the photo, not the farm — while `npm run image:import` fills in the one
+   * the table's `post` column names.
+   */
+  animals?: readonly string[];
+  locations?: readonly string[];
+  species?: readonly string[];
 }
 
 export type ImagePostField = "alt" | "credit";
@@ -30,9 +38,18 @@ export interface ImagePostProblem {
 /** The prefix that marks a generated picture; refused outside the QA dataset (02-§8.21). */
 const AI_CREDIT_PREFIX = "AI-genererad";
 
-/** The file `source/data/images/<bild-id>.yaml`: `alt` and `credit`, one line each. */
+/**
+ * The file `source/data/images/<bild-id>.yaml`: `alt` and `credit`, one line each, then
+ * the subject lists that have anything in them, in the contract's order (04-§9.13).
+ */
 export function formatImagePost(fields: ImagePostFields): string {
-  return `alt: ${yamlScalar(fields.alt)}\ncredit: ${yamlScalar(fields.credit)}\n`;
+  let text = `alt: ${yamlScalar(fields.alt)}\ncredit: ${yamlScalar(fields.credit)}\n`;
+  for (const list of ["animals", "locations", "species"] as const) {
+    const ids = fields[list] ?? [];
+    if (ids.length === 0) continue;
+    text += `${list}:\n${ids.map((id) => `  - ${yamlScalar(id)}\n`).join("")}`;
+  }
+  return text;
 }
 
 /**

@@ -1,2 +1,9 @@
 alt: Två gårdskatter, en hona och en hane, sitter tillsammans på höskullen.
 credit: AI-genererad med OpenAI ImageGen
+animals:
+  - katt-smulan
+  - katt-tusse
+locations:
+  - c
+species:
+  - katt

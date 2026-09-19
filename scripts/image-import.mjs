@@ -9,11 +9,11 @@
  *
  * The first step writes a table with one row per photo, because a camera file name says
  * nothing about the subject and a hundred of them are not typed out by hand. The second
- * prepares every photo the way `npm run image` does, writes the image posts, and prints
- * the ids grouped by record, ready to paste into `photos:`.
+ * prepares every photo the way `npm run image` does and writes the image posts with the
+ * table's `post` column as the picture's subject (02-§8.17, ADR 0026).
  *
- * The import never touches the animals', locations' or species' files: where a picture
- * belongs is the editor's call, not the command's.
+ * The import never touches the animals', locations' or species' files. It does not have
+ * to: the link lives in the picture now, and that is the file the import writes.
  *
  * It is all or nothing. Every row is checked, and every photo read and converted, before
  * the first file is written — a half-finished import is worse than none.
@@ -23,11 +23,12 @@
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
-  formatIdsByPost,
   formatIssue,
+  formatWrittenByPost,
   planImport,
   templateCsv,
 } from "./lib/image-import.ts";
+import { loadRawDataset } from "../source/ts/domain/load.ts";
 import { imageFileName, imageIdFor, imagePostFile } from "../source/ts/domain/image-id.ts";
 import { formatImagePost } from "../source/ts/domain/image-post.ts";
 import {
@@ -91,6 +92,30 @@ function imagesDirOrFail(dataDir) {
   }
 }
 
+/**
+ * The ids the dataset holds, so `post` can be resolved to a kind (02-§8.17). The raw
+ * records are enough: a file name is a record id, and the import has no opinion on
+ * whether the record inside is otherwise valid.
+ */
+async function knownPosts(dataDir) {
+  let raw;
+  try {
+    raw = await loadRawDataset(dataDir);
+  } catch {
+    fail(`Kan inte läsa datasetet i ${shownPath(dataDir)}.`);
+  }
+  const speciesEntries = raw.species?.data?.species;
+  return {
+    animals: new Set(raw.animals.map((record) => record.id)),
+    locations: new Set(raw.locations.map((record) => record.id)),
+    species: new Set(
+      (Array.isArray(speciesEntries) ? speciesEntries : [])
+        .map((entry) => entry?.id)
+        .filter((id) => typeof id === "string"),
+    ),
+  };
+}
+
 /** Every photo directly in `dir`, by extension. Other files are left alone. */
 async function listPhotos(dir) {
   let entries;
@@ -122,6 +147,9 @@ async function importTable(options) {
   if (!options.photos) fail(`Ange --photos: katalogen där fotona ligger.\n${USAGE}`);
   const tablePath = path.resolve(options.table);
   const photoDir = path.resolve(options.photos);
+  // Before the table is read and a hundred photos are converted: a --data-dir that names
+  // no images directory is a typo, and the editor should hear that first.
+  const imagesDir = imagesDirOrFail(options.dataDir);
 
   let text;
   try {
@@ -138,7 +166,7 @@ async function importTable(options) {
     );
   }
 
-  const plan = planImport(text);
+  const plan = planImport(text, await knownPosts(options.dataDir));
   if (plan.issues.length > 0) {
     // The photos are not read yet, and saying so keeps a second round of errors from
     // coming as a surprise: reading a hundred files takes a while, and doing it for a
@@ -178,7 +206,6 @@ async function importTable(options) {
     process.exit(1);
   }
 
-  const imagesDir = imagesDirOrFail(options.dataDir);
   const postsDir = path.join(options.dataDir, "images");
   await mkdir(imagesDir, { recursive: true });
   await mkdir(postsDir, { recursive: true });
@@ -194,18 +221,18 @@ async function importTable(options) {
       continue;
     }
     await writeFile(imagePath, data);
-    await writeFile(postPath, formatImagePost({ alt: row.alt, credit: row.credit }));
+    await writeFile(postPath, formatImagePost({ alt: row.alt, credit: row.credit, [row.kind]: [row.post] }));
     written += 1;
   }
 
-  const ids = formatIdsByPost(prepared.map(({ row, id }) => ({ post: row.post, id })));
+  const listing = formatWrittenByPost(prepared.map(({ row, id }) => ({ post: row.post, id })));
   const summary =
     written === 0
       ? `Alla ${existing} bilder fanns redan; ingenting skrevs.`
       : `Skrev ${written} ${written === 1 ? "bild" : "bilder"} till ${shownPath(imagesDir)} och ` +
         `lika många bildposter till ${shownPath(postsDir)}` +
         (existing === 0 ? "." : `. ${existing} fanns redan.`);
-  console.log(`${summary}\n\nKlistra in id:na under photos i respektive fil:\n\n${ids}`);
+  console.log(`${summary}\n\nBilderna står nu i sina bildposter:\n\n${listing}\n\nKör npm run validate.`);
 }
 
 async function exists(file) {

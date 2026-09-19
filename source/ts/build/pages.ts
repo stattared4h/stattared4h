@@ -166,7 +166,7 @@ export interface LocationPageView {
   note: string | null;
   /** The location's `description` field, Markdown. */
   body: string | null;
-  /** The location's photos, in data order (02-§5.31). */
+  /** The location's photos: its portrait first, then the rest in id order (02-§8.29). */
   photos: Image[];
   /** "Hit når man med rullstol och barnvagn" or its negation (02-§5.10). */
   accessibility: string;
@@ -290,7 +290,7 @@ export function speciesTile(species: Species): SpeciesTileView {
   return { id: species.id, name: species.name, plural: species.plural, url: speciesUrl(species.id), photo: species.photo };
 }
 
-/** The portrait is the first photo in the list (02-§8.11). */
+/** The portrait is the first photo, which `attachPhotos` has already put there (02-§8.29). */
 export function portraitOf(animal: Animal): Image | null {
   return animal.photos[0] ?? null;
 }

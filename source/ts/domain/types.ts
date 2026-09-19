@@ -38,7 +38,7 @@ export interface Animal {
   father: string | null;
   status: Status;
   description: string | null;
-  /** In data order; the first one is the portrait (02-§8.11). */
+  /** Derived from the image posts: the portrait first, then the rest in id order (02-§8.29). */
   photos: Image[];
 }
 
@@ -75,7 +75,7 @@ export interface Location {
    * for the farmyard's cluster, and only the farm knows which of two neighbours matters.
    */
   label: LabelPlacement | null;
-  /** In data order; the first one is shown at the top of the page (02-§8.11). */
+  /** Derived from the image posts: the portrait first, then the rest in id order (02-§8.29). */
   photos: Image[];
 }
 
@@ -86,6 +86,7 @@ export interface Species {
   id: string;
   name: string;
   plural: string;
+  /** The species' `portrait`, or the first picture that names the species (02-§8.29). */
   photo: Image | null;
 }
 

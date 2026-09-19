@@ -16,11 +16,32 @@ export const TABLE_COLUMNS = ["fil", "post", "alt", "fotograf"] as const;
 /** 04-§3.2: lowercase a–z, digits and single hyphens between groups. */
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+/** Which kind of record the table's `post` names, and the image post's field for it. */
+export type PostKind = "animals" | "locations" | "species";
+
+const POST_KINDS: readonly PostKind[] = ["animals", "locations", "species"];
+
+/** What each kind is called when the message talks to the editor (CL-§1.10). */
+const KIND_NOUNS: Record<PostKind, string> = { animals: "djur", locations: "plats", species: "art" };
+
+/**
+ * The ids the dataset already holds, so `post` can be resolved to a kind (02-§8.17).
+ * The import writes the id into the image post, and to do that it must know which of
+ * the three lists it belongs in.
+ */
+export interface KnownPosts {
+  animals: ReadonlySet<string>;
+  locations: ReadonlySet<string>;
+  species: ReadonlySet<string>;
+}
+
 /** One row to import. `line` is the line in the table, counting the header as 1. */
 export interface ImportRow {
   line: number;
   file: string;
   post: string;
+  /** Which of the image post's subject lists `post` goes in. */
+  kind: PostKind;
   alt: string;
   credit: string;
 }
@@ -129,7 +150,7 @@ export function templateCsv(files: readonly string[]): string {
  * Turns a filled-in table into a plan. Every problem is reported at once, so the editor
  * fixes the table in one pass rather than discovering one error per run.
  */
-export function planImport(text: string): ImportPlan {
+export function planImport(text: string, known: KnownPosts): ImportPlan {
   const issues: ImportIssue[] = [];
   const table = parseTable(text);
 
@@ -201,7 +222,34 @@ export function planImport(text: string): ImportPlan {
       seenFiles.set(file, line);
     }
 
-    if (valid) rows.push({ line, file, post, alt, credit });
+    // 02-§8.17: the id goes into the image post, so it has to name something that
+    // exists — and exactly one thing, or the command cannot know which list it belongs
+    // in. A typo is caught here instead of becoming a picture nobody finds.
+    let kind: PostKind | null = null;
+    if (valid && post !== "") {
+      const kinds = POST_KINDS.filter((candidate) => known[candidate].has(post));
+      if (kinds.length === 1) {
+        kind = kinds[0];
+      } else if (kinds.length === 0) {
+        issues.push({
+          line,
+          column: "post",
+          message: `"${post}" finns inte i datasetet. Lägg till djuret, platsen eller arten först, eller rätta stavningen.`,
+        });
+        valid = false;
+      } else {
+        issues.push({
+          line,
+          column: "post",
+          message:
+            `"${post}" finns som både ${kinds.map((candidate) => KIND_NOUNS[candidate]).join(" och ")}, ` +
+            "så kommandot kan inte veta vad bilden visar. Skriv motivet i bildposten för hand i stället.",
+        });
+        valid = false;
+      }
+    }
+
+    if (valid && kind !== null) rows.push({ line, file, post, kind, alt, credit });
   });
 
   // All or nothing (02-§8.16): a partly valid table plans nothing.
@@ -209,18 +257,18 @@ export function planImport(text: string): ImportPlan {
 }
 
 /**
- * The written ids grouped by post, in the form `photos` takes in YAML (02-§8.17), so the
- * editor can copy a block straight into a record. Posts come in first-seen order and
- * their images in table order, which is the order they will appear on the page.
+ * What was written, one line per record: the id the editor can look up, not a block to
+ * paste — the ids are already in the image posts (02-§8.17). Posts come in first-seen
+ * order and their images in table order.
  */
-export function formatIdsByPost(entries: readonly { post: string; id: string }[]): string {
+export function formatWrittenByPost(entries: readonly { post: string; id: string }[]): string {
   const byPost = new Map<string, string[]>();
   for (const { post, id } of entries) {
     const ids = byPost.get(post);
     if (ids) ids.push(id);
     else byPost.set(post, [id]);
   }
-  return [...byPost].map(([post, ids]) => `${post}:\n${ids.map((id) => `  - ${id}`).join("\n")}\n`).join("\n");
+  return [...byPost].map(([post, ids]) => `${post}: ${ids.join(", ")}`).join("\n");
 }
 
 /** `fil:rad: meddelande`-style formatting for one issue, the way linters print. */

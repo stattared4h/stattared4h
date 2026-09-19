@@ -466,6 +466,7 @@ test("portrait comes first and the rest follow in image-id order", async () => {
 test("without portrait the first picture in id order is the main one", async () => {
   const raw = await rawQa();
   const ids = [await photoId("rosa", 0), await photoId("rosa", 1), await photoId("rosa", 2)].sort();
+  editAnimal(raw, "rosa", (a) => delete a.portrait);
   const result = await validate(raw);
   const photos = result.dataset?.animals.find((a) => a.id === "rosa")?.photos.map((photo) => photo.id) ?? [];
   assert.deepEqual(photos, ids, "the order is the image ids', so every build agrees");
@@ -632,7 +633,7 @@ test("an image post nothing refers to warns", async () => {
   const result = await validate(raw);
   assert.deepEqual(result.errors, []);
   const warning = result.warnings.find((w) => w.file === "images/img-abcdef012345.yaml");
-  assert.match(warning?.message ?? "", /ingen post använder/);
+  assert.match(warning?.message ?? "", /inget motiv och används ingenstans/);
 });
 
 test("an image file without an image post warns, and only when the directory is given", async () => {

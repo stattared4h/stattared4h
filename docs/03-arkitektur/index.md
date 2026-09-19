@@ -199,7 +199,7 @@ allt-eller-inget (`02-§8.16`), och det kräver att varje rad är godkänd innan
 filen skrivs. <!-- 03-§6.7 -->
 
 QA-bilderna har en separat, envägs kedja enligt ADR 0017. `npm run qa:prompts` läser
-bildposterna och de motiv de bär och skriver promptunderlaget. Genereringen sker
+bildposterna och de poster som visar dem och skriver promptunderlaget. Genereringen sker
 utanför bygget. `npm run qa:images -- --import <katalog>` kontrollerar samtliga
 källfiler, lägger märkningen i en SVG-overlay och använder `optimiseImage` med QA:s
 gränser innan något skrivs. Utan `--import` fyller samma kommando bara saknade filer

@@ -76,7 +76,7 @@ const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** 04-§10.9: anything that looks like the start of an HTML tag, comment or doctype. */
 /** A Markdown image, `![](img-a3f2c1d8b901)`. The address is checked with `isImageId`. */
 const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*\]\(([^)\s]*)\)/g;
-const IMAGE_FIELDS = new Set(["alt", "credit"]);
+const IMAGE_FIELDS = new Set(["alt", "credit", "animals", "locations", "species"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
@@ -93,7 +93,7 @@ const ANIMAL_FIELDS = new Set([
   "father",
   "status",
   "description",
-  "photos",
+  "portrait",
 ]);
 const LOCATION_FIELDS = new Set([
   "name",
@@ -107,10 +107,10 @@ const LOCATION_FIELDS = new Set([
   "accessible",
   "active",
   "label",
-  "photos",
+  "portrait",
 ]);
 const CLUE_FIELDS = new Set(["location", "text"]);
-const SPECIES_FIELDS = new Set(["id", "name", "plural", "photo"]);
+const SPECIES_FIELDS = new Set(["id", "name", "plural", "portrait"]);
 const BREED_FIELDS = new Set(["id", "name", "species", "heritage"]);
 const POPULATION_FIELDS = new Set(["species", "breed", "count"]);
 
@@ -136,6 +136,17 @@ class Issues {
   warn(file: string, field: string | null, message: string): void {
     this.warnings.push({ file, field, message });
   }
+}
+
+/**
+ * The ids in `species.yaml` as they stand in the file, before validation drops any
+ * entry. `attachPhotos` needs them so a broken species entry fails once, on itself.
+ */
+function readSpeciesIds(record: RawRecord | null): Set<string> {
+  const entries = (record?.data as { species?: unknown } | undefined)?.species;
+  if (!Array.isArray(entries)) return new Set();
+  const ids = entries.filter(isObject).map((entry) => entry.id);
+  return new Set(ids.filter((id): id is string => typeof id === "string"));
 }
 
 /** Formats an issue the way the CLI and the build print it: `file: fältet x: message`. */
@@ -306,33 +317,47 @@ class Fields {
     return image;
   }
 
-  /** A record's `photos`: a list of image ids, without repeats. Null when unusable. */
-  photos(data: Obj, images: ReadonlyMap<string, Image>): Image[] | null {
-    const raw = data.photos;
+  /**
+   * A record's `portrait` (02-§8.28): the one picture that is its main one, or null when
+   * the field is absent. That the picture actually shows the record is checked later, in
+   * `attachPhotos`, where the image posts' subject lists are known.
+   */
+  portrait(data: Obj, images: ReadonlyMap<string, Image>, field = "portrait"): Image | null {
+    const raw = data.portrait;
+    if (raw === undefined || raw === null) return null;
+    return this.imageReference(field, raw, images);
+  }
+
+  /**
+   * One of an image post's subject lists (04-§9.13): record ids, each in the form of
+   * §3 and each at most once. That the ids exist is checked in `attachPhotos`, which is
+   * the first point where every record has been read.
+   */
+  idList(data: Obj, field: string): string[] {
+    const raw = data[field];
     if (raw === undefined || raw === null) return [];
     if (!Array.isArray(raw)) {
-      this.error("photos", "måste vara en lista med bild-id:n, ett per streck.");
-      return null;
+      this.error(field, "måste vara en lista med id:n, ett per streck.");
+      return [];
     }
-    const photos: Image[] = [];
-    const seen = new Set<string>();
-    let valid = true;
+    const ids: string[] = [];
     raw.forEach((entry, index) => {
-      const field = `photos[${index}]`;
-      const image = this.imageReference(field, entry, images);
-      if (image === null) {
-        valid = false;
+      const at = `${field}[${index}]`;
+      if (typeof entry !== "string") {
+        this.error(
+          at,
+          `${quote(entry)} är inte ett id. Använd små bokstäver a–z, siffror och bindestreck; å och ä blir a, ö blir o.`,
+        );
         return;
       }
-      if (seen.has(image.id)) {
-        this.error(field, `bilden ${quote(image.id)} står med två gånger. Ta bort den ena raden.`);
-        valid = false;
+      if (!this.id(at, entry)) return;
+      if (ids.includes(entry)) {
+        this.error(at, `${quote(entry)} står med två gånger. Ta bort den ena raden.`);
         return;
       }
-      seen.add(image.id);
-      photos.push(image);
+      ids.push(entry);
     });
-    return valid ? photos : null;
+    return ids;
   }
 }
 
@@ -362,8 +387,13 @@ function openRecord(record: RawRecord, issues: Issues, kind: string): Obj | null
  * name check; a post with an unusable id is dropped, and every reference to it then
  * fails on its own with a message the editor can act on.
  */
-function validateImagePosts(records: readonly RawRecord[], issues: Issues, allowAiCredit: boolean): Map<string, Image> {
+function validateImagePosts(
+  records: readonly RawRecord[],
+  issues: Issues,
+  allowAiCredit: boolean,
+): { images: Map<string, Image>; subjects: Map<string, Subjects> } {
   const images = new Map<string, Image>();
+  const subjects = new Map<string, Subjects>();
   for (const record of records) {
     if (record.parseError !== null) {
       issues.error(record.file, null, `kunde inte läsas som YAML: ${record.parseError}`);
@@ -391,8 +421,121 @@ function validateImagePosts(records: readonly RawRecord[], issues: Issues, allow
       issues.error(record.file, "credit", "AI-genererade bilder får bara finnas i QA-datasetet.");
     }
     images.set(record.id, { id: record.id, alt, credit });
+    subjects.set(record.id, {
+      file: record.file,
+      animals: fields.idList(record.data, "animals"),
+      locations: fields.idList(record.data, "locations"),
+      species: fields.idList(record.data, "species"),
+    });
   }
-  return images;
+  return { images, subjects };
+}
+
+/**
+ * What one image post says it shows (04-§9.13, ADR 0026). The ids are kept as written
+ * and resolved in `attachPhotos`, because the animals, places and species have not been
+ * read yet when the image posts are.
+ */
+/** Every id that was read from a file, valid or not; see `attachPhotos`. */
+interface KnownIds {
+  animals: ReadonlySet<string>;
+  locations: ReadonlySet<string>;
+  species: ReadonlySet<string>;
+}
+
+interface Subjects {
+  /** The post's own file, so a bad id is reported where it stands. */
+  file: string;
+  animals: string[];
+  locations: string[];
+  species: string[];
+}
+
+/**
+ * Turns the image posts' subject lists into each record's `photos` (04-§8, 04-§9.14).
+ *
+ * This is the one place the reversed reference is resolved: the picture names the
+ * animal, and the animal's page needs the picture. The record's own `portrait` is
+ * already first in `photos`; everything else follows in image-id order, which is
+ * arbitrary but the same in every build (02-§6.9).
+ */
+function attachPhotos(
+  subjects: ReadonlyMap<string, Subjects>,
+  images: ReadonlyMap<string, Image>,
+  known: KnownIds,
+  animals: readonly Animal[],
+  locations: readonly Location[],
+  species: readonly Species[],
+  files: ReadonlyMap<string, string>,
+  speciesFile: string,
+  issues: Issues,
+): void {
+  const byAnimal = new Map<string, Image[]>();
+  const byLocation = new Map<string, Image[]>();
+  const bySpecies = new Map<string, Image[]>();
+
+  // The ids are checked against every record that was *read*, not against the ones that
+  // came through validation: an animal held back by its own broken `born` would
+  // otherwise make each picture of it report a second, misleading error.
+  const lists = [
+    { field: "animals", known: known.animals, into: byAnimal, missing: (id: string) => `djuret ${quote(id)} finns inte i animals/.` },
+    { field: "locations", known: known.locations, into: byLocation, missing: (id: string) => `platsen ${quote(id)} finns inte i locations/.` },
+    { field: "species", known: known.species, into: bySpecies, missing: (id: string) => `arten ${quote(id)} finns inte i ${speciesFile}.` },
+  ] as const;
+
+  for (const imageId of [...subjects.keys()].sort()) {
+    const post = subjects.get(imageId) as Subjects;
+    const image = images.get(imageId);
+    if (image === undefined) continue;
+    for (const list of lists) {
+      post[list.field].forEach((id, index) => {
+        if (!list.known.has(id)) {
+          issues.error(post.file, `${list.field}[${index}]`, `${list.missing(id)} Skriv id:t så som filen heter, utan .yaml.`);
+          return;
+        }
+        const found = list.into.get(id);
+        if (found === undefined) list.into.set(id, [image]);
+        else found.push(image);
+      });
+    }
+  }
+
+  /** The record's pictures: its portrait first, then the rest in image-id order. */
+  function ordered(portrait: Image | null, shown: readonly Image[]): Image[] {
+    const rest = shown.filter((image) => image.id !== portrait?.id);
+    return portrait === null ? rest : [portrait, ...rest];
+  }
+
+  /** 04-§10.19: a main picture that does not show the record is a mistake, not a choice. */
+  function checkPortrait(portrait: Image | null, shown: readonly Image[], file: string, field: string, noun: string): void {
+    if (portrait === null || shown.some((image) => image.id === portrait.id)) return;
+    issues.error(
+      file,
+      field,
+      `bilden ${quote(portrait.id)} visar inte ${noun}. ` +
+        `Skriv posten i bildens egen lista, eller välj en bild som redan står där.`,
+    );
+  }
+
+  for (const animal of animals) {
+    const shown = byAnimal.get(animal.id) ?? [];
+    const file = files.get(animal.id) ?? `animals/${animal.id}.yaml`;
+    checkPortrait(animal.photos[0] ?? null, shown, file, "portrait", "djuret");
+    animal.photos = ordered(animal.photos[0] ?? null, shown);
+  }
+
+  for (const location of locations) {
+    const shown = byLocation.get(location.id) ?? [];
+    const file = files.get(`locations/${location.id}`) ?? `locations/${location.id}.yaml`;
+    checkPortrait(location.photos[0] ?? null, shown, file, "portrait", "platsen");
+    location.photos = ordered(location.photos[0] ?? null, shown);
+  }
+
+  for (const entry of species) {
+    const shown = bySpecies.get(entry.id) ?? [];
+    checkPortrait(entry.photo, shown, speciesFile, `species[${entry.id}].portrait`, "arten");
+    entry.photo = ordered(entry.photo, shown)[0] ?? null;
+  }
 }
 
 // --- Clues ---------------------------------------------------------------------
@@ -511,9 +654,11 @@ function validateSpecies(record: RawRecord | null, images: ReadonlyMap<string, I
     }
     if (id !== null) seen.add(id);
 
+    // The species' picture is its `portrait`; every other picture that names the
+    // species is attached later, in `attachPhotos` (ADR 0026).
     let photo: Image | null = null;
-    if (entry.photo !== undefined && entry.photo !== null) {
-      photo = fields.imageReference(`${prefix}photo`, entry.photo, images);
+    if (entry.portrait !== undefined && entry.portrait !== null) {
+      photo = fields.imageReference(`${prefix}portrait`, entry.portrait, images);
       if (photo === null) return;
     }
 
@@ -649,7 +794,7 @@ function validateAnimal(
   const mother = fields.optionalString(data, "mother");
   const father = fields.optionalString(data, "father");
   const description = fields.optionalString(data, "description");
-  const photos = fields.photos(data, images);
+  const portrait = fields.portrait(data, images);
 
   const bornResult = normaliseBorn(data.born, today);
   if (!bornResult.ok) issues.error(record.file, "born", bornResult.message);
@@ -661,7 +806,6 @@ function validateAnimal(
     species === null ||
     sex === null ||
     status === null ||
-    photos === null ||
     !bornResult.ok
   ) {
     return { animal: null, refs };
@@ -677,7 +821,9 @@ function validateAnimal(
     father,
     status,
     description,
-    photos,
+    // The portrait is the only picture the record itself names; `attachPhotos` adds the
+    // ones whose posts name the animal (ADR 0026).
+    photos: portrait === null ? [] : [portrait],
   };
   return { animal, refs };
 }
@@ -780,7 +926,7 @@ function validateLocation(
   const accessible = fields.requiredBoolean(data, "accessible");
   const active = fields.requiredBoolean(data, "active");
   const label = fields.optionalEnum(data, "label", LABEL_PLACEMENTS);
-  const photos = fields.photos(data, images);
+  const portrait = fields.portrait(data, images);
 
   let species: string[] | null = null;
   if (data.species === undefined || data.species === null) {
@@ -836,11 +982,11 @@ function validateLocation(
     species === null ||
     accessible === null ||
     active === null ||
-    photos === null ||
     !coordinatesValid
   ) {
     return null;
   }
+  const photos = portrait === null ? [] : [portrait];
   return { id: record.id, name, shortName, kind, species, note, description, lat, lon, accessible, active, label, photos };
 }
 
@@ -858,8 +1004,9 @@ function collectWarnings(
   speciesFile: string,
   issues: Issues,
 ): void {
-  // 02-§8.13: an image post nothing points at. The file is in the repository for good
-  // (ADR 0008), so an unused one is worth saying out loud.
+  // 02-§8.13: an image post with no subject that nothing else uses either. The file is
+  // in the repository for good (ADR 0008), and until someone says what it shows it
+  // reaches no visitor. This warning is the queue the categorising tool works through.
   const used = new Set([
     ...animals.flatMap((animal) => animal.photos.map((photo) => photo.id)),
     ...locations.flatMap((location) => location.photos.map((photo) => photo.id)),
@@ -875,13 +1022,18 @@ function collectWarnings(
     issues.warn(
       imagePostFile(id),
       null,
-      "ingen post använder bilden. Referera den från ett djur, en plats eller en art, eller ta bort posten och filen.",
+      "bilden har inget motiv och används ingenstans. Skriv vilket djur, vilken plats " +
+        "eller vilken art den visar, eller ta bort posten och filen.",
     );
   }
 
   for (const animal of animals) {
     if (animal.photos.length === 0) {
-      issues.warn(files.get(animal.id) ?? `animals/${animal.id}.yaml`, "photos", "djuret har inget foto och visas med en platshållare.");
+      issues.warn(
+        files.get(animal.id) ?? `animals/${animal.id}.yaml`,
+        null,
+        "djuret har inget foto och visas med en platshållare. Skriv djurets id i en bildposts animals.",
+      );
     }
   }
 
@@ -910,7 +1062,11 @@ function collectWarnings(
   const speciesAtActiveLocations = new Set(locations.filter((l) => l.active).flatMap((l) => l.species));
   for (const entry of species) {
     if (entry.photo === null) {
-      issues.warn(speciesFile, `species[${entry.id}].photo`, "arten har ingen bild och visas med sitt namn på en platta.");
+      issues.warn(
+        speciesFile,
+        `species[${entry.id}].portrait`,
+        "arten har ingen bild och visas med sitt namn på en platta. Skriv artens id i en bildposts species.",
+      );
     }
     const hasAnimalsHere =
       animals.some((a) => a.species === entry.id && a.status === "here") ||
@@ -1043,7 +1199,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
   const today = options.today ?? new Date();
   const speciesFile = raw.species?.file ?? "species.yaml";
 
-  const images = validateImagePosts(raw.images, issues, path.basename(raw.dir).startsWith("data-"));
+  const { images, subjects } = validateImagePosts(raw.images, issues, path.basename(raw.dir).startsWith("data-"));
   const species = validateSpecies(raw.species, images, issues);
   const speciesIds = new Set(species.map((s) => s.id));
   const breeds = validateBreeds(raw.breeds, speciesIds, issues);
@@ -1069,6 +1225,13 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
     const location = validateLocation(record, speciesIds, images, issues);
     if (location !== null) locations.push(location);
   }
+
+  const known: KnownIds = {
+    animals: new Set(raw.animals.map((record) => record.id)),
+    locations: new Set(raw.locations.map((record) => record.id)),
+    species: readSpeciesIds(raw.species),
+  };
+  attachPhotos(subjects, images, known, animals, locations, species, files, speciesFile, issues);
 
   const clues = validateClues(raw.clues, images, new Set(locations.map((location) => location.id)), issues);
 
