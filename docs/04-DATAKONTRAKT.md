@@ -104,7 +104,7 @@ father: string | null        # djur-id, om pappan finns i registret
 publicId: string | null      # publikt märkningsnummer, t.ex. öronmärke
 status: here | gone          # finns på gården, eller har lämnat den
 description: string | null   # markdown, presentationstexten
-photos: [string]             # bild-id:n, se §9; den första är porträttet
+portrait: string | null      # bild-id, se §9: djurets porträtt
 ```
 
 Obligatoriskt: `name`, `species`, `sex` och `status`. Övrigt får utelämnas. <!-- 04-§4.1 -->
@@ -185,7 +185,7 @@ lat: number | null           # WGS84 i decimalgrader; ytans mitt, se regeln neda
 lon: number | null
 accessible: boolean          # nåbar med rullstol eller barnvagn
 active: boolean              # false för platser som inte används just nu
-photos: [string]             # bild-id:n, se §9; den första visas överst
+portrait: string | null      # bild-id, se §9: bilden överst på sidan
 ```
 
 Obligatoriskt: `name`, `kind`, `species`, `accessible` och `active`. `species` får vara en
@@ -262,7 +262,7 @@ species:
   - id: string               # t.ex. "get"
     name: string             # singular, "Get"
     plural: string           # "Getter"
-    photo: string            # frivillig: bild-id, se §9
+    portrait: string         # frivillig: bild-id, se §9
 ```
 
 Arten anges en gång här, så att "get" och "getter" stavas likadant överallt. <!-- 04-§6.1 -->
@@ -304,6 +304,7 @@ två ställen. <!-- 04-§8.1 -->
 | Ett djurs avkomma | djur vars `mother` eller `father` är detta djur |
 | Syskon | djur med samma `mother` eller `father` |
 | Djur per ras | djur med det `breed`-id:t |
+| En posts bilder | bildposter vars `animals`, `locations` eller `species` bär postens id, i id-ordning med `portrait` först (§9) |
 
 Djurets egen sida påstår aldrig var individen står. Den säger vilken art djuret är, och
 länkar till artsidan som visar var arten finns. <!-- 04-§8.2 -->
@@ -314,7 +315,8 @@ länkar till artsidan som visar var arten finns. <!-- 04-§8.2 -->
 
 Bilden är en **egen post**, inte ett fält inuti djuret. Ett foto kan visa två djur, och
 ett filnamn som bär ett djurnamn blir osant så snart bilden hamnar under fel post. Se
-[ADR 0015](adr/0015-bilden-som-egen-post.md). <!-- 04-§9.5 -->
+[ADR 0015](adr/0015-bilden-som-egen-post.md) och
+[ADR 0026](adr/0026-bilden-bar-sina-motiv.md). <!-- 04-§9.5 -->
 
 ```yaml
 # source/data/images/img-a3f2c1d8b901.yaml
@@ -346,14 +348,43 @@ Ett bild-id är `img-` följt av **tolv hexadecimala tecken**: `img-a3f2c1d8b901
 Poster refererar bild-id, aldrig ett filnamn och aldrig en sökväg. Bygget avgör var
 filen bor, så att lagringen kan bytas utan att datat rörs. <!-- 04-§9.2 -->
 
-| Post | Fält | Form |
-| --- | --- | --- |
-| Djur | `photos` | lista av bild-id:n; den första är porträttet |
-| Plats | `photos` | lista av bild-id:n; den första visas överst |
-| Art | `photo` | ett bild-id |
+**Bilden säger vad den visar; posten räknar inte upp sina bilder.** Se
+[ADR 0026](adr/0026-bilden-bar-sina-motiv.md).
 
-Samma bild-id får stå i flera poster. Filen finns en gång, alt-texten skrivs en gång, och
-upphovsuppgiften är sann överallt där bilden visas. <!-- 04-§9.11 -->
+```yaml
+# source/data/images/img-a3f2c1d8b901.yaml
+alt: Rosa och Stjärna står tillsammans i Tåmossen.
+credit: Anna Karlsson
+animals:                       # djur-id:n, se §4
+  - rosa
+  - stjarna
+locations:                     # plats-id:n, se §5
+  - tamossen
+species:                       # art-id:n, se §6
+  - ko
+```
+
+| Fält i bildposten | Form |
+| --- | --- |
+| `animals` | lista av djur-id:n, eller utelämnad |
+| `locations` | lista av plats-id:n, eller utelämnad |
+| `species` | lista av art-id:n, eller utelämnad |
+
+Alla tre är frivilliga, och en bild utan ett enda motiv-id är giltig — den är en bild som
+väntar på någon som känner igen den, och valideringen varnar för den
+(`04-§10.10`). <!-- 04-§9.13 -->
+
+Ett id får stå högst en gång i sin lista, och ska peka på en post som finns. Samma bild-id
+får däremot stå i flera listor och i flera poster: filen finns en gång, alt-texten skrivs
+en gång, och upphovsuppgiften är sann överallt där bilden visas. <!-- 04-§9.11 -->
+
+Djurets, platsens och artens bilder är **härledda** (§8): posten visar varje bild som bär
+dess id. Ordningen är bild-id:ts, med postens `portrait` först. <!-- 04-§9.14 -->
+
+`portrait` är frivilligt och bär ett enda bild-id — djurets porträtt, platsens toppbild
+och artens bild. Bilden ska bära postens eget id: en huvudbild som inte visar djuret är
+fel, och valideringen fäller. Utan `portrait` är den första bilden i id-ordning postens
+huvudbild. <!-- 04-§9.15 -->
 
 En innehållssida i Markdown infogar en bild med bildsyntax där adressen är bild-id:t och
 alt-texten är tom: `![](img-a3f2c1d8b901)`. Alt-texten hämtas ur bildposten. <!-- 04-§9.12 -->
@@ -393,8 +424,12 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
   <!-- 04-§10.15 -->
 - Att varje bildpost har en bildfil som finns, är WebP, saknar metadata och håller sig
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->
-- Att varje bild-id följer formen i §9, och att ingen post refererar samma bild två
-  gånger. <!-- 04-§10.14 -->
+- Att varje bild-id följer formen i §9, och att ingen bildpost bär samma id två gånger i
+  samma motivlista. <!-- 04-§10.14 -->
+- Att varje id i en bildposts `animals`, `locations` och `species` pekar på ett djur, en
+  plats respektive en art som finns. <!-- 04-§10.18 -->
+- Att en posts `portrait` är en bild som bär postens eget id, så att huvudbilden visar det
+  den är huvudbild för. <!-- 04-§10.19 -->
 - Att `publicId`, när det finns, följer formen i §4 och är unikt efter normalisering.
   <!-- 04-§10.16 -->
 - Att inget djur har ett `location`-fält. <!-- 04-§10.8 -->
@@ -406,8 +441,9 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
 
 Valideringen ger dessutom **varningar** som inte fäller bygget, för sådant som är tillåtet
 men troligen ett förbiseende: ett djur utan foto, en aktiv plats utan djurslag, en plats
-utan koordinater, en bildpost som ingen refererar, en bildfil som ingen bildpost hör till
-och en ledtråd som pekar på en plats som inte används just nu. <!-- 04-§10.10 -->
+utan koordinater, en bildpost utan motiv som varken en innehållssida eller en ledtråd
+använder, en bildfil som ingen bildpost hör till och en ledtråd som pekar på en plats som
+inte används just nu. <!-- 04-§10.10 -->
 
 ---
 

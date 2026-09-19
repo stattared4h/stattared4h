@@ -56,8 +56,7 @@ status: here
 description: |
   Skriv några meningar om djuret. Vad är det för personlighet?
   Något besökaren känner igen det på?
-photos:
-  - img-a3f2c1d8b901
+portrait: img-a3f2c1d8b901
 ```
 
 Bara `name`, `species`, `sex` och `status` måste vara med. Vet du inte födelsedatumet kan
@@ -69,9 +68,11 @@ du skriva bara årtalet, `born: 2021`, eller utelämna raden.
 `mother` och `father` är filnamnen på föräldrarna utan `.yaml`. Finns föräldern inte i
 registret utelämnar du raden — skriv inte ett namn, för fältet vill ha ett id.
 
-`photos` är en lista med bild-id:n, och den första bilden är porträttet. Id:na får du av
-`npm run image`, se *Lägga till en bild* nedan. Har djuret ingen bild än utelämnar du
-raden — det blir en varning, inte ett fel, och sidan visar en platta med djurslagets namn.
+Djuret räknar **inte** upp sina bilder. Det är bilden som säger vilket djur den visar, se
+*Lägga till en bild* nedan. `portrait` är enda undantaget: ett enda bild-id som väljer
+vilken av djurets bilder som blir porträttet. Utelämnar du raden väljer bygget en av dem,
+och samma varje gång. Har djuret ingen bild alls blir det en varning, inte ett fel, och
+sidan visar en platta med djurslagets namn.
 
 Slå upp vad varje fält betyder i [`04-DATAKONTRAKT.md`](04-DATAKONTRAKT.md).
 
@@ -154,20 +155,30 @@ kommandot säger att bilden redan finns i stället för att göra en kopia.
 krävs: en bild utan alt-text kommer ändå inte förbi valideringen. Publicera aldrig en
 bild på en identifierbar person utan samtycke — det gäller lika mycket i verktyget.
 
-Referera sedan id:t från djuret eller platsen:
+Skriv sedan in i bildposten vad bilden visar — du behöver inte röra djurets fil:
 
 ```yaml
-photos:
-  - img-a3f2c1d8b901
-  - img-7be014aa39c2
+# source/data/images/img-a3f2c1d8b901.yaml
+alt: Rosa och Stjärna står tillsammans i Tåmossen.
+credit: Anna Karlsson
+animals:
+  - rosa
+  - stjarna
+locations:
+  - tamossen
 ```
 
-Den **första bilden i listan är huvudbilden**: djurets porträtt, platsens toppbild. Vill
-du byta porträtt flyttar du raden överst. En art har i stället ett enda id:
-`photo: img-a3f2c1d8b901`.
+Djurets, platsens och artens sida plockar därefter upp bilden av sig själv. Ett foto med
+två djur på läggs in en gång och nämner båda — filen finns en gång, och alt-texten skrivs
+en gång.
 
-Samma id får stå hos flera poster. Ett foto med två djur på läggs in en gång och
-refereras från båda — filen finns en gång och alt-texten skrivs en gång.
+Vet du inte vad bilden föreställer lämnar du listorna helt. Bilden blir liggande med en
+varning tills någon som känner igen djuret svarar, och det är just den kön
+kategoriseringsverktyget betar av.
+
+Vill du styra vilken bild som blir huvudbild skriver du `portrait: img-a3f2c1d8b901` i
+djurets, platsens eller artens fil. Den bilden måste nämna posten i sin egen lista —
+annars vore det ett porträtt av någon annan.
 
 I en innehållstext i Markdown infogas bilden med tom alt-text, eftersom texten redan står
 i bildposten:
@@ -248,24 +259,24 @@ kalkylprogram skriver ofta det.
 npm run image:import -- bilder.csv --photos ~/Bilder/gard
 ```
 
-Kommandot bereder varje bild precis som `npm run image` gör, skriver bildposterna, och
-skriver ut id:na grupperade per post:
+Kommandot bereder varje bild precis som `npm run image` gör och skriver bildposterna med
+kolumnen `post` inskriven som motiv — ett djur-id hamnar under `animals`, ett plats-id
+under `locations` och ett art-id under `species`. Sedan skriver det en sammanställning av
+vad som lades in:
 
 ```text
-rosa:
-  - img-983a851829da
-  - img-88c164764c6d
-
-brackebur:
-  - img-e28ead3d09f0
+rosa: img-983a851829da, img-88c164764c6d
+brackebur: img-e28ead3d09f0
 ```
 
 Är något fel på någon rad skrivs **ingenting alls** — du får en lista med radnummer och
 vad som ska rättas, fixar tabellen och kör om. Du får aldrig hälften av bilderna inlagda.
+Ett `post` som inte finns i datasetet är ett sådant fel, så ett stavfel i tabellen fastnar
+här i stället för att bli en bild ingen hittar.
 
-**Steg 4. Klistra in.** Kommandot rör aldrig djurens filer; det är du som avgör var
-bilderna hör hemma. Kopiera raderna under `rosa:` in i `source/data/animals/rosa.yaml`
-under `photos:`, och så vidare. Kör `npm run validate` när du är klar.
+**Steg 4. Kör `npm run validate`.** Kommandot rör aldrig djurens, platsernas eller
+arternas filer, så det finns inget att klistra in. Vill du byta porträtt på något djur gör
+du det med `portrait` i djurets fil.
 
 ### Vad som händer sedan
 

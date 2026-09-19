@@ -140,12 +140,13 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§8.5`–`8.7` | Leverans av bilder | `byggd` | `picture`-shortcoden i djurkortet, djurslagsrutan och djur- och artsidan, `credit` i `source/pages/djur.njk` och `arter.njk`; `tests/build/data-pages.test.ts` kontrollerar `srcset`, `width`, `height`, `loading`, `fetchpriority`, `alt` och fototexten på Rosas, Bockens och Tuvas sidor |
 | `02-§8.8` | Bildposten med `alt` och `credit` | `byggd` | `validateImagePosts` i `source/ts/domain/validate.ts`, `Image` i `types.ts`, `images/` i `load.ts`; `tests/domain/validate.test.ts` och `tests/domain/qa-data.test.ts`. Se [ADR 0015](../adr/0015-bilden-som-egen-post.md) |
 | `02-§8.9` | Bild-id ur innehållets SHA-256 | `byggd` | `source/ts/domain/image-id.ts`; `tests/domain/image-id.test.ts` prövar formen, att hashen är stabil och att prefixet hindrar YAML från att läsa ett id med bara siffror som heltal |
-| `02-§8.10`–`8.11` | Referenser och huvudbild | `byggd` | `Fields.photos` och `Fields.imageReference` löser upp id:n till `Image`, `portraitOf` i `source/ts/build/pages.ts` tar den första; `tests/domain/validate.test.ts` prövar delning mellan poster och dubbelreferens, `tests/build/data-pages.test.ts` att en delad bild ger en fil och en alt-text på båda sidorna |
+| `02-§8.10`–`8.11` | Bilden bär sina motiv; postens bilder härleds | `saknas` | Riktningen vänds av [ADR 0026](../adr/0026-bilden-bar-sina-motiv.md): bildposten får `animals`, `locations` och `species`, och `photos` härleds ur dem |
 | `02-§8.12` | Bilder i Markdown | `byggd` | Bildregeln i `source/ts/build/markdown.ts` och upplösaren i `images-plugin.ts`; `tests/build/markdown.test.ts` och en markdown-bild i en QA-platsbeskrivning som `tests/build/data-pages.test.ts` följer genom bygget |
-| `02-§8.13` | Varning för oanvänd bildpost och oanvänd bildfil | `byggd` | `collectWarnings` och `warnAboutStrayImageFiles` i `validate.ts`; bild-id i Markdown räknas som användning, annars vore varningen falsk. `tests/domain/validate.test.ts` |
+| `02-§8.13` | Varning för bildpost utan motiv och oanvänd bildfil | `saknas` | `collectWarnings` och `warnAboutStrayImageFiles` i `validate.ts` finns; varningen ska räkna motivlistorna i stället för postens referenser, och blir då kön av bilder som väntar på svar |
 | `02-§8.14`–`8.15` | `npm run image:import` i två steg | `byggd` | `scripts/image-import.mjs` med `--scan` och import; `tests/build/image-import.test.ts` kör båda mot en tillfällig fotokatalog och kontrollerar att bara `images/` finns i datakatalogen efteråt |
 | `02-§8.16` | Importen är allt-eller-inget | `byggd` | `planImport` samlar alla fel innan något planeras, och CLI:n läser och omvandlar varje foto innan den första filen skrivs; `tests/build/image-import.test.ts` prövar både en trasig tabell och ett foto som saknas |
-| `02-§8.17` | Id:n grupperade per post, klistringsfärdiga | `byggd` | `formatIdsByPost` i `scripts/lib/image-import.ts`; `tests/build/image-import.test.ts` prövar formen både som funktion och i kommandots utskrift |
+| `02-§8.17` | Importens `post` skrivs in i bildposten | `saknas` | `scripts/lib/image-import.ts` ska slå upp id:t i datasetet, välja motivlista efter posttyp och fälla vid okänt eller tvetydigt id |
+| `02-§8.28`–`8.31` | `portrait`, ordning, referenskontroll och spärr mot `photos` | `saknas` | Huvudbilden pekas ut i posten och ska bära postens id; resten sorteras på bild-id. Gamla `photos`- och `photo`-fält fälls av kontrollen av okända fält |
 | `02-§8.18`–`8.19` | Felmeddelanden och CSV med citerade fält | `byggd` | `parseTable` och `formatIssue` i `scripts/lib/image-import.ts`; `tests/build/image-import.test.ts` prövar citattecken, kommatecken och radbrytningar i ett fält, semikolon, byteordningsmarkering, CRLF, och att rad och kolumn står i varje meddelande |
 | `02-§8.20` | Samma bild två gånger skrivs en gång | `byggd` | Två rader med samma fil fälls i `planImport`; en omkörning hoppar över bilder som finns, eftersom id:t är innehållets hash. `tests/build/image-import.test.ts` |
 | `02-§8.21` | AI-credit i QA och spärr i produktion | `byggd` | QA-bildposterna anger OpenAI ImageGen; `validateImagePosts` avvisar credit som börjar med `AI-genererad` utanför QA och bevakas av `tests/domain/validate.test.ts` |
@@ -305,6 +306,8 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `04-§10` | Validering | `byggd` | Den kompletta ingången är `source/ts/domain/index.ts`, som validerar `publicId` och delegerar övriga kontraktsregler till `source/ts/domain/validate.ts`; `tests/domain/validate.test.ts` och `tests/domain/public-id-validation.test.ts` |
 | `04-§10.15` | AI-credit avvisas i produktion | `byggd` | `validateImagePosts` skiljer QA från produktion via datakatalogen; `tests/domain/validate.test.ts` prövar båda fallen |
 | `04-§10.16` | Publikt ID har giltig form och normaliserad unikhet | `byggd` | `readPublicIds` och `normalisePublicId`; `tests/domain/public-id.test.ts` och `tests/domain/public-id-validation.test.ts` |
+| `04-§9.13`–`9.15` | Motivlistor, härledda bilder och `portrait` | `saknas` | Formen står i kontraktets §9; härledningen hör till `04-§8` |
+| `04-§10.18`–`10.19` | Motiv-id:n finns; `portrait` bär postens id | `saknas` | Två nya kontrollområden i `validate.ts` |
 | `04-§11` | Ledtrådskatalogen: filnamnet är bild-id:t, `location` och frivillig `text` | `byggd` | `Clue` i `source/ts/domain/types.ts`, läsningen i `load.ts` och `validateClues` i `validate.ts`; `tests/domain/clues.test.ts` prövar QA-katalogen, och `tests/domain/clue-post.test.ts` att en fil skriven av bildverktyget läses tillbaka av samma validering |
 | `04-§10.17` | Ledtrådens bildpost och plats finns | `byggd` | `validateClues` i `source/ts/domain/validate.ts`; `tests/domain/clues.test.ts` prövar filnamn som inte är bild-id, bildpost som saknas, plats som saknas eller inte finns, okänt fält och texten |
 
@@ -340,6 +343,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§6.1` | Bygget genererar bara mindre storlekar | `byggd` | `generateImageSizes` i `source/ts/build/images.ts`; `tests/build/images.test.ts` |
 | `03-§6.2` | Upplösare från bild-id till sökväg | `byggd` | `imagesDirFor` och `renderPicture`; `tests/build/images.test.ts` kontrollerar också att ingen sökväg har en underkatalog per posttyp |
 | `03-§6.5` | Bild-id löses upp när datasetet normaliseras | `byggd` | `Fields.imageReference` i `validate.ts` ger `Animal.photos`, `Location.photos` och `Species.photo` färdiga `Image`-objekt; `tests/domain/validate.test.ts` |
+| `03-§6.9` | Motiven vänds till postens bilder i valideringen | `saknas` | `attachPhotos` efter att djur, platser och arter validerats, så att `pages.ts`, mallarna och spelen ser samma `photos` som förut |
 | `03-§6.7` | Importen delad i planering och utförande | `byggd` | `scripts/lib/image-import.ts` är ren och testas på strängar; `scripts/image-import.mjs` gör filarbetet. `tests/build/image-import.test.ts` |
 | `03-§6.8` | Prompt- och importkedja för QA-bilder | `byggd` | `scripts/lib/qa-images.ts`, `scripts/qa-prompts.mjs` och importläget i `scripts/qa-images.mjs`; `tests/build/qa-images.test.ts` och `tests/build/images.test.ts` bevakar kedjan |
 | `03-§6.6` | Bilder i Markdown genom samma kedja | `byggd` | `renderMarkdown(text, { renderImage })` och `markdownImages` från `images-plugin.ts`; `tests/build/markdown.test.ts` |
@@ -392,10 +396,10 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 8 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
-| `byggd` | 193 |
+| `byggd` | 190 |
 | `manuell` | 69 |
 
 Summeringen räknar rader i tabellerna under *Läget nu* och uppdateras i fas 5 av processen i

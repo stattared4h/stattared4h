@@ -180,8 +180,17 @@ vymodellerna i `pages.ts` och mallarna arbetar med ett färdigt bildobjekt och b
 aldrig slå upp något själva. Härledningen går åt ett håll, som alla andra i
 `04-§8`. <!-- 03-§6.5 -->
 
+Bilden bär också sina motiv ([ADR 0026](../adr/0026-bilden-bar-sina-motiv.md)): `animals`,
+`locations` och `species` i bildposten. `validateImagePosts` läser listorna, och
+`attachPhotos` vänder dem till varje posts `photos` när djuren, platserna och arterna är
+validerade — porträttet först, resten i id-ordning. Djurets, platsens och artens fält
+heter `photos` respektive `photo` i det validerade datasetet precis som förut, så
+`pages.ts`, mallarna, spelen och service workern ser ingen skillnad. Skillnaden är var
+uppgiften skrivs: i bilden, av den som känner igen den. <!-- 03-§6.9 -->
+
 Importen av många bilder (`02-§8.14`–`8.20`) är samma kedja med en tabell framför:
-`scripts/lib/image-import.ts` läser CSV:n, kontrollerar varje rad och planerar arbetet;
+`scripts/lib/image-import.ts` läser CSV:n, kontrollerar varje rad mot datasetets id:n och
+planerar arbetet, med kolumnen `post` som bildpostens motiv (`02-§8.17`);
 `scripts/image-import.mjs` utför planen med samma `optimiseImage` och `imageIdFor` som
 `npm run image`. Uppdelningen finns för att allt utom filskrivningen ska gå att
 enhetstesta i Node, på samma sätt som dokumentkontrollen i `scripts/lib/check-docs.ts`.
@@ -190,7 +199,7 @@ allt-eller-inget (`02-§8.16`), och det kräver att varje rad är godkänd innan
 filen skrivs. <!-- 03-§6.7 -->
 
 QA-bilderna har en separat, envägs kedja enligt ADR 0017. `npm run qa:prompts` läser
-bildposterna och deras bakåtreferenser och skriver promptunderlaget. Genereringen sker
+bildposterna och de motiv de bär och skriver promptunderlaget. Genereringen sker
 utanför bygget. `npm run qa:images -- --import <katalog>` kontrollerar samtliga
 källfiler, lägger märkningen i en SVG-overlay och använder `optimiseImage` med QA:s
 gränser innan något skrivs. Utan `--import` fyller samma kommando bara saknade filer
