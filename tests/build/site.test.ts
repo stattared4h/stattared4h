@@ -309,7 +309,7 @@ describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
     const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
     const template = html.slice(html.indexOf("<template data-image-tool-places>"), html.indexOf("</template>"));
     assert.ok(template.length > 0, "sidan bär ingen platsmall");
-    const options = [...template.matchAll(/<option value="([^"]*)">([^<]+)<\/option>/g)];
+    const options = [...template.matchAll(/<option value="([^"]*)"[^>]*>([^<]+)<\/option>/g)];
     assert.equal(options[0][1], "", "första valet är tomt, så inget väljs av misstag");
     const places = options.slice(1);
     assert.ok(places.length >= 30, `bara ${places.length} platser i väljaren`);
@@ -317,5 +317,30 @@ describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
     const names = places.map((option) => option[2]);
     assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, "sv")), "platserna står i bokstavsordning");
     assert.equal(html.includes("fetch("), false, "sidan hämtar ingenting i körtid (ADR 0021)");
+  });
+
+  test("varje plats i väljaren bär sina koordinater och om den har foton (02-§11.36–11.37, 03-§11.8)", async () => {
+    const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
+    const template = html.slice(html.indexOf("<template data-image-tool-places>"), html.indexOf("</template>"));
+    const places = [...template.matchAll(/<option value="([^"]+)"([^>]*)>/g)];
+    assert.ok(places.length > 0, "inga platser i väljaren");
+    for (const [, id, attributes] of places) {
+      assert.match(attributes, /data-photos="(true|false)"/, `${id} saknar data-photos`);
+      const lat = /data-lat="([^"]*)"/.exec(attributes);
+      const lon = /data-lon="([^"]*)"/.exec(attributes);
+      assert.equal(lat === null, lon === null, `${id}: lat och lon anges tillsammans`);
+      if (lat !== null && lon !== null) {
+        assert.ok(Number.isFinite(Number(lat[1])) && Number.isFinite(Number(lon[1])), `${id}: koordinaterna är tal`);
+      }
+    }
+    assert.ok(places.some(([, , attributes]) => attributes.includes("data-lat")), "ingen plats har koordinater");
+  });
+
+  test("sidan säger att platsens fil ändras på samma gren som bilderna (02-§11.38)", async () => {
+    const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
+    const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+    assert.match(main, /samma gren/);
+    assert.match(main, /source\/data\/locations\//);
+    assert.doesNotMatch(main, /Platsuppgiften i mobilfotot följer aldrig med/, "den gamla meningen om GPS stämmer inte längre (ADR 0026)");
   });
 });

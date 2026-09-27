@@ -15,6 +15,7 @@ import {
   buildViews,
   GONE_LABEL,
   HERITAGE_LABEL,
+  imageToolView,
   NO_SPECIES_AT_LOCATION_TEXT,
   NOT_ACCESSIBLE_TEXT,
   OTHER_PLACES_HEADING,
@@ -480,5 +481,23 @@ describe("species content (02-§5.22)", () => {
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe("the image tool's places (02-§11.26, 02-§11.35–11.37)", () => {
+  test("each active place carries its coordinates and whether it already has photos", async () => {
+    const dataset = await qaDataset();
+    const view = imageToolView(dataset);
+    const active = dataset.locations.filter((location) => location.active);
+    assert.equal(view.places.length, active.length);
+    for (const place of view.places) {
+      const location = dataset.locations.find((one) => one.id === place.id);
+      assert.ok(location, place.id);
+      assert.equal(place.lat, location.lat, `${place.id}: lat`);
+      assert.equal(place.lon, location.lon, `${place.id}: lon`);
+      assert.equal(place.hasPhotos, location.photos.length > 0, `${place.id}: hasPhotos`);
+    }
+    assert.ok(view.places.some((place) => place.hasPhotos), "a place with photos");
+    assert.ok(view.places.some((place) => !place.hasPhotos), "a place without");
   });
 });
