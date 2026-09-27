@@ -419,9 +419,11 @@ canvas-anropen ligger i `source/ts/ui/`.
 | `source/ts/domain/clue-post.ts` | Ledtrådspostens YAML och kontrollen av plats och text (`02-§11.25`–`11.29`, `04-§11`) |
 | `source/ts/domain/yaml-scalar.ts` | Citeringen båda posterna skriver med, så samma värde stavas likadant |
 | `source/ts/domain/image-prepare.ts` | Skalningsbeslutet och kvalitetstrappan som ren logik, med kodaren som argument (`02-§11.8`, `02-§11.10`) |
+| `source/ts/domain/exif-position.ts` | GPS-positionen ur originalfotots EXIF, ur bytes och utan webbläsare (`02-§11.31`) |
+| `source/ts/domain/photo-position.ts` | Avståndet, `MAX_FARM_DISTANCE_METRES` och `PLACE_GUESS_DISTANCE_METRES`, gårdsgränsen och den närmaste platsen (`02-§11.33`, `02-§11.36`, `02-§11.39`, `04-§10.18`) |
 | `source/ts/ui/image-tool/` | Filväljaren, canvas, formuläret och nedladdningarna |
 
-`prepareEncoded` i `image-prepare.ts` tar en kodarfunktion och prövar kvalitetsstegen
+`encodeUnderLimit` i `image-prepare.ts` tar en kodarfunktion och prövar kvalitetsstegen
 tills resultatet håller storleksgränsen. Den vet ingenting om `canvas`, och testas därför
 med en påhittad kodare i Node — samma mönster som `optimiseImage` följer på andra sidan
 ([ADR 0021](../adr/0021-bildberedning-i-webblasaren.md)). <!-- 03-§11.3 -->
@@ -435,6 +437,22 @@ Platsväljaren för ledtrådar (`02-§11.26`) är byggd på samma sätt som spel
 dem i sidan som en `<template>` med en färdig `<select>`, och verktyget klonar den in i
 varje kort som kryssas i. Ingen förfrågan går iväg när redaktören står i en hage, och
 listan kan inte gå i otakt med datat: den byggdes ur det. <!-- 03-§11.6 -->
+
+Fotots position läses ur originalfilens bytes innan bilden ritas om, eftersom `canvas`
+släpper allt utom bildpunkterna (`02-§11.31`, [ADR 0026](../adr/0026-fotots-position-i-bildposten.md)).
+`readExifPosition` letar upp EXIF-blocket efter dess signatur — `Exif` följt av ett
+TIFF-huvud — i stället för att tolka varje containerformat för sig, så JPEG, HEIC och
+WebP går samma väg. Den läser bara GPS-katalogen och ger `null` för allt annat, även en
+position på noll grader, som vissa Android-väljare skriver i stället för att ta bort
+fältet. Gårdsgränsen prövas med `onTheFarm` i `photo-position.ts` mot platserna i
+sidan, och valideringen anropar samma funktion med datasetets platser (`04-§10.18`), så
+verktyget och CI kan inte vara oense om var gården slutar. <!-- 03-§11.7 -->
+
+Platsen bilden hör till (`02-§11.35`) väljs i en klon av samma `<template>` som
+ledtrådens. Varje `<option>` bär platsens `lat`, `lon` och om den har foton i bygget som
+dataattribut, så att förvalet (`02-§11.36`) och raden som ska in i platsfilen
+(`02-§11.37`) räknas ut utan någon förfrågan. Länken till platsfilen byggs ur `site.repo`,
+som sidan redan har för uppladdningsvyn. <!-- 03-§11.8 -->
 
 Sidan skriver ingenting och talar inte med GitHub. Den bygger en adress till repots
 uppladdningsvy och låter redaktörens webbläsare öppna den, precis som feedbacklänken gör

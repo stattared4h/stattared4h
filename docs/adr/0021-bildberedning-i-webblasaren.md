@@ -1,6 +1,8 @@
 # 0021 — Bilden bereds i webbläsaren, med valideringen som enda grind
 
-**Status:** Antagen, 2026-09-08
+**Status:** Antagen, 2026-09-08. Att GPS-positionen stannar i telefonen är ersatt av
+[ADR 0026](0026-fotots-position-i-bildposten.md): positionen följer med i bildposten,
+inte i filen.
 
 ## Sammanhang
 

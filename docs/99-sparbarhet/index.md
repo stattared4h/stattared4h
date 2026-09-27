@@ -211,6 +211,15 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `02-§11.26` | Platslistan bakas in i sidan vid byggtillfället | `byggd` | `imageToolView` i `source/ts/build/pages.ts` och mallen `data-image-tool-places`; `tests/build/site.test.ts` kräver listan i produktionsbygget, i bokstavsordning och utan anrop i körtid. Utan platser i datat är rutan avstängd med en förklaring — bygg med en tom datakatalog och bekräfta det |
 | `02-§11.28`–`11.29` | Ledtrådsfilen i arkivet och som egen knapp, i katalogens form | `byggd` | `entriesFor` och knappen i `source/ts/ui/image-tool/tool.ts` över `formatCluePost` och `cluePostFile` i `source/ts/domain/clue-post.ts`; `tests/domain/clue-post.test.ts` kör den skrivna filen genom `loadDataset` och kräver att den passerar utan efterarbete |
 | `02-§11.30` | Samma filnamn i olika mappar; telefonstegen säger hur | `byggd` | Stycket i `source/pages/verktyg-bild.njk`; `tests/build/site.test.ts` kräver det på den byggda sidan |
+| `02-§11.31` | Positionen ur EXIF till bildposten | `saknas` | |
+| `02-§11.32` | Ingen position utan EXIF, och ingen fråga efter den | `saknas` | |
+| `02-§11.33` | Positioner utanför gården följer inte med | `saknas` | |
+| `02-§11.34` | Kortet säger om positionen följer med | `saknas` | |
+| `02-§11.35` | Platsväljaren "Bilden hör till platsen" | `saknas` | |
+| `02-§11.36` | Närmaste plats förvald | `saknas` | |
+| `02-§11.37` | Raden till platsfilen, kopieringsknapp och länk | `saknas` | |
+| `02-§11.38` | Platsfilen ändras på samma gren, aldrig av sidan | `saknas` | |
+| `02-§11.39` | Avståndsgränserna på ett enda ställe | `saknas` | |
 | `02-§12.1` | Startskärm med storlek och nivå; inga inställningar under spelet | `manuell` | Formuläret `data-bingo-start` i `source/pages/bingo.njk`; `source/ts/ui/bingo.ts` döljer det när brickan visas. Öppna `/bingo/` i 360 px, välj 4 × 4 och tryck Börja spela: sidan visar bara rubriken, lägesraden och brickan, och radioknapparna är borta |
 | `02-§12.2` | Sida, navkort och menyrad | `byggd` | `bingoUrl` och kortet i `homeView` i `source/ts/build/pages.ts`, symbolen i `HOME_CARD_SYMBOLS`, raden i `navLinks` i `source/layouts/header.njk`; `tests/build/pages.test.ts` och `tests/build/data-pages.test.ts` kräver kortet, `tests/build/site.test.ts` menyradens plats |
 | `02-§12.3` | Sidan i förcachen | `byggd` | Sidan är en vanlig sida i `collections.all`, som `source/pages/sw.njk` listar; `tests/build/pwa.test.ts` kräver varje sida i förcachen |
@@ -307,6 +316,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `04-§10.16` | Publikt ID har giltig form och normaliserad unikhet | `byggd` | `readPublicIds` och `normalisePublicId`; `tests/domain/public-id.test.ts` och `tests/domain/public-id-validation.test.ts` |
 | `04-§11` | Ledtrådskatalogen: filnamnet är bild-id:t, `location` och frivillig `text` | `byggd` | `Clue` i `source/ts/domain/types.ts`, läsningen i `load.ts` och `validateClues` i `validate.ts`; `tests/domain/clues.test.ts` prövar QA-katalogen, och `tests/domain/clue-post.test.ts` att en fil skriven av bildverktyget läses tillbaka av samma validering |
 | `04-§10.17` | Ledtrådens bildpost och plats finns | `byggd` | `validateClues` i `source/ts/domain/validate.ts`; `tests/domain/clues.test.ts` prövar filnamn som inte är bild-id, bildpost som saknas, plats som saknas eller inte finns, okänt fält och texten |
+| `04-§9.13`, `04-§10.18` | Bildpostens frivilliga position, parvis och på gården | `saknas` | |
 
 ### Miljöer (`06-§`)
 
@@ -361,6 +371,7 @@ Kraven är sajtens beställning. Allt annat i matrisen finns för att uppfylla d
 | `03-§11.1`–`11.2` | Adressen som en sanning i bygget; undantagen från förcachen och indexeringen | `byggd` | `IMAGE_TOOL_PATH` i `source/ts/build/tool-page.ts` läses av `eleventy.config.js`, mallen och byggtesterna; `tests/build/site.test.ts` och `tests/build/pwa.test.ts` |
 | `03-§11.3`–`11.5` | Lagerdelningen: domänlogik i Node, canvas i `ui/`, id via `crypto.subtle` | `byggd` | `source/ts/domain/image-prepare.ts`, `zip.ts`, `image-post.ts` och `image-limits.ts` testas i Node; `source/ts/ui/image-tool/` håller sig till canvas och DOM. `imageIdFor` är samma funktion i bygget, kommandona och webbläsaren (`tests/domain/image-id.test.ts`) |
 | `03-§11.6` | Platsväljaren byggd ur datat, inte hämtad | `byggd` | `imageToolView` i `source/ts/build/pages.ts` och `<template data-image-tool-places>` i `source/pages/verktyg-bild.njk`; `tests/build/site.test.ts` |
+| `03-§11.7`–`11.8` | EXIF-läsningen och gårdsgränsen i domänen; platsens data i mallen | `saknas` | |
 | `03-§12.1` | Kandidaterna från bygget som `<template>` per post | `byggd` | `bingoView` i `source/ts/build/pages.ts` och poolen i `source/pages/bingo.njk`; `tests/build/data-pages.test.ts` räknar malldelarna och kräver bildkedjans markup i dem |
 | `03-§12.2` | Regler i domänen, DOM i vyn, firande utan beroenden | `byggd` | `source/ts/domain/bingo.ts` testad i `tests/domain/bingo.test.ts`; `source/ts/ui/bingo.ts`, `confetti.ts` och `fanfare.ts` håller sig till DOM, canvas och Web Audio, och `tests/build/pwa.test.ts` kräver att den buntade koden inte pekar på någon annan värd. Fanfarens tonlista är ren data i `fanfareNotes`, testad utan webbläsare i `tests/ui/fanfare.test.ts` |
 | `03-§12.3` | Dragningen som en modul båda spelen läser | `byggd` | `source/ts/domain/draw.ts`, som både `bingo.ts` och `spana.ts` bygger på; `tests/domain/draw.test.ts` prövar fördelningen en gång i stället för en gång per spel |
@@ -392,7 +403,7 @@ Två sorters dokument har medvetet inga `§`-ID och står därför utanför matr
 
 | Status | Antal rader |
 | --- | --- |
-| `saknas` | 1 |
+| `saknas` | 12 |
 | `dokumenterad` | 20 |
 | `påbörjad` | 17 |
 | `byggd` | 193 |
