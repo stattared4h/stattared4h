@@ -326,6 +326,21 @@ Båda fälten är obligatoriska. `alt` beskriver vad som är viktigt i bilden, p
 `credit` är fotografen eller rättighetshavaren, och visas intill bilden
 (`02-§8.7`). <!-- 04-§9.6 -->
 
+```yaml
+# source/data/images/img-a3f2c1d8b901.yaml — med position
+alt: Rosa och Stjärna står tillsammans i Tåmossen.
+credit: Anna Karlsson
+lat: 57.337412
+lon: 12.340871
+```
+
+`lat` och `lon` är frivilliga och anges tillsammans, eller inte alls. De är fotots
+GPS-position i WGS84 och decimalgrader, med högst sex decimaler, och pekar på **var
+fotografen stod** — inte på motivet och inte på en plats. Bildverktyget läser dem ur
+originalfotots EXIF (`02-§11.31`); ingen behöver skriva dem för hand. Positionen kopplar
+inte bilden till någon post: vilken plats bilden visas på avgörs bara av platsens
+`photos`. Se [ADR 0026](adr/0026-fotots-position-i-bildposten.md). <!-- 04-§9.13 -->
+
 ### Bild-id
 
 Ett bild-id är `img-` följt av **tolv hexadecimala tecken**: `img-a3f2c1d8b901`.
@@ -395,6 +410,10 @@ Valideringen körs i CI och fäller bygget. Den kontrollerar: <!-- 04-§10.1 -->
   inom mått- och storleksgränsen. <!-- 04-§10.7 -->
 - Att varje bild-id följer formen i §9, och att ingen post refererar samma bild två
   gånger. <!-- 04-§10.14 -->
+- Att en bildpost med position har både `lat` och `lon`, inom WGS84:s gränser, och att
+  punkten ligger inom 500 m från någon plats med koordinater. En position längre bort är
+  inte gårdens, och ett repo som är publikt ska inte bära den (`02-§11.33`).
+  <!-- 04-§10.18 -->
 - Att `publicId`, när det finns, följer formen i §4 och är unikt efter normalisering.
   <!-- 04-§10.16 -->
 - Att inget djur har ett `location`-fält. <!-- 04-§10.8 -->

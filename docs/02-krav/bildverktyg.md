@@ -9,7 +9,8 @@ Beslut: [ADR 0008](../adr/0008-bilder-i-repot.md),
 [ADR 0015](../adr/0015-bilden-som-egen-post.md),
 [ADR 0021](../adr/0021-bildberedning-i-webblasaren.md),
 [ADR 0022](../adr/0022-verktygssidor-utanfor-navigationen.md),
-[ADR 0025](../adr/0025-spelets-ledtradar-ar-egna-poster.md).
+[ADR 0025](../adr/0025-spelets-ledtradar-ar-egna-poster.md),
+[ADR 0026](../adr/0026-fotots-position-i-bildposten.md).
 
 ---
 
@@ -64,9 +65,10 @@ bara sista steget ut.
   längsta sidan och kodas om till WebP under `MAX_IMAGE_BYTES` — samma gränser som
   `02-§8.1`. En bild som redan är mindre förstoras inte. <!-- 02-§11.8 -->
 - Den färdiga filen bär varken EXIF, XMP eller ICC. Omkodningen sker i webbläsarens
-  `canvas`, som bara bär bildpunkter vidare, så mobilfotots GPS-position stannar i
-  telefonen ([ADR 0008](../adr/0008-bilder-i-repot.md)); den färgprofil kodaren lägger
-  till på egen hand tas bort ur filen innan den lämnas ifrån sig. <!-- 02-§11.9 -->
+  `canvas`, som bara bär bildpunkter vidare ([ADR 0008](../adr/0008-bilder-i-repot.md));
+  den färgprofil kodaren lägger till på egen hand tas bort ur filen innan den lämnas
+  ifrån sig. Det enda ur originalets metadata som når repot är fotots position, och den
+  står synligt i bildposten (`02-§11.31`), aldrig i bildfilen. <!-- 02-§11.9 -->
 - Kvaliteten sänks steg för steg tills filen håller storleksgränsen, efter samma
   princip som `optimiseImage`. Håller den inte ens på lägsta steget rapporteras bilden
   som ett fel, och de övriga bilderna bereds ändå. <!-- 02-§11.10 -->
@@ -106,8 +108,9 @@ bara sista steget ut.
 - Arkivet lagrar filerna utan komprimering. WebP är redan komprimerat, och en egen
   deflate vore kod utan värde. <!-- 02-§11.20 -->
 - Bildposten har samma form som den `npm run image` skriver: `alt` och `credit`, i den
-  ordningen, en rad var. Samma bild ska ge samma fil oavsett vilken väg den kom
-  in. <!-- 02-§11.21 -->
+  ordningen, en rad var, och därefter `lat` och `lon` när fotot bar en position
+  (`02-§11.31`). Samma bild med samma uppgifter ska ge samma fil oavsett vilken väg den
+  kom in. <!-- 02-§11.21 -->
 - Sidan beskriver vägen vidare i klartext, steg för steg, och länkar till repots
   uppladdningsvy på github.com. Länken leder till en inloggningsspärrad sida hos GitHub
   — redaktören måste vara inloggad med sitt konto och ha skrivrätt
@@ -142,8 +145,46 @@ bara sista steget ut.
   har skrivits, i den ordningen, en rad var. Filerna passerar `npm run validate` utan
   efterarbete, som `02-§11.23` kräver av allt sidan lämnar ifrån sig. <!-- 02-§11.29 -->
 
+### Fotots position
+
+- När originalfotot bär en GPS-position i sin EXIF läser sidan ut den innan bilden ritas
+  om, och skriver den i bildposten som `lat` och `lon` med sex decimaler (`04-§9.13`).
+  Formaten är de sidan tar emot (`02-§11.7`): JPEG, HEIC, PNG och WebP, där webbläsaren
+  lämnar positionen kvar i filen. <!-- 02-§11.31 -->
+- Saknar fotot position — för att kameran inte sparade någon, eller för att telefonens
+  bildväljare tog bort den — får bildposten ingen. Sidan frågar inte efter en position och
+  har inget fält för den. En bild laddas oftast upp långt efter att den togs och långt
+  från gården, så telefonens läge när sidan används säger ingenting om
+  bilden. <!-- 02-§11.32 -->
+- En position som ligger längre bort än `MAX_FARM_DISTANCE_METRES`, 500 m, från varje plats med
+  koordinater följer inte med, och kortet säger det. Ett foto taget hemma ska inte
+  publicera var fotografen bor. Samma gräns håller valideringen (`04-§10.18`), så en
+  position som skrivits in för hand stoppas i CI. <!-- 02-§11.33 -->
+- Kortet visar i klartext om bildposten får en position eller inte, och
+  varför. <!-- 02-§11.34 -->
+
+### Platsen bilden hör till
+
+- Varje beredd bild har en platsväljare med etiketten "Bilden hör till platsen", med
+  samma synliga etikett som övriga fält. Den listar samma aktiva platser som ledtrådens
+  väljare (`02-§11.26`), och valet är frivilligt. <!-- 02-§11.35 -->
+- Har bilden en position och ligger den närmaste platsen inom
+  `PLACE_GUESS_DISTANCE_METRES`, 150 m, är den platsen förvald. Redaktören kan byta eller välja
+  bort den. Positionen är var fotografen stod, inte var motivet är, så förvalet är en
+  gissning och aldrig ett beslut. <!-- 02-§11.36 -->
+- När en plats är vald visar kortet exakt vad som ska läggas till i platsens fil
+  `source/data/locations/<plats-id>.yaml`: raden `- <bild-id>` under `photos:`, eller
+  båda raderna när platsen inte har några foton i bygget. Texten har en knapp som
+  kopierar den och en länk till platsens fil på github.com. <!-- 02-§11.37 -->
+- Sidan skriver aldrig platsens fil själv. Den kan ha ändrats sedan sajten byggdes, och
+  en hel fil ur ett gammalt bygge skulle skriva över det som ändrats. Kopplingen görs som
+  en ändring i den befintliga filen, på samma gren som bilderna, så att bilden och
+  referensen hamnar i samma pull request. Stegen på sidan säger det. <!-- 02-§11.38 -->
+
 ### Gränsvärdena
 
 - `MAX_IMAGE_EDGE` och `MAX_IMAGE_BYTES` är definierade på ett enda ställe, som
   valideringen, bygget, kommandona och klientkoden alla läser. Ett tal som står på flera
   ställen slutar stämma på det ena. <!-- 02-§11.24 -->
+- `MAX_FARM_DISTANCE_METRES` och `PLACE_GUESS_DISTANCE_METRES` är definierade på ett
+  enda ställe, som valideringen och klientkoden båda läser. <!-- 02-§11.39 -->
