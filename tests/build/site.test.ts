@@ -340,7 +340,7 @@ describe("bildverktyget (02-§11.1–11.6, 02-§11.22, ADR 0022)", () => {
     const html = await readFile(path.join(prod, TOOL_PAGE), "utf8");
     const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
     assert.match(main, /samma gren/);
-    assert.match(main, /source\/data\/locations\//);
+    assert.match(main, /platsens fil/);
     assert.doesNotMatch(main, /Platsuppgiften i mobilfotot följer aldrig med/, "den gamla meningen om GPS stämmer inte längre (ADR 0026)");
   });
 });

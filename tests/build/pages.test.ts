@@ -305,8 +305,8 @@ describe("the animal page (02-§5.14–5.18)", () => {
 
   test("the portrait is the first photo in the list (02-§8.11)", () => {
     const photos = [
-      { id: "img-000000000001", alt: "a", credit: "c" },
-      { id: "img-000000000002", alt: "b", credit: "c" },
+      { id: "img-000000000001", alt: "a", credit: "c", position: null },
+      { id: "img-000000000002", alt: "b", credit: "c", position: null },
     ];
     const base = { id: "a", name: "A", species: "get", breed: null, sex: "female" as const, born: null, mother: null, father: null, status: "here" as const, description: null };
     assert.equal(portraitOf({ ...base, photos })?.id, "img-000000000001");

@@ -9,14 +9,20 @@
  * The upright turn happens without a line of code asking for it: the browser reads the
  * EXIF orientation and turns the picture before it is drawn.
  *
- * Metadata takes one line. A canvas carries nothing but pixels, so EXIF and XMP — the GPS
- * position in a phone photo among them — cannot get through it (ADR 0008). The encoder on
- * the other side is another matter: Chromium writes an ICC profile into every WebP it
- * makes, and the repository takes none, so `stripWebpMetadata` takes it back out.
+ * Metadata takes one line. A canvas carries nothing but pixels, so EXIF and XMP cannot get
+ * through it (ADR 0008). The encoder on the other side is another matter: Chromium writes
+ * an ICC profile into every WebP it makes, and the repository takes none, so
+ * `stripWebpMetadata` takes it back out.
+ *
+ * The one thing kept from the original's metadata is its GPS position, read from the
+ * file's bytes before the canvas sees it and handed on as data for the image post, never
+ * as part of the file (02-§11.31, ADR 0026).
  */
+import { readExifPosition } from "../../domain/exif-position.ts";
 import { imageIdFor } from "../../domain/image-id.ts";
 import { MAX_IMAGE_EDGE } from "../../domain/image-limits.ts";
 import { encodeUnderLimit, fitWithin } from "../../domain/image-prepare.ts";
+import type { GeoPoint } from "../../domain/types.ts";
 import { stripWebpMetadata } from "../../domain/webp.ts";
 
 export interface PreparedImage {
@@ -28,6 +34,8 @@ export interface PreparedImage {
   quality: number;
   /** What the file was called on the way in, so the editor can tell two pictures apart. */
   sourceName: string;
+  /** The original's GPS position, whether or not it is on the farm; null when it had none. */
+  position: GeoPoint | null;
 }
 
 /**
@@ -76,6 +84,9 @@ async function toWebp(canvas: HTMLCanvasElement, quality: number): Promise<Uint8
  * meant for the editor: the caller shows it beside the picture that caused it.
  */
 export async function prepareImage(file: File): Promise<PreparedImage> {
+  // Read before anything else: a failure to decode still ends the picture, but a file
+  // without a readable position is an ordinary photo (02-§11.32).
+  const position = readExifPosition(new Uint8Array(await file.arrayBuffer()));
   const image = await decode(file);
   const size = fitWithin({ width: image.naturalWidth, height: image.naturalHeight }, MAX_IMAGE_EDGE);
 
@@ -94,5 +105,6 @@ export async function prepareImage(file: File): Promise<PreparedImage> {
     height: size.height,
     quality: encoded.quality,
     sourceName: file.name,
+    position,
   };
 }

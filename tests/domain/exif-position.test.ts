@@ -22,7 +22,7 @@ const GPS = {
 const LAT = 57 + 20 / 60 + 14.67 / 3600;
 const LON = 12 + 20 / 60 + 27.13 / 3600;
 
-function blank(): sharp.Sharp {
+function blank(): ReturnType<typeof sharp> {
   return sharp({ create: { width: 8, height: 8, channels: 3, background: "#7a9a5a" } });
 }
 

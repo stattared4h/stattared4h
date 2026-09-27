@@ -19,6 +19,9 @@ import {
 } from "../../domain/clue-post.ts";
 import { imageFileName, imagePostFile } from "../../domain/image-id.ts";
 import { formatImagePost, imagePostProblems, type ImagePostFields } from "../../domain/image-post.ts";
+import { guessPlace, MAX_FARM_DISTANCE_METRES, onTheFarm, type PlacePoint } from "../../domain/photo-position.ts";
+import { placeFileUrl, placePhotoLines } from "../../domain/place-link.ts";
+import type { GeoPoint } from "../../domain/types.ts";
 import { createZip, type ZipEntry } from "../../domain/zip.ts";
 import { prepareImage, type PreparedImage } from "./prepare.ts";
 
@@ -26,8 +29,22 @@ import { prepareImage, type PreparedImage } from "./prepare.ts";
 const IMAGES_DIR = "source/images";
 const DATA_DIR = "source/data";
 
+/**
+ * What the build wrote into the page about the farm's places (03-§11.8): where they are,
+ * for the farm's border and the guess, and whether each file already has a `photos` list.
+ */
+interface Places {
+  template: HTMLTemplateElement;
+  points: PlacePoint[];
+  withPhotos: Set<string>;
+  /** The repository on github.com, for the link to a place's file. */
+  repo: string;
+}
+
 interface Card {
   prepared: PreparedImage;
+  /** The photo's position when it is on the farm; this is what the post carries (02-§11.33). */
+  position: GeoPoint | null;
   alt: HTMLTextAreaElement;
   credit: HTMLInputElement;
   /** Ticked when the picture is a clue for Spana! (02-§11.25). */
@@ -50,7 +67,7 @@ interface Problem {
 const cards: Card[] = [];
 
 function fieldsOf(card: Card): ImagePostFields {
-  return { alt: card.alt.value, credit: card.credit.value };
+  return { alt: card.alt.value, credit: card.credit.value, position: card.position };
 }
 
 function clueFieldsOf(card: Card): CluePostFields {
@@ -144,13 +161,104 @@ function field(label: string, control: HTMLElement, id: string, describedBy: str
   return wrapper;
 }
 
+/** A fresh copy of the place select the build wrote into the page. */
+function placeSelect(places: Places | null): HTMLSelectElement | null {
+  if (places === null) return null;
+  return (places.template.content.cloneNode(true) as DocumentFragment).querySelector("select");
+}
+
+/** The position the post may carry, and the sentence that says so (02-§11.33, 02-§11.34). */
+function keptPosition(position: GeoPoint | null, places: Places | null): { position: GeoPoint | null; note: string } {
+  if (position === null) return { position: null, note: "Fotot har ingen position, så bildposten får ingen." };
+  if (!onTheFarm(position, places?.points ?? [])) {
+    return {
+      position: null,
+      note: `Fotots position ligger mer än ${MAX_FARM_DISTANCE_METRES} m från gården och följer inte med.`,
+    };
+  }
+  return { position, note: "Fotots position följer med i bildposten." };
+}
+
+/**
+ * Which place the picture belongs to, and what to add to that place's file for it to show
+ * there (02-§11.35–11.38). The select is a copy of the clue's; the guess comes from the
+ * photo's position when there is one close enough. Nothing here writes the place's file:
+ * the editor adds the lines on GitHub, on the same branch as the pictures.
+ */
+function belongsTo(
+  prepared: PreparedImage,
+  position: GeoPoint | null,
+  places: Places | null,
+): { fields: HTMLElement[]; select: HTMLSelectElement | null } {
+  const select = placeSelect(places);
+  if (select === null || places === null) return { fields: [], select: null };
+  const hintId = `plats-bild-tips-${prepared.id}`;
+
+  const guess = position === null ? null : guessPlace(position, places.points);
+  if (guess !== null) select.value = guess;
+  const hint = element("p", "meta", "Förvald efter var fotot togs. Byt om den är fel.");
+  hint.id = hintId;
+
+  const block = element("div", "image-tool__place");
+  const how = element("p", "");
+  const lines = element("pre", "image-tool__lines");
+  const code = element("code", "");
+  lines.append(code);
+  const copy = element("button", "button button--secondary", "Kopiera");
+  copy.type = "button";
+  const link = element("a", "", "Öppna platsens fil på GitHub");
+  link.target = "_blank";
+  link.rel = "noopener";
+  const copied = element("p", "meta");
+  copied.setAttribute("role", "status");
+  const row = element("div", "image-tool__copy");
+  row.append(copy, link);
+  block.append(how, lines, row, copied);
+
+  const update = (): void => {
+    const id = select.value;
+    hint.hidden = guess === null || id !== guess;
+    block.hidden = id === "";
+    copied.textContent = "";
+    if (id === "") return;
+    const hasPhotos = places.withPhotos.has(id);
+    how.replaceChildren(
+      ...(hasPhotos
+        ? ["Lägg till raden sist i listan under ", element("code", "", "photos:"), " i platsens fil, på samma gren som bilderna."]
+        : [
+            "Lägg till raderna sist i platsens fil, på samma gren som bilderna. Står det ",
+            element("code", "", "photos: []"),
+            " i filen, ta bort den raden först.",
+          ]),
+    );
+    code.textContent = placePhotoLines(prepared.id, hasPhotos);
+    link.href = placeFileUrl(places.repo, id);
+  };
+  select.addEventListener("change", update);
+  copy.addEventListener("click", () => {
+    void navigator.clipboard.writeText(`${code.textContent ?? ""}\n`).then(
+      () => {
+        copied.textContent = "Kopierat.";
+      },
+      () => {
+        copied.textContent = "Det gick inte att kopiera. Markera raderna och kopiera dem själv.";
+      },
+    );
+  });
+  update();
+
+  const wrapper = field("Bilden hör till platsen (frivilligt)", select, `plats-bild-${prepared.id}`, hintId);
+  wrapper.append(hint);
+  return { fields: [wrapper, block], select };
+}
+
 /**
  * The card for one prepared picture: what it became, what to write about it, and the
- * files it turns into. `places` is the select the build wrote into the page, or null when
- * the dataset has no places at all — then the picture cannot be a clue and the tick box
- * says why (02-§11.26).
+ * files it turns into. `places` is what the build wrote into the page, or null when the
+ * dataset has no places at all — then the picture cannot be a clue and the tick box says
+ * why (02-§11.26), and there is no place for it to belong to.
  */
-function buildCard(prepared: PreparedImage, places: HTMLTemplateElement | null): { node: HTMLLIElement; card: Card } {
+function buildCard(prepared: PreparedImage, places: Places | null): { node: HTMLLIElement; card: Card } {
   const node = element("li", "image-tool__item");
   const errorId = `fel-${prepared.id}`;
 
@@ -166,6 +274,8 @@ function buildCard(prepared: PreparedImage, places: HTMLTemplateElement | null):
     "meta",
     `${prepared.sourceName} · ${prepared.id} · ${prepared.width} × ${prepared.height} px · ${kilobytes(prepared.data.byteLength)}`,
   );
+  const kept = keptPosition(prepared.position, places);
+  const positionNote = element("p", "meta", kept.note);
 
   const alt = element("textarea", "field__input field__input--multiline");
   alt.rows = 3;
@@ -179,7 +289,7 @@ function buildCard(prepared: PreparedImage, places: HTMLTemplateElement | null):
   error.setAttribute("role", "alert");
 
   const isClueBox = element("input", "");
-  const place = places === null ? null : (places.content.cloneNode(true) as DocumentFragment).querySelector("select");
+  const place = placeSelect(places);
   const clueText = element("input", "field__input");
   clueText.type = "text";
   const clueFields = element("div", "image-tool__clue");
@@ -189,7 +299,18 @@ function buildCard(prepared: PreparedImage, places: HTMLTemplateElement | null):
   clueDownload.type = "button";
   clueDownload.hidden = true;
 
-  const card: Card = { prepared, alt, credit, isClue: isClueBox, place, clueText, clueFields, clueDownload, error };
+  const card: Card = {
+    prepared,
+    position: kept.position,
+    alt,
+    credit,
+    isClue: isClueBox,
+    place,
+    clueText,
+    clueFields,
+    clueDownload,
+    error,
+  };
 
   if (place === null) {
     // Nothing to answer with: the dataset has no places, so a clue could not be finished
@@ -241,8 +362,10 @@ function buildCard(prepared: PreparedImage, places: HTMLTemplateElement | null):
   node.append(
     preview,
     facts,
+    positionNote,
     field("Alt-text — vad är viktigt i bilden?", alt, `alt-${prepared.id}`, errorId),
     field("Fotograf", credit, `credit-${prepared.id}`, errorId),
+    ...belongsTo(prepared, kept.position, places).fields,
     checkbox("Det här är en ledtråd till Spana!", isClueBox, `ledtrad-kryss-${prepared.id}`),
     clueFields,
     error,
@@ -268,6 +391,22 @@ function entriesFor(card: Card): ZipEntry[] {
   return entries;
 }
 
+/** The places as the build wrote them into the template's options (03-§11.8). */
+function readPlaces(template: HTMLTemplateElement, repo: string): Places {
+  const points: PlacePoint[] = [];
+  const withPhotos = new Set<string>();
+  for (const option of template.content.querySelectorAll("option")) {
+    if (option.value === "") continue;
+    if (option.dataset.photos === "true") withPhotos.add(option.value);
+    const lat = Number(option.dataset.lat);
+    const lon = Number(option.dataset.lon);
+    if (option.dataset.lat !== undefined && Number.isFinite(lat) && Number.isFinite(lon)) {
+      points.push({ id: option.value, lat, lon });
+    }
+  }
+  return { template, points, withPhotos, repo };
+}
+
 export function init(): void {
   const root = document.querySelector<HTMLElement>("[data-image-tool]");
   if (root === null) return;
@@ -277,8 +416,9 @@ export function init(): void {
   const actions = root.querySelector<HTMLElement>("[data-image-tool-actions]");
   const zipButton = root.querySelector<HTMLButtonElement>("[data-image-tool-zip]");
   const blocked = root.querySelector<HTMLElement>("[data-image-tool-blocked]");
-  const places = root.querySelector<HTMLTemplateElement>("[data-image-tool-places]");
+  const template = root.querySelector<HTMLTemplateElement>("[data-image-tool-places]");
   if (input === null || list === null || status === null || actions === null || zipButton === null || blocked === null) return;
+  const places = template === null ? null : readPlaces(template, root.dataset.repo ?? "");
 
   const say = (message: string): void => {
     status.textContent = message;

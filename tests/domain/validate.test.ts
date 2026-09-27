@@ -430,7 +430,7 @@ test("a reference is resolved to the post's alt and credit", async () => {
   });
   const result = await validate(raw);
   const photo = result.dataset?.animals.find((a) => a.id === "rosa")?.photos[0];
-  assert.deepEqual(photo, { id, alt: "Rosa står i Bräckebur.", credit: "Anna Andersson" });
+  assert.deepEqual(photo, { id, alt: "Rosa står i Bräckebur.", credit: "Anna Andersson", position: null });
 });
 
 // --- Coordinates ------------------------------------------------------------------

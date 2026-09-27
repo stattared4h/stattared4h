@@ -17,11 +17,19 @@ export type Status = "here" | "gone";
  * therefore appears in every record that uses the image, which is the point: the alt
  * text and the credit are written once.
  */
+/** A point in WGS84, in decimal degrees. */
+export interface GeoPoint {
+  lat: number;
+  lon: number;
+}
+
 export interface Image {
   /** `img-` and twelve hex characters (04-§9.7). */
   id: string;
   alt: string;
   credit: string;
+  /** Where the photographer stood, when the photo said so (04-§9.13, ADR 0026). */
+  position: GeoPoint | null;
 }
 
 export interface Animal {

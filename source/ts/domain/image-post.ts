@@ -11,12 +11,16 @@
  * standing in a paddock rather than for a pull request: the same fields must be there,
  * carry no markup, and not claim a generated picture is the farm's own (02-§8.21).
  */
+import { roundPosition } from "./photo-position.ts";
 import { containsHtml } from "./plain-text.ts";
+import type { GeoPoint } from "./types.ts";
 import { yamlScalar } from "./yaml-scalar.ts";
 
 export interface ImagePostFields {
   alt: string;
   credit: string;
+  /** The photo's position, when it carried one that is on the farm (02-§11.31, 02-§11.33). */
+  position?: GeoPoint | null;
 }
 
 export type ImagePostField = "alt" | "credit";
@@ -30,9 +34,17 @@ export interface ImagePostProblem {
 /** The prefix that marks a generated picture; refused outside the QA dataset (02-§8.21). */
 const AI_CREDIT_PREFIX = "AI-genererad";
 
-/** The file `source/data/images/<bild-id>.yaml`: `alt` and `credit`, one line each. */
+/**
+ * The file `source/data/images/<bild-id>.yaml`: `alt` and `credit`, one line each, and
+ * `lat` and `lon` after them when there is a position (04-§9.13).
+ */
 export function formatImagePost(fields: ImagePostFields): string {
-  return `alt: ${yamlScalar(fields.alt)}\ncredit: ${yamlScalar(fields.credit)}\n`;
+  const lines = [`alt: ${yamlScalar(fields.alt)}`, `credit: ${yamlScalar(fields.credit)}`];
+  if (fields.position) {
+    const { lat, lon } = roundPosition(fields.position);
+    lines.push(`lat: ${lat}`, `lon: ${lon}`);
+  }
+  return `${lines.join("\n")}\n`;
 }
 
 /**

@@ -39,7 +39,7 @@ description: >-
     </p>
   </noscript>
 
-  <div class="image-tool" data-image-tool>
+  <div class="image-tool" data-image-tool data-repo="{{ site.repo }}">
     <div class="field">
       <label class="field__label" for="image-tool-files">Välj bilder från kameran eller datorn</label>
       <input class="field__input" id="image-tool-files" type="file" accept="image/*" multiple data-image-tool-input>
@@ -48,17 +48,20 @@ description: >-
 
     <p class="image-tool__status" role="status" data-image-tool-status hidden></p>
 
-    {#- The places a clue can answer with (02-§11.26). The build writes the list into the
-        page; the tool clones this select into every card that is ticked as a clue, so
-        nothing is fetched while the editor is standing in a paddock (ADR 0021). Without
-        places in the dataset there is nothing to pick, and the tool says so instead of
-        offering an empty list. #}
+    {#- The places a clue can answer with and a picture can belong to (02-§11.26,
+        02-§11.35). The build writes the list into the page; the tool clones this select
+        into every card, so nothing is fetched while the editor is standing in a paddock
+        (ADR 0021). Each option carries the place's coordinates, for the farm's border and
+        the guess, and whether its file already has photos (03-§11.8). Without places in
+        the dataset there is nothing to pick, and the tool says so instead of offering an
+        empty list. #}
     {%- if views.imageTool.places.length > 0 %}
     <template data-image-tool-places>
       <select class="field__input">
         <option value="">Välj plats …</option>
         {%- for place in views.imageTool.places %}
-        <option value="{{ place.id }}">{{ place.name }}</option>
+        <option value="{{ place.id }}" data-photos="{{ 'true' if place.hasPhotos else 'false' }}"
+          {%- if place.lat != null and place.lon != null %} data-lat="{{ place.lat }}" data-lon="{{ place.lon }}"{% endif %}>{{ place.name }}</option>
         {%- endfor %}
       </select>
     </template>
@@ -86,6 +89,7 @@ description: >-
     <li>Öppna <a href="{{ site.repo }}/upload/main">repot i uppladdningsläge</a>.</li>
     <li>Dra mappen <code>source</code> till rutan. GitHub behåller mapparna, så bilderna och bildposterna hamnar rätt.</li>
     <li>Välj <strong>Create a new branch for this commit</strong> och sedan <strong>Propose changes</strong> följt av <strong>Create pull request</strong>.</li>
+    <li>Har du valt en plats för en bild: öppna platsens fil med länken vid bilden, byt till samma gren som bilderna, tryck på pennan och lägg till raderna verktyget visar.</li>
   </ol>
 
   <h3>På telefonen: en bild i taget</h3>
@@ -99,8 +103,16 @@ description: >-
     <li>Ladda ner bildens <code>.webp</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/images"><code>source/images/</code></a>.</li>
     <li>Ladda ner bildens <code>.yaml</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/data/images"><code>source/data/images/</code></a>.</li>
     <li>Är bilden en ledtråd: ladda ner ledtrådens <code>.yaml</code> och lägg den i <a href="{{ site.repo }}/upload/main/source/data/clues"><code>source/data/clues/</code></a>.</li>
+    <li>Har du valt en plats för bilden: öppna platsens fil med länken vid bilden, byt till samma gren, tryck på pennan och lägg till raderna verktyget visar.</li>
     <li>Välj samma gren varje gång, så hamnar filerna i samma pull request.</li>
   </ol>
+
+  <p class="note">
+    Platsens fil ändras på <strong>samma gren</strong> som bilderna. Ändras den i en egen
+    pull request som hinner före bilderna, stoppar kontrollen den: filen pekar då på en bild
+    som inte finns än. Verktyget ändrar aldrig filen åt dig — den kan ha ändrats sedan sidan
+    byggdes, och då skulle det nya skrivas över.
+  </p>
 
   <p class="note">
     Bildposten och ledtråden heter <strong>samma sak</strong> — bildens id — eftersom det är
@@ -114,9 +126,9 @@ description: >-
   <ul>
     <li>Bildens namn räknas ut ur bilden själv. Samma foto får alltid samma namn, så du väljer inget och kan ladda upp samma bild två gånger utan att det blir en kopia.</li>
     <li>Alt-texten beskriver vad som är viktigt i bilden, för den som inte kan se den. Fotografen är den som tagit bilden. Båda måste fyllas i.</li>
-    <li>Platsuppgiften i mobilfotot följer aldrig med. Verktyget ritar om bilden, och då finns det ingen sådan uppgift kvar att ta med.</li>
+    <li>Bär fotot en position från kameran följer den med i bildposten, så länge den ligger på gården. Den står som två rader du kan se, aldrig gömd i bildfilen. Saknas den blir det ingen, och du behöver inte göra något — många telefoner tar bort positionen när bilden väljs.</li>
     <li>Publicera aldrig en bild på en identifierbar person utan samtycke.</li>
-    <li>När bilden ligger i repot refererar du den från djuret eller platsen. Bidragsguiden visar hur.</li>
+    <li>Välj platsen bilden hör till, så visar verktyget raden som ska in i platsens fil. Har fotot en position väljs den närmaste platsen i förväg. För ett djur refererar du bilden från djurets fil; bidragsguiden visar hur.</li>
     <li>Kryssa i <strong>Det här är en ledtråd till Spana!</strong> när bilden är en närbild på något besökaren ska leta upp — en gunga, en grind, en käpphäst. Välj platsen där detaljen sitter; den är svaret spelaren får när hen tryckt Hittat!. Ledtrådens fil får samma namn som bilden, så de två hör ihop av sig själva.</li>
     <li>Låt bli att skriva var detaljen finns i alt-texten. Den läses upp för den som inte ser bilden, och skulle då avslöja svaret innan spelaren letat.</li>
   </ul>

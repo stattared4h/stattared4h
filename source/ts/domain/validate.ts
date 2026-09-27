@@ -21,6 +21,7 @@ import {
   isImageId,
 } from "./image-id.ts";
 import { MAX_IMAGE_BYTES, MAX_IMAGE_EDGE } from "./image-limits.ts";
+import { MAX_FARM_DISTANCE_METRES, onTheFarm, type PlacePoint } from "./photo-position.ts";
 import { HTML_PATTERN } from "./plain-text.ts";
 import type { RawDataset, RawRecord } from "./load.ts";
 import { sortAnimals, sortLocations } from "./sort.ts";
@@ -30,6 +31,7 @@ import type {
   Clue,
   LabelPlacement,
   Dataset,
+  GeoPoint,
   Image,
   Issue,
   Location,
@@ -76,7 +78,7 @@ const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** 04-§10.9: anything that looks like the start of an HTML tag, comment or doctype. */
 /** A Markdown image, `![](img-a3f2c1d8b901)`. The address is checked with `isImageId`. */
 const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*\]\(([^)\s]*)\)/g;
-const IMAGE_FIELDS = new Set(["alt", "credit"]);
+const IMAGE_FIELDS = new Set(["alt", "credit", "lat", "lon"]);
 
 const SEXES: readonly Sex[] = ["female", "male", "unknown"];
 const STATUSES: readonly Status[] = ["here", "gone"];
@@ -386,13 +388,58 @@ function validateImagePosts(records: readonly RawRecord[], issues: Issues, allow
     fields.noHtml(record.data, null);
     const alt = fields.requiredString(record.data, "alt");
     const credit = fields.requiredString(record.data, "credit");
+    const position = imagePosition(record, fields, issues);
     if (alt === null || credit === null) continue;
     if (!allowAiCredit && credit.startsWith("AI-genererad")) {
       issues.error(record.file, "credit", "AI-genererade bilder får bara finnas i QA-datasetet.");
     }
-    images.set(record.id, { id: record.id, alt, credit });
+    images.set(record.id, { id: record.id, alt, credit, position });
   }
   return images;
+}
+
+/**
+ * The photo's optional position (04-§9.13): both halves or neither, on the globe. Whether
+ * it is on the farm needs the places, so that is checked once they are read
+ * (`validateImagePositions`).
+ */
+function imagePosition(record: RawRecord, fields: Fields, issues: Issues): GeoPoint | null {
+  const data = record.data as Obj;
+  const lat = fields.optionalNumber(data, "lat");
+  const lon = fields.optionalNumber(data, "lon");
+  if ((lat === null) !== (lon === null)) {
+    issues.error(record.file, lat === null ? "lat" : "lon", "saknas. lat och lon anges tillsammans, eller inte alls.");
+    return null;
+  }
+  if (lat === null || lon === null) return null;
+  if (lat < -90 || lat > 90) {
+    issues.error(record.file, "lat", `${lat} ligger utanför -90 till 90. Skriv WGS84 i decimalgrader.`);
+    return null;
+  }
+  if (lon < -180 || lon > 180) {
+    issues.error(record.file, "lon", `${lon} ligger utanför -180 till 180. Skriv WGS84 i decimalgrader.`);
+    return null;
+  }
+  return { lat, lon };
+}
+
+/**
+ * 04-§10.18: a photo's position is on the farm, measured against the places the same
+ * way the image tool measures it (`onTheFarm`). A position further away is somebody's
+ * home or somewhere else entirely, and the repository is public.
+ */
+function validateImagePositions(images: Map<string, Image>, locations: readonly Location[], issues: Issues): void {
+  const places: PlacePoint[] = locations.flatMap((location) =>
+    location.lat === null || location.lon === null ? [] : [{ id: location.id, lat: location.lat, lon: location.lon }],
+  );
+  for (const image of images.values()) {
+    if (image.position === null || onTheFarm(image.position, places)) continue;
+    issues.error(
+      imagePostFile(image.id),
+      "lat",
+      `positionen ligger mer än ${MAX_FARM_DISTANCE_METRES} m från varje plats på gården. Ta bort lat och lon.`,
+    );
+  }
 }
 
 // --- Clues ---------------------------------------------------------------------
@@ -1070,6 +1117,7 @@ export async function validateDataset(raw: RawDataset, options: ValidateOptions 
     if (location !== null) locations.push(location);
   }
 
+  validateImagePositions(images, locations, issues);
   const clues = validateClues(raw.clues, images, new Set(locations.map((location) => location.id)), issues);
 
   const inMarkdown = collectMarkdownImages(

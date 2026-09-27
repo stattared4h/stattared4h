@@ -138,6 +138,11 @@ export interface SpanaView {
 export interface ToolPlaceView {
   id: string;
   name: string;
+  /** Where the place is, for guessing the place a photo belongs to (02-§11.36). */
+  lat: number | null;
+  lon: number | null;
+  /** Whether the place's file already has a `photos` list (02-§11.37). */
+  hasPhotos: boolean;
 }
 
 /**
@@ -411,16 +416,24 @@ export function bingoView(dataset: Dataset): BingoView {
 }
 
 /**
- * The places the image tool can hand a clue (02-§11.26). Active places only, by name: a
- * clue that answers with a paddock nobody keeps would send the player nowhere, and the
- * validator warns about exactly that (04-§10.10). The sort is the site's own, so the
+ * The places the image tool can hand a clue or a picture (02-§11.26, 02-§11.35), with
+ * what the tool needs to guess the place and to say which lines to add to its file
+ * (02-§11.36, 02-§11.37). Active places only, by name: a clue that answers with a
+ * paddock nobody keeps would send the player nowhere, and the validator warns about
+ * exactly that (04-§10.10). The sort is the site's own, so the
  * picker reads like the list under the map.
  */
 export function imageToolView(dataset: Dataset): ImageToolView {
   return {
     places: sortLocations(dataset.locations)
       .filter((location) => location.active)
-      .map((location) => ({ id: location.id, name: location.name })),
+      .map((location) => ({
+        id: location.id,
+        name: location.name,
+        lat: location.lat,
+        lon: location.lon,
+        hasPhotos: location.photos.length > 0,
+      })),
   };
 }
 

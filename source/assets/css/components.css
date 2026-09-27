@@ -868,6 +868,23 @@
   margin: var(--space-md) 0;
 }
 
+/* Kopieringsknappen och länken till platsens fil på en rad, mittlinjerade. */
+.image-tool__copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-sm);
+}
+
+/* Raderna som ska in i platsens fil: exakt text att kopiera, så indraget måste synas. */
+.image-tool__lines {
+  margin: 0 0 var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  background: var(--color-page);
+}
+
 /* ── Djurbingo (02-§12, 05-§6.47) ──────────────────────────────────────── */
 
 /* The board is a square, as wide as the column allows but never taller than what is
